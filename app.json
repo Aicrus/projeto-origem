@@ -1,26 +1,51 @@
 {
   "expo": {
-    "name": "projeto-base",
+    "name": "Projeto Base",
     "slug": "projeto-base",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "projeto-base",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.seudominio.projetobase"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.seudominio.projetobase"
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "name": "Projeto Base - Aplicativo Multiplataforma",
+      "description": "Projeto base para desenvolvimento de aplicativos React Native/Expo multiplataforma para iOS, Android e Web.",
+      "lang": "pt-BR",
+      "themeColor": "#2563eb",
+      "backgroundColor": "#ffffff",
+      "templatePath": "./web/index.html",
+      "build": {
+        "minify": true,
+        "babel": {
+          "useTransformRuntime": true
+        }
+      },
+      "performance": true,
+      "splashScreenOptions": {
+        "backgroundColor": "#f9fafb",
+        "darkMode": {
+          "backgroundColor": "#111827"
+        }
+      },
+      "optimization": {
+        "treeshaking": true,
+        "splitChunks": true
+      }
     },
     "plugins": [
       "expo-router",
@@ -35,7 +60,16 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "seu-projeto-id"
+      }
     }
   }
 }

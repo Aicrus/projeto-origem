@@ -1,37 +1,23 @@
 import React, { useEffect } from 'react';
-import { View } from 'react-native';
-import { useRouter, useRootNavigation } from 'expo-router';
-import { useAuth } from '@/contexts/auth';
-import { COLORS } from '@/constants/DesignSystem';
+import { useRouter } from 'expo-router';
+import { useAuth } from '../contexts/auth';
 
-type ProtectedRouteProps = {
+interface ProtectedRouteProps {
   children: React.ReactNode;
-};
+}
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { session, isInitialized } = useAuth();
+  const { session } = useAuth();
   const router = useRouter();
-  const rootNav = useRootNavigation();
 
   useEffect(() => {
-    if (!isInitialized || !rootNav?.isReady()) return;
-
     if (!session) {
-      setTimeout(() => {
-        router.replace('/(auth)/login');
-      }, 100);
+      router.replace('/login');
     }
-  }, [session, isInitialized, rootNav?.isReady()]);
+  }, [session, router]);
 
-  if (!isInitialized || !session) {
-    return (
-      <View 
-        style={{ 
-          flex: 1, 
-          backgroundColor: COLORS.light.background // Usando light por padrão para o splash
-        }} 
-      />
-    );
+  if (!session) {
+    return null;
   }
 
   return <>{children}</>;

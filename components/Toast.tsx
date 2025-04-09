@@ -1,20 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Animated, Dimensions, Platform, Pressable, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { FeedbackMessage } from './FeedbackMessage';
-import { SPACING, BORDER_RADIUS } from '@/constants/DesignSystem';
-import { useBreakpoints } from '@/hooks/useBreakpoints';
+import React, { useEffect } from 'react';
+import { Animated, Text, View } from 'react-native';
+import { useTheme } from '../hooks/ThemeContext';
 
-export type ToastPosition = 'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-export type ToastType = 'success' | 'warning' | 'error' | 'info';
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
+export type ToastPosition = 'top' | 'bottom';
 
 interface ToastProps {
   visible: boolean;
   message: string;
   description?: string;
   type: ToastType;
-  position?: ToastPosition;
-  duration?: number;
+  position: ToastPosition;
+  duration: number;
   onHide: () => void;
 }
 
@@ -23,272 +20,70 @@ export function Toast({
   message,
   description,
   type,
-  position = 'top',
-  duration = 5000,
+  position,
+  duration,
   onHide,
 }: ToastProps) {
-  const [isPaused, setIsPaused] = useState(false);
-  const translateY = useRef(new Animated.Value(visible ? 0 : -100)).current;
-  const translateX = useRef(new Animated.Value(0)).current;
-  const scale = useRef(new Animated.Value(0.8)).current;
-  const opacity = useRef(new Animated.Value(0)).current;
-  const { width: screenWidth } = useWindowDimensions();
-  const { isMobile, isTablet } = useBreakpoints();
-  const hideTimeoutRef = useRef<NodeJS.Timeout>();
-  const insets = useSafeAreaInsets();
-
-  const nativePadding = Platform.select({
-    ios: 35,
-    android: 35,
-    default: 0
-  });
-
-  const startHideTimer = () => {
-    if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-    }
+  const { currentTheme } = useTheme();
+  const opacity = React.useRef(new Animated.Value(0)).current;
+  
+  const getBackgroundColor = () => {
+    const isDark = currentTheme === 'dark';
     
-    hideTimeoutRef.current = setTimeout(() => {
-      if (!isPaused) {
-        hideToast();
-      }
-    }, duration);
+    switch (type) {
+      case 'success':
+        return isDark ? 'bg-green-700' : 'bg-green-500';
+      case 'error':
+        return isDark ? 'bg-red-700' : 'bg-red-500';
+      case 'warning':
+        return isDark ? 'bg-yellow-700' : 'bg-yellow-500';
+      case 'info':
+      default:
+        return isDark ? 'bg-blue-700' : 'bg-blue-500';
+    }
   };
 
   useEffect(() => {
     if (visible) {
-      // Animação de entrada
-      Animated.parallel([
-        Animated.spring(scale, {
-          toValue: 1,
-          useNativeDriver: true,
-          tension: 50,
-          friction: 8,
-        }),
-        Animated.spring(translateY, {
-          toValue: 0,
-          useNativeDriver: true,
-          tension: 50,
-          friction: 8,
-        }),
-        Animated.spring(translateX, {
-          toValue: 0,
-          useNativeDriver: true,
-          tension: 50,
-          friction: 8,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
-
-      startHideTimer();
-    }
-
-    return () => {
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-      }
-    };
-  }, [visible]);
-
-  useEffect(() => {
-    if (!isPaused && visible) {
-      startHideTimer();
-    } else if (hideTimeoutRef.current) {
-      clearTimeout(hideTimeoutRef.current);
-    }
-  }, [isPaused]);
-
-  const hideToast = () => {
-    Animated.parallel([
-      Animated.spring(scale, {
-        toValue: 0.8,
-        useNativeDriver: true,
-      }),
-      Animated.spring(translateY, {
-        toValue: -100,
-        useNativeDriver: true,
-      }),
       Animated.timing(opacity, {
-        toValue: 0,
-        duration: 150,
+        toValue: 1,
+        duration: 300,
         useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onHide();
-    });
-  };
+      }).start();
 
-  const getPositionStyle = () => {
-    const getMaxWidth = () => {
-      if (isMobile) return screenWidth - (SPACING.lg * 2);
-      if (isTablet) return 400;
-      return 480;
-    };
+      const timer = setTimeout(() => {
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start(() => {
+          onHide();
+        });
+      }, duration);
 
-    const maxWidth = getMaxWidth();
-    const horizontalPadding = isMobile ? SPACING.md : SPACING.lg;
-    
-    const baseStyle = {
-      position: 'absolute' as const,
-      maxWidth: Math.min(maxWidth, screenWidth - (horizontalPadding * 2)),
-      minWidth: isMobile ? screenWidth - (horizontalPadding * 2) : Math.min(320, screenWidth - (horizontalPadding * 2)),
-      width: isMobile ? '100%' : 'auto',
-    };
-
-    const getHorizontalPosition = (align: 'left' | 'right' | 'center') => {
-      if (isMobile) {
-        return {
-          left: horizontalPadding,
-          right: horizontalPadding,
-        };
-      }
-
-      switch (align) {
-        case 'left':
-          return { left: horizontalPadding };
-        case 'right':
-          return { right: horizontalPadding };
-        case 'center':
-          return {
-            left: '50%',
-            transform: [
-              { translateX: -(maxWidth / 2) }
-            ]
-          };
-      }
-    };
-
-    // Calcula o padding considerando a safe area
-    const getSafeAreaPadding = (isTop: boolean) => {
-      if (Platform.OS === 'web') {
-        return isMobile ? SPACING.md : SPACING.lg;
-      }
-      
-      // Para dispositivos nativos
-      if (isTop) {
-        return Math.max(insets.top + SPACING.md, SPACING.xl);
-      }
-      return Math.max(insets.bottom + SPACING.md, SPACING.xl);
-    };
-
-    // No mobile, sempre usa posição top ou bottom centralizado
-    if (isMobile) {
-      if (position.includes('bottom')) {
-        return {
-          ...baseStyle,
-          bottom: getSafeAreaPadding(false),
-          ...getHorizontalPosition('center'),
-        };
-      }
-      return {
-        ...baseStyle,
-        top: getSafeAreaPadding(true),
-        ...getHorizontalPosition('center'),
-      };
+      return () => clearTimeout(timer);
     }
-
-    // Para tablet e desktop, mantém o comportamento original
-    switch (position) {
-      case 'top':
-        return {
-          ...baseStyle,
-          top: getSafeAreaPadding(true),
-          ...getHorizontalPosition('center'),
-        };
-      case 'bottom':
-        return {
-          ...baseStyle,
-          bottom: getSafeAreaPadding(false),
-          ...getHorizontalPosition('center'),
-        };
-      case 'top-left':
-        return {
-          ...baseStyle,
-          top: getSafeAreaPadding(true),
-          ...getHorizontalPosition('left'),
-        };
-      case 'top-right':
-        return {
-          ...baseStyle,
-          top: getSafeAreaPadding(true),
-          ...getHorizontalPosition('right'),
-        };
-      case 'bottom-left':
-        return {
-          ...baseStyle,
-          bottom: getSafeAreaPadding(false),
-          ...getHorizontalPosition('left'),
-        };
-      case 'bottom-right':
-        return {
-          ...baseStyle,
-          bottom: getSafeAreaPadding(false),
-          ...getHorizontalPosition('right'),
-        };
-      default:
-        return baseStyle;
-    }
-  };
+  }, [visible, duration, opacity, onHide]);
 
   if (!visible) return null;
 
   return (
     <Animated.View
-      style={[
-        styles.container,
-        getPositionStyle() as any,
-        {
-          opacity,
-          transform: [
-            { translateY },
-            { scale },
-          ],
-        },
-      ]}>
-      <Pressable
-        onHoverIn={() => Platform.OS === 'web' && setIsPaused(true)}
-        onHoverOut={() => Platform.OS === 'web' && setIsPaused(false)}
-        onPressIn={() => Platform.OS !== 'web' && setIsPaused(true)}
-        onPressOut={() => Platform.OS !== 'web' && setIsPaused(false)}
-        style={[
-          styles.pressable,
-          isMobile && styles.pressableMobile
-        ]}>
-        <FeedbackMessage
-          type={type}
-          message={message}
-          description={description}
-        />
-      </Pressable>
+      style={{
+        opacity,
+        position: 'absolute',
+        left: 16,
+        right: 16,
+        [position]: 50,
+        zIndex: 9999,
+      }}
+    >
+      <View className={`p-4 rounded-lg shadow-lg ${getBackgroundColor()}`}>
+        <Text className="text-white font-bold">{message}</Text>
+        {description ? (
+          <Text className="text-white mt-1">{description}</Text>
+        ) : null}
+      </View>
     </Animated.View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    zIndex: 9999,
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    borderRadius: BORDER_RADIUS.lg,
-  },
-  pressable: {
-    borderRadius: BORDER_RADIUS.lg,
-    overflow: 'hidden',
-    ...Platform.select({
-      web: {
-        cursor: 'pointer' as const,
-      },
-    }),
-  },
-  pressableMobile: {
-    width: '100%',
-  },
-}); 
+} 

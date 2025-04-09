@@ -1,140 +1,130 @@
-import React, { useCallback, useEffect } from 'react';
-import { StyleSheet, Pressable, View, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-  useAnimatedStyle,
-  withSpring,
-  useSharedValue,
-  runOnJS,
-} from 'react-native-reanimated';
+import React from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useTheme } from '../hooks/ThemeContext';
 
-import { ThemedView } from './ThemedView';
-import { useTheme } from '@/hooks/ThemeContext';
+type ThemeMode = 'light' | 'dark' | 'system';
 
-const THEME_ICONS = {
-  system: 'desktop-outline',
-  light: 'sunny-outline',
-  dark: 'moon-outline',
-} as const;
-
-const BUTTON_WIDTH = 32;
-const PADDING = 2;
-
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-const getInitialPosition = (mode: 'system' | 'light' | 'dark') => {
-  return mode === 'light' ? 0 : mode === 'dark' ? 1 : 2;
+const ThemeOption = ({ 
+  title, 
+  isActive, 
+  onPress, 
+  isDark 
+}: { 
+  title: string; 
+  isActive: boolean; 
+  onPress: () => void; 
+  isDark: boolean;
+}) => {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.optionButton,
+        {
+          backgroundColor: isActive 
+            ? (isDark ? '#4A6FA5' : '#4A6FA5') 
+            : (isDark ? '#14181B' : '#FFFFFF')
+        }
+      ]}
+    >
+      <Text
+        style={[
+          styles.optionText,
+          {
+            color: isActive 
+              ? '#FFFFFF' 
+              : (isDark ? '#95A1AC' : '#57636C'),
+            fontWeight: isActive ? '600' : '400'
+          }
+        ]}
+      >
+        {title}
+      </Text>
+    </Pressable>
+  );
 };
 
-// Configurações específicas para cada plataforma
-const SPRING_CONFIG = Platform.select({
-  web: {
-    damping: 15,
-    stiffness: 150,
-  },
-  default: {
-    damping: 20,
-    stiffness: 200,
-    mass: 0.5,
-  },
-});
-
-export function ThemeSelector() {
-  const { themeMode, setThemeMode, currentTheme } = useTheme();
-  const translateX = useSharedValue(getInitialPosition(themeMode));
-
-  // Atualiza a posição do slider quando o themeMode muda
-  useEffect(() => {
-    translateX.value = withSpring(
-      getInitialPosition(themeMode) * BUTTON_WIDTH,
-      SPRING_CONFIG
-    );
-  }, [themeMode]);
-
-  const handlePress = useCallback((mode: 'system' | 'light' | 'dark') => {
-    if (mode === themeMode) return; // Evita animações desnecessárias
-    setThemeMode(mode);
-  }, [setThemeMode, themeMode]);
-
-  const animatedSliderStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: translateX.value }],
-    };
-  });
-
+export const ThemeSelector = () => {
+  const { currentTheme, themeMode, setThemeMode } = useTheme();
   const isDark = currentTheme === 'dark';
 
+  const changeTheme = (newTheme: ThemeMode) => {
+    setThemeMode(newTheme);
+  };
+
   return (
-    <ThemedView style={styles.container}>
-      <View 
+    <View style={styles.container}>
+      <Text
         style={[
-          styles.switchContainer, 
-          { backgroundColor: isDark ? '#2C2C2C' : '#F1F1F1' }
-        ]}>
-        <Animated.View 
-          style={[
-            styles.slider, 
-            animatedSliderStyle,
-            { backgroundColor: '#0a7ea4' }
-          ]} 
+          styles.label,
+          { color: isDark ? '#E0E3E7' : '#57636C' }
+        ]}
+      >
+        Tema:
+      </Text>
+      <View style={styles.optionsContainer}>
+        <ThemeOption
+          title="Claro"
+          isActive={themeMode === 'light'}
+          onPress={() => changeTheme('light')}
+          isDark={isDark}
         />
-        {(['light', 'dark', 'system'] as const).map((mode, index) => (
-          <Pressable
-            key={mode}
-            style={[
-              styles.option,
-              index === 0 && styles.leftOption,
-              index === 2 && styles.rightOption,
-            ]}
-            onPress={() => handlePress(mode)}>
-            <Ionicons
-              name={THEME_ICONS[mode]}
-              size={16}
-              color={themeMode === mode ? '#FFFFFF' : '#666666'}
-            />
-          </Pressable>
-        ))}
+        <ThemeOption
+          title="Escuro"
+          isActive={themeMode === 'dark'}
+          onPress={() => changeTheme('dark')}
+          isDark={isDark}
+        />
+        <ThemeOption
+          title="Sistema"
+          isActive={themeMode === 'system'}
+          onPress={() => changeTheme('system')}
+          isDark={isDark}
+        />
       </View>
-    </ThemedView>
+      <Text
+        style={[
+          styles.status,
+          { color: isDark ? '#95A1AC' : '#57636C' }
+        ]}
+      >
+        {themeMode === 'system' 
+          ? `Sistema (${currentTheme === 'dark' ? 'escuro' : 'claro'})` 
+          : themeMode === 'dark' 
+            ? 'Escuro' 
+            : 'Claro'}
+      </Text>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
+    marginVertical: 24,
     alignItems: 'center',
-    padding: 4,
+    width: '100%',
   },
-  switchContainer: {
+  label: {
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  optionsContainer: {
     flexDirection: 'row',
-    borderRadius: 6,
-    padding: PADDING,
-    position: 'relative',
-    width: BUTTON_WIDTH * 3 + PADDING * 2,
-    height: 32,
-  },
-  option: {
-    width: BUTTON_WIDTH,
-    height: 32,
-    alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: PADDING,
-    zIndex: 1,
+    marginBottom: 8,
   },
-  slider: {
-    position: 'absolute',
-    width: BUTTON_WIDTH,
-    height: 28,
-    borderRadius: 4,
-    zIndex: 0,
-    left: PADDING,
-    top: 2,
+  optionButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginHorizontal: 4,
+    borderRadius: 8,
   },
-  leftOption: {
-    borderTopLeftRadius: 6,
-    borderBottomLeftRadius: 6,
+  optionText: {
+    fontSize: 14,
+    textAlign: 'center',
   },
-  rightOption: {
-    borderTopRightRadius: 6,
-    borderBottomRightRadius: 6,
-  },
+  status: {
+    fontSize: 12,
+    marginTop: 8,
+  }
 }); 

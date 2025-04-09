@@ -1,50 +1,61 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform, StyleSheet } from 'react-native';
-import { LayoutDashboard, Settings } from 'lucide-react-native';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-
-import { HapticTab } from '@/components/HapticTab';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { useTheme } from '@/hooks/ThemeContext';
-import { useBreakpoints } from '@/hooks/useBreakpoints';
-import { COLORS, ICONS } from '@/constants/DesignSystem';
+import React, { useEffect } from 'react';
+import { Platform, StyleSheet, View, Text } from 'react-native';
+import { Home as HomeIcon } from 'lucide-react-native';
+import { useTheme } from '../../hooks/ThemeContext';
+import { ProtectedRoute } from '../../components/ProtectedRoute';
+import { useResponsive } from '../../hooks/useResponsive';
 
 /**
- * Guia de Personalização da Tab Bar:
- * 
- * 1. Cores:
- *    - Para mudar as cores dos ícones e textos, edite em constants/DesignSystem.ts:
- *      - COLORS.light.primary (cor do item selecionado)
- *      - COLORS.light.tabIconDefault (cor dos ícones não selecionados)
- * 
- * 2. Background:
- *    - Web: Ajuste os valores de opacity aqui mesmo no backgroundColor
- *    - iOS: Edite a intensidade do blur em components/ui/TabBarBackground.ios.tsx
- *    - Android: Ajuste a opacity em components/ui/TabBarBackground.tsx
- * 
- * 3. Ícones:
- *    - Para trocar os ícones, altere o name="house.fill" nas opções de cada Tab.Screen
- *    - Lista completa de ícones: https://icons.expo.fyi/Index
- * 
- * 4. Espaçamentos:
- *    - Ajuste os valores no StyleSheet abaixo:
- *      - tabBar: altura geral e padding
- *      - webTabBar: altura específica para web
- *      - tabItem: espaçamentos dos itens
+ * Mostra um indicador de depuração do breakpoint atual quando em desenvolvimento
+ * Útil para testar e verificar os breakpoints
+ */
+const BreakpointDebugger = ({ currentBreakpoint, width }: { currentBreakpoint: string, width: number }) => {
+  if (process.env.NODE_ENV !== 'development') return null;
+  
+  return (
+    <View style={{
+      position: 'absolute',
+      top: 4,
+      right: 4,
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      padding: 4,
+      borderRadius: 4,
+      zIndex: 9999,
+    }}>
+      <Text style={{ color: 'white', fontSize: 10 }}>
+        {currentBreakpoint} ({width}px)
+      </Text>
+    </View>
+  );
+};
+
+/**
+ * Estrutura base simplificada para o TabsLayout
  */
 export default function TabsLayout() {
   const { currentTheme } = useTheme();
-  const { isMobile } = useBreakpoints();
+  const { 
+    isMobile, 
+    width, 
+    currentBreakpoint 
+  } = useResponsive();
+  
+  const isDark = currentTheme === 'dark';
+
+  // Log para debug apenas uma vez quando o componente é montado
+  useEffect(() => {
+    console.log(`[Tabs] Status inicial: ${isMobile ? 'Visível' : 'Oculto'} (${width}px / ${currentBreakpoint})`);
+  }, []);
 
   return (
     <ProtectedRoute>
+      <BreakpointDebugger currentBreakpoint={currentBreakpoint} width={width} />
+      
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: COLORS[currentTheme].primary,
+          tabBarActiveTintColor: isDark ? '#60a5fa' : '#2563eb',
           headerShown: false,
-          tabBarButton: HapticTab,
-          ...(Platform.OS !== 'web' && { tabBarBackground: TabBarBackground }),
           tabBarLabelPosition: 'below-icon',
           tabBarStyle: [
             styles.tabBar,
@@ -53,15 +64,16 @@ export default function TabsLayout() {
               android: styles.androidTabBar,
               web: {
                 ...styles.webTabBar,
-                backgroundColor: currentTheme === 'dark' 
+                backgroundColor: isDark 
                   ? 'rgba(0, 0, 0, 0.75)' 
                   : 'rgba(255, 255, 255, 0.75)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
+                // Esconde a tab bar em tablets e telas grandes
+                display: isMobile ? 'flex' : 'none',
               },
               default: {},
             }),
-            !isMobile && styles.hideTabBar,
           ],
           tabBarItemStyle: Platform.select({
             web: {
@@ -87,17 +99,10 @@ export default function TabsLayout() {
         }}
       >
         <Tabs.Screen
-          name="dash"
+          name="home"
           options={{
-            title: 'Dashboard',
-            tabBarIcon: ({ color }) => <LayoutDashboard size={ICONS.sizes.md} color={color} strokeWidth={1.5} />,
-          }}
-        />
-        <Tabs.Screen
-          name="config"
-          options={{
-            title: 'Config',
-            tabBarIcon: ({ color }) => <Settings size={ICONS.sizes.md} color={color} strokeWidth={1.5} />,
+            title: 'Home',
+            tabBarIcon: ({ color }: { color: string }) => <HomeIcon size={24} color={color} strokeWidth={1.5} />,
           }}
         />
       </Tabs>
@@ -136,8 +141,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
     marginTop: -2,
-  },
-  hideTabBar: {
-    display: 'none',
   },
 });

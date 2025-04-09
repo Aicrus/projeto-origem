@@ -5,7 +5,6 @@ import { supabase } from '@/lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/useToast';
 import { View, ActivityIndicator } from 'react-native';
-import { COLORS } from '@/constants/DesignSystem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Tipos
@@ -114,7 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (shouldBeInAuth && !inAuthGroup) {
       router.replace('/(auth)/login');
     } else if (!shouldBeInAuth && inAuthGroup) {
-      router.replace('/(tabs)/dash');
+      router.replace('/(tabs)/home');
     }
   }, [isInitialized, isLoading, session, segments]);
 
@@ -216,7 +215,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             name,
             display_name: name,
           },
-          emailRedirectTo: window.location.origin
+          emailRedirectTo: Platform.OS === 'web' ? window.location.origin : undefined
         }
       });
 
@@ -249,29 +248,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (!data.user) {
+      // Verifica se o email precisa de confirmação
+      if (data?.user?.identities?.length === 0) {
         showToast({
-          type: 'error',
-          message: 'Erro no cadastro',
-          description: 'Não foi possível criar sua conta. Por favor, tente novamente.',
+          type: 'info',
+          message: 'Email já cadastrado',
+          description: 'Uma conta com este email já existe. Por favor, faça login.',
         });
+        
+        setTimeout(() => {
+          router.replace('/(auth)/login');
+        }, 1500);
         return;
       }
 
+      // Sucesso no cadastro
       showToast({
         type: 'success',
-        message: 'Conta criada com sucesso!',
-        description: 'Redirecionando para o login...',
+        message: 'Cadastro realizado!',
+        description: 'Use suas credenciais para fazer login.',
       });
 
       setTimeout(() => {
         router.replace('/(auth)/login');
       }, 1500);
-
     } catch (error) {
+      console.error('Erro no cadastro:', error);
       showToast({
         type: 'error',
-        message: 'Erro no sistema',
+        message: 'Erro no cadastro',
         description: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
       });
     } finally {
@@ -282,7 +287,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async ({ email, password }: { email: string; password: string }) => {
     try {
       setIsLoading(true);
-
+      
       // Validação dos campos
       if (!email || !password) {
         showToast({
@@ -295,17 +300,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       const emailLowerCase = email.toLowerCase().trim();
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // Tenta fazer login
+      const { error } = await supabase.auth.signInWithPassword({
         email: emailLowerCase,
         password,
       });
 
       if (error) {
-        if (error.message?.toLowerCase().includes('invalid login credentials')) {
+        console.error('Erro no login:', error);
+
+        if (error.message === 'Invalid login credentials') {
           showToast({
             type: 'error',
             message: 'Credenciais inválidas',
             description: 'Email ou senha incorretos.',
+          });
+          return;
+        }
+
+        if (error.message?.toLowerCase().includes('email')) {
+          showToast({
+            type: 'error',
+            message: 'Email inválido',
+            description: 'Por favor, insira um email válido.',
           });
           return;
         }
@@ -318,31 +335,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (!data?.session) {
-        showToast({
-          type: 'error',
-          message: 'Erro no login',
-          description: 'Não foi possível iniciar sua sessão. Por favor, tente novamente.',
-        });
-        return;
-      }
-
-      setSession(data.session);
-
+      // Sucesso no login
       showToast({
         type: 'success',
-        message: 'Login realizado com sucesso!',
+        message: 'Login realizado!',
         description: 'Bem-vindo de volta!',
       });
 
-      setTimeout(() => {
-        router.replace('/(tabs)/dash');
-      }, 100);
-
+      // A navegação acontece automaticamente no efeito de sessão
     } catch (error) {
+      console.error('Erro no login:', error);
       showToast({
         type: 'error',
-        message: 'Erro no sistema',
+        message: 'Erro no login',
         description: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
       });
     } finally {
@@ -353,9 +358,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setIsLoading(true);
-      console.log('🔑 Iniciando processo de logout...');
 
-      // Lista de todas as chaves que precisamos limpar
+      // Lista de chaves que podem conter tokens do Supabase
       const storageKeys = [
         'supabase.auth.token',
         'supabase.auth.refreshToken',
@@ -366,63 +370,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         'supabase.auth.provider_refresh_token'
       ];
 
-      // Limpa o storage primeiro
-      console.log('🔑 Iniciando limpeza do storage...');
+      // Limpa o storage primeiro (web e nativo)
       if (Platform.OS === 'web') {
+        // Para web, limpa localStorage
         Object.keys(localStorage).forEach(key => {
           if (key.startsWith('supabase.auth') || key.startsWith('sb-')) {
             try {
               localStorage.removeItem(key);
-              console.log(`✅ Storage web: ${key} removido`);
             } catch (e) {
-              console.log(`⚠️ Erro ao remover ${key}:`, e);
+              console.error(`Erro ao remover ${key}:`, e);
             }
           }
         });
       } else {
+        // Para nativo, limpa AsyncStorage
         await Promise.all(
           storageKeys.map(async (key) => {
             try {
               await AsyncStorage.removeItem(key);
-              console.log(`✅ Storage nativo: ${key} removido`);
             } catch (e) {
-              console.log(`⚠️ Erro ao remover ${key}:`, e);
+              console.error(`Erro ao remover ${key}:`, e);
             }
           })
         );
       }
 
-      try {
-        await supabase.auth.signOut();
-      } catch (error: any) {
-        console.log('⚠️ Erro no signOut do Supabase:', error);
+      // Remove outros dados persistentes
+      await AsyncStorage.removeItem('@user_data');
+      
+      // Chama o signOut do Supabase
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error('Erro ao sair:', error);
+        showToast({
+          type: 'error',
+          message: 'Erro ao sair',
+          description: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
+        });
+      } else {
+        // Limpa o estado explicitamente
+        setSession(null);
       }
 
-      // Limpa o estado local
-      setSession(null);
-
-      showToast({
-        type: 'success',
-        message: 'Logout realizado',
-        description: 'Você foi desconectado com sucesso.',
-      });
-
-      // Adiciona um pequeno delay antes de navegar
-      setTimeout(() => {
-        router.replace('/(auth)/login');
-      }, 100);
-
+      // A navegação acontece automaticamente no efeito de sessão
     } catch (error) {
+      console.error('Erro ao sair:', error);
       showToast({
         type: 'error',
-        message: 'Erro no sistema',
-        description: 'Ocorreu um erro inesperado, mas você foi desconectado.',
+        message: 'Erro ao sair',
+        description: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
       });
-      setSession(null);
       
-      setTimeout(() => {
-        router.replace('/(auth)/login');
-      }, 100);
+      // Garante que o estado seja limpo mesmo em caso de erro
+      setSession(null);
     } finally {
       setIsLoading(false);
     }
@@ -434,37 +435,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       <View 
         style={{ 
           flex: 1, 
-          backgroundColor: COLORS.light.primaryBackground,
+          backgroundColor: '#fff',
           justifyContent: 'center',
           alignItems: 'center'
         }} 
       >
-        <ActivityIndicator size="large" color={COLORS.light.primary} />
+        <ActivityIndicator size="large" color="#000" />
       </View>
     );
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        session,
-        isLoading,
-        isInitialized,
-        signUp,
-        signIn,
-        signOut,
-      }}
-    >
+    <AuthContext.Provider value={{
+      session,
+      isLoading,
+      isInitialized,
+      signUp,
+      signIn,
+      signOut,
+    }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 // Hook personalizado
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}; 
+} 

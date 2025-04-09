@@ -3,41 +3,43 @@ import { useFonts, Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from '@e
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { ScrollView, Platform, ActivityIndicator, View } from 'react-native';
+import { useEffect, useState, memo } from 'react';
+import { ActivityIndicator, Platform, View } from 'react-native';
 import 'react-native-reanimated';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
+import Head from './head';
+
+// Importação do arquivo global.css para NativeWind
+import '@/global.css';
 
 import { useTheme } from '@/hooks/ThemeContext';
 import { ThemeProvider } from '@/hooks/ThemeContext';
 import { ToastProvider } from '@/hooks/useToast';
-import { ThemedView } from '@/components/ThemedView';
 import { AuthProvider } from '@/contexts/auth';
 import { useAuth } from '@/contexts/auth';
-import { COLORS } from '@/constants/DesignSystem';
+import { supabase } from '@/lib/supabase';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-function LoadingScreen() {
+// Memoize o componente LoadingScreen para evitar renderizações desnecessárias
+const LoadingScreen = memo(function LoadingScreen() {
   const { currentTheme } = useTheme();
-  const themeColors = COLORS[currentTheme];
   
   return (
-    <View style={{ 
-      flex: 1, 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      backgroundColor: themeColors.primaryBackground 
-    }}>
+    <View className={`flex-1 justify-center items-center ${currentTheme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
       <StatusBar 
         style={currentTheme === 'dark' ? 'light' : 'dark'}
-        backgroundColor={themeColors.secondaryBackground}
+        backgroundColor={currentTheme === 'dark' ? '#111827' : '#f9fafb'}
       />
-      <ActivityIndicator size="large" color={themeColors.primary} />
+      <ActivityIndicator size="large" color={currentTheme === 'dark' ? '#60a5fa' : '#2563eb'} />
     </View>
   );
-}
+});
+
+// Cria um contexto para o Helmet
+const helmetContext = {};
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -45,64 +47,96 @@ export default function RootLayout() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
+
+  // Verificar e limpar tokens inválidos na inicialização
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error || !data.session) {
+          // Se houver erro ou não houver sessão, limpa qualquer token residual
+          await supabase.auth.signOut();
+        }
+      } catch (e) {
+        console.error('Erro ao verificar sessão inicial:', e);
+      } finally {
+        setInitialCheckDone(true);
+      }
+    };
+
+    checkSession();
+  }, []);
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
+    if (fontsLoaded && initialCheckDone) {
+      SplashScreen.hideAsync().catch(console.error);
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, initialCheckDone]);
+
+  if (!fontsLoaded || !initialCheckDone) {
+    return (
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <View className="flex-1 justify-center items-center bg-white dark:bg-gray-900">
+            <ActivityIndicator size="large" color="#2563eb" />
+          </View>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    );
+  }
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <ToastProvider>
-          {!fontsLoaded ? (
-            <LoadingScreen />
-          ) : (
+    <HelmetProvider context={helmetContext}>
+      {/* Adiciona metadados básicos inline */}
+      {Platform.OS === 'web' && (
+        <Helmet>
+          <title>Projeto Base - Aplicativo Multiplataforma</title>
+          <meta name="description" content="Projeto base para desenvolvimento de aplicativos React Native/Expo multiplataforma para iOS, Android e Web." />
+          <meta charSet="utf-8" />
+          <html lang="pt-BR" />
+          <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+          <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        </Helmet>
+      )}
+      <Head />
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <ToastProvider>
             <AuthProvider>
               <RootLayoutNav />
             </AuthProvider>
-          )}
-        </ToastProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+          </ToastProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </HelmetProvider>
   );
 }
 
-function RootLayoutNav() {
+// Memoize o componente principal 
+const RootLayoutNav = memo(function RootLayoutNav() {
   const { currentTheme } = useTheme();
   const { isLoading, isInitialized, session } = useAuth();
-  const themeColors = COLORS[currentTheme];
-
-  console.log('📱 RootLayoutNav - Estado:', {
-    isLoading,
-    isInitialized,
-    hasSession: !!session,
-    theme: currentTheme
-  });
+  const isDark = currentTheme === 'dark';
 
   if (isLoading || !isInitialized) {
-    console.log('⌛ Renderizando tela de carregamento...');
     return <LoadingScreen />;
   }
 
-  console.log('🎯 Renderizando conteúdo principal');
   const MainContent = (
     <NavigationThemeProvider value={currentTheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <ThemedView style={{ 
-        flex: 1, 
-        backgroundColor: themeColors.primaryBackground
-      }}>
+      <View className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
         <StatusBar 
           style={currentTheme === 'dark' ? 'light' : 'dark'}
-          backgroundColor={themeColors.secondaryBackground}
+          backgroundColor={currentTheme === 'dark' ? '#111827' : '#f9fafb'}
         />
         <Stack 
           screenOptions={{
             headerShown: false,
             contentStyle: { 
               flex: 1,
-              backgroundColor: themeColors.primaryBackground 
+              backgroundColor: currentTheme === 'dark' ? '#111827' : '#f9fafb' 
             },
             animation: 'fade'
           }}
@@ -122,25 +156,20 @@ function RootLayoutNav() {
           />
           <Stack.Screen name="+not-found" />
         </Stack>
-      </ThemedView>
+      </View>
     </NavigationThemeProvider>
   );
 
   if (Platform.OS === 'web') {
-    console.log('🌐 Renderizando para web');
     return MainContent;
   }
 
-  console.log('📱 Renderizando para dispositivo móvel');
   return (
     <SafeAreaView 
-      style={{ 
-        flex: 1,
-        backgroundColor: themeColors.secondaryBackground 
-      }} 
+      className={`flex-1 ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}
       edges={['top', 'right', 'left']}
     >
       {MainContent}
     </SafeAreaView>
   );
-}
+});
