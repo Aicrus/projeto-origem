@@ -38,9 +38,9 @@ Este documento é o guia mestre OBRIGATÓRIO que estabelece as regras invioláve
 
 ### ✅ Ações Obrigatórias
 1. SEMPRE:
-   - Siga o Design System
+   - Siga o Design System (tailwind.config.js)
    - Use as classes de tema do NativeWind/Tailwind
-   - Mantenha a responsividade
+   - Mantenha a responsividade (hooks/useResponsive)
    - Preserve a tipagem TypeScript
    - Respeite os breakpoints definidos
 
@@ -49,7 +49,7 @@ Este documento é o guia mestre OBRIGATÓRIO que estabelece as regras invioláve
    - Verifique impactos em outras partes
    - Valide a necessidade real da alteração
 
-## 🎨 Sistema de Design (NUNCA IGNORAR)
+## 🎨 Design System e Responsividade
 
 ### 📚 Consultando Configurações do Design System (OBRIGATÓRIO)
 ```typescript
@@ -77,7 +77,7 @@ const isDark = currentTheme === 'dark';
 </View>
 ```
 
-### 📱 Breakpoints (SEMPRE RESPEITAR)
+### 📱 Breakpoints e Responsividade
 ```typescript
 // SEMPRE consulte as definições oficiais de breakpoints:
 // 1. BREAKPOINTS - Veja os valores atualizados em hooks/useResponsive.ts ou constants/Breakpoints.ts
@@ -90,14 +90,13 @@ import { useResponsive } from '../hooks/useResponsive';
 const { responsive, isMobile, isTablet, isDesktop } = useResponsive();
 
 // Aplique estilos responsivos usando o helper responsive:
-// CONSULTE o código-fonte para ver os breakpoints atualizados
 const responsiveStyle = {
   // Use valores adaptados a cada breakpoint
   someProperty: responsive({
-    mobile: 'valorMobile',    // Consulte hooks/useResponsive.ts para faixas exatas
-    tablet: 'valorTablet',    // Não defina breakpoints manualmente
-    desktop: 'valorDesktop',  // Use sempre os helpers do projeto
-    default: 'valorPadrão'
+    mobile: 'valorMobile',    // Para dispositivos móveis
+    tablet: 'valorTablet',    // Para tablets
+    desktop: 'valorDesktop',  // Para desktops
+    default: 'valorPadrão'    // Valor padrão
   })
 }
 ```
@@ -108,33 +107,16 @@ const responsiveStyle = {
    - NUNCA altere o app.json sem autorização
    - MANTENHA as configurações de plugins inalteradas
    - RESPEITE as configurações específicas de plataforma
+
 ## 🔍 Checklist de Verificação (USAR EM TODA MODIFICAÇÃO)
 
 1. [ ] A modificação foi EXPLICITAMENTE solicitada?
 2. [ ] Está usando APENAS os imports corretos?
 3. [ ] Mantém suporte a tema claro/escuro?
 4. [ ] Respeita TODOS os breakpoints?
-5. [ ] Usa APENAS constantes do Design System?
-6. [ ] Preserva TODA a estrutura existente?
-7. [ ] Mantém TODA a tipagem TypeScript?
-8. [ ] Respeita a configuração da StatusBar para ambos os temas?
-
-## ⚠️ Processo de Modificação
-
-1. **ANTES de modificar:**
-   - Confirme o escopo EXATO
-   - Verifique dependências
-   - Identifique impactos
-
-2. **DURANTE a modificação:**
-   - Siga o checklist RIGOROSAMENTE
-   - Mantenha o escopo limitado
-   - Documente alterações
-
-3. **APÓS a modificação:**
-   - Verifique em todos os temas
-   - Teste em todos os breakpoints
-   - Confirme tipagem TypeScript
+5. [ ] Preserva TODA a estrutura existente?
+6. [ ] Mantém TODA a tipagem TypeScript?
+7. [ ] Respeita a configuração da StatusBar para ambos os temas?
 
 ## 📋 Exemplo Prático
 
@@ -167,6 +149,7 @@ style={{
   color: 'blue'               // ERRADO: cores genéricas
 }}
 ```
+
 ## 🎯 Conclusão
 
 Este documento é a BASE de todas as modificações. NUNCA ignore estas regras. Em caso de dúvida, SEMPRE pergunte antes de modificar.
