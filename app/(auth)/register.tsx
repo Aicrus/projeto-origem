@@ -97,7 +97,15 @@ export default function Register() {
         error: error
       });
 
-      if (error.message === 'EMAIL_ALREADY_EXISTS') {
+      // Detecta vários padrões possíveis de mensagens de erro relacionadas a email já existente
+      const emailAlreadyExists = 
+        error.message === 'EMAIL_ALREADY_EXISTS' || 
+        error.message?.includes('already registered') || 
+        error.message?.includes('email already exists') ||
+        error.message?.includes('email address is already registered') ||
+        error.code === '23505'; // Código comum de violação de unicidade no PostgreSQL
+
+      if (emailAlreadyExists) {
         showToast({
           type: 'info',
           message: 'Email já cadastrado',

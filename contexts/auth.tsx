@@ -15,6 +15,7 @@ type AuthContextData = {
   signUp: (data: { email: string; password: string; name: string }) => Promise<void>;
   signIn: (data: { email: string; password: string }) => Promise<void>;
   signOut: () => Promise<void>;
+  checkEmailExists: (email: string) => Promise<boolean>;
 };
 
 // Criação do contexto
@@ -208,13 +209,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       const emailLowerCase = email.toLowerCase().trim();
 
-      // Verifica se o usuário já existe
+      // Método 1: Verificação através da tentativa de login fictício
+      // (Mantido como fallback e para compatibilidade)
       const { error: checkError } = await supabase.auth.signInWithPassword({
         email: emailLowerCase,
         password: 'dummy-password-for-check',
       });
 
-      if (!checkError || !checkError.message.includes('Invalid login credentials')) {
+      // Método 2: Verificação direta com a API admin (mais confiável)
+      // Tenta criar um usuário com signUp mas sem auto-confirmar
+      const { data: checkData, error: signUpCheckError } = await supabase.auth.signUp({
+        email: emailLowerCase,
+        password: Math.random().toString(36).substring(2, 15), // Senha aleatória para o teste
+        options: {
+          emailRedirectTo: Platform.OS === 'web' ? window.location.origin : undefined
+        }
+      });
+
+      // Se o erro for null e identities estiver vazio OU o erro indicar que o email já existe
+      const emailExists = (
+        (!signUpCheckError && checkData?.user?.identities?.length === 0) || 
+        signUpCheckError?.message?.includes('email already exists') ||
+        signUpCheckError?.message?.includes('already registered') ||
+        (!checkError || !checkError.message.includes('Invalid login credentials'))
+      );
+
+      if (emailExists) {
         showToast({
           type: 'info',
           message: 'Email já cadastrado',
@@ -227,7 +247,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Tenta criar o usuário
+      // Cria o usuário (nova tentativa com os dados corretos)
       const { data, error } = await supabase.auth.signUp({
         email: emailLowerCase,
         password,
@@ -461,6 +481,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const checkEmailExists = async (email: string): Promise<boolean> => {
+    try {
+      // Método 1: Tentativa de login fictício
+      const { error: checkError } = await supabase.auth.signInWithPassword({
+        email: email.toLowerCase().trim(),
+        password: 'dummy-password-for-check',
+      });
+
+      // Método 2: Tentativa de criar usuário temporário
+      const { data, error: signUpCheckError } = await supabase.auth.signUp({
+        email: email.toLowerCase().trim(),
+        password: Math.random().toString(36).substring(2, 15), // Senha aleatória
+        options: {
+          emailRedirectTo: Platform.OS === 'web' ? window.location.origin : undefined
+        }
+      });
+
+      // 1. A tentativa de login não retornou erro específico de credenciais inválidas OU
+      // 2. O signup não deu erro mas identities está vazio OU
+      // 3. Mensagem de erro indica que email já existe
+      const userExists = (
+        (!checkError || !checkError.message?.includes('Invalid login credentials')) ||
+        (!signUpCheckError && data?.user?.identities?.length === 0) || 
+        !!signUpCheckError?.message?.includes('email already exists') ||
+        !!signUpCheckError?.message?.includes('already registered')
+      );
+
+      return Boolean(userExists);
+    } catch (error) {
+      console.error('Erro ao verificar existência do email:', error);
+      return false;
+    }
+  };
+
   // Loading screen
   if (!isInitialized || isLoading) {
     return (
@@ -485,6 +539,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp,
       signIn,
       signOut,
+      checkEmailExists,
     }}>
       {children}
     </AuthContext.Provider>
