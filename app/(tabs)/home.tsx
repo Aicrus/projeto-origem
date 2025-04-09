@@ -113,7 +113,7 @@ export default function Home() {
       </View>
       
       {/* Status do breakpoint atual */}
-      <View className="mt-xl py-xs px-md rounded-sm bg-opacity-5 bg-black dark:bg-white dark:bg-opacity-5">
+      <View className={`mt-xl py-xs px-md rounded-sm ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}>
         <Text className={`text-body-sm text-center ${textSecondary}`}>
           Breakpoint: {isMobile ? 'Mobile' : (isTablet ? 'Tablet' : 'Desktop')}
         </Text>
@@ -122,9 +122,9 @@ export default function Home() {
       {/* Link para a página Dev */}
       <Pressable
         onPress={() => router.push('/(tabs)/dev')}
-        className={`mt-md px-md py-xs rounded-md bg-secondary-light dark:bg-secondary-dark`}
+        className={`mt-md px-md py-xs rounded-md ${isDark ? 'bg-secondary-dark' : 'bg-secondary-light'}`}
       >
-        <Text className={`text-label-sm font-inter-semibold text-white dark:text-white`}>
+        <Text className={`text-label-sm font-inter-semibold text-white`}>
           Abrir Ferramentas de Dev
         </Text>
       </Pressable>

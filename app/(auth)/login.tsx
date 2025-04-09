@@ -53,16 +53,16 @@ export default function Login() {
 
   return (
     <View 
-      className={`flex-1 ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}
+      className={`flex-1 ${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}`}
       onTouchStart={handlePressOutside}
     >
       <View className="flex-1 flex-row">
         <View className={`flex-1 justify-center items-center p-6 ${isDesktopOrTablet ? 'max-w-[50%]' : ''}`}>
-          <Text className={`text-2xl font-bold text-center mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          <Text className={`text-2xl font-bold text-center mb-2 ${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
             Bem-vindo de volta!
           </Text>
           
-          <Text className={`text-base text-center mb-8 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+          <Text className={`text-base text-center mb-8 ${isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light'}`}>
             Entre com suas credenciais para acessar sua conta
           </Text>
 
@@ -70,11 +70,11 @@ export default function Login() {
             <TextInput
               className={`w-full h-12 rounded-md px-4 shadow-sm border ${
                 isDark 
-                  ? 'bg-gray-900 text-white border-gray-700' 
-                  : 'bg-white text-gray-900 border-gray-300'
+                  ? 'bg-bg-secondary-dark text-text-primary-dark border-divider-dark' 
+                  : 'bg-bg-secondary-light text-text-primary-light border-divider-light'
               }`}
               placeholder="E-mail"
-              placeholderTextColor={isDark ? '#9ca3af' : '#9ca3af'}
+              placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -89,11 +89,11 @@ export default function Login() {
             <TextInput
               className={`w-full h-12 rounded-md px-4 shadow-sm border ${
                 isDark 
-                  ? 'bg-gray-900 text-white border-gray-700' 
-                  : 'bg-white text-gray-900 border-gray-300'
+                  ? 'bg-bg-secondary-dark text-text-primary-dark border-divider-dark' 
+                  : 'bg-bg-secondary-light text-text-primary-light border-divider-light'
               }`}
               placeholder="Senha"
-              placeholderTextColor={isDark ? '#9ca3af' : '#9ca3af'}
+              placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
               value={senha}
               onChangeText={setSenha}
               secureTextEntry={!showPassword}
@@ -108,9 +108,9 @@ export default function Login() {
               className="absolute right-4 top-3 p-1"
             >
               {showPassword ? (
-                <EyeOff size={20} color={isDark ? '#9ca3af' : '#9ca3af'} />
+                <EyeOff size={20} color={isDark ? '#95A1AC' : '#8B97A2'} />
               ) : (
-                <Eye size={20} color={isDark ? '#9ca3af' : '#9ca3af'} />
+                <Eye size={20} color={isDark ? '#95A1AC' : '#8B97A2'} />
               )}
             </Pressable>
           </View>
@@ -120,7 +120,7 @@ export default function Login() {
               isLoading 
                 ? 'opacity-70' 
                 : isHovered ? 'opacity-80' : 'opacity-100'
-            } ${isDark ? 'bg-blue-600' : 'bg-blue-500'}`}
+            } ${isDark ? 'bg-primary-dark' : 'bg-primary-light'}`}
             onPress={handleLogin}
             disabled={isLoading}
             onHoverIn={() => Platform.OS === 'web' && setIsHovered(true)}
@@ -136,7 +136,7 @@ export default function Login() {
           </Pressable>
 
           <View className="flex-row items-center mt-6">
-            <Text className={`text-base ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <Text className={`text-base ${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
               Ainda não tem uma conta?{' '}
             </Text>
             <Link href="/register" asChild>
@@ -147,7 +147,7 @@ export default function Login() {
               >
                 <Text 
                   className={`text-base font-semibold ${
-                    isDark ? 'text-blue-400' : 'text-blue-600'
+                    isDark ? 'text-secondary-dark' : 'text-secondary-light'
                   } ${isLinkHovered ? 'opacity-80' : 'opacity-100'}`}
                 >
                   Cadastre-se
@@ -158,7 +158,7 @@ export default function Login() {
         </View>
 
         {isDesktopOrTablet && (
-          <View className="flex-1 bg-blue-500">
+          <View className={`flex-1 ${isDark ? 'bg-primary-dark' : 'bg-primary-light'}`}>
             <View className="flex-1 justify-center items-center">
               <Text className="text-white text-2xl font-bold">Bem-vindo ao App</Text>
               <Text className="text-white text-center mt-2 px-8">
