@@ -15,15 +15,15 @@ module.exports = async function (env, argv) {
     new CopyWebpackPlugin({
       patterns: [
         { 
-          from: path.resolve(__dirname, 'assets/web/robots.txt'),
+          from: path.resolve(__dirname, 'assets/seo-web/robots.txt'),
           to: path.resolve(__dirname, 'dist/robots.txt') 
         },
         { 
-          from: path.resolve(__dirname, 'assets/web/sitemap.xml'),
+          from: path.resolve(__dirname, 'assets/seo-web/sitemap.xml'),
           to: path.resolve(__dirname, 'dist/sitemap.xml') 
         },
         { 
-          from: path.resolve(__dirname, 'assets/web/site.webmanifest'),
+          from: path.resolve(__dirname, 'assets/seo-web/site.webmanifest'),
           to: path.resolve(__dirname, 'dist/site.webmanifest') 
         },
       ],

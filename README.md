@@ -265,6 +265,13 @@ O projeto já vem com configurações de SEO otimizadas para web. Para personali
    - Para imagens de compartilhamento (og:image), use imagens de 1200x630px
    - Substitua os ícones em `/assets/images/` com seus próprios ícones
 
+4. **Arquivos de SEO adicionais**:
+   - O projeto inclui arquivos importantes de SEO em `assets/seo-web/`:
+     - `robots.txt`: Controla o acesso de bots de busca ao seu site
+     - `sitemap.xml`: Ajuda os buscadores a indexarem suas páginas
+     - `site.webmanifest`: Configurações para instalação da app como PWA
+   - Edite estes arquivos conforme necessário para seu projeto
+
 > 💡 **Nota**: As cores e temas no arquivo `head.tsx` são obtidas do `tailwind.config.js`, garantindo consistência em todo o aplicativo.
 
 ### 📱 Configuração da StatusBar
@@ -365,6 +372,9 @@ showToast({
 
 🎨 Assets e Componentes
 /assets            # Recursos estáticos
+  /images         # Imagens e ícones
+  /fonts          # Fontes utilizadas
+  /seo-web        # Arquivos de SEO e configurações para web
 /components        # Componentes reutilizáveis
   /ui             # Componentes base (botões, inputs, etc)
 /constants        # Constantes de responsividade e breakpoints
