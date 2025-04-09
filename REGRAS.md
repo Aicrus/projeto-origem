@@ -51,6 +51,51 @@ Este documento é o guia mestre OBRIGATÓRIO que estabelece as regras invioláve
 
 ## 🎨 Sistema de Design (NUNCA IGNORAR)
 
+### 🎨 Sistema de Cores do Tailwind (OBRIGATÓRIO)
+```typescript
+// NUNCA use cores genéricas do Tailwind como:
+// ❌ ERRADO: 'bg-blue-500', 'text-gray-800', 'border-gray-300', etc.
+
+// SEMPRE use a nomenclatura de cores personalizada definida no tailwind.config.js:
+// ✅ CORRETO: 'bg-primary-light', 'bg-primary-dark', 'text-text-primary-light', etc.
+
+// Validação de cores:
+// 1. Verificar se a cor existe no arquivo tailwind.config.js
+// 2. Usar sempre o prefixo correto: bg-, text-, border-, etc.
+// 3. Usar o sufixo -light ou -dark conforme o tema
+
+// Aplicação correta das cores baseada no tema atual:
+const isDark = currentTheme === 'dark';
+
+// ✅ CORRETO: Uso condicional para temas
+<View className={`${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}`}>
+  <Text className={`${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
+    Texto no tema correto
+  </Text>
+</View>
+
+// ❌ ERRADO: Usar a notação 'dark:' do Tailwind
+// Não use: className="bg-white dark:bg-black"
+// Em vez disso, use a condição isDark como mostrado acima
+
+// Cores disponíveis no tema (ver tailwind.config.js para lista completa):
+// Tema claro:
+// - primary-light: '#4A6FA5' - Cor principal
+// - secondary-light: '#22D3EE' - Cor secundária
+// - tertiary-light: '#D3545D' - Cor terciária
+// - bg-primary-light: '#F7F8FA' - Fundo principal
+// - bg-secondary-light: '#FFFFFF' - Fundo secundário
+// - text-primary-light: '#14181B' - Texto principal
+
+// Tema escuro:
+// - primary-dark: '#4A6FA5' - Cor principal
+// - secondary-dark: '#2C3E50' - Cor secundária
+// - tertiary-dark: '#D3545D' - Cor terciária
+// - bg-primary-dark: '#1C1E26' - Fundo principal
+// - bg-secondary-dark: '#14181B' - Fundo secundário
+// - text-primary-dark: '#FFFFFF' - Texto principal
+```
+
 ### 📱 Breakpoints (SEMPRE RESPEITAR)
 ```typescript
 // Os breakpoints reais do projeto são:
@@ -100,54 +145,3 @@ const styles = {
    - NUNCA altere o app.json sem autorização
    - MANTENHA as configurações de plugins inalteradas
    - RESPEITE as configurações específicas de plataforma
-
-## 🔍 Checklist de Verificação (USAR EM TODA MODIFICAÇÃO)
-
-1. [ ] A modificação foi EXPLICITAMENTE solicitada?
-2. [ ] Está usando APENAS os imports corretos?
-3. [ ] Mantém suporte a tema claro/escuro?
-4. [ ] Respeita TODOS os breakpoints?
-5. [ ] Usa APENAS constantes do Design System?
-6. [ ] Preserva TODA a estrutura existente?
-7. [ ] Mantém TODA a tipagem TypeScript?
-8. [ ] Respeita a configuração da StatusBar para ambos os temas?
-
-## ⚠️ Processo de Modificação
-
-1. **ANTES de modificar:**
-   - Confirme o escopo EXATO
-   - Verifique dependências
-   - Identifique impactos
-
-2. **DURANTE a modificação:**
-   - Siga o checklist RIGOROSAMENTE
-   - Mantenha o escopo limitado
-   - Documente alterações
-
-3. **APÓS a modificação:**
-   - Verifique em todos os temas
-   - Teste em todos os breakpoints
-   - Confirme tipagem TypeScript
-
-## 📋 Exemplo Prático
-
-Se receber: "Mude a cor do botão para azul"
-
-```typescript
-// ✅ CORRETO - Apenas o solicitado
-style={{ 
-  backgroundColor: COLORS[currentTheme].primary 
-}}
-
-// ❌ ERRADO - Alterações não solicitadas
-style={{ 
-  backgroundColor: COLORS[currentTheme].primary,
-  margin: 20,        // NÃO SOLICITADO
-  padding: 10,       // NÃO SOLICITADO
-  borderRadius: 8    // NÃO SOLICITADO
-}}
-```
-
-## 🎯 Conclusão
-
-Este documento é a BASE de todas as modificações. NUNCA ignore estas regras. Em caso de dúvida, SEMPRE pergunte antes de modificar.
