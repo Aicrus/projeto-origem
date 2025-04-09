@@ -54,7 +54,7 @@ export default function TabsLayout() {
       
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: isDark ? '#60a5fa' : '#2563eb',
+          tabBarActiveTintColor: isDark ? '#4A6FA5' : '#4A6FA5',
           headerShown: false,
           tabBarLabelPosition: 'below-icon',
           tabBarStyle: [
@@ -65,7 +65,7 @@ export default function TabsLayout() {
               web: {
                 ...styles.webTabBar,
                 backgroundColor: isDark 
-                  ? 'rgba(0, 0, 0, 0.75)' 
+                  ? 'rgba(20, 24, 27, 0.75)'
                   : 'rgba(255, 255, 255, 0.75)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
