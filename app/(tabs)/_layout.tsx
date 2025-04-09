@@ -43,6 +43,15 @@ export default function TabsLayout() {
   
   const isDark = currentTheme === 'dark';
 
+  // Definindo cores baseadas no tema
+  const activeTabColor = isDark ? '#4A6FA5' : '#4A6FA5'; // primary-dark / primary-light
+  const tabBackgroundColor = isDark 
+    ? 'rgba(20, 24, 27, 0.75)' // bg-secondary-dark com transparência
+    : 'rgba(255, 255, 255, 0.75)'; // bg-secondary-light com transparência
+  const tabBorderColor = isDark 
+    ? 'rgba(38, 45, 52, 0.5)' // divider-dark com transparência
+    : 'rgba(224, 227, 231, 0.5)'; // divider-light com transparência
+
   // Log para debug apenas uma vez quando o componente é montado
   useEffect(() => {
     console.log(`[Tabs] Status inicial: ${isMobile ? 'Visível' : 'Oculto'} (${width}px / ${currentBreakpoint})`);
@@ -54,7 +63,7 @@ export default function TabsLayout() {
       
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: isDark ? '#4A6FA5' : '#4A6FA5',
+          tabBarActiveTintColor: activeTabColor,
           headerShown: false,
           tabBarLabelPosition: 'below-icon',
           tabBarStyle: [
@@ -64,11 +73,10 @@ export default function TabsLayout() {
               android: styles.androidTabBar,
               web: {
                 ...styles.webTabBar,
-                backgroundColor: isDark 
-                  ? 'rgba(20, 24, 27, 0.75)'
-                  : 'rgba(255, 255, 255, 0.75)',
+                backgroundColor: tabBackgroundColor,
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
+                borderTopColor: tabBorderColor,
                 // Esconde a tab bar em tablets e telas grandes
                 display: isMobile ? 'flex' : 'none',
               },
@@ -132,7 +140,6 @@ const styles = StyleSheet.create({
     paddingTop: 4,
     paddingBottom: 8,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(128, 128, 128, 0.2)',
   },
   tabItem: {
     paddingTop: 8,
