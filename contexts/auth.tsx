@@ -353,12 +353,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       const emailLowerCase = email.toLowerCase().trim();
 
-      // Tenta fazer login
-      const { data, error } = await supabase.auth.signInWithPassword({
+      console.log("Iniciando tentativa de login com:", emailLowerCase);
+      
+      // Limpa qualquer possível toast de erro anterior
+      // que poderia estar aparecendo indevidamente
+      
+      // Tenta fazer login - não use await aqui para evitar race conditions
+      const loginPromise = supabase.auth.signInWithPassword({
         email: emailLowerCase,
         password,
       });
+      
+      // Dá um pequeno tempo para processar e evitar race conditions
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Agora espera a resposta
+      const { data, error } = await loginPromise;
+      
+      console.log("Resposta do login:", { 
+        sucesso: !!data?.session, 
+        erro: error ? error.message : "Nenhum" 
+      });
 
+      // Trata erro explícito da API
       if (error) {
         console.error('Erro no login:', error);
 
@@ -388,31 +405,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Se chegou aqui, não houve erro e o login foi bem-sucedido
-      // Atualiza a sessão diretamente
-      setSession(data.session);
-
-      // Sucesso no login - apenas exibe o toast se tiver data.session
-      if (data.session) {
-        showToast({
-          type: 'success',
-          message: 'Login realizado!',
-          description: 'Bem-vindo de volta!',
-        });
-
-        // Navega diretamente para a home
-        router.replace('/(tabs)/home');
-      } else {
-        // Se não tiver sessão mesmo sem erro, algo deu errado
+      // Se chegou aqui, não houve erro e o login pode ter sido bem-sucedido
+      // Verifica explicitamente se temos uma sessão
+      if (!data?.session) {
+        console.error('Login sem sessão válida:', data);
         showToast({
           type: 'error',
           message: 'Erro no login',
           description: 'Não foi possível iniciar sua sessão. Tente novamente.',
         });
+        return;
       }
+      
+      // Login bem-sucedido! Atualiza a sessão e mostra mensagem de sucesso
+      console.log("Login bem-sucedido! Atualizando sessão e navegando...");
+      setSession(data.session);
+      
+      showToast({
+        type: 'success',
+        message: 'Login realizado!',
+        description: 'Bem-vindo de volta!',
+      });
+
+      // Navega diretamente para a home após um breve delay
+      setTimeout(() => {
+        router.replace('/(tabs)/home');
+      }, 100);
 
     } catch (error) {
-      console.error('Erro no login:', error);
+      console.error('Erro inesperado no login:', error);
       showToast({
         type: 'error',
         message: 'Erro no login',
