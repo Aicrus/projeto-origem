@@ -15,21 +15,19 @@ URL_OFICIAL_DO_PROJETO="https://github.com/Aicrus/projeto-origem"
    - Antes de QUALQUER operação Git, o sistema DEVE verificar se a URL remota corresponde à URL_OFICIAL_DO_PROJETO
    - Se a URL remota estiver diferente, ela DEVE ser corrigida AUTOMATICAMENTE para URL_OFICIAL_DO_PROJETO
 
-2. **PROCESSO DE VERIFICAÇÃO OBRIGATÓRIO:**
+2. **PROCESSO DE VERIFICAÇÃO SIMPLIFICADO:**
    ```bash
-   # 1. Verificar URL atual do remoto
-   REMOTE_URL=$(git remote get-url origin 2>/dev/null)
-
-   # 2. Comparar com URL oficial do projeto
-   if [ "$REMOTE_URL" != "$URL_OFICIAL_DO_PROJETO" ]; then
-       echo "⚠️ ATENÇÃO: URL remota incorreta detectada!"
-       echo "URL Atual: $REMOTE_URL"
-       echo "URL Oficial: $URL_OFICIAL_DO_PROJETO"
-       
-       # 3. Corrigir automaticamente a URL remota para corresponder à oficial
-       git remote remove origin 2>/dev/null
-       git remote add origin "$URL_OFICIAL_DO_PROJETO"
-       echo "✓ URL remota corrigida automaticamente para: $URL_OFICIAL_DO_PROJETO"
+   # Script de verificação da URL remota sem quebras
+   URL_OFICIAL="https://github.com/Aicrus/projeto-origem"
+   REMOTE_URL=$(git remote get-url origin 2>/dev/null || echo "")
+   
+   if [ "$REMOTE_URL" != "$URL_OFICIAL" ]; then
+     echo "Corrigindo URL remota."
+     git remote remove origin 2>/dev/null
+     git remote add origin "$URL_OFICIAL"
+     echo "URL remota corrigida para: $URL_OFICIAL"
+   else
+     echo "URL remota está correta: $REMOTE_URL"
    fi
    ```
 
@@ -53,44 +51,93 @@ URL_OFICIAL_DO_PROJETO="https://github.com/Aicrus/projeto-origem"
 ## Processo de Envio de Alterações:
 
 1. **VERIFICAÇÃO INICIAL OBRIGATÓRIA:**
-   - Executar verificação da URL do repositório conforme processo acima
-   - NUNCA prosseguir se a URL remota não corresponder à URL_OFICIAL_DO_PROJETO
-   - Corrigir a URL remota se necessário
+   ```bash
+   # Script de verificação da URL remota
+   URL_OFICIAL="https://github.com/Aicrus/projeto-origem"
+   REMOTE_URL=$(git remote get-url origin 2>/dev/null || echo "")
+   
+   if [ "$REMOTE_URL" != "$URL_OFICIAL" ]; then
+     echo "Corrigindo URL remota."
+     git remote remove origin 2>/dev/null
+     git remote add origin "$URL_OFICIAL"
+     echo "URL remota corrigida para: $URL_OFICIAL"
+   else
+     echo "URL remota está correta: $REMOTE_URL"
+   fi
+   ```
 
-2. Verificar configuração Git e autenticação:
-    ```bash
-    # Verificar configuração Git
-    git config --get user.name
-    git config --get user.email
-    
-    # Se não estiver configurado, configurar:
-    # git config --global user.name "Seu Nome"
-    # git config --global user.email "seu@email.com"
-    ```
-    
-3. Verificar login Github:
-    ```bash
-    gh auth status
-    # Se não estiver logado:
-    # gh auth login
-    ```
-    
-4. Verificar status das alterações:
-    ```bash
-    git status
-    ```
-    
-5. Se houver alterações:
-    ```bash
-    # Adicionar alterações
-    git add .
-    
-    # Criar commit com mensagem descritiva
-    git commit -m "tipo: descrição das alterações"
-    
-    # Enviar para o repositório remoto
-    git push origin main
-    ```
+2. **Verificar e configurar Git:**
+   ```bash
+   # Verificar e exibir configuração Git
+   git config --get user.name
+   git config --get user.email
+   ```
+
+3. **Verificar alterações e status:**
+   ```bash
+   git status
+   ```
+
+4. **Adicionar, commitar e enviar alterações:**
+   ```bash
+   # Adicionar todas as alterações
+   git add .
+   
+   # Verificar o que será commitado
+   git status
+   
+   # Criar commit com mensagem descritiva
+   git commit -m "tipo: descrição das alterações"
+   
+   # Enviar para o repositório remoto
+   git push origin main
+   ```
+
+5. **Script de automação completo:**
+   ```bash
+   #!/bin/bash
+   # Script completo para verificar e enviar alterações
+   
+   echo "=== Verificando URL do repositório ==="
+   URL_OFICIAL="https://github.com/Aicrus/projeto-origem"
+   REMOTE_URL=$(git remote get-url origin 2>/dev/null || echo "")
+   
+   if [ "$REMOTE_URL" != "$URL_OFICIAL" ]; then
+     echo "Corrigindo URL remota."
+     git remote remove origin 2>/dev/null
+     git remote add origin "$URL_OFICIAL"
+     echo "URL remota corrigida para: $URL_OFICIAL"
+   else
+     echo "URL remota está correta: $REMOTE_URL"
+   fi
+   
+   echo "=== Verificando configuração Git ==="
+   git config --get user.name
+   git config --get user.email
+   
+   echo "=== Status das alterações ==="
+   git status
+   
+   read -p "Continuar com o commit e push? (s/n): " continuar
+   if [ "$continuar" != "s" ]; then
+     echo "Operação cancelada."
+     exit 0
+   fi
+   
+   echo "=== Adicionando alterações ==="
+   git add .
+   
+   echo "=== Alterações que serão commitadas ==="
+   git status
+   
+   read -p "Informe a mensagem de commit (tipo: descrição): " mensagem
+   git commit -m "$mensagem"
+   
+   echo "=== Enviando para o repositório remoto ==="
+   git push origin main
+   
+   echo "=== Operação concluída! ==="
+   ```
 
 ## Regras para Mensagens de Commit:
 - Antes de criar um commit, verificar arquivos alterados com `git status`
