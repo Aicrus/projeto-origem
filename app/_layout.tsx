@@ -126,17 +126,17 @@ const RootLayoutNav = memo(function RootLayoutNav() {
 
   const MainContent = (
     <NavigationThemeProvider value={currentTheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <View className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
+      <View className={`flex-1 ${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}`}>
         <StatusBar 
           style={currentTheme === 'dark' ? 'light' : 'dark'}
-          backgroundColor={currentTheme === 'dark' ? '#111827' : '#f9fafb'}
+          backgroundColor={currentTheme === 'dark' ? '#14181B' : '#F7F8FA'}
         />
         <Stack 
           screenOptions={{
             headerShown: false,
             contentStyle: { 
               flex: 1,
-              backgroundColor: currentTheme === 'dark' ? '#111827' : '#f9fafb' 
+              backgroundColor: currentTheme === 'dark' ? '#14181B' : '#F7F8FA'
             },
             animation: 'none'
           }}
@@ -166,7 +166,7 @@ const RootLayoutNav = memo(function RootLayoutNav() {
 
   return (
     <SafeAreaView 
-      className={`flex-1 ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}
+      className={`flex-1 ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}
       edges={['top', 'right', 'left']}
     >
       {MainContent}

@@ -239,6 +239,34 @@ Para modificar as fontes do projeto:
 
 > 💡 **Dica**: Para usar fontes carregadas pelo Expo, consulte a [documentação oficial do Expo sobre fontes](https://docs.expo.dev/guides/using-custom-fonts/).
 
+### 🔎 SEO e Meta Tags
+
+O projeto já vem com configurações de SEO otimizadas para web. Para personalizar o SEO:
+
+1. **Editar arquivo de SEO**: 
+   - Abra o arquivo `app/head.tsx`
+   - Este arquivo contém todas as metatags relacionadas a SEO e compartilhamento em redes sociais
+
+2. **Principais configurações**:
+   ```jsx
+   <title>Seu Título Aqui</title>
+   <meta name="description" content="Sua descrição aqui" />
+   
+   // Open Graph (para compartilhamento em redes sociais)
+   <meta property="og:title" content="Título para compartilhamento" />
+   <meta property="og:description" content="Descrição para compartilhamento" />
+   <meta property="og:image" content="https://seu-site.com/imagem.jpg" />
+   
+   // Tema e cores
+   <meta name="theme-color" content={themeColor} /> // Usa a cor primária do tema
+   ```
+
+3. **Imagens e ícones**:
+   - Para imagens de compartilhamento (og:image), use imagens de 1200x630px
+   - Substitua os ícones em `/assets/images/` com seus próprios ícones
+
+> 💡 **Nota**: As cores e temas no arquivo `head.tsx` são obtidas do `tailwind.config.js`, garantindo consistência em todo o aplicativo.
+
 ### 📱 Configuração da StatusBar
 
 A barra de status (onde aparecem as horas, sinal, bateria) está configurada para respeitar o tema atual do aplicativo:

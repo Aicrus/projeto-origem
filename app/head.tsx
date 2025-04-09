@@ -1,7 +1,26 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useTheme } from '../hooks/ThemeContext';
 
+/**
+ * Componente Head - Responsável pelas configurações de SEO e meta tags
+ * 
+ * Este arquivo contém as configurações para otimização de SEO, Open Graph e compartilhamento
+ * em redes sociais. Para personalizar sua aplicação, atualize as tags meta aqui.
+ * 
+ * As configurações importantes incluem:
+ * - Título e descrição do site
+ * - Imagens para compartilhamento (Open Graph)
+ * - Ícones e favicons
+ * - Metatags para melhorar o SEO
+ */
 export default function Head() {
+  const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
+  
+  // Use a cor primária do tema como theme-color
+  const themeColor = isDark ? '#4A6FA5' : '#4A6FA5'; // primary-dark ou primary-light do tailwind.config.js
+
   return (
     <Helmet>
       {/* Metadados básicos */}
@@ -24,7 +43,7 @@ export default function Head() {
       <link rel="preload" as="font" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" crossOrigin="anonymous" />
       
       {/* Otimizações para SEO e desempenho */}
-      <meta name="theme-color" content="#2563eb" />
+      <meta name="theme-color" content={themeColor} />
       <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
       
       {/* Otimizações de cache */}
