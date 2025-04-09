@@ -120,9 +120,13 @@ const RootLayoutNav = memo(function RootLayoutNav() {
   const { isLoading, isInitialized, session } = useAuth();
   const isDark = currentTheme === 'dark';
 
+  // Se ainda está carregando ou não foi inicializado, mostra o loading
   if (isLoading || !isInitialized) {
     return <LoadingScreen />;
   }
+
+  // Determina o grupo inicial com base na sessão
+  const initialRouteName = session ? '(tabs)' : '(auth)';
 
   const MainContent = (
     <NavigationThemeProvider value={currentTheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -138,23 +142,30 @@ const RootLayoutNav = memo(function RootLayoutNav() {
               flex: 1,
               backgroundColor: currentTheme === 'dark' ? '#14181B' : '#F7F8FA'
             },
-            animation: 'none'
+            animation: Platform.OS === 'web' ? 'none' : 'fade'
           }}
-          initialRouteName="(auth)"
+          initialRouteName={initialRouteName}
         >
           <Stack.Screen 
             name="(auth)" 
             options={{
-              gestureEnabled: false
+              gestureEnabled: false,
+              animation: Platform.OS === 'web' ? 'none' : 'fade'
             }}
           />
           <Stack.Screen 
             name="(tabs)"
             options={{
-              gestureEnabled: false
+              gestureEnabled: false,
+              animation: Platform.OS === 'web' ? 'none' : 'fade'
             }}
           />
-          <Stack.Screen name="+not-found" />
+          <Stack.Screen 
+            name="+not-found" 
+            options={{
+              animation: Platform.OS === 'web' ? 'none' : 'fade'
+            }}
+          />
         </Stack>
       </View>
     </NavigationThemeProvider>

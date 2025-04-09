@@ -6,6 +6,7 @@ import { Session } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/useToast';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '@/hooks/ThemeContext';
 
 // Tipos
 type AuthContextData = {
@@ -29,6 +30,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const segments = useSegments();
   const { showToast } = useToast();
+  const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
 
   // Função para verificar e atualizar a sessão
   const checkAndUpdateSession = async () => {
@@ -110,13 +113,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const inAuthGroup = segments[0] === '(auth)';
     const shouldBeInAuth = !session;
 
-    // Se está na rota errada, navega
-    if (shouldBeInAuth && !inAuthGroup) {
-      router.replace('/(auth)/login');
-    } else if (!shouldBeInAuth && inAuthGroup) {
-      // Quando temos sessão mas estamos na tela de auth, vamos para home diretamente
-      router.replace('/(tabs)/home');
-    }
+    // Garante que o componente está montado antes de navegar
+    const navigationTimeout = setTimeout(() => {
+      try {
+        if (shouldBeInAuth && !inAuthGroup) {
+          router.replace('/(auth)/login');
+        } else if (!shouldBeInAuth && inAuthGroup) {
+          router.replace('/(tabs)/home');
+        }
+      } catch (error) {
+        console.error('Erro na navegação:', error);
+      }
+    }, 100); // Aumentado para 100ms para garantir que o layout está pronto
+
+    return () => clearTimeout(navigationTimeout);
   }, [isInitialized, isLoading, session, segments]);
 
   // Efeito para monitorar mudanças na sessão
@@ -350,94 +360,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
         return;
       }
-      
-      const emailLowerCase = email.toLowerCase().trim();
 
-      console.log("Iniciando tentativa de login com:", emailLowerCase);
-      
-      // Limpa qualquer possível toast de erro anterior
-      // que poderia estar aparecendo indevidamente
-      
-      // Tenta fazer login - não use await aqui para evitar race conditions
-      const loginPromise = supabase.auth.signInWithPassword({
-        email: emailLowerCase,
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.toLowerCase().trim(),
         password,
       });
-      
-      // Dá um pequeno tempo para processar e evitar race conditions
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Agora espera a resposta
-      const { data, error } = await loginPromise;
-      
-      console.log("Resposta do login:", { 
-        sucesso: !!data?.session, 
-        erro: error ? error.message : "Nenhum" 
-      });
 
-      // Trata erro explícito da API
+      // Se houver erro na autenticação
       if (error) {
-        console.error('Erro no login:', error);
-
-        if (error.message === 'Invalid login credentials') {
+        if (error.message.includes('Invalid login credentials') ||
+            error.message.includes('Invalid email or password')) {
           showToast({
             type: 'error',
             message: 'Credenciais inválidas',
             description: 'Email ou senha incorretos.',
           });
-          return;
-        }
-
-        if (error.message?.toLowerCase().includes('email')) {
+        } else if (error.message.includes('Email not confirmed')) {
+          showToast({
+            type: 'warning',
+            message: 'Email não confirmado',
+            description: 'Por favor, confirme seu email antes de fazer login.',
+          });
+        } else {
           showToast({
             type: 'error',
-            message: 'Email inválido',
-            description: 'Por favor, insira um email válido.',
+            message: 'Erro ao fazer login',
+            description: 'Ocorreu um erro inesperado. Tente novamente.',
           });
-          return;
         }
-
-        showToast({
-          type: 'error',
-          message: 'Erro no login',
-          description: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
-        });
         return;
       }
 
-      // Se chegou aqui, não houve erro e o login pode ter sido bem-sucedido
-      // Verifica explicitamente se temos uma sessão
-      if (!data?.session) {
-        console.error('Login sem sessão válida:', data);
+      // Se não houver erro e temos uma sessão válida
+      if (data?.session) {
+        // Atualiza a sessão imediatamente
+        setSession(data.session);
+        
+        // Mostra mensagem de sucesso
+        showToast({
+          type: 'success',
+          message: 'Login realizado!',
+          description: 'Bem-vindo de volta!',
+        });
+        
+        // A navegação será feita automaticamente pelo useEffect que monitora a sessão
+        // Não precisamos chamar router.replace aqui
+      } else {
+        // Caso improvável onde não há erro mas também não há sessão
         showToast({
           type: 'error',
-          message: 'Erro no login',
+          message: 'Erro ao fazer login',
           description: 'Não foi possível iniciar sua sessão. Tente novamente.',
         });
-        return;
       }
-      
-      // Login bem-sucedido! Atualiza a sessão e mostra mensagem de sucesso
-      console.log("Login bem-sucedido! Atualizando sessão e navegando...");
-      setSession(data.session);
-      
-      showToast({
-        type: 'success',
-        message: 'Login realizado!',
-        description: 'Bem-vindo de volta!',
-      });
-
-      // Navega diretamente para a home após um breve delay
-      setTimeout(() => {
-        router.replace('/(tabs)/home');
-      }, 100);
-
-    } catch (error) {
-      console.error('Erro inesperado no login:', error);
+    } catch (error: any) {
+      console.error('Erro no login:', error);
       showToast({
         type: 'error',
-        message: 'Erro no login',
-        description: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
+        message: 'Erro ao fazer login',
+        description: 'Ocorreu um erro inesperado. Tente novamente.',
       });
     } finally {
       setIsLoading(false);
@@ -556,14 +537,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (!isInitialized || isLoading) {
     return (
       <View 
-        style={{ 
-          flex: 1, 
-          backgroundColor: '#fff',
-          justifyContent: 'center',
-          alignItems: 'center'
-        }} 
+        className={`flex-1 justify-center items-center ${
+          isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'
+        }`}
       >
-        <ActivityIndicator size="large" color="#000" />
+        <ActivityIndicator 
+          size="large" 
+          color={isDark ? '#60a5fa' : '#2563eb'} 
+        />
       </View>
     );
   }

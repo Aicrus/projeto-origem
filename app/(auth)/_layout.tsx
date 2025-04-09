@@ -6,27 +6,23 @@ export default function AuthLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        animationDuration: 200,
-        ...(Platform.OS === 'ios' ? {
-          animation: 'fade',
-        } : Platform.OS === 'android' ? {
-          animation: 'fade',
-          presentation: 'transparentModal',
-        } : {
-          animation: 'fade',
-        })
+        animation: Platform.OS === 'web' ? 'none' : 'fade',
+        animationDuration: Platform.OS === 'web' ? 0 : 200,
+        contentStyle: {
+          backgroundColor: 'transparent'
+        }
       }}
     >
       <Stack.Screen
         name="login"
         options={{
-          title: 'Login',
+          title: 'Login'
         }}
       />
       <Stack.Screen
         name="register"
         options={{
-          title: 'Cadastro',
+          title: 'Cadastro'
         }}
       />
     </Stack>
