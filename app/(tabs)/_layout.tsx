@@ -44,7 +44,8 @@ export default function TabsLayout() {
   const isDark = currentTheme === 'dark';
 
   // Definindo cores baseadas no tema
-  const activeTabColor = isDark ? '#4A6FA5' : '#4A6FA5'; // primary-dark / primary-light
+  const activeTabColor = isDark ? '#4A6FA5' : '#892CDC'; // primary-dark / primary-light
+  const inactiveTabColor = isDark ? '#95A1AC' : '#57636C'; // text-tertiary-dark / text-secondary-light
   const tabBackgroundColor = isDark 
     ? 'rgba(20, 24, 27, 0.75)' // bg-secondary-dark com transparência
     : 'rgba(255, 255, 255, 0.75)'; // bg-secondary-light com transparência
@@ -64,6 +65,7 @@ export default function TabsLayout() {
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: activeTabColor,
+          tabBarInactiveTintColor: inactiveTabColor,
           headerShown: false,
           tabBarLabelPosition: 'below-icon',
           tabBarStyle: [
@@ -110,14 +112,26 @@ export default function TabsLayout() {
           name="home"
           options={{
             title: 'Home',
-            tabBarIcon: ({ color }: { color: string }) => <HomeIcon size={24} color={color} strokeWidth={1.5} />,
+            tabBarIcon: ({ color, focused }: { color: string, focused: boolean }) => (
+              <HomeIcon 
+                size={24} 
+                color={color} 
+                strokeWidth={focused ? 2 : 1.5} 
+              />
+            ),
           }}
         />
         <Tabs.Screen
           name="dev"
           options={{
             title: 'Dev',
-            tabBarIcon: ({ color }: { color: string }) => <CodeIcon size={24} color={color} strokeWidth={1.5} />,
+            tabBarIcon: ({ color, focused }: { color: string, focused: boolean }) => (
+              <CodeIcon 
+                size={24} 
+                color={color} 
+                strokeWidth={focused ? 2 : 1.5} 
+              />
+            ),
           }}
         />
       </Tabs>

@@ -6,12 +6,12 @@ module.exports = {
     extend: {
       colors: {
         // Light theme colors
-        'primary-light': '#4A6FA5',
+        'primary-light': '#892CDC',
         'primary-light-hover': '#3D5C8C',
         'primary-light-active': '#345078',
-        'secondary-light': '#22D3EE',
-        'secondary-light-hover': '#06B6D4',
-        'secondary-light-active': '#0891B2',
+        'secondary-light': '#22D',
+        'secondary-light-hover': '#06B6',
+        'secondary-light-active': '#0891',
         'tertiary-light': '#D3545D',
         'tertiary-light-hover': '#C1414A',
         'tertiary-light-active': '#AB343C',
@@ -28,10 +28,10 @@ module.exports = {
         'active-light': '#00000012',
         
         // Dark theme colors
-        'primary-dark': '#4A6FA5',
+        'primary-dark': '#4A6',
         'primary-dark-hover': '#5B80B6', 
         'primary-dark-active': '#6C91C7',
-        'secondary-dark': '#2C3E50',
+        'secondary-dark': '#2C3E',
         'secondary-dark-hover': '#3D4F61',
         'secondary-dark-active': '#4E6072',
         'tertiary-dark': '#D3545D',
