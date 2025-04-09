@@ -199,6 +199,50 @@ npm run android
 - Cadastro: `/(auth)/signup`
 - Home após login: `/(tabs)/home`
 
+### 🔐 Rotas Protegidas
+
+O projeto utiliza o componente `ProtectedRoute` para controlar o acesso às rotas que necessitam de autenticação.
+
+#### Como funciona:
+- Rotas protegidas: Precisam de autenticação para serem acessadas
+- Rotas públicas: Podem ser acessadas sem autenticação
+
+#### Uso:
+1. **Para proteger uma rota**:
+```tsx
+import { ProtectedRoute } from '../components/ProtectedRoute';
+
+export default function SuaRotaProtegida() {
+  return (
+    <ProtectedRoute>
+      {/* Seu conteúdo aqui */}
+    </ProtectedRoute>
+  );
+}
+```
+
+2. **Para uma rota pública**:
+```tsx
+export default function SuaRotaPublica() {
+  return (
+    // Não precisa do ProtectedRoute
+    <View>
+      {/* Seu conteúdo aqui */}
+    </View>
+  );
+}
+```
+
+> 💡 **Dica**: Use o ProtectedRoute apenas nas rotas que realmente precisam de autenticação. Rotas como login, cadastro e recuperação de senha devem ser públicas.
+
+#### Comportamento:
+- Se o usuário não estiver autenticado e tentar acessar uma rota protegida:
+  - Será redirecionado automaticamente para a tela de login
+  - Após fazer login, será redirecionado de volta para a rota que tentou acessar
+- Se o usuário estiver autenticado:
+  - Terá acesso normal à rota protegida
+  - Poderá navegar livremente entre rotas protegidas
+
 ## 🎨 Design System
 
 O projeto utiliza um design system completo e consistente para todas as plataformas (web, iOS e Android). 

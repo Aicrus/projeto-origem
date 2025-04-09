@@ -23,111 +23,21 @@ type AuthContextData = {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 // Provider
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isInitialized, setIsInitialized] = useState(false);
+export function AuthProvider({ 
+  children,
+  initialSession
+}: { 
+  children: React.ReactNode;
+  initialSession: Session | null;
+}) {
+  const [session, setSession] = useState<Session | null>(initialSession);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(true);
   const router = useRouter();
   const segments = useSegments();
   const { showToast } = useToast();
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-
-  // Função para verificar e atualizar a sessão
-  const checkAndUpdateSession = async () => {
-    try {
-      const { data: { session: currentSession }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Erro ao verificar sessão:', error);
-        setSession(null);
-        return;
-      }
-
-      // Se a sessão mudou, atualiza
-      if (JSON.stringify(currentSession) !== JSON.stringify(session)) {
-        setSession(currentSession);
-      }
-    } catch (error) {
-      console.error('Erro ao verificar sessão:', error);
-      setSession(null);
-    } finally {
-      setIsLoading(false);
-      setIsInitialized(true);
-    }
-  };
-
-  // Efeito para verificação inicial da sessão e navegação
-  useEffect(() => {
-    let isMounted = true;
-
-    const initialize = async () => {
-      try {
-        // Mantém o loading até ter certeza do estado
-        setIsLoading(true);
-
-        // Verifica a sessão antes de qualquer coisa
-        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
-
-        if (!isMounted) return;
-
-        if (error) {
-          console.error('Erro ao verificar sessão:', error);
-          setSession(null);
-        } else {
-          setSession(currentSession);
-        }
-
-        // Marca como inicializado antes de remover o loading
-        setIsInitialized(true);
-
-        // Pequeno delay antes de remover o loading para garantir que tudo está pronto
-        setTimeout(() => {
-          if (isMounted) {
-            setIsLoading(false);
-          }
-        }, 100);
-
-      } catch (error) {
-        console.error('Erro ao verificar sessão:', error);
-        if (isMounted) {
-          setSession(null);
-          setIsInitialized(true);
-          setIsLoading(false);
-        }
-      }
-    };
-
-    initialize();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Efeito para navegação baseada no estado da sessão
-  useEffect(() => {
-    // Só executa quando já estiver inicializado e não estiver carregando
-    if (!isInitialized || isLoading) return;
-
-    const inAuthGroup = segments[0] === '(auth)';
-    const shouldBeInAuth = !session;
-
-    // Garante que o componente está montado antes de navegar
-    const navigationTimeout = setTimeout(() => {
-      try {
-        if (shouldBeInAuth && !inAuthGroup) {
-          router.replace('/(auth)/login');
-        } else if (!shouldBeInAuth && inAuthGroup) {
-          router.replace('/(tabs)/home');
-        }
-      } catch (error) {
-        console.error('Erro na navegação:', error);
-      }
-    }, 100); // Aumentado para 100ms para garantir que o layout está pronto
-
-    return () => clearTimeout(navigationTimeout);
-  }, [isInitialized, isLoading, session, segments]);
 
   // Efeito para monitorar mudanças na sessão
   useEffect(() => {
@@ -145,6 +55,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
     };
   }, []);
+
+  // Efeito para navegação baseada no estado da sessão
+  useEffect(() => {
+    if (!isInitialized || isLoading) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (session && inAuthGroup) {
+      router.replace('/(tabs)/home');
+    } else if (!session && !inAuthGroup) {
+      router.replace('/(auth)/login');
+    }
+  }, [isInitialized, isLoading, session, segments]);
 
   useEffect(() => {
     if (!session) return;

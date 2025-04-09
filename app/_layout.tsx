@@ -8,6 +8,7 @@ import { ActivityIndicator, Platform, View } from 'react-native';
 import 'react-native-reanimated';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
+import { Session } from '@supabase/supabase-js';
 import Head from './head';
 
 // Importação do arquivo global.css para NativeWind
@@ -48,6 +49,7 @@ export default function RootLayout() {
     Inter_700Bold,
   });
   const [initialCheckDone, setInitialCheckDone] = useState(false);
+  const [initialSession, setInitialSession] = useState<Session | null>(null);
 
   // Verificar e limpar tokens inválidos na inicialização
   useEffect(() => {
@@ -56,11 +58,14 @@ export default function RootLayout() {
         const { data, error } = await supabase.auth.getSession();
         
         if (error || !data.session) {
-          // Se houver erro ou não houver sessão, limpa qualquer token residual
           await supabase.auth.signOut();
+          setInitialSession(null);
+        } else {
+          setInitialSession(data.session);
         }
       } catch (e) {
         console.error('Erro ao verificar sessão inicial:', e);
+        setInitialSession(null);
       } finally {
         setInitialCheckDone(true);
       }
@@ -75,6 +80,7 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, initialCheckDone]);
 
+  // Mantém a tela de splash até ter certeza do estado de autenticação
   if (!fontsLoaded || !initialCheckDone) {
     return (
       <SafeAreaProvider>
@@ -89,7 +95,6 @@ export default function RootLayout() {
 
   return (
     <HelmetProvider context={helmetContext}>
-      {/* Adiciona metadados básicos inline */}
       {Platform.OS === 'web' && (
         <Helmet>
           <title>Projeto Origem - Aplicativo Multiplataforma</title>
@@ -104,7 +109,7 @@ export default function RootLayout() {
         <ThemeProvider>
           <Head />
           <ToastProvider>
-            <AuthProvider>
+            <AuthProvider initialSession={initialSession}>
               <RootLayoutNav />
             </AuthProvider>
           </ToastProvider>
@@ -120,13 +125,10 @@ const RootLayoutNav = memo(function RootLayoutNav() {
   const { isLoading, isInitialized, session } = useAuth();
   const isDark = currentTheme === 'dark';
 
-  // Se ainda está carregando ou não foi inicializado, mostra o loading
+  // Se ainda está carregando ou não foi inicializado, mantém a tela de loading
   if (isLoading || !isInitialized) {
     return <LoadingScreen />;
   }
-
-  // Determina o grupo inicial com base na sessão
-  const initialRouteName = session ? '(tabs)' : '(auth)';
 
   const MainContent = (
     <NavigationThemeProvider value={currentTheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -141,29 +143,30 @@ const RootLayoutNav = memo(function RootLayoutNav() {
             contentStyle: { 
               flex: 1,
               backgroundColor: currentTheme === 'dark' ? '#14181B' : '#F7F8FA'
-            },
-            animation: Platform.OS === 'web' ? 'none' : 'fade'
+            }
           }}
-          initialRouteName={initialRouteName}
         >
-          <Stack.Screen 
-            name="(auth)" 
-            options={{
-              gestureEnabled: false,
-              animation: Platform.OS === 'web' ? 'none' : 'fade'
-            }}
-          />
-          <Stack.Screen 
-            name="(tabs)"
-            options={{
-              gestureEnabled: false,
-              animation: Platform.OS === 'web' ? 'none' : 'fade'
-            }}
-          />
+          {session ? (
+            <Stack.Screen 
+              name="(tabs)" 
+              options={{
+                gestureEnabled: false,
+                animation: 'none'
+              }}
+            />
+          ) : (
+            <Stack.Screen 
+              name="(auth)" 
+              options={{
+                gestureEnabled: false,
+                animation: 'none'
+              }}
+            />
+          )}
           <Stack.Screen 
             name="+not-found" 
             options={{
-              animation: Platform.OS === 'web' ? 'none' : 'fade'
+              animation: 'none'
             }}
           />
         </Stack>
