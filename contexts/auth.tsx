@@ -114,6 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (shouldBeInAuth && !inAuthGroup) {
       router.replace('/(auth)/login');
     } else if (!shouldBeInAuth && inAuthGroup) {
+      // Quando temos sessão mas estamos na tela de auth, vamos para home diretamente
       router.replace('/(tabs)/home');
     }
   }, [isInitialized, isLoading, session, segments]);
@@ -353,7 +354,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const emailLowerCase = email.toLowerCase().trim();
 
       // Tenta fazer login
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: emailLowerCase,
         password,
       });
@@ -387,6 +388,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      // Atualiza a sessão diretamente para evitar um ciclo de atualização
+      setSession(data.session);
+
       // Sucesso no login
       showToast({
         type: 'success',
@@ -394,7 +398,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: 'Bem-vindo de volta!',
       });
 
-      // A navegação acontece automaticamente no efeito de sessão
+      // Navega diretamente para a home, sem esperar pelo efeito
+      router.replace('/(tabs)/home');
+
     } catch (error) {
       console.error('Erro no login:', error);
       showToast({

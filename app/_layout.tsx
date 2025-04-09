@@ -138,7 +138,7 @@ const RootLayoutNav = memo(function RootLayoutNav() {
               flex: 1,
               backgroundColor: currentTheme === 'dark' ? '#111827' : '#f9fafb' 
             },
-            animation: 'fade'
+            animation: 'none'
           }}
           initialRouteName="(auth)"
         >
