@@ -33,6 +33,17 @@ export default function Login() {
         return;
       }
 
+      // Validação do formato do email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showToast({
+          type: 'warning',
+          message: 'Email inválido',
+          description: 'Por favor, digite um endereço de email válido.',
+        });
+        return;
+      }
+
       await signIn({ email, password: senha });
     } catch (error) {
       // Erro tratado pelo contexto de autenticação

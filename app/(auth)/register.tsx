@@ -26,12 +26,33 @@ export default function Register() {
 
   const handleRegister = async () => {
     try {
-      // Validações
+      // Validações básicas
       if (!nome || !email || !senha || !confirmarSenha) {
         showToast({
           type: 'warning',
           message: 'Campos obrigatórios',
           description: 'Por favor, preencha todos os campos.',
+        });
+        return;
+      }
+
+      // Validação do nome
+      if (nome.trim().length < 3) {
+        showToast({
+          type: 'warning',
+          message: 'Nome inválido',
+          description: 'O nome deve ter pelo menos 3 caracteres.',
+        });
+        return;
+      }
+
+      // Validação do email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showToast({
+          type: 'warning',
+          message: 'Email inválido',
+          description: 'Por favor, digite um endereço de email válido.',
         });
         return;
       }
