@@ -209,6 +209,36 @@ Principais características:
 - 📱 Componentes adaptados para todas as plataformas
 - 🔄 Suporte completo a temas
 
+### 🔤 Fontes do Projeto
+
+O projeto utiliza as seguintes fontes:
+- **Inter**: fonte principal para textos e interfaces
+- **SpaceMono**: fonte monoespaçada para códigos e dados técnicos
+
+Para modificar as fontes do projeto:
+
+1. **Adicionar arquivos de fonte**:
+   - Coloque seus arquivos de fonte (.ttf ou .otf) na pasta `assets/fonts/`
+   - A pasta já contém o arquivo `SpaceMono-Regular.ttf` como exemplo
+
+2. **Configurar no Tailwind**:
+   - Edite o arquivo `tailwind.config.js`
+   - Modifique a seção `fontFamily` para incluir suas fontes:
+   ```js
+   fontFamily: {
+     'inter-regular': ['Inter_400Regular'],
+     'inter-semibold': ['Inter_600SemiBold'],
+     'inter-bold': ['Inter_700Bold'],
+     // Adicione suas novas fontes aqui
+     'sua-fonte': ['SuaFonte-Regular'],
+   }
+   ```
+
+3. **Importar fontes no projeto**:
+   - Caso use o Expo Font, importe e carregue as fontes no arquivo `app/_layout.tsx`
+
+> 💡 **Dica**: Para usar fontes carregadas pelo Expo, consulte a [documentação oficial do Expo sobre fontes](https://docs.expo.dev/guides/using-custom-fonts/).
+
 ### 📱 Configuração da StatusBar
 
 A barra de status (onde aparecem as horas, sinal, bateria) está configurada para respeitar o tema atual do aplicativo:

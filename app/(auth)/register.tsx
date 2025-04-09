@@ -18,7 +18,7 @@ export default function Register() {
   const [isLinkHovered, setIsLinkHovered] = useState(false);
   const { currentTheme } = useTheme();
   const { width } = useWindowDimensions();
-  const { signUp, isLoading } = useAuth();
+  const { signUp, isLoading, checkEmailExists } = useAuth();
   const { showToast } = useToast();
   const router = useRouter();
   const isDark = currentTheme === 'dark';
@@ -54,6 +54,21 @@ export default function Register() {
           message: 'Email inválido',
           description: 'Por favor, digite um endereço de email válido.',
         });
+        return;
+      }
+
+      // Verificação explícita se o email já existe
+      const emailExists = await checkEmailExists(email);
+      if (emailExists) {
+        showToast({
+          type: 'info',
+          message: 'Email já cadastrado',
+          description: 'Uma conta com este email já existe. Você será redirecionado para a tela de login.',
+        });
+        
+        setTimeout(() => {
+          router.replace('/login');
+        }, 2000);
         return;
       }
 
