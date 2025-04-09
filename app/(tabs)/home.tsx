@@ -15,8 +15,17 @@ export default function Home() {
   const isDark = currentTheme === 'dark';
 
   const handleSignOut = async () => {
-    await signOut();
-    router.replace('/(auth)/login');
+    try {
+      await signOut();
+      // Não precisamos navegar aqui, a navegação acontecerá automaticamente
+      // pelo useEffect no contexto de autenticação quando a sessão for limpa
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      // Se houver erro, pode tentar redirecionar manualmente
+      setTimeout(() => {
+        router.replace('/(auth)/login');
+      }, 500);
+    }
   };
 
   // Obtenha as classes de tema corretas com base no modo atual

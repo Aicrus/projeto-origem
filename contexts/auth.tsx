@@ -388,18 +388,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Atualiza a sessão diretamente para evitar um ciclo de atualização
+      // Se chegou aqui, não houve erro e o login foi bem-sucedido
+      // Atualiza a sessão diretamente
       setSession(data.session);
 
-      // Sucesso no login
-      showToast({
-        type: 'success',
-        message: 'Login realizado!',
-        description: 'Bem-vindo de volta!',
-      });
+      // Sucesso no login - apenas exibe o toast se tiver data.session
+      if (data.session) {
+        showToast({
+          type: 'success',
+          message: 'Login realizado!',
+          description: 'Bem-vindo de volta!',
+        });
 
-      // Navega diretamente para a home, sem esperar pelo efeito
-      router.replace('/(tabs)/home');
+        // Navega diretamente para a home
+        router.replace('/(tabs)/home');
+      } else {
+        // Se não tiver sessão mesmo sem erro, algo deu errado
+        showToast({
+          type: 'error',
+          message: 'Erro no login',
+          description: 'Não foi possível iniciar sua sessão. Tente novamente.',
+        });
+      }
 
     } catch (error) {
       console.error('Erro no login:', error);
