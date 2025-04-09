@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Platform, StyleSheet, View, Text } from 'react-native';
-import { Home as HomeIcon } from 'lucide-react-native';
+import { Home as HomeIcon, Code as CodeIcon } from 'lucide-react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { ProtectedRoute } from '../../components/ProtectedRoute';
 import { useResponsive } from '../../hooks/useResponsive';
@@ -103,6 +103,13 @@ export default function TabsLayout() {
           options={{
             title: 'Home',
             tabBarIcon: ({ color }: { color: string }) => <HomeIcon size={24} color={color} strokeWidth={1.5} />,
+          }}
+        />
+        <Tabs.Screen
+          name="dev"
+          options={{
+            title: 'Dev',
+            tabBarIcon: ({ color }: { color: string }) => <CodeIcon size={24} color={color} strokeWidth={1.5} />,
           }}
         />
       </Tabs>

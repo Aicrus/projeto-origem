@@ -92,8 +92,8 @@ export default function RootLayout() {
       {/* Adiciona metadados básicos inline */}
       {Platform.OS === 'web' && (
         <Helmet>
-          <title>Projeto Base - Aplicativo Multiplataforma</title>
-          <meta name="description" content="Projeto base para desenvolvimento de aplicativos React Native/Expo multiplataforma para iOS, Android e Web." />
+          <title>Projeto Origem - Aplicativo Multiplataforma</title>
+          <meta name="description" content="Projeto Origem para desenvolvimento de aplicativos React Native/Expo multiplataforma para iOS, Android e Web." />
           <meta charSet="utf-8" />
           <html lang="pt-BR" />
           <link rel="dns-prefetch" href="https://fonts.googleapis.com" />

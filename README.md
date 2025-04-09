@@ -1,4 +1,4 @@
-# 🎨 Projeto Base com Design System
+# 🎨 Projeto Origem
 
 ## 📋 Índice
 - [👋 Introdução](#-introdução)
@@ -12,11 +12,12 @@
 - [📦 Componentes Principais](#-componentes-principais)
 - [📁 Estrutura do Projeto](#-estrutura-do-projeto)
 - [💻 Desenvolvimento](#-desenvolvimento)
+- [🔄 Renomeando o Projeto](#-renomeando-o-projeto)
 - [🤝 Suporte](#-suporte)
 
 ## 👋 Introdução
 
-Bem-vindo ao nosso projeto base! Este é um template moderno e flexível para criar aplicações incríveis que funcionam tanto na web quanto em dispositivos móveis. Nosso objetivo é tornar o desenvolvimento mais fácil e divertido, fornecendo uma base sólida com as melhores práticas já implementadas.
+Bem-vindo ao Projeto Origem! Este é um template moderno e flexível para criar aplicações incríveis que funcionam tanto na web quanto em dispositivos móveis. Nosso objetivo é tornar o desenvolvimento mais fácil e divertido, fornecendo uma base sólida com as melhores práticas já implementadas.
 
 ## ✨ Destaques
 
@@ -190,15 +191,67 @@ npm run android
    > 💡 **Dica**: Crie o arquivo correspondente em `app/(auth)/sua-nova-rota.tsx`
 
 2. **Usuários Logados**
-   - Padrão: `/(tabs)/dash` (nossa tela inicial após login)
+   - Padrão: `/(tabs)/home` (nossa tela inicial após login)
    - Para alterar, edite `contexts/auth.tsx`
 
 ### 📱 Fluxo de Autenticação
 - Login: `/(auth)/login`
 - Cadastro: `/(auth)/signup`
-- Home após login: `/(tabs)/dash`
+- Home após login: `/(tabs)/home`
 
 ## 🎨 Design System
+
+O projeto utiliza um design system completo e consistente para todas as plataformas (web, iOS e Android). 
+
+Principais características:
+- 🎨 Cores temáticas para modo claro e escuro
+- 📏 Sistema consistente de espaçamento e tipografia
+- 📱 Componentes adaptados para todas as plataformas
+- 🔄 Suporte completo a temas
+
+### 📱 Configuração da StatusBar
+
+A barra de status (onde aparecem as horas, sinal, bateria) está configurada para respeitar o tema atual do aplicativo:
+
+```typescript
+// Configuração da StatusBar do Expo
+import { StatusBar } from 'expo-status-bar';
+
+<StatusBar 
+  style={currentTheme === 'dark' ? 'light' : 'dark'} // Texto branco em fundo escuro, texto preto em fundo claro
+  backgroundColor={currentTheme === 'dark' ? '#1C1E26' : '#F7F8FA'} // Fundo transparente ou cores do tema
+/>
+```
+
+Esta configuração pode ser encontrada no arquivo `app/_layout.tsx` e garante que a StatusBar sempre se ajuste ao tema atual do aplicativo.
+
+### 🎨 Cores do Sistema e NativeWind
+
+O projeto utiliza o NativeWind (Tailwind para React Native) para estilização. As definições de cores, espaçamento, tipografia e sombras estão no arquivo `tailwind.config.js`.
+
+Para usar as classes do design system:
+
+```tsx
+// Em um componente:
+const isDark = currentTheme === 'dark';
+const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
+const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
+
+<View className={`p-md ${bgPrimary}`}>
+  <Text className={`text-headline-lg font-inter-bold ${textPrimary}`}>
+    Título Principal
+  </Text>
+</View>
+```
+
+### 🎨 Visualização do Design System
+
+Para visualizar todas as opções do Design System, acesse a rota "/(tabs)/dev" no aplicativo. Lá você encontrará exemplos visuais de:
+- Cores
+- Tipografia
+- Espaçamentos
+- Sombras
+- Componentes básicos
 
 ### 🎨 Cores do Sistema
 ```typescript
@@ -220,167 +273,6 @@ const COLORS = {
 };
 ```
 
-### 🖱️ Hover (Web)
-
-O projeto oferece duas abordagens diferentes para efeitos de hover:
-
-#### 1️⃣ Hover Simples
-Este é o hover básico, ideal para elementos isolados como botões e links que precisam apenas de uma mudança sutil de opacidade ao passar o mouse:
-
-- ✅ **Quando Usar**:
-  - Em botões de ação (login, cadastro, etc)
-  - Em links de navegação simples
-  - Quando precisa apenas reduzir a opacidade no hover
-  - Para interações isoladas e específicas
-
-- 🎯 **Características**:
-  - Transição suave de opacidade
-  - Sem animações complexas
-  - Implementação leve e direta
-  - Específico para cada componente
-
-#### 2️⃣ RoverView Component
-Este é nosso componente especializado para efeitos de hover mais elaborados, usado em cards e elementos que precisam de animações mais complexas:
-
-- ✅ **Quando Usar**:
-  - Em cards de conteúdo
-  - Em elementos que precisam de zoom
-  - Quando necessitar animações elaboradas
-  - Para manter consistência em grupos de elementos similares
-
-- 🎯 **Características**:
-  - Animação de zoom
-  - Efeitos de elevação (shadow)
-  - Transições mais complexas
-  - Padronizado para todo o sistema
-
-#### 💡 Qual Escolher?
-
-1. **Use Hover Simples quando**:
-   ```typescript
-   // Para interações básicas e isoladas
-   const [isHovered, setIsHovered] = useState(false);
-   
-   <Pressable
-     onHoverIn={() => Platform.OS === 'web' && setIsHovered(true)}
-     onHoverOut={() => Platform.OS === 'web' && setIsHovered(false)}
-     style={{ opacity: isHovered ? 0.8 : 1 }}
-   >
-     {/* Conteúdo */}
-   </Pressable>
-   ```
-
-2. **Use RoverView quando**:
-   ```typescript
-   // Para cards e elementos que precisam de animações complexas
-   import { RoverView } from '@/components/RoverView';
-   
-   <RoverView>
-     <Card>
-       {/* Conteúdo que precisa de zoom e elevação */}
-     </Card>
-   </RoverView>
-   ```
-
-#### 🎯 Comparativo
-
-| Característica | Hover Simples | RoverView |
-|---------------|---------------|-----------|
-| Complexidade | Baixa | Alta |
-| Animações | Básicas | Complexas |
-| Uso Ideal | Botões/Links | Cards/Containers |
-| Customização | Por elemento | Padronizada |
-| Performance | Muito leve | Moderada |
-
-#### 🚀 Onde Usamos no Projeto
-
-- **RoverView**: 
-  - Card de Perfil (com zoom e elevação)
-  - Menu de Notificações (com animação ao expandir)
-  - Cards de Conteúdo Interativos
-
-- **Hover Simples**:
-  - Links da Sidebar (mudança sutil de cor)
-  - Botões de Login/Cadastro (alteração de opacidade)
-  - Links de Navegação (efeito suave)
-
-
-> 💡 **Dica**: Se estiver em dúvida, comece com o hover simples. Se perceber que precisa de mais elaboração ou que o mesmo efeito está sendo repetido em vários lugares similares, considere migrar para o RoverView.
-
-Agora vamos ver como implementar cada tipo...
-
-#### 📱 Exemplos de Hover Simples no Projeto
-
-1. **Botões Principais**
-   ```typescript
-   // Botão de Login/Cadastro
-   <Pressable
-     style={[
-       styles.button,
-       { 
-         backgroundColor: COLORS[currentTheme].primary,
-         opacity: isLoading ? 0.7 : isHovered ? 0.8 : 1,
-       }
-     ]}
-     onHoverIn={() => Platform.OS === 'web' && setIsHovered(true)}
-     onHoverOut={() => Platform.OS === 'web' && setIsHovered(false)}
-   >
-     <ThemedText>Entrar</ThemedText>
-   </Pressable>
-   ```
-
-2. **Links de Navegação**
-   ```typescript
-   // Links "Faça login" e "Cadastre-se"
-   <Link href="/register" asChild>
-     <Pressable
-       onHoverIn={() => Platform.OS === 'web' && setIsLinkHovered(true)}
-       onHoverOut={() => Platform.OS === 'web' && setIsLinkHovered(false)}
-     >
-       <ThemedText
-         style={[
-           typography.bodySemiBold,
-           {
-             color: COLORS[currentTheme].primary,
-             opacity: isLinkHovered ? 0.8 : 1,
-             transition: 'all 0.2s ease-in-out',
-           }
-         ]}
-       >
-         Cadastre-se
-       </ThemedText>
-     </Pressable>
-   </Link>
-   ```
-
-#### 💡 Dicas Gerais para Hover
-- Sempre verifique `Platform.OS === 'web'` antes de aplicar efeitos de hover
-- Use transições suaves com `transition: 'all 0.2s ease-in-out'`
-- Mantenha a opacidade entre 0.8 e 1 para um efeito sutil
-- Adicione `cursor: 'pointer'` para melhor UX na web
-- Escolha entre Hover Simples ou RoverView baseado na complexidade necessária
-
-### 📏 Sistema de Espaçamento
-```typescript
-const SPACING = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
-};
-```
-
-### 📱 Breakpoints
-```typescript
-const BREAKPOINTS = {
-  mobile: 0,
-  tablet: 768,
-  desktop: 1024,
-};
-```
-
 ## 📦 Componentes Principais
 
 ### 🔔 Toast
@@ -397,36 +289,6 @@ showToast({
 });
 ```
 
-### 📄 PageContainer
-```typescript
-import { PageContainer } from '@/components/PageContainer';
-
-export default function MinhaTelaLinda() {
-  return (
-    <PageContainer>
-      {/* Seu conteúdo aqui */}
-    </PageContainer>
-  );
-}
-```
-
-### 🧭 Sidebar e Header
-```typescript
-import { Sidebar } from '@/components/Sidebar';
-import { Header } from '@/components/Header';
-
-// Usar na sua tela
-<Sidebar 
-  onNavigate={handleNavigation} 
-  currentPath="/sua-rota"
-/>
-
-<Header 
-  sidebarWidth={currentSidebarWidth} 
-  onNavigate={handleNavigation}
-/>
-```
-
 ## 📁 Estrutura do Projeto
 
 ```
@@ -439,15 +301,15 @@ import { Header } from '@/components/Header';
     /register.tsx   # Tela de registro
   /(tabs)           # Rotas autenticadas
     /_layout.tsx    # Layout das tabs
-    /dash.tsx       # Dashboard (tela inicial)
-    /design-system.tsx  # Visualização do Design System
+    /home.tsx       # Home (tela inicial)
+    /dev.tsx        # Ferramentas de desenvolvimento e Design System
   /+not-found.tsx   # Página 404
 
 🎨 Assets e Componentes
 /assets            # Recursos estáticos
 /components        # Componentes reutilizáveis
   /ui             # Componentes base (botões, inputs, etc)
-/constants        # Design System e configurações
+/constants        # Constantes de responsividade e breakpoints
 /contexts         # Contextos do React
 /hooks            # Hooks personalizados
 /lib              # Bibliotecas e utilitários
@@ -488,13 +350,109 @@ git push
 6. [ ] Usar cores do tema atual
 7. [ ] Implementar animações suaves (quando necessário)
 
+## 🔄 Renomeando o Projeto
+
+Se você deseja usar este projeto como base e mudar seu nome, siga estes passos para evitar erros:
+
+### 📋 Passo a Passo para Renomear
+
+1. **Renomeie a pasta do projeto**
+   ```bash
+   # Fora do diretório do projeto
+   mv projeto-origem seu-novo-nome
+   cd seu-novo-nome
+   ```
+
+2. **Limpe o cache e reinstale dependências**
+   ```bash
+   # Limpe completamente tudo para evitar referências ao nome antigo
+   rm -rf node_modules
+   rm -rf .expo
+   npm cache clean --force
+   
+   # Reinstale as dependências
+   npm install
+   ```
+
+3. **Atualize o arquivo package.json**
+   Edite o arquivo e mude o nome do projeto:
+   ```json
+   {
+     "name": "seu-novo-nome",
+     // outras configurações...
+   }
+   ```
+
+4. **Atualize o app.json**
+   Edite o nome, slug e outras referências:
+   ```json
+   {
+     "expo": {
+       "name": "Seu Novo Nome",
+       "slug": "seu-novo-nome",
+       // outras configurações...
+     }
+   }
+   ```
+
+5. **Atualize metadados no Head (para web)**
+   Edite o arquivo `app/_layout.tsx` atualizando o title e meta description:
+   ```tsx
+   <Helmet>
+     <title>Seu Novo Nome - Aplicativo Multiplataforma</title>
+     <meta name="description" content="Seu Novo Nome para desenvolvimento de aplicativos..." />
+     // outros metadados...
+   </Helmet>
+   ```
+
+6. **Reinicie com cache limpo**
+   ```bash
+   npx expo start -c
+   ```
+
+### ⚠️ Resolução de Problemas
+
+Se encontrar erros relacionados a caminhos ou nomes antigos do projeto:
+
+1. **Erro de caminhos**: Se aparecer erro mencionando caminhos com o nome antigo:
+   ```
+   Unable to resolve module [path/com/nome-antigo]
+   ```
+
+   Execute:
+   ```bash
+   # Limpe o cache do Metro
+   npx react-native start --reset-cache
+   # OU
+   npx expo start -c
+   ```
+
+2. **Persistência de erros**: Se os erros continuarem após limpar o cache:
+   - Verifique se há referências hardcoded ao nome antigo no código
+   - Considere remover completamente o projeto e clonar novamente
+   - Verifique se há variáveis de ambiente ou configurações locais com o nome antigo
+
+> 💡 **Dica**: Para projetos em produção, considere usar um nome de projeto genérico nas dependências internas para evitar problemas de renomeação.
+
 ## 🤝 Suporte
 
 - 📖 Consulte nossa documentação acima
 - 🐛 Encontrou um bug? Abra uma issue no GitHub
 - 💡 Tem uma sugestão? Adoramos ouvir ideias novas!
 
+## 📜 Licença
+
+Este projeto está sob uma **Licença Exclusiva da Aicrus Academy**. 
+
+⚠️ **IMPORTANTE**: Este software só pode ser utilizado por membros ativos da Aicrus Academy. A licença permite que membros desenvolvam projetos pessoais e comerciais para seus clientes usando este software como base, mas proíbe expressamente:
+- Revenda ou redistribuição para terceiros
+- Uso por não-membros da Aicrus Academy
+- Remoção dos avisos de direitos autorais
+
+Por favor, leia o arquivo `LICENSE` na raiz do projeto para entender completamente os termos e restrições de uso.
+
+O uso não autorizado resultará em penalidades legais e fiscais.
+
 ---
 
-Feito com ❤️ pela [Aicrus Tech](https://www.aicrustech.com/)
-Sinta -se à vontade para remover o texto acima quando quiser.
+Feito com ❤️ pela [Aicrus Tech](https://www.aicrustech.com/)  

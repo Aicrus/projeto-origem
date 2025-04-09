@@ -1,4 +1,4 @@
-# 🔒 REGRAS_FUNDAMENTAIS.md
+# 🔒 REGRAS.md - Projeto Origem
 
 ## 🎯 Propósito e Escopo
 Este documento é o guia mestre OBRIGATÓRIO que estabelece as regras invioláveis para TODAS as modificações no projeto. Toda interação deve seguir estas diretrizes RIGOROSAMENTE.
@@ -11,7 +11,7 @@ Este documento é o guia mestre OBRIGATÓRIO que estabelece as regras invioláve
    - MANTENHA todos os padrões e convenções existentes
 
 2. **Princípio da Consistência**
-   - SEMPRE siga o Design System estabelecido
+   - SEMPRE siga o Design System estabelecido em `tailwind.config.js`
    - NUNCA introduza novos padrões sem autorização
    - MANTENHA a coerência com o código existente
 
@@ -39,7 +39,7 @@ Este documento é o guia mestre OBRIGATÓRIO que estabelece as regras invioláve
 ### ✅ Ações Obrigatórias
 1. SEMPRE:
    - Siga o Design System
-   - Use os componentes temáticos (ThemedView, ThemedText)
+   - Use as classes de tema do NativeWind/Tailwind
    - Mantenha a responsividade
    - Preserve a tipagem TypeScript
    - Respeite os breakpoints definidos
@@ -51,39 +51,47 @@ Este documento é o guia mestre OBRIGATÓRIO que estabelece as regras invioláve
 
 ## 🎨 Sistema de Design (NUNCA IGNORAR)
 
-### Imports Obrigatórios
+### 📱 Breakpoints (SEMPRE RESPEITAR)
 ```typescript
-// SEMPRE use estes imports para consistência
-import { COLORS, SPACING, BORDER_RADIUS, TYPOGRAPHY } from '@/constants/DesignSystem';
-import { useTheme } from '@/hooks/ThemeContext';
-import { ThemedView, ThemedText } from '@/components/ui';
-```
-
-### Cores e Temas
-```typescript
-// ✅ CORRETO
-const { currentTheme } = useTheme();
-style={{ color: COLORS[currentTheme].text }}
-
-// ❌ ERRADO - NUNCA faça isso
-style={{ color: '#000000' }}
-```
-
-### Breakpoints (SEMPRE RESPEITAR)
-```typescript
-const BREAKPOINTS = {
-  mobile: 0,      // 0-767px
-  tablet: 768,    // 768-1023px
-  desktop: 1024,  // 1024px+
+// Os breakpoints reais do projeto são:
+export const BREAKPOINTS = {
+  // Celulares pequenos (até iPhone SE)
+  SMALL_MOBILE: 320, 
+  
+  // Celulares maiores (até iPhone Pro Max)
+  MOBILE: 480,
+  
+  // Tablets pequenos e celulares em landscape
+  SMALL_TABLET: 640,
+  
+  // Tablets (iPad, etc)
+  TABLET: 768,
+  
+  // Tablets grandes e pequenos laptops
+  LARGE_TABLET: 900,
+  
+  // Laptops e desktops
+  DESKTOP: 1024,
+  
+  // Telas grandes
+  LARGE_DESKTOP: 1280,
 };
 
-// ✅ CORRETO
-import { useWindowDimensions } from 'react-native';
+// ✅ CORRETO - Usando o hook useResponsive
+import { useResponsive } from '../hooks/useResponsive';
 
-const { width } = useWindowDimensions();
-const isMobile = width < BREAKPOINTS.tablet;
-const isTablet = width >= BREAKPOINTS.tablet && width < BREAKPOINTS.desktop;
-const isDesktop = width >= BREAKPOINTS.desktop;
+// No componente
+const { responsive, isMobile, isTablet, isDesktop } = useResponsive();
+
+// Usar valores diferentes por breakpoint:
+const styles = {
+  maxWidth: responsive({
+    mobile: '95%',    // Para mobile (até 480px)
+    tablet: '70%',    // Para tablet (481-1023px)
+    desktop: '50%',   // Para desktop (1024px+)
+    default: '95%'    // Valor padrão se nenhum caso acima se aplicar
+  })
+}
 ```
 
 ## 📱 Regras Específicas do Expo
@@ -92,8 +100,8 @@ const isDesktop = width >= BREAKPOINTS.desktop;
    - NUNCA altere o app.json sem autorização
    - MANTENHA as configurações de plugins inalteradas
    - RESPEITE as configurações específicas de plataforma
+
 ## 🔍 Checklist de Verificação (USAR EM TODA MODIFICAÇÃO)
-```
 
 1. [ ] A modificação foi EXPLICITAMENTE solicitada?
 2. [ ] Está usando APENAS os imports corretos?
@@ -102,6 +110,7 @@ const isDesktop = width >= BREAKPOINTS.desktop;
 5. [ ] Usa APENAS constantes do Design System?
 6. [ ] Preserva TODA a estrutura existente?
 7. [ ] Mantém TODA a tipagem TypeScript?
+8. [ ] Respeita a configuração da StatusBar para ambos os temas?
 
 ## ⚠️ Processo de Modificação
 

@@ -1,42 +1,40 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { useTheme } from '../hooks/ThemeContext';
 
 type ThemeMode = 'light' | 'dark' | 'system';
+
+interface ThemeOptionProps {
+  title: string;
+  isActive: boolean;
+  onPress: () => void;
+  isDark: boolean;
+}
 
 const ThemeOption = ({ 
   title, 
   isActive, 
   onPress, 
   isDark 
-}: { 
-  title: string; 
-  isActive: boolean; 
-  onPress: () => void; 
-  isDark: boolean;
-}) => {
+}: ThemeOptionProps) => {
+  // Classes baseadas no tema e estado
+  const bgColor = isActive 
+    ? (isDark ? 'bg-primary-dark' : 'bg-primary-light') 
+    : (isDark ? 'bg-bg-secondary-dark' : 'bg-bg-secondary-light');
+    
+  const textColor = isActive 
+    ? 'text-text-primary-dark' 
+    : (isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light');
+    
+  const fontWeight = isActive ? 'font-inter-semibold' : 'font-inter-regular';
+
   return (
     <Pressable
       onPress={onPress}
-      style={[
-        styles.optionButton,
-        {
-          backgroundColor: isActive 
-            ? (isDark ? '#4A6FA5' : '#4A6FA5') 
-            : (isDark ? '#14181B' : '#FFFFFF')
-        }
-      ]}
+      className={`py-xs px-md mx-xs rounded-md ${bgColor}`}
     >
       <Text
-        style={[
-          styles.optionText,
-          {
-            color: isActive 
-              ? '#FFFFFF' 
-              : (isDark ? '#95A1AC' : '#57636C'),
-            fontWeight: isActive ? '600' : '400'
-          }
-        ]}
+        className={`text-label-md text-center ${textColor} ${fontWeight}`}
       >
         {title}
       </Text>
@@ -52,17 +50,18 @@ export const ThemeSelector = () => {
     setThemeMode(newTheme);
   };
 
+  // Classes de texto baseadas no tema
+  const labelTextColor = isDark ? 'text-divider-light' : 'text-text-secondary-light';
+  const statusTextColor = isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light';
+
   return (
-    <View style={styles.container}>
+    <View className="my-xl items-center w-full">
       <Text
-        style={[
-          styles.label,
-          { color: isDark ? '#E0E3E7' : '#57636C' }
-        ]}
+        className={`text-body-md ${labelTextColor} mb-sm`}
       >
         Tema:
       </Text>
-      <View style={styles.optionsContainer}>
+      <View className="flex-row justify-center mb-xs">
         <ThemeOption
           title="Claro"
           isActive={themeMode === 'light'}
@@ -83,10 +82,7 @@ export const ThemeSelector = () => {
         />
       </View>
       <Text
-        style={[
-          styles.status,
-          { color: isDark ? '#95A1AC' : '#57636C' }
-        ]}
+        className={`text-body-sm ${statusTextColor} mt-xs`}
       >
         {themeMode === 'system' 
           ? `Sistema (${currentTheme === 'dark' ? 'escuro' : 'claro'})` 
@@ -96,35 +92,4 @@ export const ThemeSelector = () => {
       </Text>
     </View>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: 24,
-    alignItems: 'center',
-    width: '100%',
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 12,
-  },
-  optionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  optionButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginHorizontal: 4,
-    borderRadius: 8,
-  },
-  optionText: {
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  status: {
-    fontSize: 12,
-    marginTop: 8,
-  }
-}); 
+}; 

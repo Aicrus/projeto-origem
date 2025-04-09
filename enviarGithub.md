@@ -5,7 +5,7 @@ A URL definida neste documento (URL_OFICIAL_DO_PROJETO) é a ÚNICA URL CORRETA 
 Se a URL remota do seu repositório estiver diferente, é a URL remota que DEVE ser corrigida, NUNCA o contrário.
 
 ## Repositório Oficial do Projeto
-URL_OFICIAL_DO_PROJETO="https://github.com/Aicrus/projeto-base"
+URL_OFICIAL_DO_PROJETO="https://github.com/Aicrus/projeto-origem"
 
 ## DIRETRIZES FUNDAMENTAIS:
 
