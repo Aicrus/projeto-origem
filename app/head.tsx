@@ -15,11 +15,19 @@ import { useTheme } from '../hooks/ThemeContext';
  * - Metatags para melhorar o SEO
  */
 export default function Head() {
-  const { currentTheme } = useTheme();
-  const isDark = currentTheme === 'dark';
+  // Tenta usar o Theme, mas com fallback para caso não esteja disponível
+  let themeColor = '#4A6FA5'; // Valor padrão (primary-color)
+  let isDark = false;
   
-  // Use a cor primária do tema como theme-color
-  const themeColor = isDark ? '#4A6FA5' : '#4A6FA5'; // primary-dark ou primary-light do tailwind.config.js
+  try {
+    const theme = useTheme();
+    isDark = theme?.currentTheme === 'dark';
+    // Use a cor primária do tema como theme-color
+    themeColor = isDark ? '#4A6FA5' : '#4A6FA5'; // primary-dark ou primary-light do tailwind.config.js
+  } catch (error) {
+    console.warn('Theme context não disponível no Head:', error);
+    // Continua com os valores padrão
+  }
 
   return (
     <Helmet>
