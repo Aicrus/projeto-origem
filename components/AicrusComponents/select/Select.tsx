@@ -137,7 +137,7 @@ const WebDropdownOptions = ({
   position,
   maxHeight,
   searchable,
-  autoFocus = true,
+  autoFocus = false,
   superBaseTable,
 }: any) => {
   // Ref para a lista de opções
@@ -149,10 +149,21 @@ const WebDropdownOptions = ({
   // Estado para controlar a pesquisa
   const [searchValue, setSearchValue] = useState('');
   
-  // Filtrar opções baseado na pesquisa
+  // Função para normalizar texto (remover acentos)
+  const normalizeText = (text: string): string => {
+    return text.toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s]/gi, '');
+  };
+  
+  // Filtrar opções baseado na pesquisa - versão melhorada
   const filteredOptions = searchable && searchValue
-    ? options.filter((option: DropdownOption) => 
-        option.label.toLowerCase().includes(searchValue.toLowerCase()))
+    ? options.filter((option: DropdownOption) => {
+        const normalizedLabel = normalizeText(option.label);
+        const normalizedSearch = normalizeText(searchValue);
+        return normalizedLabel.includes(normalizedSearch);
+      })
     : options;
   
   // Reset da pesquisa quando fechar
@@ -161,6 +172,34 @@ const WebDropdownOptions = ({
       setSearchValue('');
     }
   }, [visible]);
+  
+  // Adicionar estilos para remover outline de foco no campo de busca
+  useEffect(() => {
+    if (Platform.OS === 'web' && searchable && typeof document !== 'undefined') {
+      const style = document.createElement('style');
+      style.textContent = `
+        /* Remover outline azul padrão nos inputs de busca do Select */
+        [data-search-input="true"]:focus {
+          outline: none !important;
+          outline-width: 0 !important;
+          box-shadow: none !important;
+          -moz-box-shadow: none !important;
+          -webkit-box-shadow: none !important;
+        }
+        
+        /* Remover cor de seleção padrão (azul) */
+        [data-search-input="true"]::selection {
+          background-color: rgba(128, 128, 128, 0.2) !important;
+          color: inherit !important;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      return () => {
+        document.head.removeChild(style);
+      };
+    }
+  }, [searchable, visible]);
   
   // Salvar posição de scroll quando o componente estiver montado
   useEffect(() => {
@@ -469,11 +508,28 @@ const MobileSelectModal = ({
   position,
   openDown,
   searchable,
-  autoFocus = true,
+  autoFocus = false,
   superBaseTable,
 }: any) => {
   // Estado para controlar a pesquisa
   const [searchValue, setSearchValue] = useState('');
+  
+  // Função para normalizar texto (remover acentos)
+  const normalizeText = (text: string): string => {
+    return text.toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s]/gi, '');
+  };
+  
+  // Filtrar opções baseado na pesquisa - versão melhorada
+  const filteredOptions = searchable && searchValue
+    ? options.filter((option: DropdownOption) => {
+        const normalizedLabel = normalizeText(option.label);
+        const normalizedSearch = normalizeText(searchValue);
+        return normalizedLabel.includes(normalizedSearch);
+      })
+    : options;
   
   // Ref para a ScrollView
   const scrollViewRef = useRef<ScrollView>(null);
@@ -481,18 +537,40 @@ const MobileSelectModal = ({
   // Ref para a posição de scroll
   const scrollPositionRef = useRef(0);
   
-  // Filtrar opções baseado na pesquisa
-  const filteredOptions = searchable && searchValue
-    ? options.filter((option: DropdownOption) => 
-        option.label.toLowerCase().includes(searchValue.toLowerCase()))
-    : options;
-  
   // Reset da pesquisa quando fechar
   useEffect(() => {
     if (!visible) {
       setSearchValue('');
     }
   }, [visible]);
+  
+  // Adicionar estilos para remover outline de foco no campo de busca
+  useEffect(() => {
+    if (Platform.OS === 'web' && searchable && typeof document !== 'undefined') {
+      const style = document.createElement('style');
+      style.textContent = `
+        /* Remover outline azul padrão nos inputs de busca do Select */
+        [data-search-input-mobile="true"]:focus {
+          outline: none !important;
+          outline-width: 0 !important;
+          box-shadow: none !important;
+          -moz-box-shadow: none !important;
+          -webkit-box-shadow: none !important;
+        }
+        
+        /* Remover cor de seleção padrão (azul) */
+        [data-search-input-mobile="true"]::selection {
+          background-color: rgba(128, 128, 128, 0.2) !important;
+          color: inherit !important;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      return () => {
+        document.head.removeChild(style);
+      };
+    }
+  }, [searchable, visible]);
   
   // Lidar com alteração na pesquisa
   const handleSearchChange = (text: string) => {
@@ -656,6 +734,8 @@ const MobileSelectModal = ({
                 placeholder="Pesquisar..."
                 placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
                 autoFocus={autoFocus}
+                // @ts-ignore - Para compatibilidade web
+                data-search-input-mobile="true"
               />
               {searchValue.length > 0 && (
                 <TouchableOpacity 
@@ -726,7 +806,7 @@ export const Select = ({
   max,
   onOpen,
   onClose,
-  autoFocus = true,
+  autoFocus = false,
   superBaseTable = false,
 }: SelectProps) => {
   // Estado para controlar abertura do dropdown
