@@ -77,6 +77,7 @@ export default function Home() {
       contentContainerStyle={{ 
         flexGrow: 1,
         paddingVertical: 40,
+        paddingBottom: isMobile ? 120 : 40,
         alignItems: 'center'
       }}
     >

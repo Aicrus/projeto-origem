@@ -483,7 +483,11 @@ export default function DevPage() {
 
         {/* Conteúdo da Seção */}
         {activeSection === 'config' ? (
-          <ScrollView className="flex-1">
+          <ScrollView className="flex-1"
+            contentContainerStyle={{ 
+              paddingBottom: isMobile ? 120 : 0 
+            }}
+          >
             <View className={`p-lg`}>
               {/* Título da seção */}
               <Text className={`text-headline-lg font-inter-bold ${textPrimary} mb-md`}>
@@ -650,7 +654,10 @@ export default function DevPage() {
                 <ScrollView 
                   className="flex-1" 
                   showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{ flexGrow: 1 }}
+                  contentContainerStyle={{ 
+                    flexGrow: 1,
+                    paddingBottom: 120 
+                  }}
                 >
                   {renderComponentContent()}
                 </ScrollView>
