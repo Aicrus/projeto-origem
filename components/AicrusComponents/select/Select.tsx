@@ -48,6 +48,8 @@ interface BaseDropdownProps {
   onClose?: () => void;
   /** Controla se o campo de pesquisa deve receber foco automaticamente quando aberto */
   autoFocus?: boolean;
+  /** Indica se o select está dentro de uma tabela Supabase */
+  superBaseTable?: boolean;
 }
 
 interface SingleSelectProps extends BaseDropdownProps {
@@ -136,6 +138,7 @@ const WebDropdownOptions = ({
   maxHeight,
   searchable,
   autoFocus = true,
+  superBaseTable,
 }: any) => {
   // Ref para a lista de opções
   const optionsRef = useRef<any>(null);
@@ -217,18 +220,52 @@ const WebDropdownOptions = ({
     e.stopPropagation();
   };
   
-  // Posicionamento web
-  const positionStyle = {
-    position: 'fixed' as 'fixed',
-    top: position?.top || 0,
-    left: position?.left || 0,
-    width: position?.width || 200,
-    maxHeight: maxHeight || 300,
-    zIndex: 2147483647, // Valor máximo possível para z-index
-    overflowY: 'auto' as 'auto',
+  // Função para determinar o estilo de posição
+  const getPositionStyle = () => {
+    // Se não temos posição, retornar estilo padrão
+    if (!position) {
+      return {
+        position: 'fixed' as 'fixed',
+        top: 0,
+        left: 0,
+        width: 200,
+        maxHeight: maxHeight || 300,
+        zIndex: 2147483647,
+        overflowY: 'auto' as 'auto',
+      };
+    }
+    
+    // Por padrão, abre para baixo (openDown = true ou undefined)
+    // Ou se estiver em uma tabela Supabase
+    if (position.openDown !== false || superBaseTable) {
+      return {
+        position: 'fixed' as 'fixed',
+        top: position.top || 0,
+        left: position.left || 0,
+        width: position.width || 200,
+        maxHeight: maxHeight || 300,
+        zIndex: 2147483647,
+        overflowY: 'auto' as 'auto',
+      };
+    } 
+    // Abre para cima quando openDown é explicitamente false e não é tabela
+    else {
+      return {
+        position: 'fixed' as 'fixed',
+        bottom: window.innerHeight - position.top,
+        left: position.left || 0,
+        width: position.width || 200,
+        maxHeight: maxHeight || 300,
+        zIndex: 2147483647,
+        overflowY: 'auto' as 'auto',
+      };
+    }
   };
   
-  console.log("Renderizando WebDropdownOptions com posição:", position);
+  // Posicionamento web
+  const positionStyle = getPositionStyle();
+  
+  console.log("Renderizando WebDropdownOptions com posição:", position, "estilo:", positionStyle);
   
   // Lidar com alteração na pesquisa
   const handleSearchChange = (text: string) => {
@@ -401,6 +438,7 @@ const MobileSelectModal = ({
   openDown,
   searchable,
   autoFocus = true,
+  superBaseTable,
 }: any) => {
   // Estado para controlar a pesquisa
   const [searchValue, setSearchValue] = useState('');
@@ -619,6 +657,7 @@ export const Select = ({
   onOpen,
   onClose,
   autoFocus = true,
+  superBaseTable = false,
 }: SelectProps) => {
   // Estado para controlar abertura do dropdown
   const [open, setOpen] = useState(false);
@@ -646,40 +685,38 @@ export const Select = ({
       const rect = selectRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       
-      // Calcula se deve abrir para cima ou para baixo
-      const openDown = rect.bottom + maxHeight <= viewportHeight;
-      console.log("Abrirá para:", openDown ? "baixo" : "cima");
+      // Se estiver em uma tabela, força sempre abrir para baixo
+      // Caso contrário, verifica se há espaço disponível abaixo
+      const openDown = superBaseTable || rect.bottom + maxHeight <= viewportHeight || rect.top < maxHeight;
+      
+      console.log("Abrirá para:", openDown ? "baixo" : "cima", "espaço abaixo:", viewportHeight - rect.bottom);
       
       // Espaçamento consistente para cima e para baixo
       const spacingUp = 3; // Mantido em 3px para cima
       const spacingDown = 3; // Mantido em 3px para baixo
       
-      // Cálculo direto da posição
-      const topPosition = openDown 
-        ? rect.bottom + spacingDown + window.scrollY  // Abre para baixo
-        : rect.top - maxHeight - spacingUp + window.scrollY;  // Abre para cima
-      
-      // Debugging
-      console.log("Posição calculada:", {
-        top: topPosition,
-        rectTop: rect.top,
-        rectBottom: rect.bottom,
-        maxHeight,
-        spacingUp,
-        spacingDown,
-        openDown
-      });
-      
-      setPosition({
-        top: topPosition,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-        openDown: openDown
-      });
+      // Se abrir para baixo, usa top, senão usa bottom
+      if (openDown) {
+        // Abre para baixo - padrão
+        setPosition({
+          top: rect.bottom + spacingDown + window.scrollY,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+          openDown: true
+        });
+      } else {
+        // Abre para cima - só quando não tiver espaço suficiente abaixo
+        setPosition({
+          top: rect.top - spacingUp + window.scrollY,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+          openDown: false
+        });
+      }
     }
   }, [open, maxHeight, options]); // Adicionado options para recalcular quando os dados mudam
   
-  // Efeito adicional para garantir o recálculo quando os dados mudam com o dropdown aberto
+  // Efeito adicional para garantir o recálculo quando os dados mudam
   useEffect(() => {
     // Se o dropdown estiver aberto, forçar recálculo da posição quando as opções mudarem
     if (open && options.length > 0 && Platform.OS === 'web' && selectRef.current) {
@@ -687,26 +724,34 @@ export const Select = ({
       const rect = selectRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       
-      // Calcula se deve abrir para cima ou para baixo
-      const openDown = rect.bottom + maxHeight <= viewportHeight;
+      // Se estiver em uma tabela, força sempre abrir para baixo
+      // Caso contrário, verifica se há espaço disponível abaixo
+      const openDown = superBaseTable || rect.bottom + maxHeight <= viewportHeight || rect.top < maxHeight;
       
       // Espaçamento consistente 
       const spacingUp = 3; 
       const spacingDown = 3;
       
-      // Cálculo direto da posição com o spacing correto
-      const topPosition = openDown 
-        ? rect.bottom + spacingDown + window.scrollY
-        : rect.top - maxHeight - spacingUp + window.scrollY;
-      
-      setPosition({
-        top: topPosition,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-        openDown: openDown
-      });
+      // Se abrir para baixo, usa top, senão usa bottom
+      if (openDown) {
+        // Abre para baixo - padrão
+        setPosition({
+          top: rect.bottom + spacingDown + window.scrollY,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+          openDown: true
+        });
+      } else {
+        // Abre para cima - só quando não tiver espaço suficiente abaixo
+        setPosition({
+          top: rect.top - spacingUp + window.scrollY,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+          openDown: false
+        });
+      }
     }
-  }, [options, open]);
+  }, [options, open, maxHeight, superBaseTable]);
   
   // Bloquear scroll da página quando dropdown está aberto (web)
   useEffect(() => {
@@ -863,7 +908,10 @@ export const Select = ({
             // Usando Dimensions para obter o tamanho da tela
             const { height: windowHeight } = require('react-native').Dimensions.get('window');
             const spaceBelow = windowHeight - (pageY + height);
-            const openDown = spaceBelow >= maxHeight;
+            
+            // Se não houver espaço suficiente embaixo, abre para cima
+            // Mas apenas se houver espaço suficiente para cima
+            const openDown = superBaseTable || spaceBelow >= maxHeight || pageY < maxHeight;
             
             // Espaçamento consistente
             const spacingDown = 3; // Mantido em 3px
@@ -893,24 +941,30 @@ export const Select = ({
           const rect = selectRef.current.getBoundingClientRect();
           const viewportHeight = window.innerHeight;
           
-          // Calcula se deve abrir para cima ou para baixo
-          const openDown = rect.bottom + maxHeight <= viewportHeight;
+          // Se estiver em uma tabela, força sempre abrir para baixo
+          // Caso contrário, verifica se há espaço disponível abaixo
+          const openDown = superBaseTable || rect.bottom + maxHeight <= viewportHeight || rect.top < maxHeight;
           
           // Espaçamento consistente
           const spacingUp = 3; // Mantido em 3px
           const spacingDown = 3; // Mantido em 3px
           
           // Cálculo mais direto
-          const topPosition = openDown 
-            ? rect.bottom + spacingDown + window.scrollY  // Abre para baixo
-            : rect.top - maxHeight - spacingUp + window.scrollY;  // Abre para cima
-          
-          setPosition({
-            top: topPosition,
-            left: rect.left + window.scrollX,
-            width: rect.width,
-            openDown: openDown
-          });
+          if (openDown) {
+            setPosition({
+              top: rect.bottom + spacingDown + window.scrollY,
+              left: rect.left + window.scrollX,
+              width: rect.width,
+              openDown: true
+            });
+          } else {
+            setPosition({
+              top: rect.top - spacingUp + window.scrollY,
+              left: rect.left + window.scrollX,
+              width: rect.width,
+              openDown: false
+            });
+          }
         }
       }
       setOpen(!open);
@@ -1017,6 +1071,7 @@ export const Select = ({
           openDown={position.openDown}
           searchable={searchable}
           autoFocus={autoFocus}
+          superBaseTable={superBaseTable}
         />
       )}
       
@@ -1034,6 +1089,7 @@ export const Select = ({
           maxHeight={maxHeight}
           searchable={searchable}
           autoFocus={autoFocus}
+          superBaseTable={superBaseTable}
         />
       )}
     </View>
