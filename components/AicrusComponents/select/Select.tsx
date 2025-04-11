@@ -162,6 +162,38 @@ const WebDropdownOptions = ({
     }
   }, [visible]);
   
+  // Salvar posição de scroll quando o componente estiver montado
+  useEffect(() => {
+    if (visible && optionsRef.current) {
+      // Recuperar scroll position anterior quando o dropdown abre
+      if (scrollPositionRef.current > 0) {
+        setTimeout(() => {
+          if (optionsRef.current) {
+            optionsRef.current.scrollTop = scrollPositionRef.current;
+          }
+        }, 0);
+      }
+      
+      // Salvar scroll position continuamente
+      const saveScrollPosition = () => {
+        if (optionsRef.current) {
+          scrollPositionRef.current = optionsRef.current.scrollTop;
+        }
+      };
+      
+      // Adicionar event listener para salvar a posição do scroll
+      if (optionsRef.current) {
+        optionsRef.current.addEventListener('scroll', saveScrollPosition);
+      }
+      
+      return () => {
+        if (optionsRef.current) {
+          optionsRef.current.removeEventListener('scroll', saveScrollPosition);
+        }
+      };
+    }
+  }, [visible, filteredOptions]);
+  
   // Detectar clique fora para fechar
   useEffect(() => {
     if (Platform.OS === 'web') {
@@ -183,12 +215,12 @@ const WebDropdownOptions = ({
   
   // Lidar com seleção de item
   const handleItemSelect = (item: DropdownOption) => {
+    // Guardar posição de scroll atual
+    if (optionsRef.current) {
+      scrollPositionRef.current = optionsRef.current.scrollTop;
+    }
+    
     if (multiple) {
-      // Em seleção múltipla, salvar posição de scroll atual
-      if (optionsRef.current) {
-        scrollPositionRef.current = optionsRef.current.scrollTop;
-      }
-      
       // Lógica para seleção múltipla
       const isSelected = (value as string[]).includes(item.value);
       let newValue;
@@ -202,11 +234,11 @@ const WebDropdownOptions = ({
       onSelect(newValue);
       
       // Restaurar posição de scroll após atualização do estado
-      requestAnimationFrame(() => {
-        if (optionsRef.current && multiple) {
+      setTimeout(() => {
+        if (optionsRef.current) {
           optionsRef.current.scrollTop = scrollPositionRef.current;
         }
-      });
+      }, 0);
     } else {
       // Lógica para seleção única
       onSelect(item.value);
@@ -443,6 +475,12 @@ const MobileSelectModal = ({
   // Estado para controlar a pesquisa
   const [searchValue, setSearchValue] = useState('');
   
+  // Ref para a ScrollView
+  const scrollViewRef = useRef<ScrollView>(null);
+  
+  // Ref para a posição de scroll
+  const scrollPositionRef = useRef(0);
+  
   // Filtrar opções baseado na pesquisa
   const filteredOptions = searchable && searchValue
     ? options.filter((option: DropdownOption) => 
@@ -459,7 +497,29 @@ const MobileSelectModal = ({
   // Lidar com alteração na pesquisa
   const handleSearchChange = (text: string) => {
     setSearchValue(text);
+    
+    // Reset do scroll para o topo quando pesquisar
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+      scrollPositionRef.current = 0;
+    }
   };
+  
+  // Funções para salvar e restaurar a posição de scroll
+  const handleScroll = (event: any) => {
+    scrollPositionRef.current = event.nativeEvent.contentOffset.y;
+  };
+  
+  // Restaurar a posição de scroll quando o dropdown abrir novamente
+  useEffect(() => {
+    if (visible && scrollViewRef.current && scrollPositionRef.current > 0) {
+      setTimeout(() => {
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollTo({ y: scrollPositionRef.current, animated: false });
+        }
+      }, 100);
+    }
+  }, [visible]);
   
   // Limpar campo de pesquisa
   const handleClearSearch = () => {
@@ -480,6 +540,13 @@ const MobileSelectModal = ({
       }
       
       onSelect(newValue);
+      
+      // Usando setTimeout para garantir que o scroll seja mantido após a renderização
+      setTimeout(() => {
+        if (scrollViewRef.current) {
+          scrollViewRef.current.scrollTo({ y: scrollPositionRef.current, animated: false });
+        }
+      }, 0);
     } else {
       // Lógica para seleção única
       onSelect(item.value);
@@ -606,8 +673,11 @@ const MobileSelectModal = ({
           
           {/* Lista de opções */}
           <ScrollView 
+            ref={scrollViewRef}
             nestedScrollEnabled={true}
             contentContainerStyle={{ flexGrow: 0 }}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
           >
             {filteredOptions.length > 0 ? (
               filteredOptions.map((item: DropdownOption) => {
