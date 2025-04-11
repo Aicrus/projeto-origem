@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/auth';
 import { useTheme } from '../../hooks/ThemeContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { ThemeSelector } from '../../components/ThemeSelector';
-import { Select } from '../../components/AicrusComponents';
+import { Select, Input } from '../../components/AicrusComponents';
 
 export default function Home() {
   const router = useRouter();
@@ -17,6 +17,12 @@ export default function Home() {
   // Estado para o valor selecionado no Select
   const [selectedValue, setSelectedValue] = useState('');
   const [selectedMultiValues, setSelectedMultiValues] = useState<string[]>([]);
+  
+  // Estados para os campos de Input
+  const [textoNormal, setTextoNormal] = useState('');
+  const [senha, setSenha] = useState('');
+  const [pesquisa, setPesquisa] = useState('');
+  const [cpf, setCpf] = useState('');
 
   // Opções para o Select
   const opcoesSelect = [
@@ -90,6 +96,63 @@ export default function Home() {
       
       {/* Seletor de Tema */}
       <ThemeSelector />
+      
+      {/* Componentes de Input */}
+      <View className="w-full max-w-xs mb-xl">
+        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
+          Exemplos de Input
+        </Text>
+        
+        {/* Input de texto normal */}
+        <View className="mb-md">
+          <Input
+            label="Texto normal"
+            value={textoNormal}
+            onChangeText={setTextoNormal}
+            placeholder="Digite um texto..."
+            onClear={() => setTextoNormal('')}
+          />
+        </View>
+        
+        {/* Input de senha */}
+        <View className="mb-md">
+          <Input
+            label="Senha"
+            value={senha}
+            onChangeText={setSenha}
+            placeholder="Digite sua senha..."
+            type="password"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+        </View>
+        
+        {/* Input de pesquisa */}
+        <View className="mb-md">
+          <Input
+            label="Pesquisa"
+            value={pesquisa}
+            onChangeText={setPesquisa}
+            placeholder="Digite sua pesquisa..."
+            type="search"
+            onClear={() => setPesquisa('')}
+          />
+        </View>
+        
+        {/* Input com máscara de CPF */}
+        <View className="mb-md">
+          <Input
+            label="CPF"
+            value={cpf}
+            onChangeText={setCpf}
+            placeholder="000.000.000-00"
+            mask="cpf"
+            keyboardType="numeric"
+            maxLength={14}
+            onClear={() => setCpf('')}
+          />
+        </View>
+      </View>
       
       {/* Componente Select */}
       <View className="w-full max-w-xs mb-xl">

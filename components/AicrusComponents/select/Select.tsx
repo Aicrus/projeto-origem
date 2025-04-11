@@ -9,9 +9,22 @@ import { createPortal } from 'react-dom';
 
 /**
  * @component Select
- * @description Componente de seleção dropdown que suporta seleção única ou múltipla
- * com suporte a tema claro/escuro e responsividade. Usa Portal/Modal para garantir
- * que as opções sejam renderizadas acima de outros elementos na tela.
+ * @description Componente de seleção dropdown altamente personalizável que suporta:
+ * - Seleção única ou múltipla de itens
+ * - Tema claro/escuro automático
+ * - Responsividade em todas as plataformas (iOS, Android, Web)
+ * - Posicionamento inteligente (abre para cima ou para baixo conforme espaço disponível)
+ * - Estados: desabilitado, carregando, erro
+ * 
+ * Cada aspecto visual e comportamental pode ser personalizado através das props:
+ * - Label acima do select (opcional)
+ * - Placeholder quando nenhum item está selecionado
+ * - Limitação de itens mínimos/máximos na seleção múltipla
+ * - Altura máxima da lista dropdown
+ * - Comportamento ao abrir/fechar
+ * 
+ * O componente utiliza Portal/Modal para garantir que as opções sejam renderizadas
+ * acima de outros elementos na tela, independente da estrutura de componentes.
  */
 
 export interface DropdownOption {
