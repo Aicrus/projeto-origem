@@ -267,6 +267,7 @@ export default function Home() {
           setValue={setSelectedValue}
           placeholder="Pesquise uma opção..."
           searchable={true}
+          autoFocus={false}
         />
       </View>
       
@@ -284,6 +285,7 @@ export default function Home() {
           multiple={true}
           searchable={true}
           maxHeight={250}
+          autoFocus={false}
         />
       </View>
       
@@ -316,6 +318,7 @@ export default function Home() {
             searchable={true}
             loading={loadingEmails}
             maxHeight={250}
+            autoFocus={false}
           />
           
           {selectedEmail && !loadingEmails && (
@@ -340,6 +343,7 @@ export default function Home() {
             searchable={true}
             loading={loadingEmails}
             maxHeight={250}
+            autoFocus={false}
           />
           
           {selectedEmails.length > 0 && !loadingEmails && (

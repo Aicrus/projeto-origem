@@ -100,6 +100,8 @@ export interface InputProps {
   style?: any;
   /** Estilo personalizado para o texto do input */
   inputStyle?: any;
+  /** Se o input deve receber foco automaticamente ao ser renderizado */
+  autoFocus?: boolean;
 }
 
 export const Input = ({
@@ -126,6 +128,7 @@ export const Input = ({
   testID,
   style,
   inputStyle,
+  autoFocus = false,
 }: InputProps) => {
   // Estado para controlar visibilidade da senha
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -405,6 +408,7 @@ export const Input = ({
           testID={testID}
           // Cor de seleção mais sutil
           selectionColor={isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}
+          autoFocus={autoFocus}
         />
         
         {/* Botão para limpar input quando houver valor e não for disabled */}

@@ -46,6 +46,8 @@ interface BaseDropdownProps {
   max?: number;
   onOpen?: () => void;
   onClose?: () => void;
+  /** Controla se o campo de pesquisa deve receber foco automaticamente quando aberto */
+  autoFocus?: boolean;
 }
 
 interface SingleSelectProps extends BaseDropdownProps {
@@ -132,7 +134,8 @@ const WebDropdownOptions = ({
   isDark,
   position,
   maxHeight,
-  searchable
+  searchable,
+  autoFocus = true,
 }: any) => {
   // Ref para a lista de opções
   const optionsRef = useRef<any>(null);
@@ -328,7 +331,7 @@ const WebDropdownOptions = ({
               placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
               // @ts-ignore - Para compatibilidade web
               data-search-input="true"
-              autoFocus
+              autoFocus={autoFocus}
             />
             {searchValue.length > 0 && (
               <TouchableOpacity 
@@ -396,7 +399,8 @@ const MobileSelectModal = ({
   maxHeight,
   position,
   openDown,
-  searchable
+  searchable,
+  autoFocus = true,
 }: any) => {
   // Estado para controlar a pesquisa
   const [searchValue, setSearchValue] = useState('');
@@ -546,7 +550,7 @@ const MobileSelectModal = ({
                 onChangeText={handleSearchChange}
                 placeholder="Pesquisar..."
                 placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
-                autoFocus
+                autoFocus={autoFocus}
               />
               {searchValue.length > 0 && (
                 <TouchableOpacity 
@@ -614,6 +618,7 @@ export const Select = ({
   max,
   onOpen,
   onClose,
+  autoFocus = true,
 }: SelectProps) => {
   // Estado para controlar abertura do dropdown
   const [open, setOpen] = useState(false);
@@ -1011,6 +1016,7 @@ export const Select = ({
           position={position}
           openDown={position.openDown}
           searchable={searchable}
+          autoFocus={autoFocus}
         />
       )}
       
@@ -1027,6 +1033,7 @@ export const Select = ({
           position={position}
           maxHeight={maxHeight}
           searchable={searchable}
+          autoFocus={autoFocus}
         />
       )}
     </View>
