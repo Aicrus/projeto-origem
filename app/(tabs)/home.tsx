@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/auth';
 import { useTheme } from '../../hooks/ThemeContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { ThemeSelector } from '../../components/ThemeSelector';
-import { DesignSystemExample } from '../../components/DesignSystemExample';
+import { Select } from '../../components/AicrusComponents';
 
 export default function Home() {
   const router = useRouter();
@@ -13,6 +13,19 @@ export default function Home() {
   const { currentTheme } = useTheme();
   const { responsive, isMobile, isTablet } = useResponsive();
   const isDark = currentTheme === 'dark';
+  
+  // Estado para o valor selecionado no Select
+  const [selectedValue, setSelectedValue] = useState('');
+  const [selectedMultiValues, setSelectedMultiValues] = useState<string[]>([]);
+
+  // Opções para o Select
+  const opcoesSelect = [
+    { label: 'Opção 1', value: 'opcao1' },
+    { label: 'Opção 2', value: 'opcao2' },
+    { label: 'Opção 3', value: 'opcao3' },
+    { label: 'Opção 4', value: 'opcao4' },
+    { label: 'Opção 5', value: 'opcao5' },
+  ];
 
   const handleSignOut = async () => {
     try {
@@ -38,7 +51,14 @@ export default function Home() {
   const buttonOutlineText = isDark ? 'text-primary-dark' : 'text-primary-light';
 
   return (
-    <View className={`flex-1 items-center justify-center ${bgPrimary}`}>
+    <ScrollView 
+      className={`flex-1 ${bgPrimary}`}
+      contentContainerStyle={{ 
+        flexGrow: 1,
+        paddingVertical: 40,
+        alignItems: 'center'
+      }}
+    >
       <Text 
         className={`mb-lg text-center text-headline-lg font-inter-bold ${textPrimary}`}
         style={{
@@ -55,6 +75,45 @@ export default function Home() {
       
       {/* Seletor de Tema */}
       <ThemeSelector />
+      
+      {/* Componente Select */}
+      <View className="w-full max-w-xs mb-xl">
+        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
+          Exemplo de Select
+        </Text>
+        <Select
+          label="Selecione uma opção"
+          options={opcoesSelect}
+          value={selectedValue}
+          setValue={setSelectedValue}
+          placeholder="Escolha uma opção..."
+        />
+        {selectedValue && (
+          <Text className={`mt-2 text-body-sm ${textSecondary}`}>
+            Você selecionou: {opcoesSelect.find(opt => opt.value === selectedValue)?.label}
+          </Text>
+        )}
+      </View>
+      
+      {/* Select com múltipla seleção */}
+      <View className="w-full max-w-xs mb-xl">
+        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
+          Select com múltipla seleção
+        </Text>
+        <Select
+          label="Selecione várias opções"
+          options={opcoesSelect}
+          value={selectedMultiValues}
+          setValue={setSelectedMultiValues}
+          placeholder="Escolha opções..."
+          multiple={true}
+        />
+        {selectedMultiValues.length > 0 && (
+          <Text className={`mt-2 text-body-sm ${textSecondary}`}>
+            Selecionados: {selectedMultiValues.length} item(s)
+          </Text>
+        )}
+      </View>
       
       <Text 
         className={`mb-xl text-center mx-lg text-body-md font-inter-regular ${textSecondary}`}
@@ -137,6 +196,6 @@ export default function Home() {
           Abrir Ferramentas de Dev
         </Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 } 
