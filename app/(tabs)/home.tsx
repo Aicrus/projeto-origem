@@ -15,20 +15,16 @@ export default function Home() {
   const isDark = currentTheme === 'dark';
   
   // Estado para o valor selecionado no Select
-  const [selectedValue, setSelectedValue] = useState<string>('');
+  const [selectedValue, setSelectedValue] = useState('');
   const [selectedMultiValues, setSelectedMultiValues] = useState<string[]>([]);
 
-  // Adicionar mais estados para os novos dropdowns
-  const [bottomSelectedValue, setBottomSelectedValue] = useState<string>('');
-  const [bottomMultiSelectedValues, setBottomMultiSelectedValues] = useState<string[]>([]);
-
-  // Opções para os selects
-  const options = [
-    { value: 'opcao1', label: 'Opção 1' },
-    { value: 'opcao2', label: 'Opção 2' },
-    { value: 'opcao3', label: 'Opção 3' },
-    { value: 'opcao4', label: 'Opção 4' },
-    { value: 'opcao5', label: 'Opção 5' },
+  // Opções para o Select
+  const opcoesSelect = [
+    { label: 'Opção 1', value: 'opcao1' },
+    { label: 'Opção 2', value: 'opcao2' },
+    { label: 'Opção 3', value: 'opcao3' },
+    { label: 'Opção 4', value: 'opcao4' },
+    { label: 'Opção 5', value: 'opcao5' },
   ];
 
   const handleSignOut = async () => {
@@ -80,37 +76,37 @@ export default function Home() {
       {/* Seletor de Tema */}
       <ThemeSelector />
       
-      {/* Exemplo de Select */}
-      <View className="w-full mb-8">
+      {/* Componente Select */}
+      <View className="w-full max-w-xs mb-xl">
         <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
           Exemplo de Select
         </Text>
         <Select
+          label="Selecione uma opção"
+          options={opcoesSelect}
           value={selectedValue}
           setValue={setSelectedValue}
-          options={options}
           placeholder="Escolha uma opção..."
-          label="Selecione uma opção"
         />
         {selectedValue && (
           <Text className={`mt-2 text-body-sm ${textSecondary}`}>
-            Você selecionou: Opção {selectedValue.replace('opcao', '')}
+            Você selecionou: {opcoesSelect.find(opt => opt.value === selectedValue)?.label}
           </Text>
         )}
       </View>
       
       {/* Select com múltipla seleção */}
-      <View className="w-full mb-8">
+      <View className="w-full max-w-xs mb-xl">
         <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
           Select com múltipla seleção
         </Text>
         <Select
+          label="Selecione várias opções"
+          options={opcoesSelect}
           value={selectedMultiValues}
           setValue={setSelectedMultiValues}
-          options={options}
           placeholder="Escolha opções..."
           multiple={true}
-          label="Selecione várias opções"
         />
         {selectedMultiValues.length > 0 && (
           <Text className={`mt-2 text-body-sm ${textSecondary}`}>
@@ -119,37 +115,19 @@ export default function Home() {
         )}
       </View>
       
-      {/* Conteúdo para criar espaço e forçar o exemplo ao final da tela */}
-      <View className="w-full mb-8">
-        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
-          Este é o seu aplicativo multiplataforma construído com React Native, Expo e diversas tecnologias modernas.
-        </Text>
-        <Text className={`mb-8 text-body-md font-inter-regular ${textSecondary}`}>
-          Desenvolvido para funcionar perfeitamente em iOS, Android e Web, aproveitando o máximo do desenvolvimento cross-platform com uma única base de código.
-        </Text>
-      </View>
-      
-      {/* Mais conteúdo para afastar os dropdowns do final */}
-      <View className="w-full mb-8">
-        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
-          Recursos Disponíveis
-        </Text>
-        <Text className={`mb-2 text-body-md font-inter-regular ${textSecondary}`}>
-          • Design responsivo adaptado a cada plataforma
-        </Text>
-        <Text className={`mb-2 text-body-md font-inter-regular ${textSecondary}`}>
-          • Tema claro/escuro automático
-        </Text>
-        <Text className={`mb-2 text-body-md font-inter-regular ${textSecondary}`}>
-          • Componentes reutilizáveis
-        </Text>
-        <Text className={`mb-2 text-body-md font-inter-regular ${textSecondary}`}>
-          • Navegação intuitiva entre telas
-        </Text>
-        <Text className={`mb-8 text-body-md font-inter-regular ${textSecondary}`}>
-          • Gestão de estado eficiente
-        </Text>
-      </View>
+      <Text 
+        className={`mb-xl text-center mx-lg text-body-md font-inter-regular ${textSecondary}`}
+        style={{
+          maxWidth: responsive({
+            mobile: '95%',
+            tablet: '70%',
+            desktop: '50%',
+            default: '95%'
+          })
+        }}
+      >
+        Este é o seu aplicativo multiplataforma construído com React Native, Expo e diversas tecnologias modernas.
+      </Text>
       
       <View style={{
         flexDirection: responsive({
@@ -199,51 +177,6 @@ export default function Home() {
               Botão Secundário
             </Text>
           </Pressable>
-        )}
-      </View>
-      
-      {/* Dropdowns no final da tela para testar abertura para cima */}
-      <View className="w-full mb-8">
-        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
-          Dropdowns no final da página
-        </Text>
-        <Text className={`mb-3 text-body-md font-inter-regular ${textSecondary}`}>
-          Este dropdown deve abrir para cima quando não há espaço suficiente abaixo
-        </Text>
-        <Select
-          value={bottomSelectedValue}
-          setValue={setBottomSelectedValue}
-          options={options}
-          placeholder="Escolha uma opção..."
-          label="Dropdown que abre para cima"
-        />
-        {bottomSelectedValue && (
-          <Text className={`mt-2 text-body-md font-inter-regular ${textSecondary}`}>
-            Você selecionou: Opção {bottomSelectedValue.replace('opcao', '')}
-          </Text>
-        )}
-      </View>
-      
-      {/* Select com múltipla seleção no final */}
-      <View className="w-full mb-16">
-        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
-          Múltipla seleção no final
-        </Text>
-        <Text className={`mb-3 text-body-md font-inter-regular ${textSecondary}`}>
-          Este também deve abrir para cima quando necessário
-        </Text>
-        <Select
-          value={bottomMultiSelectedValues}
-          setValue={setBottomMultiSelectedValues}
-          options={options}
-          placeholder="Escolha opções..."
-          multiple={true}
-          label="Dropdown múltiplo que abre para cima"
-        />
-        {bottomMultiSelectedValues.length > 0 && (
-          <Text className={`mt-2 text-body-md font-inter-regular ${textSecondary}`}>
-            Selecionados: {bottomMultiSelectedValues.length} item(s)
-          </Text>
         )}
       </View>
       

@@ -190,29 +190,44 @@ const WebDropdownOptions = ({
   
   // Componente interno que será renderizado no portal
   const DropdownContent = () => (
-    <View
-      ref={optionsRef}
-      style={[
-        positionStyle,
-        dropdownStyle.container
-      ]}
-    >
-      {options.map((item: DropdownOption) => {
-        const isSelected = multiple 
-          ? (value as string[]).includes(item.value)
-          : value === item.value;
-        
-        return (
-          <OptionItem
-            key={item.value}
-            item={item}
-            selected={isSelected}
-            onSelect={handleItemSelect}
-            isDark={isDark}
-          />
-        );
-      })}
-    </View>
+    <>
+      {/* Overlay transparente para capturar eventos e prevenir scroll */}
+      <Pressable 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 2147483646,
+          backgroundColor: 'transparent',
+        }}
+        onPress={onClose}
+      />
+      <View
+        ref={optionsRef}
+        style={[
+          positionStyle,
+          dropdownStyle.container
+        ]}
+      >
+        {options.map((item: DropdownOption) => {
+          const isSelected = multiple 
+            ? (value as string[]).includes(item.value)
+            : value === item.value;
+          
+          return (
+            <OptionItem
+              key={item.value}
+              item={item}
+              selected={isSelected}
+              onSelect={handleItemSelect}
+              isDark={isDark}
+            />
+          );
+        })}
+      </View>
+    </>
   );
 
   // Usando createPortal para renderizar diretamente no body
@@ -374,17 +389,55 @@ export const Select = ({
   // Bloquear scroll da página quando dropdown está aberto (web)
   useEffect(() => {
     if (Platform.OS === 'web' && typeof document !== 'undefined') {
-      const originalStyle = window.getComputedStyle(document.body).overflow;
+      const originalStyle = {
+        overflow: document.body.style.overflow,
+        position: document.body.style.position,
+        top: document.body.style.top,
+        width: document.body.style.width,
+        height: document.body.style.height,
+        paddingRight: document.body.style.paddingRight
+      };
+      
+      const scrollY = window.scrollY;
       
       if (open) {
+        // Salvar a posição atual de scroll
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+        document.body.style.height = '100%';
         document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = originalStyle;
+        
+        // Prevenir o salto causado pelo scrollbar desaparecendo
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        if (scrollbarWidth > 0) {
+          document.body.style.paddingRight = `${scrollbarWidth}px`;
+        }
+        
+        // Prevenir eventos de roda do mouse
+        const wheelHandler = (e: Event) => {
+          e.preventDefault();
+        };
+        
+        window.addEventListener('wheel', wheelHandler, { passive: false });
+        window.addEventListener('touchmove', wheelHandler, { passive: false });
+        
+        return () => {
+          window.removeEventListener('wheel', wheelHandler);
+          window.removeEventListener('touchmove', wheelHandler);
+          
+          // Restaurar o estilo original
+          document.body.style.overflow = originalStyle.overflow;
+          document.body.style.position = originalStyle.position;
+          document.body.style.top = originalStyle.top;
+          document.body.style.width = originalStyle.width;
+          document.body.style.height = originalStyle.height;
+          document.body.style.paddingRight = originalStyle.paddingRight;
+          
+          // Restaurar a posição de scroll
+          window.scrollTo(0, scrollY);
+        };
       }
-      
-      return () => {
-        document.body.style.overflow = originalStyle;
-      };
     }
   }, [open]);
   
