@@ -17,6 +17,8 @@ export default function Home() {
   // Estado para o valor selecionado no Select
   const [selectedValue, setSelectedValue] = useState('');
   const [selectedMultiValues, setSelectedMultiValues] = useState<string[]>([]);
+  const [selectedSearchValue, setSelectedSearchValue] = useState('');
+  const [selectedSearchMultiValues, setSelectedSearchMultiValues] = useState<string[]>([]);
 
   // Opções para o Select
   const opcoesSelect = [
@@ -126,6 +128,47 @@ export default function Home() {
         {selectedMultiValues.length > 0 && (
           <Text className={`mt-2 text-body-sm ${textSecondary}`}>
             Selecionados: {selectedMultiValues.length} item(s)
+          </Text>
+        )}
+      </View>
+      
+      {/* Select com pesquisa */}
+      <View className="w-full max-w-xs mb-xl">
+        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
+          Select com pesquisa
+        </Text>
+        <Select
+          label="Pesquise e selecione uma opção"
+          options={opcoesSelect}
+          value={selectedSearchValue}
+          setValue={setSelectedSearchValue}
+          placeholder="Pesquise uma opção..."
+          searchable={true}
+        />
+        {selectedSearchValue && (
+          <Text className={`mt-2 text-body-sm ${textSecondary}`}>
+            Você selecionou: {opcoesSelect.find(opt => opt.value === selectedSearchValue)?.label}
+          </Text>
+        )}
+      </View>
+      
+      {/* Select com pesquisa e múltipla seleção */}
+      <View className="w-full max-w-xs mb-xl">
+        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
+          Select com pesquisa e múltipla seleção
+        </Text>
+        <Select
+          label="Pesquise e selecione várias opções"
+          options={opcoesSelect}
+          value={selectedSearchMultiValues}
+          setValue={setSelectedSearchMultiValues}
+          placeholder="Pesquise várias opções..."
+          searchable={true}
+          multiple={true}
+        />
+        {selectedSearchMultiValues.length > 0 && (
+          <Text className={`mt-2 text-body-sm ${textSecondary}`}>
+            Selecionados: {selectedSearchMultiValues.length} item(s)
           </Text>
         )}
       </View>
