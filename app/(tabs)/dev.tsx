@@ -95,7 +95,7 @@ export default function DevPage() {
   // Função para renderizar o componente Input e seus exemplos
   const renderInputComponent = () => {
     return (
-      <ScrollView className="p-lg" showsVerticalScrollIndicator={false}>
+      <View className="p-lg">
         <Text className={`text-headline-sm font-inter-bold ${textPrimary} mb-sm`}>
           Componente Input
         </Text>
@@ -262,14 +262,14 @@ export default function DevPage() {
             E muitas outras propriedades para personalização completa...
           </Text>
         </View>
-      </ScrollView>
+      </View>
     );
   };
   
   // Função para renderizar o componente Select e seus exemplos
   const renderSelectComponent = () => {
     return (
-      <ScrollView className="p-lg" showsVerticalScrollIndicator={false}>
+      <View className="p-lg">
         <Text className={`text-headline-sm font-inter-bold ${textPrimary} mb-sm`}>
           Componente Select
         </Text>
@@ -414,7 +414,7 @@ export default function DevPage() {
             E muitas outras propriedades para personalização completa...
           </Text>
         </View>
-      </ScrollView>
+      </View>
     );
   };
   
@@ -615,25 +615,22 @@ export default function DevPage() {
         ) : (
           <View className="flex-1">
             {isMobile ? (
-              // Layout para dispositivos móveis com lista horizontal no topo
+              // Layout para dispositivos móveis com botões compactos no topo
               <View className="flex-1">
-                {/* Lista de componentes em tabs horizontais */}
-                <ScrollView 
-                  horizontal 
-                  showsHorizontalScrollIndicator={false} 
-                  className={`py-sm border-b ${border}`}
-                  contentContainerStyle={{ paddingHorizontal: 16 }}
-                >
+                {/* Navegação compacta para dispositivos móveis */}
+                <View className={`flex-row justify-center py-xs border-b ${border}`}>
                   {availableComponents.map((component) => (
                     <Pressable
                       key={component.id}
                       onPress={() => setActiveComponent(component.id as 'input' | 'select')}
-                      className={`py-sm px-md mx-xs rounded-md ${
+                      className={`mx-xs px-lg py-xs rounded-full ${
                         activeComponent === component.id
                           ? isDark
                             ? 'bg-primary-dark'
                             : 'bg-primary-light'
-                          : 'bg-transparent'
+                          : isDark 
+                            ? 'bg-bg-tertiary-dark' 
+                            : 'bg-bg-tertiary-light'
                       }`}
                     >
                       <Text
@@ -641,18 +638,22 @@ export default function DevPage() {
                           activeComponent === component.id
                             ? 'text-white'
                             : textPrimary
-                        } text-subtitle-sm font-inter-semibold`}
+                        } text-label-md font-inter-semibold`}
                       >
                         {component.name}
                       </Text>
                     </Pressable>
                   ))}
-                </ScrollView>
-                
-                {/* Conteúdo do componente */}
-                <View className="flex-1">
-                  {renderComponentContent()}
                 </View>
+                
+                {/* Conteúdo do componente em um ScrollView isolado */}
+                <ScrollView 
+                  className="flex-1" 
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{ flexGrow: 1 }}
+                >
+                  {renderComponentContent()}
+                </ScrollView>
               </View>
             ) : (
               // Layout para desktop com sidebar lateral
