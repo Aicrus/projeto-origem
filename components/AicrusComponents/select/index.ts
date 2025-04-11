@@ -6,6 +6,7 @@
  * PRINCIPAIS RECURSOS:
  * - Suporte a tema claro/escuro automático
  * - Seleção única ou múltipla de opções
+ * - Pesquisa integrada para filtrar opções
  * - Totalmente responsivo e multiplataforma (iOS, Android, Web)
  * - Posicionamento inteligente (abre para cima ou para baixo conforme espaço disponível)
  * 
@@ -23,7 +24,7 @@
  * 
  * Comportamento:
  * - multiple: Habilita seleção múltipla quando true (padrão: false)
- * - searchable: Habilita busca de opções quando true (padrão: false)
+ * - searchable: Habilita campo de pesquisa para filtrar opções (padrão: false)
  * - onOpen: Função chamada quando o dropdown é aberto
  * - onClose: Função chamada quando o dropdown é fechado
  * 
@@ -50,7 +51,7 @@
  *   label="Categoria" 
  * />
  * 
- * // Select de múltipla escolha
+ * // Select de múltipla escolha com pesquisa
  * <Select 
  *   options={opcoesDisponiveis}
  *   value={itensSelecionados}
@@ -58,6 +59,7 @@
  *   placeholder="Selecione várias opções"
  *   label="Categorias"
  *   multiple={true}
+ *   searchable={true}
  *   max={5} // Máximo de 5 itens selecionáveis
  * />
  * ```

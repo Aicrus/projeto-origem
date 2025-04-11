@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Platform, TouchableOpacity, Text, View, Modal, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, Platform, TouchableOpacity, Text, View, Modal, Pressable, ScrollView, TextInput } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { ChevronUp, ChevronDown, Check } from 'lucide-react-native';
+import { ChevronUp, ChevronDown, Check, Search, X } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { colors } from '../constants/theme';
@@ -131,13 +131,30 @@ const WebDropdownOptions = ({
   multiple, 
   isDark,
   position,
-  maxHeight
+  maxHeight,
+  searchable
 }: any) => {
   // Ref para a lista de opções
   const optionsRef = useRef<any>(null);
   
   // Ref para armazenar a posição de scroll
   const scrollPositionRef = useRef(0);
+  
+  // Estado para controlar a pesquisa
+  const [searchValue, setSearchValue] = useState('');
+  
+  // Filtrar opções baseado na pesquisa
+  const filteredOptions = searchable && searchValue
+    ? options.filter((option: DropdownOption) => 
+        option.label.toLowerCase().includes(searchValue.toLowerCase()))
+    : options;
+  
+  // Reset da pesquisa quando fechar
+  useEffect(() => {
+    if (!visible) {
+      setSearchValue('');
+    }
+  }, [visible]);
   
   // Detectar clique fora para fechar
   useEffect(() => {
@@ -208,6 +225,27 @@ const WebDropdownOptions = ({
     overflowY: 'auto' as 'auto',
   };
   
+  // Lidar com alteração na pesquisa
+  const handleSearchChange = (text: string) => {
+    setSearchValue(text);
+    
+    // Reset da posição de scroll ao pesquisar
+    if (optionsRef.current) {
+      optionsRef.current.scrollTop = 0;
+    }
+  };
+  
+  // Limpar campo de pesquisa
+  const handleClearSearch = () => {
+    setSearchValue('');
+    
+    // Focus no input de pesquisa após limpar
+    const searchInput = document.querySelector('[data-search-input="true"]') as HTMLInputElement;
+    if (searchInput) {
+      searchInput.focus();
+    }
+  };
+  
   // Estilos do dropdown
   const dropdownStyle = StyleSheet.create({
     container: {
@@ -219,6 +257,28 @@ const WebDropdownOptions = ({
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: isDark ? 0.2 : 0.08,
       shadowRadius: 6,
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#262D34' : '#E0E3E7',
+      paddingHorizontal: 8,
+      paddingVertical: 6,
+    },
+    searchInput: {
+      flex: 1,
+      color: isDark ? '#FFFFFF' : '#14181B',
+      fontSize: 14,
+      paddingVertical: 4,
+      height: 30, // Mais compacto que o Input padrão
+      marginLeft: 4,
+    },
+    searchIcon: {
+      marginRight: 4,
+    },
+    clearButton: {
+      padding: 4,
     }
   });
   
@@ -250,21 +310,62 @@ const WebDropdownOptions = ({
         className="dropdown-options"
         data-dropdown-content="true"
       >
-        {options.map((item: DropdownOption) => {
-          const isSelected = multiple 
-            ? (value as string[]).includes(item.value)
-            : value === item.value;
-          
-          return (
-            <OptionItem
-              key={item.value}
-              item={item}
-              selected={isSelected}
-              onSelect={handleItemSelect}
-              isDark={isDark}
+        {/* Campo de pesquisa */}
+        {searchable && (
+          <View style={dropdownStyle.searchContainer}>
+            <Search 
+              size={14} 
+              color={isDark ? '#95A1AC' : '#57636C'} 
+              style={dropdownStyle.searchIcon}
             />
-          );
-        })}
+            <TextInput
+              style={dropdownStyle.searchInput}
+              value={searchValue}
+              onChangeText={handleSearchChange}
+              placeholder="Pesquisar..."
+              placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
+              // @ts-ignore - Para compatibilidade web
+              data-search-input="true"
+              autoFocus
+            />
+            {searchValue.length > 0 && (
+              <TouchableOpacity 
+                onPress={handleClearSearch}
+                style={dropdownStyle.clearButton}
+              >
+                <X 
+                  size={14} 
+                  color={isDark ? '#95A1AC' : '#57636C'} 
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        {/* Lista de opções */}
+        {filteredOptions.length > 0 ? (
+          filteredOptions.map((item: DropdownOption) => {
+            const isSelected = multiple 
+              ? (value as string[]).includes(item.value)
+              : value === item.value;
+            
+            return (
+              <OptionItem
+                key={item.value}
+                item={item}
+                selected={isSelected}
+                onSelect={handleItemSelect}
+                isDark={isDark}
+              />
+            );
+          })
+        ) : (
+          <View style={{ padding: 12, alignItems: 'center' }}>
+            <Text style={{ color: isDark ? '#95A1AC' : '#57636C' }}>
+              Nenhum resultado encontrado
+            </Text>
+          </View>
+        )}
       </View>
     </>
   );
@@ -292,8 +393,35 @@ const MobileSelectModal = ({
   isDark,
   maxHeight,
   position,
-  openDown
+  openDown,
+  searchable
 }: any) => {
+  // Estado para controlar a pesquisa
+  const [searchValue, setSearchValue] = useState('');
+  
+  // Filtrar opções baseado na pesquisa
+  const filteredOptions = searchable && searchValue
+    ? options.filter((option: DropdownOption) => 
+        option.label.toLowerCase().includes(searchValue.toLowerCase()))
+    : options;
+  
+  // Reset da pesquisa quando fechar
+  useEffect(() => {
+    if (!visible) {
+      setSearchValue('');
+    }
+  }, [visible]);
+  
+  // Lidar com alteração na pesquisa
+  const handleSearchChange = (text: string) => {
+    setSearchValue(text);
+  };
+  
+  // Limpar campo de pesquisa
+  const handleClearSearch = () => {
+    setSearchValue('');
+  };
+  
   // Lidar com seleção de item
   const handleItemSelect = (item: DropdownOption) => {
     if (multiple) {
@@ -352,6 +480,36 @@ const MobileSelectModal = ({
     optionsContainer: {
       maxHeight: maxHeight || 300,
       overflow: 'scroll',
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#262D34' : '#E0E3E7',
+      paddingHorizontal: 8,
+      paddingVertical: 6,
+    },
+    searchInput: {
+      flex: 1,
+      color: isDark ? '#FFFFFF' : '#14181B',
+      fontSize: 14,
+      paddingVertical: 4,
+      height: 30, // Mais compacto que o Input padrão
+      marginLeft: 4,
+    },
+    searchIcon: {
+      marginRight: 4,
+    },
+    clearButton: {
+      padding: 4,
+    },
+    noResultsContainer: {
+      padding: 12,
+      alignItems: 'center'
+    },
+    noResultsText: {
+      color: isDark ? '#95A1AC' : '#57636C',
+      fontSize: 14
     }
   });
   
@@ -370,25 +528,64 @@ const MobileSelectModal = ({
         <View 
           style={dropdownStyle.container}
         >
+          {/* Campo de pesquisa */}
+          {searchable && (
+            <View style={dropdownStyle.searchContainer}>
+              <Search 
+                size={14} 
+                color={isDark ? '#95A1AC' : '#57636C'} 
+                style={dropdownStyle.searchIcon}
+              />
+              <TextInput
+                style={dropdownStyle.searchInput}
+                value={searchValue}
+                onChangeText={handleSearchChange}
+                placeholder="Pesquisar..."
+                placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
+                autoFocus
+              />
+              {searchValue.length > 0 && (
+                <TouchableOpacity 
+                  onPress={handleClearSearch}
+                  style={dropdownStyle.clearButton}
+                >
+                  <X 
+                    size={14} 
+                    color={isDark ? '#95A1AC' : '#57636C'} 
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+          
+          {/* Lista de opções */}
           <ScrollView 
             nestedScrollEnabled={true}
             contentContainerStyle={{ flexGrow: 0 }}
           >
-            {options.map((item: DropdownOption) => {
-              const isSelected = multiple 
-                ? (value as string[]).includes(item.value)
-                : value === item.value;
-              
-              return (
-                <OptionItem
-                  key={item.value}
-                  item={item}
-                  selected={isSelected}
-                  onSelect={handleItemSelect}
-                  isDark={isDark}
-                />
-              );
-            })}
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((item: DropdownOption) => {
+                const isSelected = multiple 
+                  ? (value as string[]).includes(item.value)
+                  : value === item.value;
+                
+                return (
+                  <OptionItem
+                    key={item.value}
+                    item={item}
+                    selected={isSelected}
+                    onSelect={handleItemSelect}
+                    isDark={isDark}
+                  />
+                );
+              })
+            ) : (
+              <View style={dropdownStyle.noResultsContainer}>
+                <Text style={dropdownStyle.noResultsText}>
+                  Nenhum resultado encontrado
+                </Text>
+              </View>
+            )}
           </ScrollView>
         </View>
       </Pressable>
@@ -767,6 +964,7 @@ export const Select = ({
           maxHeight={maxHeight}
           position={position}
           openDown={position.openDown}
+          searchable={searchable}
         />
       )}
       
@@ -782,6 +980,7 @@ export const Select = ({
           isDark={isDark}
           position={position}
           maxHeight={maxHeight}
+          searchable={searchable}
         />
       )}
     </View>

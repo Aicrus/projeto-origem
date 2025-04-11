@@ -193,6 +193,38 @@ export default function Home() {
         )}
       </View>
       
+      {/* Select com pesquisa */}
+      <View className="w-full max-w-xs mb-xl">
+        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
+          Select com pesquisa
+        </Text>
+        <Select
+          label="Pesquise e selecione"
+          options={opcoesSelect}
+          value={selectedValue}
+          setValue={setSelectedValue}
+          placeholder="Pesquise uma opção..."
+          searchable={true}
+        />
+      </View>
+      
+      {/* Select com múltipla seleção e pesquisa */}
+      <View className="w-full max-w-xs mb-xl">
+        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
+          Select múltiplo com pesquisa
+        </Text>
+        <Select
+          label="Pesquise e selecione vários"
+          options={opcoesSelect}
+          value={selectedMultiValues}
+          setValue={setSelectedMultiValues}
+          placeholder="Pesquise opções..."
+          multiple={true}
+          searchable={true}
+          maxHeight={250}
+        />
+      </View>
+      
       {/* Status do breakpoint atual */}
       <View className={`mt-xl py-xs px-md rounded-sm ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}>
         <Text className={`text-body-sm text-center ${textSecondary}`}>
