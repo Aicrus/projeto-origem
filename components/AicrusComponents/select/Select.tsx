@@ -217,13 +217,15 @@ const WebDropdownOptions = ({
   // Posicionamento web
   const positionStyle = {
     position: 'fixed' as 'fixed',
-    top: position?.top || 0,  // Voltamos a usar top sempre
+    top: position?.top || 0,
     left: position?.left || 0,
     width: position?.width || 200,
     maxHeight: maxHeight || 300,
     zIndex: 2147483647, // Valor máximo possível para z-index
     overflowY: 'auto' as 'auto',
   };
+  
+  console.log("Renderizando WebDropdownOptions com posição:", position);
   
   // Lidar com alteração na pesquisa
   const handleSearchChange = (text: string) => {
@@ -451,6 +453,8 @@ const MobileSelectModal = ({
     }, 50);
   };
   
+  console.log("Renderizando MobileSelectModal com posição:", position, "openDown:", openDown);
+  
   // Estilos do dropdown
   const dropdownStyle = StyleSheet.create({
     overlay: {
@@ -633,20 +637,33 @@ export const Select = ({
   // Calcular posição para o dropdown web
   useEffect(() => {
     if (Platform.OS === 'web' && open && selectRef.current) {
+      console.log("Recalculando posição do dropdown, total de opções:", options.length);
       const rect = selectRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       
       // Calcula se deve abrir para cima ou para baixo
       const openDown = rect.bottom + maxHeight <= viewportHeight;
+      console.log("Abrirá para:", openDown ? "baixo" : "cima");
       
-      // Espaçamento diferente para cima e para baixo
-      const spacingUp = 3; // Aumentado para ser visível
-      const spacingDown = 3; // Valor menor para quando abre para baixo
+      // Espaçamento consistente para cima e para baixo
+      const spacingUp = 3; // Mantido em 3px para cima
+      const spacingDown = 3; // Mantido em 3px para baixo
       
-      // Cálculo mais direto
+      // Cálculo direto da posição
       const topPosition = openDown 
         ? rect.bottom + spacingDown + window.scrollY  // Abre para baixo
         : rect.top - maxHeight - spacingUp + window.scrollY;  // Abre para cima
+      
+      // Debugging
+      console.log("Posição calculada:", {
+        top: topPosition,
+        rectTop: rect.top,
+        rectBottom: rect.bottom,
+        maxHeight,
+        spacingUp,
+        spacingDown,
+        openDown
+      });
       
       setPosition({
         top: topPosition,
@@ -655,7 +672,36 @@ export const Select = ({
         openDown: openDown
       });
     }
-  }, [open, maxHeight]);
+  }, [open, maxHeight, options]); // Adicionado options para recalcular quando os dados mudam
+  
+  // Efeito adicional para garantir o recálculo quando os dados mudam com o dropdown aberto
+  useEffect(() => {
+    // Se o dropdown estiver aberto, forçar recálculo da posição quando as opções mudarem
+    if (open && options.length > 0 && Platform.OS === 'web' && selectRef.current) {
+      console.log("Forçando recálculo após dados carregados, opções:", options.length);
+      const rect = selectRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      // Calcula se deve abrir para cima ou para baixo
+      const openDown = rect.bottom + maxHeight <= viewportHeight;
+      
+      // Espaçamento consistente 
+      const spacingUp = 3; 
+      const spacingDown = 3;
+      
+      // Cálculo direto da posição com o spacing correto
+      const topPosition = openDown 
+        ? rect.bottom + spacingDown + window.scrollY
+        : rect.top - maxHeight - spacingUp + window.scrollY;
+      
+      setPosition({
+        top: topPosition,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+        openDown: openDown
+      });
+    }
+  }, [options, open]);
   
   // Bloquear scroll da página quando dropdown está aberto (web)
   useEffect(() => {
@@ -815,8 +861,8 @@ export const Select = ({
             const openDown = spaceBelow >= maxHeight;
             
             // Espaçamento consistente
-            const spacingDown = 3; // Valor consistente
-            const spacingUp = 3; // Mesmo valor que para baixo
+            const spacingDown = 3; // Mantido em 3px
+            const spacingUp = 3; // Mantido em 3px
             
             if (openDown) {
               // Abre para baixo - há espaço suficiente
@@ -831,7 +877,7 @@ export const Select = ({
               // Abre para cima - não há espaço suficiente abaixo
               setPosition({
                 top: undefined,
-                bottom: windowHeight - pageY + spacingUp, // Espaçamento consistente
+                bottom: windowHeight - pageY + spacingUp,
                 left: pageX,
                 width: width,
                 openDown: false
@@ -845,9 +891,9 @@ export const Select = ({
           // Calcula se deve abrir para cima ou para baixo
           const openDown = rect.bottom + maxHeight <= viewportHeight;
           
-          // Espaçamento diferente para cima e para baixo
-          const spacingUp = 3; // Mesmo valor usado no useEffect (3px)
-          const spacingDown = 3; // Valor consistente para quando abre para baixo
+          // Espaçamento consistente
+          const spacingUp = 3; // Mantido em 3px
+          const spacingDown = 3; // Mantido em 3px
           
           // Cálculo mais direto
           const topPosition = openDown 
