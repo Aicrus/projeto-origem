@@ -25,6 +25,21 @@ export default function Home() {
     { label: 'Opção 3', value: 'opcao3' },
     { label: 'Opção 4', value: 'opcao4' },
     { label: 'Opção 5', value: 'opcao5' },
+    { label: 'Opção 6', value: 'opcao6' },
+    { label: 'Opção 7', value: 'opcao7' },
+    { label: 'Opção 8', value: 'opcao8' },
+    { label: 'Opção 9', value: 'opcao9' },
+    { label: 'Opção 10', value: 'opcao10' },
+    { label: 'Opção 11', value: 'opcao11' },
+    { label: 'Opção 12', value: 'opcao12' },
+    { label: 'Opção 13', value: 'opcao13' },
+    { label: 'Opção 14', value: 'opcao14' },
+    { label: 'Opção 15', value: 'opcao15' },
+    { label: 'Opção 16', value: 'opcao16' },
+    { label: 'Opção 17', value: 'opcao17' },
+    { label: 'Opção 18', value: 'opcao18' },
+    { label: 'Opção 19', value: 'opcao19' },
+    { label: 'Opção 20', value: 'opcao20' },
   ];
 
   const handleSignOut = async () => {
@@ -116,35 +131,9 @@ export default function Home() {
       </View>
       
       {/* Status do breakpoint atual */}
-      <View className="w-full max-w-xs my-xl">
-        <Text className={`mb-2 text-subtitle-sm ${textPrimary}`}>
-          Select Adicional
-        </Text>
-        <Select
-          label="Selecione uma opção"
-          options={opcoesSelect}
-          value={selectedValue}
-          setValue={setSelectedValue}
-          placeholder="Escolha uma opção..."
-        />
-      </View>
-      
       <View className={`mt-xl py-xs px-md rounded-sm ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}>
         <Text className={`text-body-sm text-center ${textSecondary}`}>
           Breakpoint: {isMobile ? 'Mobile' : (isTablet ? 'Tablet' : 'Desktop')}
-        </Text>
-      </View>
-      
-      {/* Container para testes de rolagem */}
-      <View 
-        className={`w-full my-xl p-lg rounded-md ${isDark ? 'bg-bg-secondary-dark' : 'bg-bg-secondary-light'}`}
-        style={{ height: 800 }}
-      >
-        <Text className={`text-subtitle-md mb-md ${textPrimary}`}>
-          Área para teste de rolagem
-        </Text>
-        <Text className={`${textSecondary}`}>
-          Este container foi adicionado para permitir mais conteúdo de rolagem vertical e testar o comportamento do Select em diferentes posições da página.
         </Text>
       </View>
       

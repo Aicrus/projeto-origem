@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Platform, TouchableOpacity, Text, View, Modal, Pressable } from 'react-native';
+import { StyleSheet, Platform, TouchableOpacity, Text, View, Modal, Pressable, ScrollView } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { ChevronUp, ChevronDown, Check } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
@@ -123,6 +123,9 @@ const WebDropdownOptions = ({
   // Ref para a lista de opções
   const optionsRef = useRef<any>(null);
   
+  // Ref para armazenar a posição de scroll
+  const scrollPositionRef = useRef(0);
+  
   // Detectar clique fora para fechar
   useEffect(() => {
     if (Platform.OS === 'web') {
@@ -145,6 +148,11 @@ const WebDropdownOptions = ({
   // Lidar com seleção de item
   const handleItemSelect = (item: DropdownOption) => {
     if (multiple) {
+      // Em seleção múltipla, salvar posição de scroll atual
+      if (optionsRef.current) {
+        scrollPositionRef.current = optionsRef.current.scrollTop;
+      }
+      
       // Lógica para seleção múltipla
       const isSelected = (value as string[]).includes(item.value);
       let newValue;
@@ -156,6 +164,13 @@ const WebDropdownOptions = ({
       }
       
       onSelect(newValue);
+      
+      // Restaurar posição de scroll após atualização do estado
+      requestAnimationFrame(() => {
+        if (optionsRef.current && multiple) {
+          optionsRef.current.scrollTop = scrollPositionRef.current;
+        }
+      });
     } else {
       // Lógica para seleção única
       onSelect(item.value);
@@ -163,10 +178,16 @@ const WebDropdownOptions = ({
     }
   };
   
+  // Permitir scroll dentro do dropdown
+  const handleOptionsWheel = (e: React.WheelEvent) => {
+    // Permitir o scroll dentro das opções
+    e.stopPropagation();
+  };
+  
   // Posicionamento web
   const positionStyle = {
     position: 'fixed' as 'fixed',
-    top: position?.top || 0,
+    top: position?.top || 0,  // Voltamos a usar top sempre
     left: position?.left || 0,
     width: position?.width || 200,
     maxHeight: maxHeight || 300,
@@ -210,6 +231,11 @@ const WebDropdownOptions = ({
           positionStyle,
           dropdownStyle.container
         ]}
+        // @ts-ignore - Permitir eventos de wheel para scroll
+        onWheel={handleOptionsWheel}
+        // @ts-ignore - Adicionar classe e atributo para detectar se o scroll está dentro do dropdown
+        className="dropdown-options"
+        data-dropdown-content="true"
       >
         {options.map((item: DropdownOption) => {
           const isSelected = multiple 
@@ -276,6 +302,14 @@ const MobileSelectModal = ({
     }
   };
   
+  // Garantir que o toque seja tratado corretamente
+  const handlePressOutside = () => {
+    // Pequeno timeout para evitar conflitos de eventos
+    setTimeout(() => {
+      onClose();
+    }, 50);
+  };
+  
   // Estilos do dropdown
   const dropdownStyle = StyleSheet.create({
     overlay: {
@@ -290,6 +324,7 @@ const MobileSelectModal = ({
       width: position?.width || '90%',
       marginHorizontal: 16,
       left: position?.left - 16 || 0,
+      // Define a posição vertical com base na direção
       ...(openDown 
         ? { top: position?.top || 100 } // Abre para baixo
         : { bottom: position?.bottom || 100 }), // Abre para cima
@@ -300,16 +335,12 @@ const MobileSelectModal = ({
       shadowOpacity: isDark ? 0.2 : 0.08,
       shadowRadius: 6,
       elevation: 5,
+    },
+    optionsContainer: {
+      maxHeight: maxHeight || 300,
+      overflow: 'scroll',
     }
   });
-  
-  // Garantir que o toque seja tratado corretamente
-  const handlePressOutside = () => {
-    // Pequeno timeout para evitar conflitos de eventos
-    setTimeout(() => {
-      onClose();
-    }, 50);
-  };
   
   return (
     <Modal
@@ -323,27 +354,30 @@ const MobileSelectModal = ({
         style={dropdownStyle.overlay}
         onPress={handlePressOutside}
       >
-        <Pressable 
+        <View 
           style={dropdownStyle.container}
-          onStartShouldSetResponder={() => true}
-          onTouchEnd={(e: any) => e.stopPropagation()}
         >
-          {options.map((item: DropdownOption) => {
-            const isSelected = multiple 
-              ? (value as string[]).includes(item.value)
-              : value === item.value;
-            
-            return (
-              <OptionItem
-                key={item.value}
-                item={item}
-                selected={isSelected}
-                onSelect={handleItemSelect}
-                isDark={isDark}
-              />
-            );
-          })}
-        </Pressable>
+          <ScrollView 
+            nestedScrollEnabled={true}
+            contentContainerStyle={{ flexGrow: 0 }}
+          >
+            {options.map((item: DropdownOption) => {
+              const isSelected = multiple 
+                ? (value as string[]).includes(item.value)
+                : value === item.value;
+              
+              return (
+                <OptionItem
+                  key={item.value}
+                  item={item}
+                  selected={isSelected}
+                  onSelect={handleItemSelect}
+                  isDark={isDark}
+                />
+              );
+            })}
+          </ScrollView>
+        </View>
       </Pressable>
     </Modal>
   );
@@ -396,13 +430,16 @@ export const Select = ({
       const openDown = rect.bottom + maxHeight <= viewportHeight;
       
       // Espaçamento diferente para cima e para baixo
-      const spacingUp = 9; // Aumentado para 9px
+      const spacingUp = 3; // Aumentado para ser visível
       const spacingDown = 3; // Valor menor para quando abre para baixo
       
+      // Cálculo mais direto
+      const topPosition = openDown 
+        ? rect.bottom + spacingDown + window.scrollY  // Abre para baixo
+        : rect.top - maxHeight - spacingUp + window.scrollY;  // Abre para cima
+      
       setPosition({
-        top: openDown 
-              ? rect.bottom + spacingDown + window.scrollY  // Espaçamento menor quando abre para baixo
-              : rect.top - maxHeight + window.scrollY + rect.height - spacingUp, // Espaçamento aumentado quando abre para cima
+        top: topPosition,
         left: rect.left + window.scrollX,
         width: rect.width,
         openDown: openDown
@@ -438,17 +475,42 @@ export const Select = ({
           document.body.style.paddingRight = `${scrollbarWidth}px`;
         }
         
-        // Prevenir eventos de roda do mouse
+        // Prevenir eventos de roda do mouse na página, mas não dentro do dropdown
         const wheelHandler = (e: Event) => {
-          e.preventDefault();
+          // Verificar se o evento veio do dropdown ou de seus filhos
+          let targetElement = e.target as Element;
+          let isInsideDropdown = false;
+          
+          // Verifica se o evento aconteceu dentro do dropdown
+          while (targetElement && targetElement !== document.body) {
+            if (targetElement.classList && (
+              targetElement.classList.contains('dropdown-options') || 
+              targetElement.hasAttribute('data-dropdown-content')
+            )) {
+              isInsideDropdown = true;
+              break;
+            }
+            
+            const parentNode = targetElement.parentNode as Element;
+            if (parentNode) {
+              targetElement = parentNode;
+            } else {
+              break;
+            }
+          }
+          
+          // Se não estiver dentro do dropdown, previne o scroll
+          if (!isInsideDropdown) {
+            e.preventDefault();
+          }
         };
         
         window.addEventListener('wheel', wheelHandler, { passive: false });
-        window.addEventListener('touchmove', wheelHandler, { passive: false });
+        window.addEventListener('touchmove', wheelHandler as EventListener, { passive: false });
         
         return () => {
           window.removeEventListener('wheel', wheelHandler);
-          window.removeEventListener('touchmove', wheelHandler);
+          window.removeEventListener('touchmove', wheelHandler as EventListener);
           
           // Restaurar o estilo original
           document.body.style.overflow = originalStyle.overflow;
@@ -543,8 +605,8 @@ export const Select = ({
             const openDown = spaceBelow >= maxHeight;
             
             // Espaçamento consistente
-            const spacingDown = 5;
-            const spacingUp = 3; // Reduzido para ficar mais próximo quando abre para cima
+            const spacingDown = 3; // Valor consistente
+            const spacingUp = 3; // Mesmo valor que para baixo
             
             if (openDown) {
               // Abre para baixo - há espaço suficiente
@@ -559,7 +621,7 @@ export const Select = ({
               // Abre para cima - não há espaço suficiente abaixo
               setPosition({
                 top: undefined,
-                bottom: windowHeight - pageY + spacingUp, // Espaçamento reduzido
+                bottom: windowHeight - pageY + spacingUp, // Espaçamento consistente
                 left: pageX,
                 width: width,
                 openDown: false
@@ -574,13 +636,16 @@ export const Select = ({
           const openDown = rect.bottom + maxHeight <= viewportHeight;
           
           // Espaçamento diferente para cima e para baixo
-          const spacingUp = 11; // Aumentado para 11px
-          const spacingDown = 3; // Valor menor para quando abre para baixo
+          const spacingUp = 3; // Mesmo valor usado no useEffect (3px)
+          const spacingDown = 3; // Valor consistente para quando abre para baixo
+          
+          // Cálculo mais direto
+          const topPosition = openDown 
+            ? rect.bottom + spacingDown + window.scrollY  // Abre para baixo
+            : rect.top - maxHeight - spacingUp + window.scrollY;  // Abre para cima
           
           setPosition({
-            top: openDown 
-                  ? rect.bottom + spacingDown + window.scrollY  // Espaçamento menor quando abre para baixo
-                  : rect.top - maxHeight + window.scrollY + rect.height - spacingUp, // Espaçamento aumentado quando abre para cima
+            top: topPosition,
             left: rect.left + window.scrollX,
             width: rect.width,
             openDown: openDown
