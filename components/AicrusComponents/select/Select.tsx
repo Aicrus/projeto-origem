@@ -252,7 +252,8 @@ const MobileSelectModal = ({
   multiple, 
   isDark,
   maxHeight,
-  position
+  position,
+  openDown
 }: any) => {
   // Lidar com seleção de item
   const handleItemSelect = (item: DropdownOption) => {
@@ -289,7 +290,9 @@ const MobileSelectModal = ({
       width: position?.width || '90%',
       marginHorizontal: 16,
       left: position?.left - 16 || 0,
-      top: position?.top || 100,
+      ...(openDown 
+        ? { top: position?.top || 100 } // Abre para baixo
+        : { bottom: position?.bottom || 100 }), // Abre para cima
       borderWidth: 1,
       borderRadius: 6,
       shadowColor: '#000',
@@ -299,6 +302,14 @@ const MobileSelectModal = ({
       elevation: 5,
     }
   });
+  
+  // Garantir que o toque seja tratado corretamente
+  const handlePressOutside = () => {
+    // Pequeno timeout para evitar conflitos de eventos
+    setTimeout(() => {
+      onClose();
+    }, 50);
+  };
   
   return (
     <Modal
@@ -310,7 +321,7 @@ const MobileSelectModal = ({
     >
       <Pressable 
         style={dropdownStyle.overlay}
-        onPress={onClose}
+        onPress={handlePressOutside}
       >
         <Pressable 
           style={dropdownStyle.container}
@@ -363,7 +374,13 @@ export const Select = ({
   const selectRef = useRef<any>(null);
   
   // Posicionamento para o dropdown web
-  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [position, setPosition] = useState<{
+    top?: number;
+    left: number;
+    width: number;
+    bottom?: number;
+    openDown?: boolean;
+  }>({ top: 0, left: 0, width: 0 });
   
   // Tema atual
   const { currentTheme } = useTheme();
@@ -378,10 +395,17 @@ export const Select = ({
       // Calcula se deve abrir para cima ou para baixo
       const openDown = rect.bottom + maxHeight <= viewportHeight;
       
+      // Espaçamento diferente para cima e para baixo
+      const spacingUp = 9; // Aumentado para 9px
+      const spacingDown = 3; // Valor menor para quando abre para baixo
+      
       setPosition({
-        top: openDown ? rect.bottom + window.scrollY : rect.top - maxHeight + window.scrollY,
+        top: openDown 
+              ? rect.bottom + spacingDown + window.scrollY  // Espaçamento menor quando abre para baixo
+              : rect.top - maxHeight + window.scrollY + rect.height - spacingUp, // Espaçamento aumentado quando abre para cima
         left: rect.left + window.scrollX,
-        width: rect.width
+        width: rect.width,
+        openDown: openDown
       });
     }
   }, [open, maxHeight]);
@@ -512,11 +536,35 @@ export const Select = ({
       if (!open) {
         if (Platform.OS !== 'web' && selectRef.current) {
           selectRef.current.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
-            setPosition({
-              top: pageY + height + 2,
-              left: pageX,
-              width: width
-            });
+            // Verifica o espaço disponível para baixo no mobile
+            // Usando Dimensions para obter o tamanho da tela
+            const { height: windowHeight } = require('react-native').Dimensions.get('window');
+            const spaceBelow = windowHeight - (pageY + height);
+            const openDown = spaceBelow >= maxHeight;
+            
+            // Espaçamento consistente
+            const spacingDown = 5;
+            const spacingUp = 3; // Reduzido para ficar mais próximo quando abre para cima
+            
+            if (openDown) {
+              // Abre para baixo - há espaço suficiente
+              setPosition({
+                top: pageY + height + spacingDown,
+                left: pageX,
+                width: width,
+                bottom: undefined,
+                openDown: true
+              });
+            } else {
+              // Abre para cima - não há espaço suficiente abaixo
+              setPosition({
+                top: undefined,
+                bottom: windowHeight - pageY + spacingUp, // Espaçamento reduzido
+                left: pageX,
+                width: width,
+                openDown: false
+              });
+            }
           });
         } else if (Platform.OS === 'web' && selectRef.current) {
           const rect = selectRef.current.getBoundingClientRect();
@@ -525,10 +573,17 @@ export const Select = ({
           // Calcula se deve abrir para cima ou para baixo
           const openDown = rect.bottom + maxHeight <= viewportHeight;
           
+          // Espaçamento diferente para cima e para baixo
+          const spacingUp = 11; // Aumentado para 11px
+          const spacingDown = 3; // Valor menor para quando abre para baixo
+          
           setPosition({
-            top: openDown ? rect.bottom + window.scrollY : rect.top - maxHeight + window.scrollY,
+            top: openDown 
+                  ? rect.bottom + spacingDown + window.scrollY  // Espaçamento menor quando abre para baixo
+                  : rect.top - maxHeight + window.scrollY + rect.height - spacingUp, // Espaçamento aumentado quando abre para cima
             left: rect.left + window.scrollX,
-            width: rect.width
+            width: rect.width,
+            openDown: openDown
           });
         }
       }
@@ -575,6 +630,15 @@ export const Select = ({
     }
   });
 
+  // Função para fechar o dropdown
+  const handleClose = () => {
+    setOpen(false);
+    // Reset imediato do estado para garantir responsividade ao próximo toque
+    setTimeout(() => {
+      // Este timeout ajuda a evitar problemas de duplo toque
+    }, 50);
+  };
+
   return (
     <View style={{ width: '100%', position: 'relative' }}>
       {label && (
@@ -619,11 +683,12 @@ export const Select = ({
           options={options}
           value={value}
           onSelect={handleSelectValue}
-          onClose={() => setOpen(false)}
+          onClose={handleClose}
           multiple={multiple}
           isDark={isDark}
           maxHeight={maxHeight}
           position={position}
+          openDown={position.openDown}
         />
       )}
       
