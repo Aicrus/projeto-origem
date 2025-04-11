@@ -6,7 +6,6 @@ import { useTheme } from '../../hooks/ThemeContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { ThemeSelector } from '../../components/ThemeSelector';
 import { Select, Input } from '../../components/AicrusComponents';
-import { useSupabase } from '../../hooks/useSupabase';
 
 export default function Home() {
   const router = useRouter();
@@ -49,67 +48,6 @@ export default function Home() {
     { label: 'Opção 20', value: 'opcao20' },
   ];
   
-  // Estados e dados do Supabase
-  const { supabase } = useSupabase();
-  const [loadingEmails, setLoadingEmails] = useState(true);
-  const [emailOptions, setEmailOptions] = useState<{value: string, label: string}[]>([]);
-  const [selectedEmail, setSelectedEmail] = useState('');
-  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
-  const [errorMessage, setErrorMessage] = useState('');
-  
-  // Buscar e-mails do Supabase quando o componente for montado
-  useEffect(() => {
-    async function fetchEmails() {
-      try {
-        setLoadingEmails(true);
-        setErrorMessage('');
-        
-        console.log('Iniciando busca de emails no Supabase...');
-        
-        // Buscar dados diretamente da tabela usersAicrusAcademy
-        console.log('Tentando buscar da tabela: usersAicrusAcademy');
-        const { data, error } = await supabase
-          .from('usersAicrusAcademy')
-          .select('id, email')
-          .order('email');
-          
-        if (error) {
-          console.error('Erro ao buscar emails:', error);
-          
-          // Verificar se é erro de tabela não encontrada
-          if (error.message.includes('does not exist') || error.code === '42P01') {
-            setErrorMessage(`A tabela 'usersAicrusAcademy' não existe. Verifique o nome da tabela.`);
-          } else {
-            setErrorMessage(`Erro ao carregar dados: ${error.message || error.code || 'Erro desconhecido'}`);
-          }
-          return;
-        }
-        
-        if (data && data.length > 0) {
-          console.log('Dados recebidos:', data);
-          // Converter para o formato esperado pelo Select
-          const options = data.map(user => ({
-            value: user.id.toString(),
-            label: user.email
-          }));
-          
-          setEmailOptions(options);
-          console.log(`Carregados ${options.length} emails do Supabase`);
-        } else {
-          console.log('Nenhum dado encontrado na tabela');
-          setErrorMessage('A tabela existe, mas não foram encontrados registros.');
-        }
-      } catch (error: any) {
-        console.error('Erro na requisição:', error);
-        setErrorMessage(`Erro geral: ${error?.message || 'Falha na conexão'}`);
-      } finally {
-        setLoadingEmails(false);
-      }
-    }
-    
-    fetchEmails();
-  }, []);
-
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -287,81 +225,6 @@ export default function Home() {
           maxHeight={250}
           autoFocus={false}
         />
-      </View>
-      
-      {/* SELECT COM SUPABASE - REPOSICIONADO AQUI */}
-      <View className="w-full max-w-xs mb-xl">
-        <Text className={`mb-2 text-subtitle-sm ${textPrimary} text-center`}>
-          Select com Supabase - Emails
-        </Text>
-        
-        {errorMessage ? (
-          <View className="bg-red-50 p-2 rounded-md mb-2 border border-red-200">
-            <Text className="text-red-700 text-xs">{errorMessage}</Text>
-            <Text className="text-red-700 text-xs mt-1">
-              Verifique as credenciais e o nome da tabela no Supabase.
-            </Text>
-          </View>
-        ) : null}
-        
-        {/* SELECT COM SUPABASE - SELEÇÃO ÚNICA */}
-        <View className="mb-md">
-          <Text className={`text-body-sm ${textPrimary}`}>
-            Seleção única
-          </Text>
-          <Select
-            label="Selecione um email"
-            options={emailOptions}
-            value={selectedEmail}
-            setValue={setSelectedEmail}
-            placeholder={loadingEmails ? "Carregando emails..." : emailOptions.length ? "Selecione um email" : "Nenhum email disponível"}
-            searchable={true}
-            loading={loadingEmails}
-            maxHeight={250}
-            autoFocus={false}
-          />
-          
-          {selectedEmail && !loadingEmails && (
-            <Text className={`mt-2 text-body-sm ${textSecondary}`}>
-              Email selecionado: {emailOptions.find(opt => opt.value === selectedEmail)?.label}
-            </Text>
-          )}
-        </View>
-        
-        {/* SELECT COM SUPABASE - MÚLTIPLA SELEÇÃO */}
-        <View className="mt-xl">
-          <Text className={`text-body-sm ${textPrimary}`}>
-            Múltipla seleção
-          </Text>
-          <Select
-            label="Selecione vários emails"
-            options={emailOptions}
-            value={selectedEmails}
-            setValue={setSelectedEmails}
-            placeholder={loadingEmails ? "Carregando emails..." : "Selecione emails"}
-            multiple={true}
-            searchable={true}
-            loading={loadingEmails}
-            maxHeight={250}
-            autoFocus={false}
-          />
-          
-          {selectedEmails.length > 0 && !loadingEmails && (
-            <View className="mt-2">
-              <Text className={`text-body-sm ${textSecondary}`}>
-                {selectedEmails.length} email(s) selecionado(s):
-              </Text>
-              {selectedEmails.map(emailId => {
-                const emailInfo = emailOptions.find(opt => opt.value === emailId);
-                return (
-                  <Text key={emailId} className={`text-body-xs ${textSecondary} ml-2`}>
-                    • {emailInfo?.label || emailId}
-                  </Text>
-                );
-              })}
-            </View>
-          )}
-        </View>
       </View>
       
       {/* Status do breakpoint atual */}
