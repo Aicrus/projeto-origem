@@ -1,12 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Stack } from 'expo-router';
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { View, Text, ScrollView, Pressable, Platform, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
+import { Input } from '../../components/AicrusComponents/input';
+import { Select } from '../../components/AicrusComponents/select';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   const [activeSection, setActiveSection] = useState<'config' | 'components'>('config');
+  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | null>(null);
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+  
+  // Estados separados para cada exemplo de Input
+  const [inputBasico, setInputBasico] = useState('');
+  const [inputSenha, setInputSenha] = useState('');
+  const [inputErro, setInputErro] = useState('');
+  const [inputBusca, setInputBusca] = useState('');
+  const [inputMascara, setInputMascara] = useState('');
+  
+  // Estados separados para cada exemplo de Select
+  const [selectBasico, setSelectBasico] = useState('');
+  const [selectBusca, setSelectBusca] = useState('');
+  const [multiSelect, setMultiSelect] = useState<string[]>([]);
+
+  // Validar email
+  const isValidEmail = (email: string) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  // Selecionar o primeiro componente automaticamente quando mudar para a seção de componentes
+  useEffect(() => {
+    if (activeSection === 'components' && !activeComponent) {
+      setActiveComponent('input');
+    }
+  }, [activeSection, activeComponent]);
 
   // Cores do tema atual
   const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
@@ -15,6 +45,378 @@ export default function DevPage() {
   const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
   const textSecondary = isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light';
   const border = isDark ? 'border-divider-dark' : 'border-divider-light';
+  
+  // Opções para o componente Select
+  const selectOptions = [
+    { value: 'option1', label: 'Opção 1' },
+    { value: 'option2', label: 'Opção 2' },
+    { value: 'option3', label: 'Opção 3' },
+    { value: 'option4', label: 'Opção 4' },
+    { value: 'option5', label: 'Opção 5' },
+    { value: 'option8', label: 'Opção 8' },
+    { value: 'option10', label: 'Opção 10' },
+    { value: 'option_sp', label: 'São Paulo' },
+    { value: 'option_rj', label: 'Rio de Janeiro' },
+    { value: 'option_bh', label: 'Belo Horizonte' },
+    { value: 'option_test', label: 'Teste de Busca' },
+  ];
+  
+  // Componentes disponíveis
+  const availableComponents = [
+    { id: 'input', name: 'Input' },
+    { id: 'select', name: 'Select' },
+  ];
+  
+  // Função para renderizar o conteúdo do componente selecionado
+  const renderComponentContent = () => {
+    if (!activeComponent) {
+      return (
+        <View className="p-lg">
+          <Text className={`text-headline-sm font-inter-bold ${textPrimary} mb-md`}>
+            Selecione um componente
+          </Text>
+          <Text className={`text-body-md ${textSecondary} mb-lg`}>
+            Escolha um componente da lista ao lado para ver exemplos e documentação.
+          </Text>
+        </View>
+      );
+    }
+
+    switch (activeComponent) {
+      case 'input':
+        return renderInputComponent();
+      case 'select':
+        return renderSelectComponent();
+      default:
+        return null;
+    }
+  };
+  
+  // Função para renderizar o componente Input e seus exemplos
+  const renderInputComponent = () => {
+    return (
+      <ScrollView className="p-lg" showsVerticalScrollIndicator={false}>
+        <Text className={`text-headline-sm font-inter-bold ${textPrimary} mb-sm`}>
+          Componente Input
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O Input é um componente altamente personalizável para entrada de texto, que suporta
+          vários tipos de entrada, máscaras, estados e estilos. Mantém a mesma experiência 
+          consistente entre plataformas (iOS, Android, Web).
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-inter-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+          
+          {/* Input básico */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>Input básico</Text>
+            <Input
+              value={inputBasico}
+              onChangeText={setInputBasico}
+              placeholder="Digite aqui"
+              label="Input básico"
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Input simples com label, placeholder e foco estilizado.
+            </Text>
+          </View>
+          
+          {/* Input com senha */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>Input de senha</Text>
+            <Input
+              value={inputSenha}
+              onChangeText={setInputSenha}
+              placeholder="Digite sua senha"
+              label="Senha"
+              type="password"
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Inclui ícone de mostrar/ocultar senha e proteção do conteúdo.
+            </Text>
+          </View>
+          
+          {/* Input com erro */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>Input com validação de email</Text>
+            <Input
+              value={inputErro}
+              onChangeText={setInputErro}
+              placeholder="seu@email.com"
+              label="Email"
+              error={inputErro.length > 0 && !isValidEmail(inputErro) ? "Por favor, insira um email válido" : ""}
+              type="email"
+              keyboardType="email-address"
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Validação de email automática com feedback visual de erro.
+            </Text>
+          </View>
+          
+          {/* Input de busca */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>Input de busca</Text>
+            <Input
+              value={inputBusca}
+              onChangeText={setInputBusca}
+              placeholder="Pesquisar..."
+              type="search"
+              onClear={() => setInputBusca('')}
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Inclui ícone de busca e botão de limpar quando houver texto.
+            </Text>
+          </View>
+          
+          {/* Input com máscara */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>Input com máscara (CPF)</Text>
+            <Input
+              value={inputMascara}
+              onChangeText={setInputMascara}
+              placeholder="000.000.000-00"
+              label="CPF"
+              mask="cpf"
+              keyboardType="numeric"
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Formata automaticamente entradas numéricas no padrão de CPF: 000.000.000-00.
+            </Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-inter-bold ${textPrimary} mb-sm`}>
+          Características
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          O Input é totalmente adaptável às necessidades do seu projeto:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Tema adaptativo</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Alterna automaticamente entre temas claro e escuro</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Responsividade</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Comportamento consistente entre desktop e dispositivos móveis</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Acessibilidade</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Compatível com leitores de tela e navegação por teclado</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Personalização</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Estilo totalmente customizável via props</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Multiformato</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Suporta diversos tipos de entrada e formatação</Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-inter-bold ${textPrimary} mb-sm`}>
+          Propriedades
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O componente Input possui diversas propriedades para personalização:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>value</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Valor atual do input (obrigatório)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>onChangeText</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Função chamada quando o valor muda (obrigatório)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>placeholder</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Texto exibido quando o input está vazio</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>label</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Rótulo exibido acima do input</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>type</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Tipo de input: 'text', 'password', 'search', 'number', 'email'</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>mask</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Máscara: 'cpf', 'cnpj', 'phone', 'date', 'cep', 'currency', 'none'</Text>
+          </View>
+          
+          <Text className={`text-body-sm ${textSecondary} mt-md`}>
+            E muitas outras propriedades para personalização completa...
+          </Text>
+        </View>
+      </ScrollView>
+    );
+  };
+  
+  // Função para renderizar o componente Select e seus exemplos
+  const renderSelectComponent = () => {
+    return (
+      <ScrollView className="p-lg" showsVerticalScrollIndicator={false}>
+        <Text className={`text-headline-sm font-inter-bold ${textPrimary} mb-sm`}>
+          Componente Select
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O Select é um componente de seleção dropdown altamente personalizável que oferece
+          uma experiência unificada em todas as plataformas (iOS, Android, Web), adaptando-se 
+          às convenções de cada plataforma.
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-inter-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+          
+          {/* Select básico */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>Select básico</Text>
+            <Select
+              options={selectOptions}
+              value={selectBasico}
+              setValue={setSelectBasico}
+              placeholder="Selecione uma opção"
+              label="Select básico"
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Select simples com seleção única e animações suaves.
+            </Text>
+          </View>
+          
+          {/* Select com busca */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>Select com busca</Text>
+            <Select
+              options={selectOptions}
+              value={selectBusca}
+              setValue={setSelectBusca}
+              placeholder="Pesquise e selecione"
+              label="Select com busca"
+              searchable
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Inclui campo de busca para filtrar opções em listas grandes. Digite qualquer parte do 
+              texto (exemplo: "3", "São", "Rio", "Teste") para encontrar correspondências.
+            </Text>
+          </View>
+          
+          {/* Select múltiplo */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>Select múltiplo</Text>
+            <Select
+              options={selectOptions}
+              value={multiSelect}
+              setValue={setMultiSelect as any}
+              placeholder="Selecione várias opções"
+              label="Select múltiplo"
+              multiple={true}
+              searchable={true}
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Permite selecionar múltiplos itens com contagem e gerenciamento automático.
+              Também inclui campo de pesquisa para facilitar a seleção em listas grandes.
+            </Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-inter-bold ${textPrimary} mb-sm`}>
+          Características
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          O Select se adapta inteligentemente ao ambiente:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Posicionamento inteligente</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Abre para cima ou para baixo dependendo do espaço disponível</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Interface por plataforma</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Modal em dispositivos móveis e dropdown flutuante na web</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Busca avançada</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Pesquisa em qualquer parte do texto, ignora acentos, maiúsculas e minúsculas</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Estilo consistente</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Segue o tema da aplicação com transições suaves</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Acessibilidade</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Suporte para navegação por teclado e leitores de tela</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Animações otimizadas</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Transições suaves com desempenho otimizado</Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-inter-bold ${textPrimary} mb-sm`}>
+          Propriedades
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O componente Select possui diversas propriedades para personalização:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>options</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Array de opções com {'{ value, label }'} (obrigatório)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>value</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Valor selecionado - string ou array[string] (obrigatório)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>setValue</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Função para atualizar o valor (obrigatório)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>placeholder</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Texto exibido quando nada está selecionado</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>multiple</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Permite selecionar múltiplos itens</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>searchable</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Adiciona campo de busca nas opções</Text>
+          </View>
+          
+          <Text className={`text-body-sm ${textSecondary} mt-md`}>
+            E muitas outras propriedades para personalização completa...
+          </Text>
+        </View>
+      </ScrollView>
+    );
+  };
   
   return (
     <>
@@ -207,86 +609,106 @@ export default function DevPage() {
                     </Text>
                   </View>
                 </View>
-                
-                {/* Sombras */}
-                <Text className={`text-subtitle-md font-inter-semibold ${textPrimary} mb-md`}>Sombras</Text>
-                
-                <View className="flex-row flex-wrap gap-md mb-lg">
-                  <View className="mb-md">
-                    <View className={`${bgSecondary} shadow-xs w-20 h-20 rounded-md mb-xs items-center justify-center`}>
-                      <Text className={`text-label-sm ${textPrimary}`}>XS</Text>
-                    </View>
-                    <Text className={`text-label-sm ${textPrimary} text-center`}>shadow-xs</Text>
-                  </View>
-                  
-                  <View className="mb-md">
-                    <View className={`${bgSecondary} shadow-sm w-20 h-20 rounded-md mb-xs items-center justify-center`}>
-                      <Text className={`text-label-sm ${textPrimary}`}>SM</Text>
-                    </View>
-                    <Text className={`text-label-sm ${textPrimary} text-center`}>shadow-sm</Text>
-                  </View>
-                  
-                  <View className="mb-md">
-                    <View className={`${bgSecondary} shadow-md w-20 h-20 rounded-md mb-xs items-center justify-center`}>
-                      <Text className={`text-label-sm ${textPrimary}`}>MD</Text>
-                    </View>
-                    <Text className={`text-label-sm ${textPrimary} text-center`}>shadow-md</Text>
-                  </View>
-                  
-                  <View className="mb-md">
-                    <View className={`${bgSecondary} shadow-lg w-20 h-20 rounded-md mb-xs items-center justify-center`}>
-                      <Text className={`text-label-sm ${textPrimary}`}>LG</Text>
-                    </View>
-                    <Text className={`text-label-sm ${textPrimary} text-center`}>shadow-lg</Text>
-                  </View>
-                  
-                  <View className="mb-md">
-                    <View className={`${bgSecondary} shadow-xl w-20 h-20 rounded-md mb-xs items-center justify-center`}>
-                      <Text className={`text-label-sm ${textPrimary}`}>XL</Text>
-                    </View>
-                    <Text className={`text-label-sm ${textPrimary} text-center`}>shadow-xl</Text>
-                  </View>
-                  
-                  <View className="mb-md">
-                    <View className={`${bgSecondary} shadow-2xl w-20 h-20 rounded-md mb-xs items-center justify-center`}>
-                      <Text className={`text-label-sm ${textPrimary}`}>2XL</Text>
-                    </View>
-                    <Text className={`text-label-sm ${textPrimary} text-center`}>shadow-2xl</Text>
-                  </View>
-                  
-                  <View className="mb-md">
-                    <View className={`${bgSecondary} shadow-light-card w-20 h-20 rounded-md mb-xs items-center justify-center`}>
-                      <Text className={`text-label-sm ${textPrimary}`}>Card</Text>
-                    </View>
-                    <Text className={`text-label-sm ${textPrimary} text-center`}>shadow-light-card</Text>
-                  </View>
-                  
-                  <View className="mb-md">
-                    <View className={`${bgSecondary} shadow-float w-20 h-20 rounded-md mb-xs items-center justify-center`}>
-                      <Text className={`text-label-sm ${textPrimary}`}>Float</Text>
-                    </View>
-                    <Text className={`text-label-sm ${textPrimary} text-center`}>shadow-float</Text>
-                  </View>
-                </View>
               </View>
             </View>
           </ScrollView>
         ) : (
-          <ScrollView className="flex-1">
-            <View className="p-lg">
-              <Text className={`text-headline-lg font-inter-bold ${textPrimary} mb-md`}>
-                Componentes
-              </Text>
-              <Text className={`text-body-md ${textSecondary}`}>
-                Esta seção será preenchida com os componentes do sistema.
-              </Text>
-            </View>
-          </ScrollView>
+          <View className="flex-1">
+            {isMobile ? (
+              // Layout para dispositivos móveis com lista horizontal no topo
+              <View className="flex-1">
+                {/* Lista de componentes em tabs horizontais */}
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={false} 
+                  className={`py-sm border-b ${border}`}
+                  contentContainerStyle={{ paddingHorizontal: 16 }}
+                >
+                  {availableComponents.map((component) => (
+                    <Pressable
+                      key={component.id}
+                      onPress={() => setActiveComponent(component.id as 'input' | 'select')}
+                      className={`py-sm px-md mx-xs rounded-md ${
+                        activeComponent === component.id
+                          ? isDark
+                            ? 'bg-primary-dark'
+                            : 'bg-primary-light'
+                          : 'bg-transparent'
+                      }`}
+                    >
+                      <Text
+                        className={`${
+                          activeComponent === component.id
+                            ? 'text-white'
+                            : textPrimary
+                        } text-subtitle-sm font-inter-semibold`}
+                      >
+                        {component.name}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
+                
+                {/* Conteúdo do componente */}
+                <View className="flex-1">
+                  {renderComponentContent()}
+                </View>
+              </View>
+            ) : (
+              // Layout para desktop com sidebar lateral
+              <View className="flex-row flex-1">
+                {/* Lista de componentes */}
+                <View className={`w-1/4 border-r ${border}`}>
+                  <View className="p-lg">
+                    <Text className={`text-headline-lg font-inter-bold ${textPrimary} mb-md`}>
+                      Componentes
+                    </Text>
+                    <Text className={`text-body-md ${textSecondary} mb-lg`}>
+                      Biblioteca de componentes reutilizáveis do sistema.
+                    </Text>
+                    
+                    <View className="flex-col gap-sm">
+                      {availableComponents.map((component) => (
+                        <Pressable
+                          key={component.id}
+                          onPress={() => setActiveComponent(component.id as 'input' | 'select')}
+                          className={`p-md rounded-md ${
+                            activeComponent === component.id
+                              ? isDark
+                                ? 'bg-primary-dark/10'
+                                : 'bg-primary-light/10'
+                              : 'bg-transparent'
+                          }`}
+                        >
+                          <Text
+                            className={`${
+                              activeComponent === component.id
+                                ? isDark
+                                  ? 'text-primary-dark'
+                                  : 'text-primary-light'
+                                : textPrimary
+                            } text-subtitle-md font-inter-semibold`}
+                          >
+                            {component.name}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                  </View>
+                </View>
+                
+                {/* Conteúdo do componente */}
+                <View className="flex-1">
+                  {renderComponentContent()}
+                </View>
+              </View>
+            )}
+          </View>
         )}
       </View>
     </>
   );
-} 
+}
 
 // Tipos
 interface SectionTitleProps {
@@ -326,4 +748,4 @@ const SpacingExample = ({ size, bgColor, textColor }: SpacingExampleProps) => (
     <View className={`${bgColor} h-8`} style={{ width: parseInt(size.replace(/[^0-9]/g, '') || '4') * 4 }} />
     <Text className={`text-label-sm ${textColor} mt-xs`}>{size}</Text>
   </View>
-); 
+);
