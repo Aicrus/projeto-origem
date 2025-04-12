@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Stack } from 'expo-router';
-import { View, Text, ScrollView, Pressable, Platform, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, Pressable, Platform, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { Input } from '../../components/AicrusComponents/input';
 import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
+import { colors } from '../../components/AicrusComponents/constants/theme';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
@@ -64,9 +65,9 @@ export default function DevPage() {
   
   // Componentes disponíveis
   const availableComponents = [
-    { id: 'input', name: 'Input' },
-    { id: 'select', name: 'Select' },
-    { id: 'accordion', name: 'Accordion' },
+    { id: 'input', name: 'Input', icon: 'Type' },
+    { id: 'select', name: 'Select', icon: 'ChevronDown' },
+    { id: 'accordion', name: 'Accordion', icon: 'ChevronsUpDown' },
   ];
   
   // Função para renderizar o conteúdo do componente selecionado
@@ -916,44 +917,64 @@ export default function DevPage() {
                 </ScrollView>
               </View>
             ) : (
-              // Layout para desktop com sidebar lateral
+              // Layout para desktop com sidebar lateral - versão moderna e elegante
               <View className="flex-row flex-1">
-                {/* Lista de componentes */}
-                <View className={`w-1/4 border-r ${border}`}>
-                  <View className="p-lg">
-                    <Text className={`text-headline-lg font-inter-bold ${textPrimary} mb-md`}>
+                {/* Lista de componentes - sidebar mais fina e elegante */}
+                <View className={`w-[220px] border-r ${border} bg-opacity-50 ${bgSecondary}`}>
+                  <View className="py-xl px-md">
+                    <Text className={`text-title-sm font-inter-bold ${textPrimary} mb-sm px-sm`}>
                       Componentes
                     </Text>
-                    <Text className={`text-body-md ${textSecondary} mb-lg`}>
-                      Biblioteca de componentes reutilizáveis do sistema.
-                    </Text>
                     
-                    <View className="flex-col gap-sm">
-                      {availableComponents.map((component) => (
-                        <Pressable
-                          key={component.id}
-                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion')}
-                          className={`p-md rounded-md ${
-                            activeComponent === component.id
-                              ? isDark
-                                ? 'bg-primary-dark/10'
-                                : 'bg-primary-light/10'
-                              : 'bg-transparent'
-                          }`}
-                        >
-                          <Text
-                            className={`${
+                    <View className="flex-col">
+                      {availableComponents.map((component) => {
+                        // Obter o componente de ícone do Lucide React Native
+                        const IconComponent = require('lucide-react-native')[component.icon];
+                        
+                        return (
+                          <Pressable
+                            key={component.id}
+                            onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion')}
+                            className={`flex-row items-center py-sm px-sm my-sm rounded-md ${
                               activeComponent === component.id
                                 ? isDark
-                                  ? 'text-primary-dark'
-                                  : 'text-primary-light'
-                                : textPrimary
-                            } text-subtitle-md font-inter-semibold`}
+                                  ? 'bg-primary-dark/20'
+                                  : 'bg-primary-light/10'
+                                : 'hover:bg-bg-tertiary-light hover:dark:bg-bg-tertiary-dark'
+                            }`}
                           >
-                            {component.name}
-                          </Text>
-                        </Pressable>
-                      ))}
+                            <View className={`mr-sm ${
+                              activeComponent === component.id
+                                ? 'opacity-100'
+                                : 'opacity-60'
+                            }`}>
+                              <IconComponent 
+                                size={16} 
+                                color={
+                                  activeComponent === component.id
+                                    ? isDark 
+                                      ? colors.primary.dark 
+                                      : colors.primary.light
+                                    : isDark 
+                                      ? '#95A1AC' 
+                                      : '#57636C'
+                                } 
+                              />
+                            </View>
+                            <Text
+                              className={`${
+                                activeComponent === component.id
+                                  ? isDark
+                                    ? 'text-primary-dark font-inter-semibold'
+                                    : 'text-primary-light font-inter-semibold'
+                                  : textSecondary
+                              } text-body-sm`}
+                            >
+                              {component.name}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
                     </View>
                   </View>
                 </View>
