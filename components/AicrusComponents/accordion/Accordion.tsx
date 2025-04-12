@@ -154,7 +154,7 @@ const openAnimConfig = {
 
 // Configuração de animação para fechamento (muito mais rápida)
 const closeAnimConfig = {
-  duration: 130, // Ainda mais rápido para fechar
+  duration: 110, // Ainda mais rápido para evitar travamentos
   create: {
     type: LayoutAnimation.Types.easeOut,
     property: LayoutAnimation.Properties.opacity,
@@ -293,7 +293,7 @@ export const Accordion = ({
       // Atualizar animações de acordo com o novo estado
       if (Platform.OS === 'web') {
         // Duração diferente para abrir e fechar
-        const duration = newIsOpen ? animationDuration : Math.floor(animationDuration * 0.45);
+        const duration = newIsOpen ? animationDuration : Math.floor(animationDuration * 0.35);
         
         // Criar sequência para animação mais natural
         if (newIsOpen) {
@@ -322,31 +322,33 @@ export const Accordion = ({
             }),
           ]).start();
         } else {
-          // Ao fechar: primeiro esconde o conteúdo, depois colapsa - mais rápido
-          Animated.sequence([
-            // Rapidamente reduz a opacidade 
+          // Para fechamento ultra-rápido e suave: fazer tudo simultaneamente
+          Animated.parallel([
+            // Rapidamente reduz a opacidade
             Animated.timing(opacityAnimation, {
               toValue: 0,
-              duration: duration * 0.3, // Bem mais rápido
+              duration: duration * 0.25, // Extremamente rápido
               useNativeDriver: true,
               easing: t => t, // Linear
             }),
-            // Após começar a esconder, colapsa e rotaciona (praticamente imediato)
-            Animated.parallel([
-              Animated.timing(rotateAnimation, {
-                toValue: 0,
-                duration: duration * 0.5,
-                useNativeDriver: true,
-                easing: t => t, // Linear
-              }),
-              Animated.timing(heightAnimation, {
-                toValue: 0,
-                duration: duration * 0.6,
-                useNativeDriver: false,
-                easing: t => t * t, // Aceleração no início
-              }),
-            ]),
-          ]).start();
+            // Rotacionar o ícone rapidamente
+            Animated.timing(rotateAnimation, {
+              toValue: 0,
+              duration: duration * 0.4,
+              useNativeDriver: true,
+              easing: t => t, // Linear
+            }),
+            // Colapsar a altura muito rapidamente
+            Animated.timing(heightAnimation, {
+              toValue: 0,
+              duration: duration * 0.5,
+              useNativeDriver: false,
+              easing: t => t, // Linear para evitar interrupções
+            }),
+          ]).start(() => {
+            // Callback no final da animação para garantir estado correto
+            setIsOpenLocal(false);
+          });
         }
       } else {
         // Mobile: Usar LayoutAnimation
@@ -366,7 +368,7 @@ export const Accordion = ({
       // Gerenciar animações localmente
       if (Platform.OS === 'web') {
         // Duração diferente para abrir e fechar
-        const duration = newIsOpen ? animationDuration : Math.floor(animationDuration * 0.45);
+        const duration = newIsOpen ? animationDuration : Math.floor(animationDuration * 0.35);
         
         // Criar sequência para animação mais natural
         if (newIsOpen) {
@@ -395,38 +397,43 @@ export const Accordion = ({
             }),
           ]).start();
         } else {
-          // Ao fechar: primeiro esconde o conteúdo, depois colapsa - mais rápido
-          Animated.sequence([
-            // Rapidamente reduz a opacidade 
+          // Para fechamento ultra-rápido e suave: fazer tudo simultaneamente
+          Animated.parallel([
+            // Rapidamente reduz a opacidade
             Animated.timing(opacityAnimation, {
               toValue: 0,
-              duration: duration * 0.3, // Bem mais rápido
+              duration: duration * 0.25, // Extremamente rápido
               useNativeDriver: true,
               easing: t => t, // Linear
             }),
-            // Após começar a esconder, colapsa e rotaciona (praticamente imediato)
-            Animated.parallel([
-              Animated.timing(rotateAnimation, {
-                toValue: 0,
-                duration: duration * 0.5,
-                useNativeDriver: true,
-                easing: t => t, // Linear
-              }),
-              Animated.timing(heightAnimation, {
-                toValue: 0,
-                duration: duration * 0.6,
-                useNativeDriver: false,
-                easing: t => t * t, // Aceleração no início
-              }),
-            ]),
-          ]).start();
+            // Rotacionar o ícone rapidamente
+            Animated.timing(rotateAnimation, {
+              toValue: 0,
+              duration: duration * 0.4,
+              useNativeDriver: true,
+              easing: t => t, // Linear
+            }),
+            // Colapsar a altura muito rapidamente
+            Animated.timing(heightAnimation, {
+              toValue: 0,
+              duration: duration * 0.5,
+              useNativeDriver: false,
+              easing: t => t, // Linear para evitar interrupções
+            }),
+          ]).start(() => {
+            // Callback no final da animação para garantir estado correto
+            setIsOpenLocal(false);
+          });
         }
       } else {
         // Mobile: Usar LayoutAnimation com configuração otimizada
         LayoutAnimation.configureNext(newIsOpen ? openAnimConfig : closeAnimConfig);
+        setIsOpenLocal(newIsOpen);
       }
       
-      setIsOpenLocal(newIsOpen);
+      if (newIsOpen) {
+        setIsOpenLocal(true);
+      }
     }
     
     onToggle && onToggle(newIsOpen);
@@ -464,8 +471,8 @@ export const Accordion = ({
     } as TextStyle,
     content: {
       padding: 12,
-      paddingTop: isOpen ? 4 : 0,
-      paddingBottom: 8,
+      paddingTop: 12, // Padding superior aumentado para equilibrar
+      paddingBottom: 16, // Padding inferior aumentado para distanciar da linha divisória
       // Otimização para Android/iOS
       ...(Platform.OS !== 'web' ? {
         opacity: 1, // Controlado por LayoutAnimation
@@ -503,7 +510,7 @@ export const Accordion = ({
         
         /* Estilo para o ícone */
         [data-accordion-icon="true"] {
-          transition: transform ${animationDuration * 0.4}ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          transition: transform ${animationDuration * 0.35}ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
           will-change: transform;
         }
         
@@ -511,8 +518,8 @@ export const Accordion = ({
         [data-accordion-content="true"] {
           transition: 
             max-height ${animationDuration * 0.9}ms cubic-bezier(0.33, 1, 0.68, 1), 
-            opacity ${animationDuration * 0.4}ms ease-in-out,
-            transform ${animationDuration * 0.4}ms cubic-bezier(0.33, 1, 0.68, 1);
+            opacity ${animationDuration * 0.35}ms ease-in-out,
+            transform ${animationDuration * 0.35}ms cubic-bezier(0.33, 1, 0.68, 1);
           backface-visibility: hidden;
           will-change: max-height, opacity, transform;
           transform: translateZ(0);
