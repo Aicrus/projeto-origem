@@ -921,8 +921,8 @@ export default function DevPage() {
               <View className="flex-row flex-1">
                 {/* Lista de componentes - sidebar mais fina e elegante */}
                 <View className={`w-[220px] border-r ${border} bg-opacity-50 ${bgSecondary}`}>
-                  <View className="py-xl px-md">
-                    <Text className={`text-title-sm font-inter-bold ${textPrimary} mb-sm px-sm`}>
+                  <View className="py-md px-md">
+                    <Text className={`text-title-sm font-inter-bold ${textPrimary} mb-xs px-xs`}>
                       Componentes
                     </Text>
                     
@@ -935,7 +935,7 @@ export default function DevPage() {
                           <Pressable
                             key={component.id}
                             onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion')}
-                            className={`flex-row items-center py-sm px-sm my-sm rounded-md ${
+                            className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
                               activeComponent === component.id
                                 ? isDark
                                   ? 'bg-primary-dark/20'
@@ -943,11 +943,7 @@ export default function DevPage() {
                                 : 'hover:bg-bg-tertiary-light hover:dark:bg-bg-tertiary-dark'
                             }`}
                           >
-                            <View className={`mr-sm ${
-                              activeComponent === component.id
-                                ? 'opacity-100'
-                                : 'opacity-60'
-                            }`}>
+                            <View className="mr-xs">
                               <IconComponent 
                                 size={16} 
                                 color={
