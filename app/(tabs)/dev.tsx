@@ -4,12 +4,13 @@ import { View, Text, ScrollView, Pressable, Platform, useWindowDimensions } from
 import { useTheme } from '../../hooks/ThemeContext';
 import { Input } from '../../components/AicrusComponents/input';
 import { Select } from '../../components/AicrusComponents/select';
+import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   const [activeSection, setActiveSection] = useState<'config' | 'components'>('config');
-  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | null>(null);
+  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | null>(null);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   
@@ -65,6 +66,7 @@ export default function DevPage() {
   const availableComponents = [
     { id: 'input', name: 'Input' },
     { id: 'select', name: 'Select' },
+    { id: 'accordion', name: 'Accordion' },
   ];
   
   // Função para renderizar o conteúdo do componente selecionado
@@ -87,6 +89,8 @@ export default function DevPage() {
         return renderInputComponent();
       case 'select':
         return renderSelectComponent();
+      case 'accordion':
+        return renderAccordionComponent();
       default:
         return null;
     }
@@ -418,6 +422,254 @@ export default function DevPage() {
     );
   };
   
+  // Função para renderizar o componente Accordion e seus exemplos
+  const renderAccordionComponent = () => {
+    return (
+      <View className="p-lg">
+        <Text className={`text-headline-sm font-inter-bold ${textPrimary} mb-sm`}>
+          Componente Accordion
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O Accordion é um componente expansível que permite ocultar e mostrar conteúdo conforme
+          necessário, economizando espaço na interface e melhorando a organização da informação.
+          Oferece uma experiência consistente em todas as plataformas.
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-inter-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+          
+          {/* FAQ como na imagem - diretamente visível */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>FAQ - Perguntas Frequentes</Text>
+            <View>
+              <AccordionGroup>
+                <Accordion
+                  title="É acessível?"
+                  content="Sim, o componente Accordion é totalmente acessível, compatível com leitores de tela e navegável por teclado. Ele segue as melhores práticas de acessibilidade WCAG."
+                  bordered={true}
+                  showOutline={false}
+                  showSeparator={true}
+                  separatorSpacing={12}
+                  id="accessible"
+                  animationDuration={350}
+                />
+                <Accordion
+                  title="É estilizado?"
+                  content="Sim, o Accordion é altamente estilizável. Você pode personalizar completamente a aparência do cabeçalho, conteúdo, ícones e animações usando as propriedades style, headerStyle e contentStyle."
+                  bordered={true}
+                  showOutline={false}
+                  showSeparator={true}
+                  separatorSpacing={12}
+                  id="styled"
+                  animationDuration={350}
+                />
+                <Accordion
+                  title="É animado?"
+                  content="Sim, o Accordion possui animações suaves e otimizadas para expandir e colapsar o conteúdo. As animações são adaptadas para cada plataforma, garantindo a melhor experiência possível."
+                  bordered={true}
+                  showOutline={false}
+                  showSeparator={true}
+                  separatorSpacing={12}
+                  id="animated"
+                  animationDuration={350}
+                />
+              </AccordionGroup>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Grupo de accordions em estilo minimalista sem contorno externo com linhas divisórias entre todos os itens.
+            </Text>
+          </View>
+          
+          {/* Accordion básico */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>Accordion básico</Text>
+            <Accordion
+              title="Clique para expandir"
+              content="Este é o conteúdo do accordion básico. O componente oferece uma forma elegante de ocultar conteúdo que pode ser expandido quando necessário."
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Accordion simples com título e conteúdo como texto.
+            </Text>
+          </View>
+          
+          {/* Accordion com conteúdo personalizado */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-inter-bold ${textPrimary} mb-sm`}>Accordion com conteúdo personalizado</Text>
+            <Accordion
+              title="Conteúdo personalizado"
+              defaultOpen={true}
+            >
+              <View className="p-xs">
+                <Text className={`text-body-md ${textPrimary} mb-sm`}>
+                  Este accordion contém elementos personalizados.
+                </Text>
+                <View className={`${bgTertiary} p-sm rounded-md mb-sm`}>
+                  <Text className={`text-body-sm ${textSecondary}`}>
+                    Você pode incluir qualquer componente React Native aqui.
+                  </Text>
+                </View>
+                <Pressable 
+                  className={`px-md py-sm rounded-md bg-primary-light dark:bg-primary-dark items-center`}
+                >
+                  <Text className={`text-label-sm font-inter-semibold text-white`}>Botão de Exemplo</Text>
+                </Pressable>
+              </View>
+            </Accordion>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Accordion com conteúdo personalizado usando elementos React Native.
+            </Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-inter-bold ${textPrimary} mb-sm`}>
+          Características
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          O Accordion oferece uma série de recursos para facilitar a navegação em conteúdos extensos:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Animações suaves</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Transições animadas para expandir e colapsar o conteúdo</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Tema adaptativo</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Adapta-se automaticamente a temas claros e escuros</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Personalização</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Cabeçalho e conteúdo personalizáveis</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Responsividade</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Funciona igualmente bem em dispositivos móveis e desktop</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Estrutura aninhada</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Suporte para accordions dentro de accordions</Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-inter-bold ${textPrimary} mb-sm`}>
+          Propriedades
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O componente Accordion possui diversas propriedades para personalização:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>title</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Título do accordion (string)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>content</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Conteúdo de texto simples (string)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>children</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Componentes React Native para conteúdo personalizado</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>defaultOpen</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se o accordion deve iniciar aberto (boolean)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>separatorSpacing</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Espaçamento da linha divisória em pixels (number)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>customHeader</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Função para renderizar um cabeçalho personalizado</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>onToggle</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Callback chamado ao abrir ou fechar</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>bordered</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se deve mostrar borda ao redor do accordion</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>showOutline</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se deve mostrar o contorno/borda externa (boolean)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>showSeparator</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se deve mostrar a linha divisória quando expandido (boolean)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>animationDuration</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Duração da animação em milissegundos (number)</Text>
+          </View>
+          
+          <Text className={`text-body-sm ${textSecondary} mt-md`}>
+            E outras propriedades para personalização completa do componente...
+          </Text>
+        </View>
+
+        {/* Adicionar seção de AccordionGroup */}
+        <Text className={`text-subtitle-md font-inter-bold ${textPrimary} mb-sm`}>
+          AccordionGroup
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O componente AccordionGroup permite agrupar múltiplos accordions e garantir que apenas um esteja aberto por vez:
+        </Text>
+
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Uso</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              Envolva vários accordions com o componente AccordionGroup para criar comportamento de grupo.
+            </Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Benefícios</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • Melhora a experiência do usuário evitando múltiplos conteúdos abertos
+              • Ideal para FAQs e menus de navegação
+              • Gerencia automaticamente o estado de abertura/fechamento
+            </Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Propriedades</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • children: Os componentes Accordion a serem agrupados
+              • defaultOpenId: ID do accordion que deve iniciar aberto
+            </Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-inter-bold ${textPrimary}`}>Exemplo de código</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              {`<AccordionGroup defaultOpenId="section1">
+  <Accordion id="section1" title="Seção 1" content="Conteúdo 1" />
+  <Accordion id="section2" title="Seção 2" content="Conteúdo 2" />
+</AccordionGroup>`}
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
+  
   return (
     <>
       <Stack.Screen 
@@ -487,6 +739,7 @@ export default function DevPage() {
             contentContainerStyle={{ 
               paddingBottom: isMobile ? 120 : 0 
             }}
+            showsVerticalScrollIndicator={false}
           >
             <View className={`p-lg`}>
               {/* Título da seção */}
@@ -626,7 +879,7 @@ export default function DevPage() {
                   {availableComponents.map((component) => (
                     <Pressable
                       key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select')}
+                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion')}
                       className={`mx-xs px-lg py-xs rounded-full ${
                         activeComponent === component.id
                           ? isDark
@@ -679,7 +932,7 @@ export default function DevPage() {
                       {availableComponents.map((component) => (
                         <Pressable
                           key={component.id}
-                          onPress={() => setActiveComponent(component.id as 'input' | 'select')}
+                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion')}
                           className={`p-md rounded-md ${
                             activeComponent === component.id
                               ? isDark
@@ -706,9 +959,13 @@ export default function DevPage() {
                 </View>
                 
                 {/* Conteúdo do componente */}
-                <View className="flex-1">
+                <ScrollView 
+                  className="flex-1"
+                  contentContainerStyle={{ paddingBottom: 40 }}
+                  showsVerticalScrollIndicator={false}
+                >
                   {renderComponentContent()}
-                </View>
+                </ScrollView>
               </View>
             )}
           </View>
