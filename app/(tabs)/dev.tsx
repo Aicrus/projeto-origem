@@ -13,8 +13,7 @@ import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/to
 export default function DevPage() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  const [activeSection, setActiveSection] = useState<'config' | 'components'>('config');
-  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | null>(null);
+  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | null>('designSystem');
   const [toastVisible, setToastVisible] = useState(false);
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const [toastPosition, setToastPosition] = useState<'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('top');
@@ -42,12 +41,6 @@ export default function DevPage() {
   };
 
   // Selecionar o primeiro componente automaticamente quando mudar para a seção de componentes
-  useEffect(() => {
-    if (activeSection === 'components' && !activeComponent) {
-      setActiveComponent('input');
-    }
-  }, [activeSection, activeComponent]);
-
   // Cores do tema atual
   const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
   const bgSecondary = isDark ? 'bg-bg-secondary-dark' : 'bg-bg-secondary-light';
@@ -73,11 +66,11 @@ export default function DevPage() {
   
   // Componentes disponíveis
   const availableComponents = [
+    { id: 'designSystem', name: 'Design System', icon: 'Settings' },
     { id: 'input', name: 'Input', icon: 'Type' },
     { id: 'select', name: 'Select', icon: 'ChevronDown' },
     { id: 'accordion', name: 'Accordion', icon: 'ChevronsUpDown' },
     { id: 'button', name: 'Button', icon: 'Square' },
-    { id: 'designSystem', name: 'Design System', icon: 'Settings' },
     { id: 'toast', name: 'Toast', icon: 'MessageSquare' },
   ];
   
@@ -984,16 +977,299 @@ export default function DevPage() {
   };
 
   const renderDesignSystem = () => {
-    // Implemente a renderização do componente DesignSystem
     return (
-      <View className="p-lg">
-        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
-          Componente Design System
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          Este é um espaço reservado para o componente Design System.
-        </Text>
-      </View>
+      <ScrollView className="flex-1"
+        contentContainerStyle={{ 
+          paddingBottom: isMobile ? 120 : 0 
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View className={`p-lg`}>
+          {/* Título da seção */}
+          <Text className={`text-headline-lg font-jakarta-bold ${textPrimary} mb-md`}>
+            Ferramentas de Dev
+          </Text>
+          <Text className={`text-body-md ${textSecondary} mb-xl`}>
+            Use este guia como referência para implementar a UI consistente em todo o aplicativo.
+          </Text>
+
+          {/* Seção de Cores */}
+          <SectionTitle title="Cores" textColor={textPrimary} />
+          
+          <View className="flex-row flex-wrap gap-md mb-xl">
+            <ColorCard name="Primary" color="bg-primary-light dark:bg-primary-dark" textColor={textPrimary} />
+            <ColorCard name="Secondary" color="bg-secondary-light dark:bg-secondary-dark" textColor={textPrimary} />
+            <ColorCard name="Tertiary" color="bg-tertiary-light dark:bg-tertiary-dark" textColor={textPrimary} />
+            <ColorCard name="Background" color={bgPrimary} textColor={textPrimary} />
+            <ColorCard name="Card Background" color={bgSecondary} textColor={textPrimary} />
+            <ColorCard name="Success" color="bg-success-bg-light dark:bg-success-bg-dark" textColor={textPrimary} />
+            <ColorCard name="Warning" color="bg-warning-bg-light dark:bg-warning-bg-dark" textColor={textPrimary} />
+            <ColorCard name="Error" color="bg-error-bg-light dark:bg-error-bg-dark" textColor={textPrimary} />
+            <ColorCard name="Info" color="bg-info-bg-light dark:bg-info-bg-dark" textColor={textPrimary} />
+          </View>
+
+          {/* Seção de Tipografia */}
+          <SectionTitle title="Tipografia" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <Text className={`text-display-lg font-jakarta-extrabold ${textPrimary} mb-sm`}>Display Lg (Jakarta ExtraBold)</Text>
+            <Text className={`text-display-md font-jakarta-bold ${textPrimary} mb-sm`}>Display Md (Jakarta Bold)</Text>
+            <Text className={`text-display-sm font-jakarta-bold ${textPrimary} mb-sm`}>Display Sm (Jakarta Bold)</Text>
+            
+            <Text className={`text-headline-lg font-jakarta-bold ${textPrimary} mb-sm`}>Headline Lg (Jakarta Bold)</Text>
+            <Text className={`text-headline-md font-jakarta-bold ${textPrimary} mb-sm`}>Headline Md (Jakarta Bold)</Text>
+            <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>Headline Sm (Jakarta Bold)</Text>
+            
+            <Text className={`text-title-lg font-jakarta-bold ${textPrimary} mb-sm`}>Title Lg (Jakarta Bold)</Text>
+            <Text className={`text-title-md font-jakarta-bold ${textPrimary} mb-sm`}>Title Md (Jakarta Bold)</Text>
+            <Text className={`text-title-sm font-jakarta-bold ${textPrimary} mb-sm`}>Title Sm (Jakarta Bold)</Text>
+            
+            <Text className={`text-subtitle-lg font-jakarta-semibold ${textPrimary} mb-sm`}>Subtitle Lg (Jakarta SemiBold)</Text>
+            <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-sm`}>Subtitle Md (Jakarta SemiBold)</Text>
+            <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-sm`}>Subtitle Sm (Jakarta SemiBold)</Text>
+            
+            <Text className={`text-label-lg font-jakarta-semibold ${textPrimary} mb-sm`}>Label Lg (Jakarta SemiBold)</Text>
+            <Text className={`text-label-md font-jakarta-semibold ${textPrimary} mb-sm`}>Label Md (Jakarta SemiBold)</Text>
+            <Text className={`text-label-sm font-jakarta-semibold ${textPrimary} mb-sm`}>Label Sm (Jakarta SemiBold)</Text>
+            
+            <Text className={`text-body-lg font-jakarta-regular ${textPrimary} mb-sm`}>Body Lg (Jakarta Regular)</Text>
+            <Text className={`text-body-md font-jakarta-regular ${textPrimary} mb-sm`}>Body Md (Jakarta Regular)</Text>
+            <Text className={`text-body-sm font-jakarta-regular ${textPrimary} mb-sm`}>Body Sm (Jakarta Regular)</Text>
+            <Text className={`text-body-xs font-jakarta-regular ${textPrimary} mb-sm`}>Body Xs (Jakarta Regular)</Text>
+            
+            <View className="border-t border-divider-light dark:border-divider-dark my-md"></View>
+            
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>Pesos disponíveis da fonte</Text>
+            
+            <Text className={`text-body-lg font-jakarta-thin ${textPrimary} mb-sm`}>Plus Jakarta Sans ExtraLight (200)</Text>
+            <Text className={`text-body-lg font-jakarta-light ${textPrimary} mb-sm`}>Plus Jakarta Sans Light (300)</Text>
+            <Text className={`text-body-lg font-jakarta-regular ${textPrimary} mb-sm`}>Plus Jakarta Sans Regular (400)</Text>
+            <Text className={`text-body-lg font-jakarta-medium ${textPrimary} mb-sm`}>Plus Jakarta Sans Medium (500)</Text>
+            <Text className={`text-body-lg font-jakarta-semibold ${textPrimary} mb-sm`}>Plus Jakarta Sans SemiBold (600)</Text>
+            <Text className={`text-body-lg font-jakarta-bold ${textPrimary} mb-sm`}>Plus Jakarta Sans Bold (700)</Text>
+            <Text className={`text-body-lg font-jakarta-extrabold ${textPrimary} mb-sm`}>Plus Jakarta Sans ExtraBold (800)</Text>
+            
+            <View className="border-t border-divider-light dark:border-divider-dark my-md"></View>
+            
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>Exemplo de fonte mono</Text>
+            <Text className={`text-body-lg font-mono-regular ${textPrimary} mb-sm`}>Space Mono (para código)</Text>
+          </View>
+
+          {/* Seção de Espaçamentos */}
+          <SectionTitle title="Espaçamentos" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Aliases Semânticos</Text>
+            <View className="flex-row flex-wrap mb-lg">
+              <SpacingExample size="xxxs" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="xxs" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="xs" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="sm" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="md" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="lg" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="2xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="3xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="4xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="5xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+            </View>
+            
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Pequenos (0-20px)</Text>
+            <View className="flex-row flex-wrap mb-lg">
+              <SpacingExample size="0" value="0px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+              <SpacingExample size="px" value="1px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+              <SpacingExample size="0.5" value="2px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+              <SpacingExample size="1" value="4px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+              <SpacingExample size="1.5" value="6px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+              <SpacingExample size="2" value="8px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+              <SpacingExample size="2.5" value="10px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+              <SpacingExample size="3" value="12px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+              <SpacingExample size="3.5" value="14px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+              <SpacingExample size="4" value="16px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+              <SpacingExample size="5" value="20px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
+            </View>
+            
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Médios (24-64px)</Text>
+            <View className="flex-row flex-wrap mb-lg">
+              <SpacingExample size="6" value="24px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
+              <SpacingExample size="7" value="28px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
+              <SpacingExample size="8" value="32px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
+              <SpacingExample size="9" value="36px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
+              <SpacingExample size="10" value="40px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
+              <SpacingExample size="11" value="44px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
+              <SpacingExample size="12" value="48px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
+              <SpacingExample size="14" value="56px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
+              <SpacingExample size="16" value="64px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
+            </View>
+            
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Grandes (72px+)</Text>
+            <View className="flex-row flex-wrap mb-md">
+              <SpacingExample size="18" value="72px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
+              <SpacingExample size="20" value="80px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
+              <SpacingExample size="24" value="96px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
+              <SpacingExample size="32" value="128px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
+              <SpacingExample size="40" value="160px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
+              <SpacingExample size="64" value="256px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
+            </View>
+          </View>
+          
+          {/* Seção de Border Radius */}
+          <SectionTitle title="Border Radius" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <View className="flex-row flex-wrap gap-md">
+              <BorderRadiusExample name="none" value="0" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <BorderRadiusExample name="xs" value="2px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <BorderRadiusExample name="sm" value="4px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <BorderRadiusExample name="md" value="8px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <BorderRadiusExample name="lg" value="12px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <BorderRadiusExample name="xl" value="16px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <BorderRadiusExample name="2xl" value="20px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <BorderRadiusExample name="3xl" value="24px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <BorderRadiusExample name="4xl" value="28px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <BorderRadiusExample name="5xl" value="32px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <BorderRadiusExample name="full" value="9999px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+            </View>
+          </View>
+          
+          {/* Seção de Sombras */}
+          <SectionTitle title="Sombras" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <View className="grid grid-cols-2 md:grid-cols-3 gap-md">
+              <ShadowExample name="none" shadow="shadow-none" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="xs" shadow="shadow-xs" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="sm" shadow="shadow-sm" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="md" shadow="shadow-md" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="lg" shadow="shadow-lg" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="xl" shadow="shadow-xl" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="2xl" shadow="shadow-2xl" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="inner" shadow="shadow-inner" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="light-card" shadow="shadow-light-card dark:shadow-dark-card" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="light-button" shadow="shadow-light-button dark:shadow-dark-button" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="float" shadow="shadow-float" textColor={textPrimary} bgColor={bgTertiary} />
+            </View>
+          </View>
+          
+          {/* Seção de Opacidade */}
+          <SectionTitle title="Opacidade" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <View className="grid grid-cols-3 md:grid-cols-6 gap-md">
+              <OpacityExample name="0" value="0" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="5" value="0.05" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="10" value="0.1" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="20" value="0.2" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="30" value="0.3" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="40" value="0.4" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="50" value="0.5" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="60" value="0.6" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="70" value="0.7" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="80" value="0.8" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="90" value="0.9" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <OpacityExample name="100" value="1" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+            </View>
+          </View>
+          
+          {/* Seção de z-index */}
+          <SectionTitle title="Z-Index" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <View className="grid grid-cols-3 md:grid-cols-6 gap-md">
+              <ValueDisplay name="0" value="0" textColor={textPrimary} />
+              <ValueDisplay name="10" value="10" textColor={textPrimary} />
+              <ValueDisplay name="20" value="20" textColor={textPrimary} />
+              <ValueDisplay name="30" value="30" textColor={textPrimary} />
+              <ValueDisplay name="40" value="40" textColor={textPrimary} />
+              <ValueDisplay name="50" value="50" textColor={textPrimary} />
+              <ValueDisplay name="60" value="60" textColor={textPrimary} />
+              <ValueDisplay name="70" value="70" textColor={textPrimary} />
+              <ValueDisplay name="80" value="80" textColor={textPrimary} />
+              <ValueDisplay name="90" value="90" textColor={textPrimary} />
+              <ValueDisplay name="100" value="100" textColor={textPrimary} />
+              <ValueDisplay name="auto" value="auto" textColor={textPrimary} />
+            </View>
+          </View>
+          
+          {/* Seção de Tempos de Transição */}
+          <SectionTitle title="Tempos de Transição" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <View className="grid grid-cols-2 md:grid-cols-4 gap-md">
+              <ValueDisplay name="75" value="75ms" textColor={textPrimary} />
+              <ValueDisplay name="100" value="100ms" textColor={textPrimary} />
+              <ValueDisplay name="150" value="150ms" textColor={textPrimary} />
+              <ValueDisplay name="200" value="200ms" textColor={textPrimary} />
+              <ValueDisplay name="300" value="300ms" textColor={textPrimary} />
+              <ValueDisplay name="500" value="500ms" textColor={textPrimary} />
+              <ValueDisplay name="700" value="700ms" textColor={textPrimary} />
+              <ValueDisplay name="1000" value="1000ms" textColor={textPrimary} />
+            </View>
+          </View>
+
+          {/* Seção de Componentes */}
+          <SectionTitle title="Componentes" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            {/* Botões */}
+            <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-md`}>Botões</Text>
+            
+            <View className="flex-row flex-wrap gap-md mb-lg">
+              <Pressable 
+                className={`px-lg py-md rounded-md bg-primary-light dark:bg-primary-dark`}
+              >
+                <Text className={`text-label-md font-jakarta-semibold text-white`}>Botão Primário</Text>
+              </Pressable>
+              
+              <Pressable 
+                className={`px-lg py-md rounded-md bg-secondary-light dark:bg-secondary-dark`}
+              >
+                <Text className={`text-label-md font-jakarta-semibold text-white`}>Botão Secundário</Text>
+              </Pressable>
+              
+              <Pressable 
+                className={`px-lg py-md rounded-md border border-primary-light dark:border-primary-dark bg-transparent`}
+              >
+                <Text className={`text-label-md font-jakarta-semibold text-primary-light dark:text-primary-dark`}>
+                  Botão Outline
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Cards */}
+            <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-md`}>Cards</Text>
+            
+            <View className="gap-md mb-lg">
+              <View className={`${bgTertiary} rounded-lg p-md border ${border}`}>
+                <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-xs`}>
+                  Card Básico
+                </Text>
+                <Text className={`text-body-md ${textSecondary}`}>
+                  Este é um exemplo de card básico que pode ser usado para exibir informações.
+                </Text>
+              </View>
+              
+              <View className={`bg-success-bg-light dark:bg-success-bg-dark rounded-lg p-md border border-success-border-light dark:border-success-border-dark`}>
+                <Text className={`text-subtitle-md font-jakarta-semibold text-success-text-light dark:text-success-text-dark mb-xs`}>
+                  Card de Sucesso
+                </Text>
+                <Text className={`text-body-md text-success-text-light dark:text-success-text-dark`}>
+                  Este é um exemplo de card de sucesso para feedback positivo.
+                </Text>
+              </View>
+              
+              <View className={`bg-error-bg-light dark:bg-error-bg-dark rounded-lg p-md border border-error-border-light dark:border-error-border-dark`}>
+                <Text className={`text-subtitle-md font-jakarta-semibold text-error-text-light dark:text-error-text-dark mb-xs`}>
+                  Card de Erro
+                </Text>
+                <Text className={`text-body-md text-error-text-light dark:text-error-text-dark`}>
+                  Este é um exemplo de card de erro para feedback negativo.
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
     );
   };
 
@@ -1323,463 +1599,118 @@ showToast({
       />
       
       <View className={`flex-1 ${bgPrimary}`}>
-        {/* Seletor de Seção */}
-        <View className={`flex-row border-b ${border}`}>
-          <Pressable
-            onPress={() => setActiveSection('config')}
-            className={`flex-1 py-md items-center border-b-2 ${
-              activeSection === 'config'
-                ? isDark
-                  ? 'border-primary-dark'
-                  : 'border-primary-light'
-                : 'border-transparent'
-            }`}
-          >
-            <Text
-              className={`text-subtitle-md font-jakarta-semibold ${
-                activeSection === 'config'
-                  ? isDark
-                    ? 'text-primary-dark'
-                    : 'text-primary-light'
-                  : textSecondary
-              }`}
-            >
-              Config
-            </Text>
-          </Pressable>
-
-          <Pressable
-            onPress={() => setActiveSection('components')}
-            className={`flex-1 py-md items-center border-b-2 ${
-              activeSection === 'components'
-                ? isDark
-                  ? 'border-primary-dark'
-                  : 'border-primary-light'
-                : 'border-transparent'
-            }`}
-          >
-            <Text
-              className={`text-subtitle-md font-jakarta-semibold ${
-                activeSection === 'components'
-                  ? isDark
-                    ? 'text-primary-dark'
-                    : 'text-primary-light'
-                  : textSecondary
-              }`}
-            >
-              Componentes
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* Conteúdo da Seção */}
-        {activeSection === 'config' ? (
-          <ScrollView className="flex-1"
-            contentContainerStyle={{ 
-              paddingBottom: isMobile ? 120 : 0 
-            }}
-            showsVerticalScrollIndicator={false}
-          >
-            <View className={`p-lg`}>
-              {/* Título da seção */}
-              <Text className={`text-headline-lg font-jakarta-bold ${textPrimary} mb-md`}>
-                Ferramentas de Dev
-              </Text>
-              <Text className={`text-body-md ${textSecondary} mb-xl`}>
-                Use este guia como referência para implementar a UI consistente em todo o aplicativo.
-              </Text>
-
-              {/* Seção de Cores */}
-              <SectionTitle title="Cores" textColor={textPrimary} />
-              
-              <View className="flex-row flex-wrap gap-md mb-xl">
-                <ColorCard name="Primary" color="bg-primary-light dark:bg-primary-dark" textColor={textPrimary} />
-                <ColorCard name="Secondary" color="bg-secondary-light dark:bg-secondary-dark" textColor={textPrimary} />
-                <ColorCard name="Tertiary" color="bg-tertiary-light dark:bg-tertiary-dark" textColor={textPrimary} />
-                <ColorCard name="Background" color={bgPrimary} textColor={textPrimary} />
-                <ColorCard name="Card Background" color={bgSecondary} textColor={textPrimary} />
-                <ColorCard name="Success" color="bg-success-bg-light dark:bg-success-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Warning" color="bg-warning-bg-light dark:bg-warning-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Error" color="bg-error-bg-light dark:bg-error-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Info" color="bg-info-bg-light dark:bg-info-bg-dark" textColor={textPrimary} />
-              </View>
-
-              {/* Seção de Tipografia */}
-              <SectionTitle title="Tipografia" textColor={textPrimary} />
-              
-              <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-                <Text className={`text-display-lg font-jakarta-extrabold ${textPrimary} mb-sm`}>Display Lg (Jakarta ExtraBold)</Text>
-                <Text className={`text-display-md font-jakarta-bold ${textPrimary} mb-sm`}>Display Md (Jakarta Bold)</Text>
-                <Text className={`text-display-sm font-jakarta-bold ${textPrimary} mb-sm`}>Display Sm (Jakarta Bold)</Text>
-                
-                <Text className={`text-headline-lg font-jakarta-bold ${textPrimary} mb-sm`}>Headline Lg (Jakarta Bold)</Text>
-                <Text className={`text-headline-md font-jakarta-bold ${textPrimary} mb-sm`}>Headline Md (Jakarta Bold)</Text>
-                <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>Headline Sm (Jakarta Bold)</Text>
-                
-                <Text className={`text-title-lg font-jakarta-bold ${textPrimary} mb-sm`}>Title Lg (Jakarta Bold)</Text>
-                <Text className={`text-title-md font-jakarta-bold ${textPrimary} mb-sm`}>Title Md (Jakarta Bold)</Text>
-                <Text className={`text-title-sm font-jakarta-bold ${textPrimary} mb-sm`}>Title Sm (Jakarta Bold)</Text>
-                
-                <Text className={`text-subtitle-lg font-jakarta-semibold ${textPrimary} mb-sm`}>Subtitle Lg (Jakarta SemiBold)</Text>
-                <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-sm`}>Subtitle Md (Jakarta SemiBold)</Text>
-                <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-sm`}>Subtitle Sm (Jakarta SemiBold)</Text>
-                
-                <Text className={`text-label-lg font-jakarta-semibold ${textPrimary} mb-sm`}>Label Lg (Jakarta SemiBold)</Text>
-                <Text className={`text-label-md font-jakarta-semibold ${textPrimary} mb-sm`}>Label Md (Jakarta SemiBold)</Text>
-                <Text className={`text-label-sm font-jakarta-semibold ${textPrimary} mb-sm`}>Label Sm (Jakarta SemiBold)</Text>
-                
-                <Text className={`text-body-lg font-jakarta-regular ${textPrimary} mb-sm`}>Body Lg (Jakarta Regular)</Text>
-                <Text className={`text-body-md font-jakarta-regular ${textPrimary} mb-sm`}>Body Md (Jakarta Regular)</Text>
-                <Text className={`text-body-sm font-jakarta-regular ${textPrimary} mb-sm`}>Body Sm (Jakarta Regular)</Text>
-                <Text className={`text-body-xs font-jakarta-regular ${textPrimary} mb-sm`}>Body Xs (Jakarta Regular)</Text>
-                
-                <View className="border-t border-divider-light dark:border-divider-dark my-md"></View>
-                
-                <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>Pesos disponíveis da fonte</Text>
-                
-                <Text className={`text-body-lg font-jakarta-thin ${textPrimary} mb-sm`}>Plus Jakarta Sans ExtraLight (200)</Text>
-                <Text className={`text-body-lg font-jakarta-light ${textPrimary} mb-sm`}>Plus Jakarta Sans Light (300)</Text>
-                <Text className={`text-body-lg font-jakarta-regular ${textPrimary} mb-sm`}>Plus Jakarta Sans Regular (400)</Text>
-                <Text className={`text-body-lg font-jakarta-medium ${textPrimary} mb-sm`}>Plus Jakarta Sans Medium (500)</Text>
-                <Text className={`text-body-lg font-jakarta-semibold ${textPrimary} mb-sm`}>Plus Jakarta Sans SemiBold (600)</Text>
-                <Text className={`text-body-lg font-jakarta-bold ${textPrimary} mb-sm`}>Plus Jakarta Sans Bold (700)</Text>
-                <Text className={`text-body-lg font-jakarta-extrabold ${textPrimary} mb-sm`}>Plus Jakarta Sans ExtraBold (800)</Text>
-                
-                <View className="border-t border-divider-light dark:border-divider-dark my-md"></View>
-                
-                <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>Exemplo de fonte mono</Text>
-                <Text className={`text-body-lg font-mono-regular ${textPrimary} mb-sm`}>Space Mono (para código)</Text>
-              </View>
-
-              {/* Seção de Espaçamentos */}
-              <SectionTitle title="Espaçamentos" textColor={textPrimary} />
-              
-              <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-                <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Aliases Semânticos</Text>
-                <View className="flex-row flex-wrap mb-lg">
-                  <SpacingExample size="xxxs" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <SpacingExample size="xxs" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <SpacingExample size="xs" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <SpacingExample size="sm" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <SpacingExample size="md" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <SpacingExample size="lg" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <SpacingExample size="xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <SpacingExample size="2xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <SpacingExample size="3xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <SpacingExample size="4xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <SpacingExample size="5xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                </View>
-                
-                <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Pequenos (0-20px)</Text>
-                <View className="flex-row flex-wrap mb-lg">
-                  <SpacingExample size="0" value="0px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                  <SpacingExample size="px" value="1px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                  <SpacingExample size="0.5" value="2px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                  <SpacingExample size="1" value="4px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                  <SpacingExample size="1.5" value="6px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                  <SpacingExample size="2" value="8px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                  <SpacingExample size="2.5" value="10px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                  <SpacingExample size="3" value="12px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                  <SpacingExample size="3.5" value="14px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                  <SpacingExample size="4" value="16px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                  <SpacingExample size="5" value="20px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-                </View>
-                
-                <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Médios (24-64px)</Text>
-                <View className="flex-row flex-wrap mb-lg">
-                  <SpacingExample size="6" value="24px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-                  <SpacingExample size="7" value="28px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-                  <SpacingExample size="8" value="32px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-                  <SpacingExample size="9" value="36px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-                  <SpacingExample size="10" value="40px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-                  <SpacingExample size="11" value="44px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-                  <SpacingExample size="12" value="48px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-                  <SpacingExample size="14" value="56px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-                  <SpacingExample size="16" value="64px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-                </View>
-                
-                <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Grandes (72px+)</Text>
-                <View className="flex-row flex-wrap mb-md">
-                  <SpacingExample size="18" value="72px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="20" value="80px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="24" value="96px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="32" value="128px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="40" value="160px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="64" value="256px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-                </View>
-              </View>
-              
-              {/* Seção de Border Radius */}
-              <SectionTitle title="Border Radius" textColor={textPrimary} />
-              
-              <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-                <View className="flex-row flex-wrap gap-md">
-                  <BorderRadiusExample name="none" value="0" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <BorderRadiusExample name="xs" value="2px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <BorderRadiusExample name="sm" value="4px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <BorderRadiusExample name="md" value="8px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <BorderRadiusExample name="lg" value="12px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <BorderRadiusExample name="xl" value="16px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <BorderRadiusExample name="2xl" value="20px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <BorderRadiusExample name="3xl" value="24px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <BorderRadiusExample name="4xl" value="28px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <BorderRadiusExample name="5xl" value="32px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <BorderRadiusExample name="full" value="9999px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                </View>
-              </View>
-              
-              {/* Seção de Sombras */}
-              <SectionTitle title="Sombras" textColor={textPrimary} />
-              
-              <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-                <View className="grid grid-cols-2 md:grid-cols-3 gap-md">
-                  <ShadowExample name="none" shadow="shadow-none" textColor={textPrimary} bgColor={bgTertiary} />
-                  <ShadowExample name="xs" shadow="shadow-xs" textColor={textPrimary} bgColor={bgTertiary} />
-                  <ShadowExample name="sm" shadow="shadow-sm" textColor={textPrimary} bgColor={bgTertiary} />
-                  <ShadowExample name="md" shadow="shadow-md" textColor={textPrimary} bgColor={bgTertiary} />
-                  <ShadowExample name="lg" shadow="shadow-lg" textColor={textPrimary} bgColor={bgTertiary} />
-                  <ShadowExample name="xl" shadow="shadow-xl" textColor={textPrimary} bgColor={bgTertiary} />
-                  <ShadowExample name="2xl" shadow="shadow-2xl" textColor={textPrimary} bgColor={bgTertiary} />
-                  <ShadowExample name="inner" shadow="shadow-inner" textColor={textPrimary} bgColor={bgTertiary} />
-                  <ShadowExample name="light-card" shadow="shadow-light-card dark:shadow-dark-card" textColor={textPrimary} bgColor={bgTertiary} />
-                  <ShadowExample name="light-button" shadow="shadow-light-button dark:shadow-dark-button" textColor={textPrimary} bgColor={bgTertiary} />
-                  <ShadowExample name="float" shadow="shadow-float" textColor={textPrimary} bgColor={bgTertiary} />
-                </View>
-              </View>
-              
-              {/* Seção de Opacidade */}
-              <SectionTitle title="Opacidade" textColor={textPrimary} />
-              
-              <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-                <View className="grid grid-cols-3 md:grid-cols-6 gap-md">
-                  <OpacityExample name="0" value="0" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="5" value="0.05" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="10" value="0.1" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="20" value="0.2" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="30" value="0.3" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="40" value="0.4" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="50" value="0.5" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="60" value="0.6" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="70" value="0.7" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="80" value="0.8" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="90" value="0.9" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                  <OpacityExample name="100" value="1" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-                </View>
-              </View>
-              
-              {/* Seção de z-index */}
-              <SectionTitle title="Z-Index" textColor={textPrimary} />
-              
-              <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-                <View className="grid grid-cols-3 md:grid-cols-6 gap-md">
-                  <ValueDisplay name="0" value="0" textColor={textPrimary} />
-                  <ValueDisplay name="10" value="10" textColor={textPrimary} />
-                  <ValueDisplay name="20" value="20" textColor={textPrimary} />
-                  <ValueDisplay name="30" value="30" textColor={textPrimary} />
-                  <ValueDisplay name="40" value="40" textColor={textPrimary} />
-                  <ValueDisplay name="50" value="50" textColor={textPrimary} />
-                  <ValueDisplay name="60" value="60" textColor={textPrimary} />
-                  <ValueDisplay name="70" value="70" textColor={textPrimary} />
-                  <ValueDisplay name="80" value="80" textColor={textPrimary} />
-                  <ValueDisplay name="90" value="90" textColor={textPrimary} />
-                  <ValueDisplay name="100" value="100" textColor={textPrimary} />
-                  <ValueDisplay name="auto" value="auto" textColor={textPrimary} />
-                </View>
-              </View>
-              
-              {/* Seção de Tempos de Transição */}
-              <SectionTitle title="Tempos de Transição" textColor={textPrimary} />
-              
-              <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-                <View className="grid grid-cols-2 md:grid-cols-4 gap-md">
-                  <ValueDisplay name="75" value="75ms" textColor={textPrimary} />
-                  <ValueDisplay name="100" value="100ms" textColor={textPrimary} />
-                  <ValueDisplay name="150" value="150ms" textColor={textPrimary} />
-                  <ValueDisplay name="200" value="200ms" textColor={textPrimary} />
-                  <ValueDisplay name="300" value="300ms" textColor={textPrimary} />
-                  <ValueDisplay name="500" value="500ms" textColor={textPrimary} />
-                  <ValueDisplay name="700" value="700ms" textColor={textPrimary} />
-                  <ValueDisplay name="1000" value="1000ms" textColor={textPrimary} />
-                </View>
-              </View>
-
-              {/* Seção de Componentes */}
-              <SectionTitle title="Componentes" textColor={textPrimary} />
-              
-              <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-                {/* Botões */}
-                <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-md`}>Botões</Text>
-                
-                <View className="flex-row flex-wrap gap-md mb-lg">
-                  <Pressable 
-                    className={`px-lg py-md rounded-md bg-primary-light dark:bg-primary-dark`}
+        <View className="flex-1">
+          {isMobile ? (
+            // Layout para dispositivos móveis com botões compactos no topo
+            <View className="flex-1">
+              {/* Navegação compacta para dispositivos móveis */}
+              <View className={`flex-row justify-center py-xs border-b ${border}`}>
+                {availableComponents.map((component) => (
+                  <Pressable
+                    key={component.id}
+                    onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast')}
+                    className={`mx-xs px-lg py-xs rounded-full ${
+                      activeComponent === component.id
+                        ? isDark
+                          ? 'bg-primary-dark'
+                          : 'bg-primary-light'
+                        : isDark 
+                          ? 'bg-bg-tertiary-dark' 
+                          : 'bg-bg-tertiary-light'
+                    }`}
                   >
-                    <Text className={`text-label-md font-jakarta-semibold text-white`}>Botão Primário</Text>
-                  </Pressable>
-                  
-                  <Pressable 
-                    className={`px-lg py-md rounded-md bg-secondary-light dark:bg-secondary-dark`}
-                  >
-                    <Text className={`text-label-md font-jakarta-semibold text-white`}>Botão Secundário</Text>
-                  </Pressable>
-                  
-                  <Pressable 
-                    className={`px-lg py-md rounded-md border border-primary-light dark:border-primary-dark bg-transparent`}
-                  >
-                    <Text className={`text-label-md font-jakarta-semibold text-primary-light dark:text-primary-dark`}>
-                      Botão Outline
-                    </Text>
-                  </Pressable>
-                </View>
-
-                {/* Cards */}
-                <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-md`}>Cards</Text>
-                
-                <View className="gap-md mb-lg">
-                  <View className={`${bgTertiary} rounded-lg p-md border ${border}`}>
-                    <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-xs`}>
-                      Card Básico
-                    </Text>
-                    <Text className={`text-body-md ${textSecondary}`}>
-                      Este é um exemplo de card básico que pode ser usado para exibir informações.
-                    </Text>
-                  </View>
-                  
-                  <View className={`bg-success-bg-light dark:bg-success-bg-dark rounded-lg p-md border border-success-border-light dark:border-success-border-dark`}>
-                    <Text className={`text-subtitle-md font-jakarta-semibold text-success-text-light dark:text-success-text-dark mb-xs`}>
-                      Card de Sucesso
-                    </Text>
-                    <Text className={`text-body-md text-success-text-light dark:text-success-text-dark`}>
-                      Este é um exemplo de card de sucesso para feedback positivo.
-                    </Text>
-                  </View>
-                  
-                  <View className={`bg-error-bg-light dark:bg-error-bg-dark rounded-lg p-md border border-error-border-light dark:border-error-border-dark`}>
-                    <Text className={`text-subtitle-md font-jakarta-semibold text-error-text-light dark:text-error-text-dark mb-xs`}>
-                      Card de Erro
-                    </Text>
-                    <Text className={`text-body-md text-error-text-light dark:text-error-text-dark`}>
-                      Este é um exemplo de card de erro para feedback negativo.
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </ScrollView>
-        ) : (
-          <View className="flex-1">
-            {isMobile ? (
-              // Layout para dispositivos móveis com botões compactos no topo
-              <View className="flex-1">
-                {/* Navegação compacta para dispositivos móveis */}
-                <View className={`flex-row justify-center py-xs border-b ${border}`}>
-                  {availableComponents.map((component) => (
-                    <Pressable
-                      key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast')}
-                      className={`mx-xs px-lg py-xs rounded-full ${
+                    <Text
+                      className={`${
                         activeComponent === component.id
-                          ? isDark
-                            ? 'bg-primary-dark'
-                            : 'bg-primary-light'
-                          : isDark 
-                            ? 'bg-bg-tertiary-dark' 
-                            : 'bg-bg-tertiary-light'
-                      }`}
+                          ? 'text-white'
+                          : textPrimary
+                      } text-label-md font-jakarta-semibold`}
                     >
-                      <Text
-                        className={`${
-                          activeComponent === component.id
-                            ? 'text-white'
-                            : textPrimary
-                        } text-label-md font-jakarta-semibold`}
-                      >
-                        {component.name}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </View>
-                
-                {/* Conteúdo do componente em um ScrollView isolado */}
-                <ScrollView 
-                  className="flex-1" 
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{ 
-                    flexGrow: 1,
-                    paddingBottom: 120 
-                  }}
-                >
-                  {renderComponentContent()}
-                </ScrollView>
-              </View>
-            ) : (
-              // Layout para desktop com sidebar lateral - versão moderna e elegante
-              <View className="flex-row flex-1">
-                {/* Lista de componentes - sidebar mais fina e elegante */}
-                <View className={`w-[220px] border-r ${border} bg-opacity-50 ${bgSecondary}`}>
-                  <View className="py-md px-md">
-                    <Text className={`text-title-sm font-jakarta-bold ${textPrimary} mb-xs px-xs`}>
-                      Componentes
+                      {component.name}
                     </Text>
-                    
-                    <View className="flex-col">
-                      {availableComponents.map((component) => {
-                        // Substituir a importação dinâmica pela nossa função renderIcon
-                        return (
-                          <Pressable
-                            key={component.id}
-                            onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast')}
-                            className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
+                  </Pressable>
+                ))}
+              </View>
+              
+              {/* Conteúdo do componente em um ScrollView isolado */}
+              <ScrollView 
+                className="flex-1" 
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ 
+                  flexGrow: 1,
+                  paddingBottom: 120 
+                }}
+              >
+                {renderComponentContent()}
+              </ScrollView>
+            </View>
+          ) : (
+            // Layout para desktop com sidebar lateral - versão moderna e elegante
+            <View className="flex-row flex-1">
+              {/* Lista de componentes - sidebar mais fina e elegante */}
+              <View className={`w-[220px] border-r ${border} bg-opacity-50 ${bgSecondary}`}>
+                <View className="py-md px-md">
+                  <Text className={`text-title-sm font-jakarta-bold ${textPrimary} mb-xs px-xs`}>
+                    Componentes
+                  </Text>
+                  
+                  <View className="flex-col">
+                    {availableComponents.map((component) => {
+                      // Substituir a importação dinâmica pela nossa função renderIcon
+                      return (
+                        <Pressable
+                          key={component.id}
+                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast')}
+                          className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
+                            activeComponent === component.id
+                              ? isDark
+                                ? 'bg-primary-dark/10'
+                                : 'bg-primary-light/10'
+                              : ''
+                          }`}
+                        >
+                          <View
+                            className={`w-8 h-8 rounded-md mr-sm items-center justify-center ${
                               activeComponent === component.id
-                                ? isDark
-                                  ? 'bg-primary-dark/10'
-                                  : 'bg-primary-light/10'
-                                : ''
+                                ? isDark 
+                                  ? 'bg-primary-dark/20' 
+                                  : 'bg-primary-light/20'
+                                : isDark 
+                                  ? 'bg-gray-800/50' 
+                                  : 'bg-gray-200'
                             }`}
                           >
-                            <View
-                              className={`w-8 h-8 rounded-md mr-sm items-center justify-center ${
-                                activeComponent === component.id
-                                  ? isDark 
-                                    ? 'bg-primary-dark/20' 
-                                    : 'bg-primary-light/20'
-                                  : isDark 
-                                    ? 'bg-gray-800/50' 
-                                    : 'bg-gray-200'
-                              }`}
-                            >
-                              {renderIcon(component.icon)}
-                            </View>
-                            <Text
-                              className={`${
-                                activeComponent === component.id
-                                  ? isDark
-                                    ? 'text-primary-dark font-jakarta-semibold'
-                                    : 'text-primary-light font-jakarta-semibold'
-                                  : textSecondary
-                              } text-body-sm`}
-                            >
-                              {component.name}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
+                            {renderIcon(component.icon)}
+                          </View>
+                          <Text
+                            className={`${
+                              activeComponent === component.id
+                                ? isDark
+                                  ? 'text-primary-dark font-jakarta-semibold'
+                                  : 'text-primary-light font-jakarta-semibold'
+                                : textSecondary
+                            } text-body-sm`}
+                          >
+                            {component.name}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
                   </View>
                 </View>
-                
-                {/* Conteúdo do componente */}
-                <ScrollView 
-                  className="flex-1"
-                  contentContainerStyle={{ paddingBottom: 40 }}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {renderComponentContent()}
-                </ScrollView>
               </View>
-            )}
-          </View>
-        )}
+              
+              {/* Conteúdo do componente */}
+              <ScrollView 
+                className="flex-1"
+                contentContainerStyle={{ paddingBottom: 40 }}
+                showsVerticalScrollIndicator={false}
+              >
+                {renderComponentContent()}
+              </ScrollView>
+            </View>
+          )}
+        </View>
       </View>
     </>
   );
