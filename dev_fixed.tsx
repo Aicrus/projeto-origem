@@ -7,14 +7,13 @@ import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
 import { colors } from '../../components/AicrusComponents/constants/theme';
 import { Button } from '../../components/AicrusComponents/button';
-import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun } from 'lucide-react-native';
+import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
-import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | null>('designSystem');
+  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | null>('designSystem');
   const [toastVisible, setToastVisible] = useState(false);
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const [toastPosition, setToastPosition] = useState<'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('top');
@@ -72,31 +71,24 @@ export default function DevPage() {
     { id: 'select', name: 'Select', icon: 'ChevronDown' },
     { id: 'accordion', name: 'Accordion', icon: 'ChevronsUpDown' },
     { id: 'button', name: 'Button', icon: 'Square' },
-    { id: 'toast', name: 'Toast', icon: 'Bell' },
-    { id: 'themeSelector', name: 'Theme Selector', icon: 'Sun' },
+    { id: 'toast', name: 'Toast', icon: 'MessageSquare' },
   ];
   
   // Função para renderizar o ícone correto
   const renderIcon = (iconName: string) => {
     switch (iconName) {
       case 'Type':
-        return <Type strokeWidth={1.5} />;
+        return <Type />;
       case 'ChevronDown':
-        return <ChevronDown strokeWidth={1.5} />;
+        return <ChevronDown />;
       case 'ChevronsUpDown':
-        return <ChevronsUpDown strokeWidth={1.5} />;
+        return <ChevronsUpDown />;
       case 'Square':
-        return <Square strokeWidth={1.5} />;
+        return <Square />;
       case 'Settings':
-        return <Settings strokeWidth={1.5} />;
-      case 'Bell':
-        return <Bell strokeWidth={1.5} />;
-      case 'MessageSquare':
-        return <MessageSquare strokeWidth={1.5} />;
-      case 'Sun':
-        return <Sun strokeWidth={1.5} />;
+        return <Settings />;
       default:
-        return <Settings strokeWidth={1.5} />;
+        return <Settings />;
     }
   };
   
@@ -128,8 +120,6 @@ export default function DevPage() {
         return renderDesignSystem();
       case 'toast':
         return renderToastComponent();
-      case 'themeSelector':
-        return renderThemeSelectorComponent();
       default:
         return null;
     }
@@ -777,7 +767,7 @@ export default function DevPage() {
             <View className="flex-row flex-wrap gap-sm mb-sm">
               <Button 
                 variant="primary" 
-                leftIcon={<Mail size={16} strokeWidth={1.5} color="#FFFFFF" />}
+                leftIcon={<Mail size={16} color="#FFFFFF" />}
                 onPress={() => {}}
                 size="md"
               >
@@ -785,7 +775,7 @@ export default function DevPage() {
               </Button>
               <Button 
                 variant="outline" 
-                rightIcon={<ChevronRight size={16} strokeWidth={1.5} color={isDark ? "#FFFFFF" : "#14181B"} />}
+                rightIcon={<ChevronRight size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
                 onPress={() => {}}
                 size="md"
               >
@@ -797,7 +787,7 @@ export default function DevPage() {
                 onPress={() => {}}
                 size="md"
               >
-                <Plus size={16} strokeWidth={1.5} color={isDark ? "#FFFFFF" : "#14181B"} />
+                <Plus size={16} color={isDark ? "#FFFFFF" : "#14181B"} />
               </Button>
             </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
@@ -849,7 +839,7 @@ export default function DevPage() {
             <View className="mb-sm">
               <Button 
                 variant="primary" 
-                leftIcon={<Mail size={16} strokeWidth={1.5} color="#FFFFFF" />}
+                leftIcon={<Mail size={16} color="#FFFFFF" />}
                 onPress={() => {}}
                 fullWidth
                 size="md"
@@ -997,7 +987,7 @@ export default function DevPage() {
         <View className={`p-lg`}>
           {/* Título da seção */}
           <Text className={`text-headline-lg font-jakarta-bold ${textPrimary} mb-md`}>
-            Design System
+            Ferramentas de Dev
           </Text>
           <Text className={`text-body-md ${textSecondary} mb-xl`}>
             Use este guia como referência para implementar a UI consistente em todo o aplicativo.
@@ -1006,113 +996,26 @@ export default function DevPage() {
           {/* Seção de Cores */}
           <SectionTitle title="Cores" textColor={textPrimary} />
           
-          {/* Cores Primárias - Light/Dark theme */}
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Cores Primárias</Text>
-          <View className="flex-row flex-wrap gap-md mb-lg">
-            <ColorCard name="Primary" color="bg-primary-light dark:bg-primary-dark" textColor={textPrimary} />
-            <ColorCard name="Primary Hover" color="bg-primary-light-hover dark:bg-primary-dark-hover" textColor={textPrimary} />
-            <ColorCard name="Primary Active" color="bg-primary-light-active dark:bg-primary-dark-active" textColor={textPrimary} />
-            <ColorCard name="Secondary" color="bg-secondary-light dark:bg-secondary-dark" textColor={textPrimary} />
-            <ColorCard name="Secondary Hover" color="bg-secondary-light-hover dark:bg-secondary-dark-hover" textColor={textPrimary} />
-            <ColorCard name="Secondary Active" color="bg-secondary-light-active dark:bg-secondary-dark-active" textColor={textPrimary} />
-            <ColorCard name="Tertiary" color="bg-tertiary-light dark:bg-tertiary-dark" textColor={textPrimary} />
-            <ColorCard name="Tertiary Hover" color="bg-tertiary-light-hover dark:bg-tertiary-dark-hover" textColor={textPrimary} />
-            <ColorCard name="Tertiary Active" color="bg-tertiary-light-active dark:bg-tertiary-dark-active" textColor={textPrimary} />
-            <ColorCard name="Alternate" color="bg-alternate-light dark:bg-alternate-dark" textColor={textPrimary} />
-          </View>
-          
-          {/* Cores de Texto */}
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Texto</Text>
-          <View className="flex-row flex-wrap gap-md mb-lg">
-            <ColorCard name="Text Primary" color="bg-text-primary-light dark:bg-text-primary-dark" textColor={textPrimary} />
-            <ColorCard name="Text Secondary" color="bg-text-secondary-light dark:bg-text-secondary-dark" textColor={textPrimary} />
-            <ColorCard name="Text Tertiary" color="bg-text-tertiary-light dark:bg-text-tertiary-dark" textColor={textPrimary} />
-          </View>
-          
-          {/* Cores de Background */}
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Background</Text>
-          <View className="flex-row flex-wrap gap-md mb-lg">
-            <ColorCard name="BG Primary" color="bg-bg-primary-light dark:bg-bg-primary-dark" textColor={textPrimary} />
-            <ColorCard name="BG Secondary" color="bg-bg-secondary-light dark:bg-bg-secondary-dark" textColor={textPrimary} />
-            <ColorCard name="BG Tertiary" color="bg-bg-tertiary-light dark:bg-bg-tertiary-dark" textColor={textPrimary} />
-            <ColorCard name="Icon" color="bg-icon-light dark:bg-icon-dark" textColor={textPrimary} />
-            <ColorCard name="Divider" color="bg-divider-light dark:bg-divider-dark" textColor={textPrimary} />
-            <ColorCard name="Hover" color="bg-hover-light dark:bg-hover-dark" textColor={textPrimary} />
-            <ColorCard name="Active" color="bg-active-light dark:bg-active-dark" textColor={textPrimary} />
-          </View>
-          
-          {/* Cores de Feedback */}
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Feedback</Text>
-          <View className="flex-row flex-wrap gap-md mb-lg">
-            {/* Success */}
-            <View className="mb-sm">
-              <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Sucesso</Text>
-              <View className="flex-row flex-wrap gap-sm">
-                <ColorCard name="Success BG" color="bg-success-bg-light dark:bg-success-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Success Text" color="bg-success-text-light dark:bg-success-text-dark" textColor={textPrimary} />
-                <ColorCard name="Success Border" color="bg-success-border-light dark:bg-success-border-dark" textColor={textPrimary} />
-                <ColorCard name="Success Icon" color="bg-success-icon-light dark:bg-success-icon-dark" textColor={textPrimary} />
-              </View>
-            </View>
-            
-            {/* Warning */}
-            <View className="mb-sm">
-              <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Alerta</Text>
-              <View className="flex-row flex-wrap gap-sm">
-                <ColorCard name="Warning BG" color="bg-warning-bg-light dark:bg-warning-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Warning Text" color="bg-warning-text-light dark:bg-warning-text-dark" textColor={textPrimary} />
-                <ColorCard name="Warning Border" color="bg-warning-border-light dark:bg-warning-border-dark" textColor={textPrimary} />
-                <ColorCard name="Warning Icon" color="bg-warning-icon-light dark:bg-warning-icon-dark" textColor={textPrimary} />
-              </View>
-            </View>
-            
-            {/* Error */}
-            <View className="mb-sm">
-              <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Erro</Text>
-              <View className="flex-row flex-wrap gap-sm">
-                <ColorCard name="Error BG" color="bg-error-bg-light dark:bg-error-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Error Text" color="bg-error-text-light dark:bg-error-text-dark" textColor={textPrimary} />
-                <ColorCard name="Error Border" color="bg-error-border-light dark:bg-error-border-dark" textColor={textPrimary} />
-                <ColorCard name="Error Icon" color="bg-error-icon-light dark:bg-error-icon-dark" textColor={textPrimary} />
-              </View>
-            </View>
-            
-            {/* Info */}
-            <View className="mb-sm">
-              <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Informação</Text>
-              <View className="flex-row flex-wrap gap-sm">
-                <ColorCard name="Info BG" color="bg-info-bg-light dark:bg-info-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Info Text" color="bg-info-text-light dark:bg-info-text-dark" textColor={textPrimary} />
-                <ColorCard name="Info Border" color="bg-info-border-light dark:bg-info-border-dark" textColor={textPrimary} />
-                <ColorCard name="Info Icon" color="bg-info-icon-light dark:bg-info-icon-dark" textColor={textPrimary} />
-              </View>
-            </View>
-          </View>
-          
-          {/* Cores de Gradiente */}
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Gradientes</Text>
           <View className="flex-row flex-wrap gap-md mb-xl">
-            <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-primary-start to-gradient-primary-end">
-              <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Primário</Text>
-            </View>
-            <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-secondary-start to-gradient-secondary-end">
-              <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Secundário</Text>
-            </View>
-            <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-tertiary-start to-gradient-tertiary-end">
-              <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Terciário</Text>
-            </View>
+            <ColorCard name="Primary" color="bg-primary-light dark:bg-primary-dark" textColor={textPrimary} />
+            <ColorCard name="Secondary" color="bg-secondary-light dark:bg-secondary-dark" textColor={textPrimary} />
+            <ColorCard name="Tertiary" color="bg-tertiary-light dark:bg-tertiary-dark" textColor={textPrimary} />
+            <ColorCard name="Background" color={bgPrimary} textColor={textPrimary} />
+            <ColorCard name="Card Background" color={bgSecondary} textColor={textPrimary} />
+            <ColorCard name="Success" color="bg-success-bg-light dark:bg-success-bg-dark" textColor={textPrimary} />
+            <ColorCard name="Warning" color="bg-warning-bg-light dark:bg-warning-bg-dark" textColor={textPrimary} />
+            <ColorCard name="Error" color="bg-error-bg-light dark:bg-error-bg-dark" textColor={textPrimary} />
+            <ColorCard name="Info" color="bg-info-bg-light dark:bg-info-bg-dark" textColor={textPrimary} />
           </View>
 
           {/* Seção de Tipografia */}
           <SectionTitle title="Tipografia" textColor={textPrimary} />
           
           <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-            <Text className={`text-display-xl font-jakarta-extrabold ${textPrimary} mb-sm`}>Display XL (Jakarta ExtraBold)</Text>
             <Text className={`text-display-lg font-jakarta-extrabold ${textPrimary} mb-sm`}>Display Lg (Jakarta ExtraBold)</Text>
             <Text className={`text-display-md font-jakarta-bold ${textPrimary} mb-sm`}>Display Md (Jakarta Bold)</Text>
             <Text className={`text-display-sm font-jakarta-bold ${textPrimary} mb-sm`}>Display Sm (Jakarta Bold)</Text>
             
-            <Text className={`text-headline-xl font-jakarta-bold ${textPrimary} mb-sm`}>Headline XL (Jakarta Bold)</Text>
             <Text className={`text-headline-lg font-jakarta-bold ${textPrimary} mb-sm`}>Headline Lg (Jakarta Bold)</Text>
             <Text className={`text-headline-md font-jakarta-bold ${textPrimary} mb-sm`}>Headline Md (Jakarta Bold)</Text>
             <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>Headline Sm (Jakarta Bold)</Text>
@@ -1133,10 +1036,6 @@ export default function DevPage() {
             <Text className={`text-body-md font-jakarta-regular ${textPrimary} mb-sm`}>Body Md (Jakarta Regular)</Text>
             <Text className={`text-body-sm font-jakarta-regular ${textPrimary} mb-sm`}>Body Sm (Jakarta Regular)</Text>
             <Text className={`text-body-xs font-jakarta-regular ${textPrimary} mb-sm`}>Body Xs (Jakarta Regular)</Text>
-            
-            <Text className={`text-mono-lg font-mono-regular ${textPrimary} mb-sm`}>Mono Lg (Space Mono)</Text>
-            <Text className={`text-mono-md font-mono-regular ${textPrimary} mb-sm`}>Mono Md (Space Mono)</Text>
-            <Text className={`text-mono-sm font-mono-regular ${textPrimary} mb-sm`}>Mono Sm (Space Mono)</Text>
             
             <View className="border-t border-divider-light dark:border-divider-dark my-md"></View>
             
@@ -1162,21 +1061,20 @@ export default function DevPage() {
           <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
             <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Aliases Semânticos</Text>
             <View className="flex-row flex-wrap mb-lg">
-              <SpacingExample size="xxxs" value="2px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="xxs" value="4px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="xs" value="8px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="sm" value="12px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="md" value="16px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="lg" value="24px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="xl" value="32px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="2xl" value="48px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="3xl" value="64px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="4xl" value="80px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="5xl" value="96px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="6xl" value="128px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="xxxs" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="xxs" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="xs" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="sm" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="md" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="lg" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="2xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="3xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="4xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              <SpacingExample size="5xl" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
             </View>
             
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Extra Pequenos/Pequenos (0-20px)</Text>
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Pequenos (0-20px)</Text>
             <View className="flex-row flex-wrap mb-lg">
               <SpacingExample size="0" value="0px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
               <SpacingExample size="px" value="1px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
@@ -1204,28 +1102,14 @@ export default function DevPage() {
               <SpacingExample size="16" value="64px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
             </View>
             
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Grandes (72-128px)</Text>
-            <View className="flex-row flex-wrap mb-lg">
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Grandes (72px+)</Text>
+            <View className="flex-row flex-wrap mb-md">
               <SpacingExample size="18" value="72px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
               <SpacingExample size="20" value="80px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
               <SpacingExample size="24" value="96px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="28" value="112px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
               <SpacingExample size="32" value="128px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-            </View>
-            
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Gigantes (144-384px)</Text>
-            <View className="flex-row flex-wrap mb-md">
-              <SpacingExample size="36" value="144px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="40" value="160px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="44" value="176px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="48" value="192px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="52" value="208px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="56" value="224px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="60" value="240px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="64" value="256px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="72" value="288px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="80" value="320px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="96" value="384px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+              <SpacingExample size="40" value="160px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
+              <SpacingExample size="64" value="256px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
             </View>
           </View>
           
@@ -1275,19 +1159,14 @@ export default function DevPage() {
               <OpacityExample name="0" value="0" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="5" value="0.05" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="10" value="0.1" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="15" value="0.15" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="20" value="0.2" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="25" value="0.25" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="30" value="0.3" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="40" value="0.4" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="50" value="0.5" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="60" value="0.6" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="70" value="0.7" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="75" value="0.75" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="80" value="0.8" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="85" value="0.85" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="90" value="0.9" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="95" value="0.95" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
               <OpacityExample name="100" value="1" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
             </View>
           </View>
@@ -1325,6 +1204,68 @@ export default function DevPage() {
               <ValueDisplay name="500" value="500ms" textColor={textPrimary} />
               <ValueDisplay name="700" value="700ms" textColor={textPrimary} />
               <ValueDisplay name="1000" value="1000ms" textColor={textPrimary} />
+            </View>
+          </View>
+
+          {/* Seção de Componentes */}
+          <SectionTitle title="Componentes" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            {/* Botões */}
+            <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-md`}>Botões</Text>
+            
+            <View className="flex-row flex-wrap gap-md mb-lg">
+              <Pressable 
+                className={`px-lg py-md rounded-md bg-primary-light dark:bg-primary-dark`}
+              >
+                <Text className={`text-label-md font-jakarta-semibold text-white`}>Botão Primário</Text>
+              </Pressable>
+              
+              <Pressable 
+                className={`px-lg py-md rounded-md bg-secondary-light dark:bg-secondary-dark`}
+              >
+                <Text className={`text-label-md font-jakarta-semibold text-white`}>Botão Secundário</Text>
+              </Pressable>
+              
+              <Pressable 
+                className={`px-lg py-md rounded-md border border-primary-light dark:border-primary-dark bg-transparent`}
+              >
+                <Text className={`text-label-md font-jakarta-semibold text-primary-light dark:text-primary-dark`}>
+                  Botão Outline
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* Cards */}
+            <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-md`}>Cards</Text>
+            
+            <View className="gap-md mb-lg">
+              <View className={`${bgTertiary} rounded-lg p-md border ${border}`}>
+                <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-xs`}>
+                  Card Básico
+                </Text>
+                <Text className={`text-body-md ${textSecondary}`}>
+                  Este é um exemplo de card básico que pode ser usado para exibir informações.
+                </Text>
+              </View>
+              
+              <View className={`bg-success-bg-light dark:bg-success-bg-dark rounded-lg p-md border border-success-border-light dark:border-success-border-dark`}>
+                <Text className={`text-subtitle-md font-jakarta-semibold text-success-text-light dark:text-success-text-dark mb-xs`}>
+                  Card de Sucesso
+                </Text>
+                <Text className={`text-body-md text-success-text-light dark:text-success-text-dark`}>
+                  Este é um exemplo de card de sucesso para feedback positivo.
+                </Text>
+              </View>
+              
+              <View className={`bg-error-bg-light dark:bg-error-bg-dark rounded-lg p-md border border-error-border-light dark:border-error-border-dark`}>
+                <Text className={`text-subtitle-md font-jakarta-semibold text-error-text-light dark:text-error-text-dark mb-xs`}>
+                  Card de Erro
+                </Text>
+                <Text className={`text-body-md text-error-text-light dark:text-error-text-dark`}>
+                  Este é um exemplo de card de erro para feedback negativo.
+                </Text>
+              </View>
             </View>
           </View>
         </View>
@@ -1379,28 +1320,28 @@ export default function DevPage() {
               <Button 
                 variant="primary" 
                 onPress={() => showToast('success')}
-                leftIcon={<CheckCircle size={16} strokeWidth={1.5} color="#FFFFFF" />}
+                leftIcon={<CheckCircle size={16} color="#FFFFFF" />}
               >
                 Sucesso
               </Button>
               <Button 
                 variant="destructive" 
                 onPress={() => showToast('error')}
-                leftIcon={<AlertCircle size={16} strokeWidth={1.5} color="#FFFFFF" />}
+                leftIcon={<AlertCircle size={16} color="#FFFFFF" />}
               >
                 Erro
               </Button>
               <Button 
                 variant="outline" 
                 onPress={() => showToast('warning')}
-                leftIcon={<AlertTriangle size={16} strokeWidth={1.5} color={isDark ? "#FFFFFF" : "#14181B"} />}
+                leftIcon={<AlertTriangle size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
               >
                 Alerta
               </Button>
               <Button 
                 variant="ghost" 
                 onPress={() => showToast('info')}
-                leftIcon={<Info size={16} strokeWidth={1.5} color={isDark ? "#FFFFFF" : "#14181B"} />}
+                leftIcon={<Info size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
               >
                 Informação
               </Button>
@@ -1644,85 +1585,6 @@ showToast({
     );
   };
 
-  const renderThemeSelectorComponent = () => {
-    return (
-      <View className="p-lg">
-        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
-          Componente Theme Selector
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          O Theme Selector é um componente interativo que permite alternar entre os modos de tema
-          (claro, escuro e sistema) com animações suaves e feedback visual.
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
-          
-          {/* Exemplo básico */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Theme Selector básico</Text>
-            <ThemeSelector />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Seletor de tema com animações suaves e ícones intuitivos.
-            </Text>
-          </View>
-          
-          {/* Exemplo com tamanho personalizado */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Theme Selector com tamanho personalizado</Text>
-            <ThemeSelector className="scale-150" />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              O componente pode ser redimensionado usando classes de escala.
-            </Text>
-          </View>
-        </View>
-        
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Características
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-md`}>
-          O Theme Selector oferece diversas características para uma experiência de usuário fluida:
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Animações suaves</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Transições animadas entre os modos de tema</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tema adaptativo</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Adapta-se automaticamente ao tema atual</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Ícones intuitivos</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Representação visual clara de cada modo de tema</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Responsividade</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Funciona igualmente bem em todas as plataformas</Text>
-          </View>
-        </View>
-        
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Propriedades
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          O componente Theme Selector possui as seguintes propriedades:
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>className</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Classes adicionais para personalização (string)</Text>
-          </View>
-        </View>
-      </View>
-    );
-  };
-
   return (
     <>
       <Stack.Screen 
@@ -1742,43 +1604,32 @@ showToast({
             // Layout para dispositivos móveis com botões compactos no topo
             <View className="flex-1">
               {/* Navegação compacta para dispositivos móveis */}
-              <View className={`border-b ${border} py-1 bg-bg-tertiary-light dark:bg-bg-tertiary-dark`}>
-                <ScrollView 
-                  horizontal 
-                  showsHorizontalScrollIndicator={false} 
-                  contentContainerStyle={{ paddingHorizontal: 8, paddingVertical: 4 }}
-                >
-                  {availableComponents.map((component) => (
-                    <Pressable
-                      key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector')}
-                      className={`mr-2 px-3 py-1 rounded-md ${
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} className={`py-xs border-b ${border}`} contentContainerStyle={{ paddingHorizontal: 4 }}>
+                {availableComponents.map((component) => (
+                  <Pressable
+                    key={component.id}
+                    onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast')}
+                    className={`mx-xs px-lg py-xs rounded-full ${
+                      activeComponent === component.id
+                        ? isDark
+                          ? 'bg-primary-dark'
+                          : 'bg-primary-light'
+                        : isDark 
+                          ? 'bg-bg-tertiary-dark' 
+                          : 'bg-bg-tertiary-light'
+                    }`}
+                  >
+                    <Text
+                      className={`${
                         activeComponent === component.id
-                          ? isDark
-                            ? 'bg-primary-dark'
-                            : 'bg-primary-light'
-                          : isDark 
-                            ? 'bg-bg-secondary-dark' 
-                            : 'bg-bg-secondary-light'
-                      }`}
-                      style={{ 
-                        height: 32,
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                      }}
+                          ? 'text-white'
+                          : textPrimary
+                      } text-label-md font-jakarta-semibold`}
                     >
-                      <Text
-                        className={`${
-                          activeComponent === component.id
-                            ? 'text-white'
-                            : textPrimary
-                        } text-body-sm font-jakarta-medium`}
-                      >
-                        {component.name}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </ScrollView>
+                      {component.name}
+                    </Text>
+                  </Pressable>
+                ))}
               </View>
               
               {/* Conteúdo do componente em um ScrollView isolado */}
@@ -1809,7 +1660,7 @@ showToast({
                       return (
                         <Pressable
                           key={component.id}
-                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector')}
+                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast')}
                           className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
                             activeComponent === component.id
                               ? isDark

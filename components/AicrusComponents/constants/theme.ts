@@ -1,9 +1,9 @@
 // Paleta de cores para o tema do aplicativo
 export const colors = {
   primary: {
-    main: '#892CDC',
-    light: '#EEEAFF',
-    dark: '#4A6'
+    main: '#892CDC', // Cor primária principal (mesma do tailwind primary-light)
+    light: '#EEEAFF', // Versão clara da cor primária - deveria ser igual ao tailwind
+    dark: '#4A6'     // Versão escura da cor primária - mesma do tailwind primary-dark
   },
   secondary: {
     main: '#22D3EE',

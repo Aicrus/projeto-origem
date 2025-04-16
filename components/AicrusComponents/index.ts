@@ -12,6 +12,7 @@ export * from './input';
 export * from './accordion';
 export * from './button';
 export * from './toast';
+export * from './theme-selector';
 
 // Exportações de constantes
 export * from './constants/theme'; 
