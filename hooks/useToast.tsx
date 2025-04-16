@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Toast, ToastPosition, ToastType } from '@/components/Toast';
+import { Toast, ToastPosition, ToastType } from '@/components/AicrusComponents/toast';
 
 interface ToastContextData {
   showToast: (params: ShowToastParams) => void;
@@ -11,6 +11,7 @@ interface ShowToastParams {
   description?: string;
   position?: ToastPosition;
   duration?: number;
+  closable?: boolean;
 }
 
 interface ToastState {
@@ -20,6 +21,7 @@ interface ToastState {
   type: ToastType;
   position: ToastPosition;
   duration: number;
+  closable: boolean;
 }
 
 const ToastContext = createContext<ToastContextData>({} as ToastContextData);
@@ -32,6 +34,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     type: 'info',
     position: 'top',
     duration: 3000,
+    closable: false,
   });
 
   const showToast = useCallback(({ 
@@ -39,7 +42,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     message, 
     description, 
     position = 'top',
-    duration = 3000 
+    duration = 3000,
+    closable = false 
   }: ShowToastParams) => {
     setToast({
       visible: true,
@@ -48,6 +52,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       description,
       position,
       duration,
+      closable,
     });
   }, []);
 
@@ -65,6 +70,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         description={toast.description}
         position={toast.position}
         duration={toast.duration}
+        closable={toast.closable}
         onHide={hideToast}
       />
     </ToastContext.Provider>

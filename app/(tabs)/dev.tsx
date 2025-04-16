@@ -6,12 +6,19 @@ import { Input } from '../../components/AicrusComponents/input';
 import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
 import { colors } from '../../components/AicrusComponents/constants/theme';
+import { Button } from '../../components/AicrusComponents/button';
+import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X } from 'lucide-react-native';
+import { Toast } from '../../components/AicrusComponents/toast';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   const [activeSection, setActiveSection] = useState<'config' | 'components'>('config');
-  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | null>(null);
+  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | null>(null);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
+  const [toastPosition, setToastPosition] = useState<'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('top');
+  const [toastClosable, setToastClosable] = useState(false);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   
@@ -68,7 +75,28 @@ export default function DevPage() {
     { id: 'input', name: 'Input', icon: 'Type' },
     { id: 'select', name: 'Select', icon: 'ChevronDown' },
     { id: 'accordion', name: 'Accordion', icon: 'ChevronsUpDown' },
+    { id: 'button', name: 'Button', icon: 'Square' },
+    { id: 'designSystem', name: 'Design System', icon: 'Settings' },
+    { id: 'toast', name: 'Toast', icon: 'MessageSquare' },
   ];
+  
+  // Função para renderizar o ícone correto
+  const renderIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Type':
+        return <Type />;
+      case 'ChevronDown':
+        return <ChevronDown />;
+      case 'ChevronsUpDown':
+        return <ChevronsUpDown />;
+      case 'Square':
+        return <Square />;
+      case 'Settings':
+        return <Settings />;
+      default:
+        return <Settings />;
+    }
+  };
   
   // Função para renderizar o conteúdo do componente selecionado
   const renderComponentContent = () => {
@@ -92,6 +120,12 @@ export default function DevPage() {
         return renderSelectComponent();
       case 'accordion':
         return renderAccordionComponent();
+      case 'button':
+        return renderButtonComponent();
+      case 'designSystem':
+        return renderDesignSystem();
+      case 'toast':
+        return renderToastComponent();
       default:
         return null;
     }
@@ -671,6 +705,583 @@ export default function DevPage() {
     );
   };
   
+  const renderButtonComponent = () => {
+    return (
+      <View className="p-lg">
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+          Componente Button
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O Button é um componente altamente personalizável para ações interativas, oferecendo
+          diversas variantes, estados e opções de personalização. Ele mantém uma experiência visual
+          e interativa consistente em todas as plataformas.
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+          
+          {/* Variantes básicas */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Variantes de Botão</Text>
+            <View className="flex-row flex-wrap gap-sm mb-sm">
+              <Button variant="primary" onPress={() => {}}>
+                Primary
+              </Button>
+              <Button variant="destructive" onPress={() => {}}>
+                Destructive
+              </Button>
+              <Button variant="outline" onPress={() => {}}>
+                Outline
+              </Button>
+              <Button variant="ghost" onPress={() => {}}>
+                Ghost
+              </Button>
+              <Button variant="link" onPress={() => {}}>
+                Link
+              </Button>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Principais variantes visuais disponíveis para uso em diferentes contextos.
+            </Text>
+          </View>
+          
+          {/* Tamanhos */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Tamanhos</Text>
+            <View className="flex-row flex-wrap items-center gap-sm mb-sm">
+              <Button size="xs" variant="primary" onPress={() => {}}>
+                Extra pequeno
+              </Button>
+              <Button size="sm" variant="primary" onPress={() => {}}>
+                Pequeno
+              </Button>
+              <Button size="md" variant="primary" onPress={() => {}}>
+                Médio (padrão)
+              </Button>
+              <Button size="lg" variant="primary" onPress={() => {}}>
+                Grande
+              </Button>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Botões em diferentes tamanhos para se adequar a diversas necessidades de UI.
+            </Text>
+          </View>
+          
+          {/* Botões com ícones */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Botões com Ícones</Text>
+            <View className="flex-row flex-wrap gap-sm mb-sm">
+              <Button 
+                variant="primary" 
+                leftIcon={<Mail size={16} color="#FFFFFF" />}
+                onPress={() => {}}
+                size="md"
+              >
+                Ícone à esquerda
+              </Button>
+              <Button 
+                variant="outline" 
+                rightIcon={<ChevronRight size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
+                onPress={() => {}}
+                size="md"
+              >
+                Ícone à direita
+              </Button>
+              <Button 
+                variant="ghost" 
+                isIconOnly
+                onPress={() => {}}
+                size="md"
+              >
+                <Plus size={16} color={isDark ? "#FFFFFF" : "#14181B"} />
+              </Button>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Botões podem incluir ícones à esquerda, à direita ou serem compostos apenas por um ícone.
+            </Text>
+          </View>
+          
+          {/* Estados do botão */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Estados</Text>
+            <View className="flex-row flex-wrap gap-sm mb-sm">
+              <Button 
+                variant="primary" 
+                onPress={() => {}}
+              >
+                Normal
+              </Button>
+              <Button 
+                variant="primary" 
+                onPress={() => {}}
+                disabled
+              >
+                Desabilitado
+              </Button>
+              <Button 
+                variant="primary" 
+                onPress={() => {}}
+                loading
+              >
+                Carregando
+              </Button>
+              <Button 
+                variant="primary" 
+                onPress={() => {}}
+                loading
+                loadingText="Aguarde..."
+              >
+                Com texto
+              </Button>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Botões em diferentes estados: normal, desabilitado e carregamento.
+            </Text>
+          </View>
+          
+          {/* Botão Login com Email com ícone */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Exemplo prático</Text>
+            <View className="mb-sm">
+              <Button 
+                variant="primary" 
+                leftIcon={<Mail size={16} color="#FFFFFF" />}
+                onPress={() => {}}
+                fullWidth
+                size="md"
+              >
+                Login with Email
+              </Button>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Botão de login com largura total e ícone, ilustrando um caso de uso comum.
+            </Text>
+          </View>
+          
+          {/* Botão de loading */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Botão com loading</Text>
+            <View className="mb-sm">
+              <Button 
+                variant="primary" 
+                onPress={() => {}}
+                loading
+                loadingText="Please wait"
+              >
+                Please wait
+              </Button>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Botão em estado de carregamento com texto informativo para o usuário.
+            </Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Características
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          O Button oferece diversas características para atender diferentes necessidades:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Variantes</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Primary, Destructive, Outline, Ghost, Link</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tamanhos</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>xs, sm, md, lg para diferentes necessidades de UI</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tema adaptativo</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Adapta-se automaticamente a temas claros e escuros</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Acessibilidade</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Compatível com leitores de tela e navegação por teclado</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Estados</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Normal, Disabled, Loading com feedback visual adequado</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Ícones</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Suporte a ícones à esquerda, à direita ou botão de ícone</Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Propriedades
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O componente Button possui diversas propriedades para personalização:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>children</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Texto do botão ou conteúdo React</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>variant</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Estilo visual ('primary', 'destructive', 'outline', 'ghost', 'link')</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>size</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Tamanho do botão ('xs', 'sm', 'md', 'lg')</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>loading</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se o botão está em estado de carregamento (boolean)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>loadingText</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Texto exibido durante o carregamento (string)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>disabled</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se o botão está desabilitado (boolean)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>leftIcon / rightIcon</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Ícones exibidos à esquerda/direita do texto (ReactNode)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>isIconOnly</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se o botão contém apenas um ícone (boolean)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>onPress</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Função chamada quando o botão é pressionado</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>fullWidth</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se o botão deve ocupar toda a largura disponível (boolean)</Text>
+          </View>
+          
+          <Text className={`text-body-sm ${textSecondary} mt-md`}>
+            E outras propriedades para personalização completa do componente...
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderDesignSystem = () => {
+    // Implemente a renderização do componente DesignSystem
+    return (
+      <View className="p-lg">
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+          Componente Design System
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          Este é um espaço reservado para o componente Design System.
+        </Text>
+      </View>
+    );
+  };
+
+  const renderToastComponent = () => {
+    const showToast = (type: 'success' | 'error' | 'info' | 'warning') => {
+      setToastType(type);
+      setToastVisible(true);
+    };
+
+    return (
+      <View className="p-lg">
+        <Toast
+          visible={toastVisible}
+          type={toastType}
+          position={toastPosition}
+          message={`Toast de ${toastType === 'success' ? 'sucesso' : 
+                          toastType === 'error' ? 'erro' : 
+                          toastType === 'warning' ? 'alerta' : 'informação'}`}
+          description={`Este é um exemplo de toast do tipo ${toastType}, posicionado na posição ${toastPosition}.`}
+          closable={toastClosable}
+          duration={5000}
+          onHide={() => setToastVisible(false)}
+        />
+
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+          Componente Toast
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O Toast é um componente de notificação que fornece feedback contextual aos usuários.
+          Suporta diferentes tipos, posições e opções de personalização, mantendo uma experiência
+          consistente em todas as plataformas.
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+          
+          {/* Tipos de Toast */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Tipos de Toast</Text>
+            <View className="flex-row flex-wrap gap-sm mb-sm">
+              <Button 
+                variant="primary" 
+                onPress={() => showToast('success')}
+                leftIcon={<CheckCircle size={16} color="#FFFFFF" />}
+              >
+                Success
+              </Button>
+              <Button 
+                variant="destructive" 
+                onPress={() => showToast('error')}
+                leftIcon={<AlertCircle size={16} color="#FFFFFF" />}
+              >
+                Error
+              </Button>
+              <Button 
+                variant="outline" 
+                onPress={() => showToast('warning')}
+                leftIcon={<AlertTriangle size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
+              >
+                Warning
+              </Button>
+              <Button 
+                variant="ghost" 
+                onPress={() => showToast('info')}
+                leftIcon={<Info size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
+              >
+                Info
+              </Button>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Diferentes tipos de Toast para diferentes contextos de feedback.
+            </Text>
+          </View>
+          
+          {/* Posições */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Posições</Text>
+            <View className="flex-row flex-wrap gap-sm mb-sm">
+              <View className="flex-col gap-sm mb-sm">
+                <Button 
+                  variant="outline" 
+                  onPress={() => {
+                    setToastPosition('top');
+                    showToast(toastType);
+                  }}
+                  size="sm"
+                >
+                  Top
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onPress={() => {
+                    setToastPosition('top-left');
+                    showToast(toastType);
+                  }}
+                  size="sm"
+                >
+                  Top Left
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onPress={() => {
+                    setToastPosition('top-right');
+                    showToast(toastType);
+                  }}
+                  size="sm"
+                >
+                  Top Right
+                </Button>
+              </View>
+              <View className="flex-col gap-sm mb-sm">
+                <Button 
+                  variant="outline" 
+                  onPress={() => {
+                    setToastPosition('bottom');
+                    showToast(toastType);
+                  }}
+                  size="sm"
+                >
+                  Bottom
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onPress={() => {
+                    setToastPosition('bottom-left');
+                    showToast(toastType);
+                  }}
+                  size="sm"
+                >
+                  Bottom Left
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onPress={() => {
+                    setToastPosition('bottom-right');
+                    showToast(toastType);
+                  }}
+                  size="sm"
+                >
+                  Bottom Right
+                </Button>
+              </View>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              O Toast pode ser posicionado em diferentes áreas da tela.
+            </Text>
+          </View>
+          
+          {/* Opções */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Opções</Text>
+            <View className="flex-row flex-wrap gap-sm mb-sm">
+              <Button 
+                variant={toastClosable ? "primary" : "outline"} 
+                onPress={() => {
+                  setToastClosable(!toastClosable);
+                  showToast(toastType);
+                }}
+              >
+                {toastClosable ? "Com botão de fechar" : "Sem botão de fechar"}
+              </Button>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              O Toast pode ter um botão de fechamento e outras opções de personalização.
+            </Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Características
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          O Toast oferece diversas características para atender diferentes necessidades:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tipos</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Success, Error, Warning, Info para diferentes contextos</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Posições</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Flexibilidade para posicionamento em seis posições diferentes</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Animações</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Animações suaves de entrada e saída</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Personalização</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Título, descrição e opções de fechamento</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tema adaptativo</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Adapta-se automaticamente a temas claros e escuros</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Responsividade</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Layout responsivo para diferentes tamanhos de tela</Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Propriedades
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O componente Toast possui diversas propriedades para personalização:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>visible</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se o toast está visível (boolean)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>type</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Tipo de toast ('success', 'error', 'warning', 'info')</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>position</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Posição na tela ('top', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right')</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>message</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Mensagem principal do toast (string)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>description</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Descrição opcional para detalhes adicionais (string)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>duration</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Tempo de exibição em ms (0 para não desaparecer automaticamente)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>closable</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se o toast possui botão de fechamento (boolean)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>onHide</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Função chamada quando o toast é fechado (callback)</Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Uso
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          Exemplo de implementação com useToast hook para gerenciar os estados:
+        </Text>
+        
+        <View className={`bg-bg-tertiary-${isDark ? 'dark' : 'light'} rounded-lg p-md mb-lg`}>
+          <Text className={`text-mono-md font-mono-regular ${textPrimary}`}>
+{`// Usando o hook useToast
+const { showToast } = useToast();
+
+// Mostrar um toast de sucesso
+showToast({
+  type: 'success',
+  message: 'Operação concluída',
+  description: 'Os dados foram salvos com sucesso.'
+});
+
+// Mostrar um toast de erro com mais duração
+showToast({
+  type: 'error',
+  message: 'Erro ao processar',
+  description: 'Tente novamente mais tarde.',
+  duration: 6000,
+  position: 'bottom'
+});`}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <>
       <Stack.Screen 
@@ -1038,7 +1649,7 @@ export default function DevPage() {
                   {availableComponents.map((component) => (
                     <Pressable
                       key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion')}
+                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast')}
                       className={`mx-xs px-lg py-xs rounded-full ${
                         activeComponent === component.id
                           ? isDark
@@ -1086,34 +1697,31 @@ export default function DevPage() {
                     
                     <View className="flex-col">
                       {availableComponents.map((component) => {
-                        // Obter o componente de ícone do Lucide React Native
-                        const IconComponent = require('lucide-react-native')[component.icon];
-                        
+                        // Substituir a importação dinâmica pela nossa função renderIcon
                         return (
                           <Pressable
                             key={component.id}
-                            onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion')}
+                            onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast')}
                             className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
                               activeComponent === component.id
                                 ? isDark
-                                  ? 'bg-primary-dark/20'
+                                  ? 'bg-primary-dark/10'
                                   : 'bg-primary-light/10'
-                                : 'hover:bg-bg-tertiary-light hover:dark:bg-bg-tertiary-dark'
+                                : ''
                             }`}
                           >
-                            <View className="mr-xs">
-                              <IconComponent 
-                                size={16} 
-                                color={
-                                  activeComponent === component.id
-                                    ? isDark 
-                                      ? colors.primary.dark 
-                                      : colors.primary.light
-                                    : isDark 
-                                      ? '#95A1AC' 
-                                      : '#57636C'
-                                } 
-                              />
+                            <View
+                              className={`w-8 h-8 rounded-md mr-sm items-center justify-center ${
+                                activeComponent === component.id
+                                  ? isDark 
+                                    ? 'bg-primary-dark/20' 
+                                    : 'bg-primary-light/20'
+                                  : isDark 
+                                    ? 'bg-gray-800/50' 
+                                    : 'bg-gray-200'
+                              }`}
+                            >
+                              {renderIcon(component.icon)}
                             </View>
                             <Text
                               className={`${

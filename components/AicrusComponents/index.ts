@@ -10,6 +10,8 @@
 export * from './select';
 export * from './input';
 export * from './accordion';
+export * from './button';
+export * from './toast';
 
 // Exportações de constantes
 export * from './constants/theme'; 
