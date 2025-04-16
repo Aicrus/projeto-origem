@@ -337,10 +337,6 @@ export const Button = ({
           transition: background-color 0.3s ease !important;
         }
         
-        .button-${variant}-active:not(:disabled):active {
-          background-color: ${variantColors.backgroundPressed} !important;
-        }
-        
         .button-link-hover:not(:disabled):hover {
           color: ${variantColors.textHover || '#9D3CED'} !important;
           transition: color 0.3s ease !important;
@@ -358,7 +354,6 @@ export const Button = ({
       const buttonElement = document.querySelector(`[data-testid="${testID}"]`);
       if (buttonElement) {
         buttonElement.classList.add(`button-${variant}-hover`);
-        buttonElement.classList.add(`button-${variant}-active`);
       }
       
       return () => {
@@ -457,7 +452,7 @@ export const Button = ({
   
   return (
     <TouchableOpacity
-      activeOpacity={variant === 'link' ? 0.7 : 0.8}
+      activeOpacity={0.9}
       onPress={onPress}
       disabled={disabled || loading}
       style={[getButtonStyles(), style]}
@@ -466,7 +461,7 @@ export const Button = ({
       accessibilityRole="button"
       accessibilityState={{ disabled: disabled || loading, busy: loading }}
       {...(Platform.OS === 'web' ? {
-        className: `button-${variant}-hover button-${variant}-active ${(disabled || loading) ? 'button-disabled' : ''}`,
+        className: `button-${variant}-hover ${(disabled || loading) ? 'button-disabled' : ''}`,
       } : {})}
       {...rest}
     >
