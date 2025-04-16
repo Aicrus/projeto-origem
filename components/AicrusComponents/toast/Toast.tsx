@@ -115,25 +115,25 @@ export function Toast({
     success: {
       backgroundColor: isDark ? 'bg-success-bg-dark' : 'bg-success-bg-light',
       textColor: isDark ? 'text-success-text-dark' : 'text-success-text-light',
-      borderColor: isDark ? 'border-success-border-dark' : 'border-success-border-light',
+      borderColor: 'border-gray-200 dark:border-gray-700',
       icon: () => <CheckCircle size={20} color={isDark ? '#10B981' : '#059669'} />,
     },
     error: {
       backgroundColor: isDark ? 'bg-error-bg-dark' : 'bg-error-bg-light',
       textColor: isDark ? 'text-error-text-dark' : 'text-error-text-light',
-      borderColor: isDark ? 'border-error-border-dark' : 'border-error-border-light',
+      borderColor: 'border-gray-200 dark:border-gray-700',
       icon: () => <AlertCircle size={20} color={isDark ? '#F87171' : '#DC2626'} />,
     },
     warning: {
       backgroundColor: isDark ? 'bg-warning-bg-dark' : 'bg-warning-bg-light',
       textColor: isDark ? 'text-warning-text-dark' : 'text-warning-text-light',
-      borderColor: isDark ? 'border-warning-border-dark' : 'border-warning-border-light',
+      borderColor: 'border-gray-200 dark:border-gray-700',
       icon: () => <AlertTriangle size={20} color={isDark ? '#FBBF24' : '#D97706'} />,
     },
     info: {
       backgroundColor: isDark ? 'bg-info-bg-dark' : 'bg-info-bg-light',
       textColor: isDark ? 'text-info-text-dark' : 'text-info-text-light',
-      borderColor: isDark ? 'border-info-border-dark' : 'border-info-border-light',
+      borderColor: 'border-gray-200 dark:border-gray-700',
       icon: () => <Info size={20} color={isDark ? '#38BDF8' : '#0284C7'} />,
     },
   }), [isDark]);
@@ -242,8 +242,25 @@ export function Toast({
       ]}
     >
       <View 
-        className={`${toastConfig[type].backgroundColor} border border-${toastConfig[type].borderColor} rounded-lg shadow-md overflow-hidden`}
-        style={styles.container}
+        className={`${toastConfig[type].backgroundColor} border ${toastConfig[type].borderColor} rounded-lg overflow-hidden`}
+        style={[styles.container, {
+          shadowColor: isDark ? '#000000' : '#000000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: isDark ? 0.2 : 0.1,
+          shadowRadius: 10,
+          elevation: 5,
+          borderWidth: isDark ? 0.5 : 0.7,
+          borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+          backgroundColor: isDark ? 
+            (type === 'success' ? '#064E3B' : 
+             type === 'error' ? '#450A0A' : 
+             type === 'warning' ? '#451A03' : 
+             '#082F49') : 
+            (type === 'success' ? '#ECFDF5' : 
+             type === 'error' ? '#FEF2F2' : 
+             type === 'warning' ? '#FFFBEB' : 
+             '#EFF6FF'),
+        }]}
       >
         <View style={styles.contentContainer}>
           <View style={styles.iconContainer}>
@@ -303,14 +320,15 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 450,
     minHeight: 48,
+    backdropFilter: Platform.OS === 'web' ? 'blur(8px)' : undefined,
   },
   contentContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: 14,
   },
   iconContainer: {
-    marginRight: 12,
+    marginRight: 14,
   },
   textContainer: {
     flex: 1,
@@ -318,15 +336,17 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 14,
     lineHeight: 20,
+    fontWeight: '600',
   },
   description: {
-    fontSize: 12,
+    fontSize: 13,
     lineHeight: 18,
-    marginTop: 2,
+    marginTop: 4,
+    opacity: 0.85,
   },
   closeButton: {
-    padding: 2,
-    marginLeft: 8,
+    padding: 4,
+    marginLeft: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
