@@ -140,8 +140,11 @@ export function Toast({
 
   // Calcula posição baseada na prop position
   const getPositionStyle = (): ViewStyle => {
+    // Em plataformas web, usamos posição fixa para evitar problemas com scroll
+    const positionType = Platform.OS === 'web' ? 'fixed' : 'absolute';
+    
     const basePositionStyle: ViewStyle = {
-      position: 'absolute',
+      position: positionType as any,
       zIndex: 9999,
       width: isMobile ? '90%' : 400,
     };
@@ -230,6 +233,121 @@ export function Toast({
   const transformStyle = {
     transform: [{ translateY: offset }],
   };
+
+  // No web, renderizamos em um portal para garantir que o Toast esteja fora de qualquer
+  // container com scrolling ou com position: relative
+  if (Platform.OS === 'web' && visible) {
+    // Utilizamos React Portal em ambientes web para posicionar o Toast corretamente
+    // Esta parte só é executada se react-dom estiver disponível (web)
+    try {
+      const ReactDOM = require('react-dom');
+      const portalContainer = document.getElementById('toast-portal-container');
+      
+      if (!portalContainer) {
+        const newPortalContainer = document.createElement('div');
+        newPortalContainer.id = 'toast-portal-container';
+        newPortalContainer.style.position = 'fixed';
+        newPortalContainer.style.zIndex = '9999';
+        newPortalContainer.style.pointerEvents = 'none';
+        newPortalContainer.style.top = '0';
+        newPortalContainer.style.left = '0';
+        newPortalContainer.style.right = '0';
+        newPortalContainer.style.bottom = '0';
+        document.body.appendChild(newPortalContainer);
+      }
+
+      const toastContent = (
+        <Animated.View
+          testID={testID || `toast-${type}`}
+          style={[
+            getPositionStyle(),
+            transformStyle,
+            { opacity, pointerEvents: 'auto' as any },
+            style,
+          ]}
+        >
+          <View 
+            className={`${toastConfig[type].backgroundColor} border ${toastConfig[type].borderColor} rounded-lg overflow-hidden`}
+            style={[styles.container, {
+              shadowColor: isDark ? '#000000' : '#000000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: isDark ? 0.2 : 0.1,
+              shadowRadius: 10,
+              elevation: 5,
+              borderWidth: isDark ? 0.5 : 0.7,
+              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+              backgroundColor: isDark ? 
+                (type === 'success' ? '#064E3B' : 
+                 type === 'error' ? '#450A0A' : 
+                 type === 'warning' ? '#451A03' : 
+                 '#082F49') : 
+                (type === 'success' ? '#ECFDF5' : 
+                 type === 'error' ? '#FEF2F2' : 
+                 type === 'warning' ? '#FFFBEB' : 
+                 '#EFF6FF'),
+            }]}
+          >
+            <View style={styles.contentContainer}>
+              <View style={styles.iconContainer}>
+                {toastConfig[type].icon()}
+              </View>
+              
+              <View style={styles.textContainer}>
+                <Text 
+                  className={`${toastConfig[type].textColor} font-jakarta-semibold`}
+                  style={styles.message}
+                  numberOfLines={2}
+                >
+                  {message}
+                </Text>
+                
+                {description ? (
+                  <Text 
+                    className={`${toastConfig[type].textColor} opacity-90 font-jakarta-regular`}
+                    style={styles.description}
+                    numberOfLines={3}
+                  >
+                    {description}
+                  </Text>
+                ) : null}
+              </View>
+              
+              {closable && (
+                <Pressable 
+                  onPress={handleClose} 
+                  style={styles.closeButton}
+                  hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                  accessibilityLabel="Fechar notificação"
+                >
+                  <X 
+                    size={16} 
+                    color={isDark ? 
+                      (type === 'info' ? '#38BDF8' : 
+                       type === 'success' ? '#10B981' : 
+                       type === 'warning' ? '#FBBF24' : 
+                       '#F87171') : 
+                      (type === 'info' ? '#0284C7' : 
+                       type === 'success' ? '#059669' : 
+                       type === 'warning' ? '#D97706' : 
+                       '#DC2626')
+                    } 
+                  />
+                </Pressable>
+              )}
+            </View>
+          </View>
+        </Animated.View>
+      );
+
+      const portalTarget = document.getElementById('toast-portal-container');
+      if (portalTarget) {
+        return ReactDOM.createPortal(toastContent, portalTarget);
+      }
+    } catch (e) {
+      // Fallback para quando react-dom não estiver disponível
+      console.log('React DOM not available, using standard rendering');
+    }
+  }
 
   return (
     <Animated.View

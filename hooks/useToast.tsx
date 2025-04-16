@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { Platform } from 'react-native';
 import { Toast, ToastPosition, ToastType } from '@/components/AicrusComponents/toast';
 
 interface ToastContextData {
@@ -36,6 +37,36 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     duration: 3000,
     closable: false,
   });
+
+  // Inicializa o container do portal para web
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      // Cria o container para o portal do Toast, se ainda não existir
+      const existingContainer = document.getElementById('toast-portal-container');
+      if (!existingContainer) {
+        const portalContainer = document.createElement('div');
+        portalContainer.id = 'toast-portal-container';
+        portalContainer.style.position = 'fixed';
+        portalContainer.style.zIndex = '9999';
+        portalContainer.style.pointerEvents = 'none';
+        portalContainer.style.top = '0';
+        portalContainer.style.left = '0';
+        portalContainer.style.right = '0';
+        portalContainer.style.bottom = '0';
+        document.body.appendChild(portalContainer);
+      }
+    }
+
+    // Cleanup na desmontagem
+    return () => {
+      if (Platform.OS === 'web') {
+        const container = document.getElementById('toast-portal-container');
+        if (container) {
+          document.body.removeChild(container);
+        }
+      }
+    };
+  }, []);
 
   const showToast = useCallback(({ 
     type, 

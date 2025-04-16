@@ -998,8 +998,14 @@ export default function DevPage() {
 
   const renderToastComponent = () => {
     const showToast = (type: 'success' | 'error' | 'info' | 'warning') => {
-      setToastType(type);
-      setToastVisible(true);
+      // Primeiro esconde qualquer toast visível
+      setToastVisible(false);
+      
+      // Pequeno atraso para garantir que o estado anterior seja processado
+      setTimeout(() => {
+        setToastType(type);
+        setToastVisible(true);
+      }, 100);
     };
 
     return (
@@ -1013,7 +1019,7 @@ export default function DevPage() {
                           toastType === 'warning' ? 'alerta' : 'informação'}`}
           description={`Este é um exemplo de toast do tipo ${toastType}, posicionado na posição ${toastPosition}.`}
           closable={toastClosable}
-          duration={5000}
+          duration={10000} // Aumentando a duração para testes
           onHide={() => setToastVisible(false)}
         />
 
@@ -1070,74 +1076,73 @@ export default function DevPage() {
           {/* Posições */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Posições</Text>
+            <Text className={`text-body-sm ${textSecondary} mb-sm`}>
+              Escolha a posição e depois clique em um dos botões de tipo acima para ver o Toast:
+            </Text>
             <View className="flex-row flex-wrap gap-sm mb-sm">
-              <View className="flex-col gap-sm mb-sm">
+              <View className="flex-col gap-sm mr-sm">
+                <Text className={`text-body-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Topo</Text>
                 <Button 
-                  variant="outline" 
+                  variant={toastPosition === 'top' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('top');
-                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Top
+                  Centro
                 </Button>
                 <Button 
-                  variant="outline" 
+                  variant={toastPosition === 'top-left' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('top-left');
-                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Top Left
+                  Esquerda
                 </Button>
                 <Button 
-                  variant="outline" 
+                  variant={toastPosition === 'top-right' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('top-right');
-                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Top Right
+                  Direita
                 </Button>
               </View>
-              <View className="flex-col gap-sm mb-sm">
+              <View className="flex-col gap-sm">
+                <Text className={`text-body-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Base</Text>
                 <Button 
-                  variant="outline" 
+                  variant={toastPosition === 'bottom' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('bottom');
-                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Bottom
+                  Centro
                 </Button>
                 <Button 
-                  variant="outline" 
+                  variant={toastPosition === 'bottom-left' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('bottom-left');
-                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Bottom Left
+                  Esquerda
                 </Button>
                 <Button 
-                  variant="outline" 
+                  variant={toastPosition === 'bottom-right' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('bottom-right');
-                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Bottom Right
+                  Direita
                 </Button>
               </View>
             </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              O Toast pode ser posicionado em diferentes áreas da tela.
+              O Toast pode ser posicionado em diferentes áreas da tela, incluindo todos os cantos.
             </Text>
           </View>
           
@@ -1278,6 +1283,15 @@ showToast({
 });`}
           </Text>
         </View>
+
+        <Button 
+          variant="primary"
+          onPress={() => showToast(toastType)}
+          className="mt-sm"
+          fullWidth
+        >
+          Mostrar Toast na posição selecionada
+        </Button>
       </View>
     );
   };
