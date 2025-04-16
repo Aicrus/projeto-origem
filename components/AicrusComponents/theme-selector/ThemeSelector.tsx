@@ -47,8 +47,8 @@ export const THEME_SELECTOR_VARIANTS = {
   pill: 'pill',
   minimal: 'minimal',
   labeled: 'labeled',
-  segmented: 'segmented',
   toggle: 'toggle',
+  single: 'single', // Novo estilo: botão único para alternar temas
 } as const;
 
 // Configurações específicas para cada plataforma com ajustes para evitar overshooting
@@ -82,7 +82,6 @@ interface ThemeSelectorProps {
     inactiveIconColor?: string;
     textColor?: string;
     activeTextColor?: string;
-    activeBackground?: string;
   };
 }
 
@@ -119,7 +118,9 @@ export function ThemeSelector({
   // Calcular largura do container
   const containerWidth = variant === 'toggle'
     ? buttonWidth * 2
-    : buttonWidth * availableModes.length + padding * 2;
+    : variant === 'single'
+      ? buttonWidth
+      : buttonWidth * availableModes.length + padding * 2;
   
   // Calcular raio de borda com base na variante
   const getBorderRadius = () => {
@@ -128,10 +129,10 @@ export function ThemeSelector({
         return height / 2;
       case 'minimal':
         return 4;
-      case 'segmented':
-        return 12;
       case 'toggle':
         return height / 2;
+      case 'single':
+        return height / 2; // Single é redondo como o pill
       default:
         return 6; // default e labeled
     }
@@ -145,8 +146,8 @@ export function ThemeSelector({
     pill: isDark ? colors.gray[800] : colors.gray[200],
     minimal: 'transparent',
     labeled: isDark ? colors.gray[800] : colors.gray[200],
-    segmented: isDark ? colors.gray[900] : '#F0F4F8',
     toggle: isDark ? colors.gray[700] : colors.gray[300],
+    single: isDark ? colors.gray[700] : colors.gray[300],
   };
   
   const sliderColors = {
@@ -154,8 +155,8 @@ export function ThemeSelector({
     pill: isDark ? colors.primary.dark : colors.primary.main,
     minimal: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
     labeled: isDark ? colors.primary.dark : colors.primary.main,
-    segmented: isDark ? colors.gray[800] : 'white',
     toggle: isDark ? colors.primary.dark : colors.primary.main,
+    single: isDark ? colors.primary.dark : colors.primary.main,
   };
   
   const activeTextColors = {
@@ -163,8 +164,8 @@ export function ThemeSelector({
     pill: '#FFFFFF',
     minimal: isDark ? colors.primary.dark : colors.primary.main,
     labeled: '#FFFFFF',
-    segmented: isDark ? '#FFFFFF' : colors.primary.main,
     toggle: '#FFFFFF',
+    single: '#FFFFFF',
   };
   
   const textColors = {
@@ -172,8 +173,8 @@ export function ThemeSelector({
     pill: isDark ? colors.gray[400] : colors.gray[600],
     minimal: isDark ? colors.gray[400] : colors.gray[600],
     labeled: isDark ? colors.gray[400] : colors.gray[600],
-    segmented: isDark ? colors.gray[400] : colors.gray[600],
     toggle: isDark ? '#FFFFFF' : colors.gray[800],
+    single: isDark ? '#FFFFFF' : colors.gray[800],
   };
   
   const backgroundColor = customColors.background || backgroundColors[variant];
@@ -201,6 +202,12 @@ export function ThemeSelector({
     setThemeMode(mode);
   }, [setThemeMode, themeMode]);
 
+  // Função específica para o estilo "single" que alterna entre claro e escuro
+  const handleSinglePress = useCallback(() => {
+    const newMode = themeMode === 'light' ? 'dark' : 'light';
+    setThemeMode(newMode);
+  }, [themeMode, setThemeMode]);
+
   const animatedSliderStyle = useAnimatedStyle(() => {
     return {
       transform: [{ translateX: clampedTranslateX.value }],
@@ -219,11 +226,6 @@ export function ThemeSelector({
       // Para a variante minimal, usar cor primária
       if (variant === 'minimal') {
         return isDark ? colors.primary.dark : colors.primary.main;
-      }
-      
-      // Para segmented, a cor do ícone ativo depende
-      if (variant === 'segmented') {
-        return isDark ? '#FFFFFF' : colors.primary.main;
       }
       
       // Para outros estilos, usar branco
@@ -248,8 +250,8 @@ export function ThemeSelector({
   };
   
   const renderSlider = () => {
-    // Não renderizar o slider para a variante minimal ou segmented
-    if (variant === 'minimal' || variant === 'segmented') {
+    // Não renderizar o slider para a variante minimal
+    if (variant === 'minimal') {
       return null;
     }
     
@@ -278,6 +280,36 @@ export function ThemeSelector({
     );
   };
 
+  // Estilo single - botão único para alternar entre claro/escuro
+  if (variant === 'single') {
+    return (
+      <View className={`${className}`}>
+        <Pressable
+          style={{
+            width: buttonWidth,
+            height: height,
+            borderRadius: height / 2,
+            backgroundColor: isDark ? colors.primary.dark : colors.primary.main,
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.1,
+            shadowRadius: 2,
+            elevation: 2,
+          }}
+          onPress={handleSinglePress}
+        >
+          <Ionicons
+            name={themeMode === 'light' ? THEME_ICONS.light : THEME_ICONS.dark}
+            size={iconSize}
+            color="#FFFFFF"
+          />
+        </Pressable>
+      </View>
+    );
+  }
+
   // Renderiza o estilo toggle (apenas dois estados)
   if (variant === 'toggle') {
     return (
@@ -302,6 +334,7 @@ export function ThemeSelector({
                 backgroundColor: isDark ? colors.primary.dark : colors.primary.main,
                 top: 2,
                 left: 2,
+                zIndex: 0,
               },
               {
                 transform: [{ translateX: themeMode === 'dark' ? buttonWidth : 0 }],
@@ -310,7 +343,13 @@ export function ThemeSelector({
           />
           <View className="flex-row h-full">
             <Pressable
-              style={{ width: buttonWidth, justifyContent: 'center', alignItems: 'center', zIndex: 1 }}
+              style={{ 
+                width: buttonWidth, 
+                height: height - 4,
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                zIndex: 1,
+              }}
               onPress={() => setThemeMode('light')}
             >
               <Ionicons
@@ -320,7 +359,13 @@ export function ThemeSelector({
               />
             </Pressable>
             <Pressable
-              style={{ width: buttonWidth, justifyContent: 'center', alignItems: 'center', zIndex: 1 }}
+              style={{ 
+                width: buttonWidth, 
+                height: height - 4,
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                zIndex: 1,
+              }}
               onPress={() => setThemeMode('dark')}
             >
               <Ionicons
@@ -330,66 +375,6 @@ export function ThemeSelector({
               />
             </Pressable>
           </View>
-        </View>
-      </View>
-    );
-  }
-
-  // Renderiza o estilo segmentado (como na imagem)
-  if (variant === 'segmented') {
-    return (
-      <View className={`${className}`}>
-        <View 
-          className="flex-row overflow-hidden"
-          style={{
-            borderRadius,
-            backgroundColor,
-          }}
-        >
-          {availableModes.map((mode, index) => {
-            const isActive = mode === themeMode;
-            const activeStyle = isActive ? {
-              backgroundColor: customColors.activeBackground || (isDark ? colors.gray[800] : 'white'),
-            } : {};
-            
-            return (
-              <Pressable
-                key={mode}
-                style={[
-                  {
-                    paddingVertical: 8,
-                    paddingHorizontal: buttonWidth * 0.5,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'column',
-                    minWidth: buttonWidth * 2,
-                    borderRadius: 8,
-                    margin: 4,
-                  },
-                  activeStyle,
-                ]}
-                onPress={() => handlePress(mode)}
-              >
-                <Ionicons
-                  name={THEME_ICONS[mode]}
-                  size={iconSize}
-                  color={getIconColor(mode)}
-                  style={{ marginBottom: 4 }}
-                />
-                <Text
-                  style={{
-                    fontSize: Math.max(10, Math.floor(buttonWidth * 0.35)),
-                    color: isActive 
-                      ? (isDark ? 'white' : colors.primary.main)
-                      : (isDark ? colors.gray[400] : colors.gray[600]),
-                    fontWeight: isActive ? '600' : '400',
-                  }}
-                >
-                  {getLabel(mode)}
-                </Text>
-              </Pressable>
-            );
-          })}
         </View>
       </View>
     );
@@ -464,24 +449,7 @@ export function ThemeSelector({
         ))}
       </View>
       
-      {variant === 'labeled' && showLabels && (
-        <View className="flex-row justify-between" style={{ width: containerWidth }}>
-          {availableModes.map((mode) => (
-            <Text
-              key={`label-${mode}`}
-              className="text-center"
-              style={{
-                width: buttonWidth,
-                fontSize: Math.max(9, Math.floor(buttonWidth * 0.32)),
-                color: isDark ? colors.gray[400] : colors.gray[600],
-                fontWeight: mode === themeMode ? '600' : '400',
-              }}
-            >
-              {getLabel(mode)}
-            </Text>
-          ))}
-        </View>
-      )}
+      {/* Removido o bloco de rótulos abaixo do componente para a variante labeled */}
     </View>
   );
 } 

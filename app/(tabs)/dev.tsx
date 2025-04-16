@@ -1658,12 +1658,17 @@ showToast({
         <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
           
-          {/* Exemplo básico */}
+          {/* Tamanhos diferentes */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Versão padrão</Text>
-            <ThemeSelector />
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Diferentes tamanhos</Text>
+            <View className="flex-row space-x-lg items-center">
+              <ThemeSelector size="sm" />
+              <ThemeSelector size="md" />
+              <ThemeSelector size="lg" />
+              <ThemeSelector size="xl" />
+            </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Seletor de tema com animações suaves e ícones intuitivos.
+              Tamanhos disponíveis: sm, md (padrão), lg, xl
             </Text>
           </View>
 
@@ -1685,35 +1690,12 @@ showToast({
             </Text>
           </View>
 
-          {/* Tamanhos diferentes */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Diferentes tamanhos</Text>
-            <View className="flex-row space-x-lg items-center">
-              <ThemeSelector size="sm" />
-              <ThemeSelector size="md" />
-              <ThemeSelector size="lg" />
-              <ThemeSelector size="xl" />
-            </View>
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Tamanhos disponíveis: sm, md (padrão), lg, xl
-            </Text>
-          </View>
-
           {/* Exemplo com rótulos */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Com rótulos</Text>
-            <ThemeSelector variant="labeled" showLabels={true} />
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Com rótulos integrados</Text>
+            <ThemeSelector variant="labeled" showLabels={true} size="lg" />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Versão com rótulos abaixo dos ícones.
-            </Text>
-          </View>
-
-          {/* Estilo segmentado (como na imagem) */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Estilo segmentado com rótulos</Text>
-            <ThemeSelector variant="segmented" size="md" />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Layout segmentado com rótulos e ícones integrados.
             </Text>
           </View>
 
@@ -1723,6 +1705,15 @@ showToast({
             <ThemeSelector variant="toggle" size="md" />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Versão simplificada para alternar entre claro e escuro.
+            </Text>
+          </View>
+
+          {/* Estilo Single */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Botão único</Text>
+            <ThemeSelector variant="single" size="lg" />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Um único botão que alterna entre temas ao ser clicado.
             </Text>
           </View>
 
@@ -1810,7 +1801,7 @@ showToast({
           
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>variant</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Estilo visual: 'default', 'pill', 'minimal', 'labeled' (padrão: 'default')</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Estilo visual: 'default', 'pill', 'minimal', 'labeled', 'toggle', 'single' (padrão: 'default')</Text>
           </View>
           
           <View className="mb-sm">
