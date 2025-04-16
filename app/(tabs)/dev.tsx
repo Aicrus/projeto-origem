@@ -1594,7 +1594,8 @@ showToast({
           headerTintColor: currentTheme === 'dark' ? '#FFFFFF' : '#14181B',
           headerStyle: {
             backgroundColor: currentTheme === 'dark' ? '#1C1E26' : '#F7F8FA',
-          }
+          },
+          contentStyle: isMobile ? { paddingTop: 0 } : undefined
         }} 
       />
       
@@ -1602,14 +1603,14 @@ showToast({
         <View className="flex-1">
           {isMobile ? (
             // Layout para dispositivos móveis com botões compactos no topo
-            <View className="flex-1">
+            <View className="flex-1 mt-0">
               {/* Navegação compacta para dispositivos móveis */}
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} className={`h-11 items-center flex-row py-xs border-b ${border}`} contentContainerStyle={{ paddingHorizontal: 4 }}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} className={`h-11 items-center flex-row py-0 border-b ${border}`} contentContainerStyle={{ paddingHorizontal: 4 }}>
                 {availableComponents.map((component) => (
                   <Pressable
                     key={component.id}
                     onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast')}
-                    className={`mx-xs px-lg py-xs rounded-full ${
+                    className={`mx-xs px-lg py-0 rounded-full ${
                       activeComponent === component.id
                         ? isDark
                           ? 'bg-primary-dark'
@@ -1638,7 +1639,7 @@ showToast({
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ 
                   flexGrow: 1,
-                  paddingBottom: 120 
+                  paddingBottom: 120, marginTop: -16 
                 }}
               >
                 {renderComponentContent()}
@@ -1661,7 +1662,7 @@ showToast({
                         <Pressable
                           key={component.id}
                           onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast')}
-                          className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
+                          className={`flex-row items-center py-0 px-xs my-[2px] rounded-md ${
                             activeComponent === component.id
                               ? isDark
                                 ? 'bg-primary-dark/10'
