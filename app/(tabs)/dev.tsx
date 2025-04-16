@@ -19,6 +19,7 @@ export default function DevPage() {
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const [toastPosition, setToastPosition] = useState<'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('top');
   const [toastClosable, setToastClosable] = useState(false);
+  const [toastProgressBar, setToastProgressBar] = useState(true);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   
@@ -1019,7 +1020,8 @@ export default function DevPage() {
                           toastType === 'warning' ? 'alerta' : 'informação'}`}
           description={`Este é um exemplo de toast do tipo ${toastType}, posicionado na posição ${toastPosition}.`}
           closable={toastClosable}
-          duration={10000} // Aumentando a duração para testes
+          showProgressBar={toastProgressBar}
+          duration={10000}
           onHide={() => setToastVisible(false)}
         />
 
@@ -1154,14 +1156,22 @@ export default function DevPage() {
                 variant={toastClosable ? "primary" : "outline"} 
                 onPress={() => {
                   setToastClosable(!toastClosable);
-                  showToast(toastType);
                 }}
               >
                 {toastClosable ? "Com botão de fechar" : "Sem botão de fechar"}
               </Button>
+
+              <Button 
+                variant={toastProgressBar ? "primary" : "outline"} 
+                onPress={() => {
+                  setToastProgressBar(!toastProgressBar);
+                }}
+              >
+                {toastProgressBar ? "Com barra de progresso" : "Sem barra de progresso"}
+              </Button>
             </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              O Toast pode ter um botão de fechamento e outras opções de personalização.
+              O Toast pode ter um botão de fechamento, barra de progresso e outras opções de personalização.
             </Text>
           </View>
         </View>
@@ -1246,6 +1256,11 @@ export default function DevPage() {
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>closable</Text>
             <Text className={`text-body-sm ${textSecondary}`}>Se o toast possui botão de fechamento (boolean)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>showProgressBar</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se deve mostrar a barra de progresso (boolean)</Text>
           </View>
           
           <View className="mb-sm">

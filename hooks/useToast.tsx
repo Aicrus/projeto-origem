@@ -13,6 +13,7 @@ interface ShowToastParams {
   position?: ToastPosition;
   duration?: number;
   closable?: boolean;
+  showProgressBar?: boolean;
 }
 
 interface ToastState {
@@ -23,6 +24,7 @@ interface ToastState {
   position: ToastPosition;
   duration: number;
   closable: boolean;
+  showProgressBar: boolean;
 }
 
 const ToastContext = createContext<ToastContextData>({} as ToastContextData);
@@ -36,6 +38,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     position: 'bottom-right',
     duration: 3000,
     closable: false,
+    showProgressBar: true,
   });
 
   // Inicializa o container do portal para web
@@ -74,7 +77,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     description, 
     position = 'bottom-right',
     duration = 3000,
-    closable = false 
+    closable = false,
+    showProgressBar = true 
   }: ShowToastParams) => {
     setToast({
       visible: true,
@@ -84,6 +88,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       position,
       duration,
       closable,
+      showProgressBar,
     });
   }, []);
 
@@ -102,6 +107,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         position={toast.position}
         duration={toast.duration}
         closable={toast.closable}
+        showProgressBar={toast.showProgressBar}
         onHide={hideToast}
       />
     </ToastContext.Provider>

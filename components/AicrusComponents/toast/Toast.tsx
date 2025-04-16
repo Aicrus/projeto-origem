@@ -85,6 +85,8 @@ export interface ToastProps {
   onHide: () => void;
   /** Se o toast pode ser fechado pelo usuário */
   closable?: boolean;
+  /** Se o toast mostra uma barra de progresso */
+  showProgressBar?: boolean;
   /** Estilos adicionais para o container do toast */
   style?: ViewStyle;
   /** ID para testes automatizados */
@@ -100,6 +102,7 @@ export function Toast({
   duration = 3000,
   onHide,
   closable = false,
+  showProgressBar = false,
   style,
   testID,
 }: ToastProps) {
@@ -107,6 +110,7 @@ export function Toast({
   const isDark = currentTheme === 'dark';
   const opacity = React.useRef(new Animated.Value(0)).current;
   const offset = React.useRef(new Animated.Value(position.includes('top') ? -20 : 20)).current;
+  const progressAnim = React.useRef(new Animated.Value(1)).current;
   const { width: windowWidth } = useWindowDimensions();
   const isMobile = windowWidth < 768;
   
@@ -180,6 +184,7 @@ export function Toast({
     if (visible) {
       // Reset initial position for animation
       offset.setValue(position.includes('top') ? -20 : 20);
+      progressAnim.setValue(1); // Reset progress animation
       
       // Animate in
       Animated.parallel([
@@ -197,6 +202,15 @@ export function Toast({
 
       // Auto-hide after duration (if duration > 0)
       if (duration > 0) {
+        // Animar a barra de progresso
+        if (showProgressBar) {
+          Animated.timing(progressAnim, {
+            toValue: 0,
+            duration: duration,
+            useNativeDriver: false, // Não pode usar useNativeDriver para width
+          }).start();
+        }
+
         const timer = setTimeout(() => {
           hideToast();
         }, duration);
@@ -204,7 +218,7 @@ export function Toast({
         return () => clearTimeout(timer);
       }
     }
-  }, [visible, duration]);
+  }, [visible, duration, showProgressBar]);
 
   // Função para esconder o toast com animação
   const hideToast = () => {
@@ -349,6 +363,35 @@ export function Toast({
     }
   }
 
+  // Função para renderizar a barra de progresso
+  const renderProgressBar = () => {
+    if (!showProgressBar || duration <= 0) return null;
+
+    const progressBarColor = {
+      success: isDark ? '#10B981' : '#059669',
+      error: isDark ? '#F87171' : '#DC2626',
+      warning: isDark ? '#FBBF24' : '#D97706',
+      info: isDark ? '#38BDF8' : '#0284C7',
+    };
+    
+    return (
+      <View style={styles.progressContainer}>
+        <Animated.View 
+          style={[
+            styles.progressBar, 
+            { 
+              width: progressAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+              }),
+              backgroundColor: progressBarColor[type]
+            }
+          ]} 
+        />
+      </View>
+    );
+  };
+
   return (
     <Animated.View
       testID={testID || `toast-${type}`}
@@ -428,6 +471,7 @@ export function Toast({
             </Pressable>
           )}
         </View>
+        {renderProgressBar()}
       </View>
     </Animated.View>
   );
@@ -467,5 +511,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  progressContainer: {
+    width: '100%',
+    height: 3,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+  },
+  progressBar: {
+    height: '100%',
   },
 }); 
