@@ -1604,7 +1604,7 @@ showToast({
             // Layout para dispositivos móveis com botões compactos no topo
             <View className="flex-1">
               {/* Navegação compacta para dispositivos móveis */}
-              <View className={`flex-row justify-center py-xs border-b ${border}`}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} className={`py-xs border-b ${border}`} contentContainerStyle={{ paddingHorizontal: 4 }}>
                 {availableComponents.map((component) => (
                   <Pressable
                     key={component.id}
@@ -1630,7 +1630,7 @@ showToast({
                     </Text>
                   </Pressable>
                 ))}
-              </View>
+              </ScrollView>
               
               {/* Conteúdo do componente em um ScrollView isolado */}
               <ScrollView 
