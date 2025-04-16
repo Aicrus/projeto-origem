@@ -9,6 +9,7 @@
 // Exportações de componentes
 export * from './select';
 export * from './input';
+export * from './accordion';
 
 // Exportações de constantes
 export * from './constants/theme'; 
