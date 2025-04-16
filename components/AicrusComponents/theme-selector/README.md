@@ -8,7 +8,7 @@ O ThemeSelector é um componente interativo que permite alternar entre os modos 
 - **Design responsivo**: Funciona igualmente bem em todas as plataformas (iOS, Android e Web)
 - **Adaptação automática**: Adapta-se automaticamente ao tema atual do aplicativo
 - **Ícones intuitivos**: Representação visual clara de cada modo (sol, lua, desktop)
-- **Múltiplas variantes**: Diferentes estilos visuais (padrão, pill, minimal, com rótulos)
+- **Múltiplas variantes**: Diferentes estilos visuais (padrão, pill, minimal, segmentado, toggle)
 - **Tamanhos flexíveis**: Opções de tamanho (sm, md, lg, xl) para diferentes contextos
 - **Personalização**: Suporta classes adicionais e cores personalizadas
 
@@ -28,6 +28,12 @@ import { ThemeSelector } from '@/components/AicrusComponents/theme-selector';
 
 // Com rótulos
 <ThemeSelector variant="labeled" showLabels={true} />
+
+// Estilo segmentado com ícones e rótulos
+<ThemeSelector variant="segmented" />
+
+// Estilo toggle para alternar entre claro/escuro
+<ThemeSelector variant="toggle" />
 
 // Sem opção de sistema
 <ThemeSelector showSystemOption={false} />
@@ -49,7 +55,7 @@ import { ThemeSelector } from '@/components/AicrusComponents/theme-selector';
 |-----------------|--------------------------------|------------|-------------------------------------------------|
 | className       | string                         | ''         | Classes adicionais para personalização de estilo |
 | size            | 'sm' \| 'md' \| 'lg' \| 'xl'   | 'md'       | Tamanho do componente                           |
-| variant         | 'default' \| 'pill' \| 'minimal' \| 'labeled' | 'default' | Estilo visual do componente        |
+| variant         | 'default' \| 'pill' \| 'minimal' \| 'labeled' \| 'segmented' \| 'toggle' | 'default' | Estilo visual do componente        |
 | showLabels      | boolean                        | false      | Exibir rótulos para os modos                     |
 | showSystemOption | boolean                        | true       | Exibir opção de tema do sistema                  |
 | customColors    | object                         | {}         | Personalização de cores (ver abaixo)             |
@@ -62,6 +68,9 @@ import { ThemeSelector } from '@/components/AicrusComponents/theme-selector';
 | sliderBackground   | string | Cor de fundo do slider                             |
 | activeIconColor    | string | Cor do ícone do modo selecionado                   |
 | inactiveIconColor  | string | Cor dos ícones dos modos não selecionados          |
+| activeBackground   | string | Cor de fundo do item ativo (para variant="segmented") |
+| textColor          | string | Cor do texto não selecionado                        |
+| activeTextColor    | string | Cor do texto selecionado                            |
 
 ## Variantes
 
@@ -92,6 +101,20 @@ Versão minimalista sem fundo ou slider, apenas ícones.
 <ThemeSelector variant="labeled" showLabels={true} />
 ```
 Versão com rótulos abaixo dos ícones.
+
+### Segmentado (segmented)
+
+```jsx
+<ThemeSelector variant="segmented" />
+```
+Layout segmentado com rótulos e ícones integrados, semelhante a uma barra de abas.
+
+### Alternância (toggle)
+
+```jsx
+<ThemeSelector variant="toggle" />
+```
+Versão simplificada para alternar apenas entre os modos claro e escuro.
 
 ## Tamanhos
 

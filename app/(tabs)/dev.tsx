@@ -1708,6 +1708,24 @@ showToast({
             </Text>
           </View>
 
+          {/* Estilo segmentado (como na imagem) */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Estilo segmentado com rótulos</Text>
+            <ThemeSelector variant="segmented" size="md" />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Layout segmentado com rótulos e ícones integrados.
+            </Text>
+          </View>
+
+          {/* Estilo toggle */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Alternância simples (toggle)</Text>
+            <ThemeSelector variant="toggle" size="md" />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Versão simplificada para alternar entre claro e escuro.
+            </Text>
+          </View>
+
           {/* Sem opção de sistema */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Sem opção de sistema</Text>

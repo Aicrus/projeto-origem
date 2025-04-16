@@ -47,6 +47,8 @@ export const THEME_SELECTOR_VARIANTS = {
   pill: 'pill',
   minimal: 'minimal',
   labeled: 'labeled',
+  segmented: 'segmented',
+  toggle: 'toggle',
 } as const;
 
 // Configurações específicas para cada plataforma com ajustes para evitar overshooting
@@ -78,6 +80,9 @@ interface ThemeSelectorProps {
     sliderBackground?: string;
     activeIconColor?: string;
     inactiveIconColor?: string;
+    textColor?: string;
+    activeTextColor?: string;
+    activeBackground?: string;
   };
 }
 
@@ -108,7 +113,13 @@ export function ThemeSelector({
     ? ['light', 'dark', 'system'] as const
     : ['light', 'dark'] as const;
     
-  const containerWidth = buttonWidth * availableModes.length + padding * 2;
+  // No caso do toggle, só usar 'light' e 'dark'
+  const toggleModes = ['light', 'dark'] as const;
+  
+  // Calcular largura do container
+  const containerWidth = variant === 'toggle'
+    ? buttonWidth * 2
+    : buttonWidth * availableModes.length + padding * 2;
   
   // Calcular raio de borda com base na variante
   const getBorderRadius = () => {
@@ -117,6 +128,10 @@ export function ThemeSelector({
         return height / 2;
       case 'minimal':
         return 4;
+      case 'segmented':
+        return 12;
+      case 'toggle':
+        return height / 2;
       default:
         return 6; // default e labeled
     }
@@ -130,6 +145,8 @@ export function ThemeSelector({
     pill: isDark ? colors.gray[800] : colors.gray[200],
     minimal: 'transparent',
     labeled: isDark ? colors.gray[800] : colors.gray[200],
+    segmented: isDark ? colors.gray[900] : '#F0F4F8',
+    toggle: isDark ? colors.gray[700] : colors.gray[300],
   };
   
   const sliderColors = {
@@ -137,10 +154,32 @@ export function ThemeSelector({
     pill: isDark ? colors.primary.dark : colors.primary.main,
     minimal: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
     labeled: isDark ? colors.primary.dark : colors.primary.main,
+    segmented: isDark ? colors.gray[800] : 'white',
+    toggle: isDark ? colors.primary.dark : colors.primary.main,
+  };
+  
+  const activeTextColors = {
+    default: '#FFFFFF',
+    pill: '#FFFFFF',
+    minimal: isDark ? colors.primary.dark : colors.primary.main,
+    labeled: '#FFFFFF',
+    segmented: isDark ? '#FFFFFF' : colors.primary.main,
+    toggle: '#FFFFFF',
+  };
+  
+  const textColors = {
+    default: isDark ? colors.gray[400] : colors.gray[600],
+    pill: isDark ? colors.gray[400] : colors.gray[600],
+    minimal: isDark ? colors.gray[400] : colors.gray[600],
+    labeled: isDark ? colors.gray[400] : colors.gray[600],
+    segmented: isDark ? colors.gray[400] : colors.gray[600],
+    toggle: isDark ? '#FFFFFF' : colors.gray[800],
   };
   
   const backgroundColor = customColors.background || backgroundColors[variant];
   const sliderBackgroundColor = customColors.sliderBackground || sliderColors[variant];
+  const activeTextColor = customColors.activeTextColor || activeTextColors[variant];
+  const textColor = customColors.textColor || textColors[variant];
   
   // Configurar posição inicial e animação
   const targetPosition = useSharedValue(getInitialPosition(themeMode, showSystemOption));
@@ -172,7 +211,7 @@ export function ThemeSelector({
   const getIconColor = (mode: 'system' | 'light' | 'dark') => {
     // Se for o modo selecionado
     if (mode === themeMode) {
-      // Cor personalizada ou branco para variantes com fundo colorido
+      // Cor personalizada ou cor ativa para o ícone
       if (customColors.activeIconColor) {
         return customColors.activeIconColor;
       }
@@ -182,15 +221,20 @@ export function ThemeSelector({
         return isDark ? colors.primary.dark : colors.primary.main;
       }
       
+      // Para segmented, a cor do ícone ativo depende
+      if (variant === 'segmented') {
+        return isDark ? '#FFFFFF' : colors.primary.main;
+      }
+      
       // Para outros estilos, usar branco
-      return '#FFFFFF';
+      return activeTextColor;
     } 
     // Para os ícones não selecionados
     else {
       if (customColors.inactiveIconColor) {
         return customColors.inactiveIconColor;
       }
-      return isDark ? colors.gray[400] : colors.gray[600];
+      return textColor;
     }
   };
   
@@ -204,8 +248,8 @@ export function ThemeSelector({
   };
   
   const renderSlider = () => {
-    // Não renderizar o slider para a variante minimal
-    if (variant === 'minimal') {
+    // Não renderizar o slider para a variante minimal ou segmented
+    if (variant === 'minimal' || variant === 'segmented') {
       return null;
     }
     
@@ -217,7 +261,7 @@ export function ThemeSelector({
             position: 'absolute',
             width: buttonWidth - Math.max(1, Math.floor(buttonWidth * 0.03)),
             height: height - Math.max(4, Math.floor(height * 0.12)),
-            borderRadius: variant === 'pill' ? height / 2 : 4,
+            borderRadius: variant === 'pill' || variant === 'toggle' ? height / 2 : 4,
             zIndex: 0,
             left: padding + Math.floor(buttonWidth * 0.01),
             top: Math.max(2, Math.floor(height * 0.06)),
@@ -234,6 +278,124 @@ export function ThemeSelector({
     );
   };
 
+  // Renderiza o estilo toggle (apenas dois estados)
+  if (variant === 'toggle') {
+    return (
+      <View className={`${className}`}>
+        <View 
+          style={{
+            width: buttonWidth * 2,
+            height: height,
+            backgroundColor,
+            borderRadius: height / 2,
+            padding: 2,
+            position: 'relative',
+          }}
+        >
+          <Animated.View 
+            style={[
+              {
+                position: 'absolute',
+                width: buttonWidth - 4,
+                height: height - 4,
+                borderRadius: height / 2,
+                backgroundColor: isDark ? colors.primary.dark : colors.primary.main,
+                top: 2,
+                left: 2,
+              },
+              {
+                transform: [{ translateX: themeMode === 'dark' ? buttonWidth : 0 }],
+              }
+            ]} 
+          />
+          <View className="flex-row h-full">
+            <Pressable
+              style={{ width: buttonWidth, justifyContent: 'center', alignItems: 'center', zIndex: 1 }}
+              onPress={() => setThemeMode('light')}
+            >
+              <Ionicons
+                name={THEME_ICONS.light}
+                size={iconSize}
+                color={themeMode === 'light' ? '#FFFFFF' : isDark ? '#FFFFFF' : colors.gray[600]}
+              />
+            </Pressable>
+            <Pressable
+              style={{ width: buttonWidth, justifyContent: 'center', alignItems: 'center', zIndex: 1 }}
+              onPress={() => setThemeMode('dark')}
+            >
+              <Ionicons
+                name={THEME_ICONS.dark}
+                size={iconSize}
+                color={themeMode === 'dark' ? '#FFFFFF' : isDark ? '#FFFFFF' : colors.gray[600]}
+              />
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  // Renderiza o estilo segmentado (como na imagem)
+  if (variant === 'segmented') {
+    return (
+      <View className={`${className}`}>
+        <View 
+          className="flex-row overflow-hidden"
+          style={{
+            borderRadius,
+            backgroundColor,
+          }}
+        >
+          {availableModes.map((mode, index) => {
+            const isActive = mode === themeMode;
+            const activeStyle = isActive ? {
+              backgroundColor: customColors.activeBackground || (isDark ? colors.gray[800] : 'white'),
+            } : {};
+            
+            return (
+              <Pressable
+                key={mode}
+                style={[
+                  {
+                    paddingVertical: 8,
+                    paddingHorizontal: buttonWidth * 0.5,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flexDirection: 'column',
+                    minWidth: buttonWidth * 2,
+                    borderRadius: 8,
+                    margin: 4,
+                  },
+                  activeStyle,
+                ]}
+                onPress={() => handlePress(mode)}
+              >
+                <Ionicons
+                  name={THEME_ICONS[mode]}
+                  size={iconSize}
+                  color={getIconColor(mode)}
+                  style={{ marginBottom: 4 }}
+                />
+                <Text
+                  style={{
+                    fontSize: Math.max(10, Math.floor(buttonWidth * 0.35)),
+                    color: isActive 
+                      ? (isDark ? 'white' : colors.primary.main)
+                      : (isDark ? colors.gray[400] : colors.gray[600]),
+                    fontWeight: isActive ? '600' : '400',
+                  }}
+                >
+                  {getLabel(mode)}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+    );
+  }
+
+  // Renderização para outros estilos (default, pill, minimal, labeled)
   return (
     <View className={`${className}`}>
       <View 
