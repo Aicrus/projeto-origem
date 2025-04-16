@@ -7,7 +7,7 @@ import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
 import { colors } from '../../components/AicrusComponents/constants/theme';
 import { Button } from '../../components/AicrusComponents/button';
-import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X } from 'lucide-react-native';
+import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
 
 export default function DevPage() {
@@ -71,24 +71,28 @@ export default function DevPage() {
     { id: 'select', name: 'Select', icon: 'ChevronDown' },
     { id: 'accordion', name: 'Accordion', icon: 'ChevronsUpDown' },
     { id: 'button', name: 'Button', icon: 'Square' },
-    { id: 'toast', name: 'Toast', icon: 'MessageSquare' },
+    { id: 'toast', name: 'Toast', icon: 'Bell' },
   ];
   
   // Função para renderizar o ícone correto
   const renderIcon = (iconName: string) => {
     switch (iconName) {
       case 'Type':
-        return <Type />;
+        return <Type strokeWidth={1.5} />;
       case 'ChevronDown':
-        return <ChevronDown />;
+        return <ChevronDown strokeWidth={1.5} />;
       case 'ChevronsUpDown':
-        return <ChevronsUpDown />;
+        return <ChevronsUpDown strokeWidth={1.5} />;
       case 'Square':
-        return <Square />;
+        return <Square strokeWidth={1.5} />;
       case 'Settings':
-        return <Settings />;
+        return <Settings strokeWidth={1.5} />;
+      case 'Bell':
+        return <Bell strokeWidth={1.5} />;
+      case 'MessageSquare':
+        return <MessageSquare strokeWidth={1.5} />;
       default:
-        return <Settings />;
+        return <Settings strokeWidth={1.5} />;
     }
   };
   
@@ -767,7 +771,7 @@ export default function DevPage() {
             <View className="flex-row flex-wrap gap-sm mb-sm">
               <Button 
                 variant="primary" 
-                leftIcon={<Mail size={16} color="#FFFFFF" />}
+                leftIcon={<Mail size={16} strokeWidth={1.5} color="#FFFFFF" />}
                 onPress={() => {}}
                 size="md"
               >
@@ -775,7 +779,7 @@ export default function DevPage() {
               </Button>
               <Button 
                 variant="outline" 
-                rightIcon={<ChevronRight size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
+                rightIcon={<ChevronRight size={16} strokeWidth={1.5} color={isDark ? "#FFFFFF" : "#14181B"} />}
                 onPress={() => {}}
                 size="md"
               >
@@ -787,7 +791,7 @@ export default function DevPage() {
                 onPress={() => {}}
                 size="md"
               >
-                <Plus size={16} color={isDark ? "#FFFFFF" : "#14181B"} />
+                <Plus size={16} strokeWidth={1.5} color={isDark ? "#FFFFFF" : "#14181B"} />
               </Button>
             </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
@@ -839,7 +843,7 @@ export default function DevPage() {
             <View className="mb-sm">
               <Button 
                 variant="primary" 
-                leftIcon={<Mail size={16} color="#FFFFFF" />}
+                leftIcon={<Mail size={16} strokeWidth={1.5} color="#FFFFFF" />}
                 onPress={() => {}}
                 fullWidth
                 size="md"
@@ -1369,28 +1373,28 @@ export default function DevPage() {
               <Button 
                 variant="primary" 
                 onPress={() => showToast('success')}
-                leftIcon={<CheckCircle size={16} color="#FFFFFF" />}
+                leftIcon={<CheckCircle size={16} strokeWidth={1.5} color="#FFFFFF" />}
               >
                 Sucesso
               </Button>
               <Button 
                 variant="destructive" 
                 onPress={() => showToast('error')}
-                leftIcon={<AlertCircle size={16} color="#FFFFFF" />}
+                leftIcon={<AlertCircle size={16} strokeWidth={1.5} color="#FFFFFF" />}
               >
                 Erro
               </Button>
               <Button 
                 variant="outline" 
                 onPress={() => showToast('warning')}
-                leftIcon={<AlertTriangle size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
+                leftIcon={<AlertTriangle size={16} strokeWidth={1.5} color={isDark ? "#FFFFFF" : "#14181B"} />}
               >
                 Alerta
               </Button>
               <Button 
                 variant="ghost" 
                 onPress={() => showToast('info')}
-                leftIcon={<Info size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
+                leftIcon={<Info size={16} strokeWidth={1.5} color={isDark ? "#FFFFFF" : "#14181B"} />}
               >
                 Informação
               </Button>
