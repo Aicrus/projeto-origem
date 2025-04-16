@@ -32,7 +32,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     message: '',
     description: '',
     type: 'info',
-    position: 'top',
+    position: 'bottom-right',
     duration: 3000,
     closable: false,
   });
@@ -41,7 +41,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     type, 
     message, 
     description, 
-    position = 'top',
+    position = 'bottom-right',
     duration = 3000,
     closable = false 
   }: ShowToastParams) => {

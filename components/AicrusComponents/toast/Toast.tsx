@@ -96,7 +96,7 @@ export function Toast({
   message,
   description,
   type = 'info',
-  position = 'top',
+  position = 'bottom-right',
   duration = 3000,
   onHide,
   closable = false,
@@ -143,7 +143,7 @@ export function Toast({
     const basePositionStyle: ViewStyle = {
       position: 'absolute',
       zIndex: 9999,
-      width: isMobile ? 'auto' : 400,
+      width: isMobile ? '90%' : 400,
     };
 
     // Posições horizontais
@@ -155,17 +155,17 @@ export function Toast({
       basePositionStyle.left = 'auto';
     } else {
       // Centralizado
-      basePositionStyle.left = isMobile ? 16 : 'auto';
-      basePositionStyle.right = isMobile ? 16 : 'auto';
-      basePositionStyle.marginHorizontal = isMobile ? 0 : 'auto';
+      basePositionStyle.left = isMobile ? '5%' : '50%';
+      basePositionStyle.right = 'auto';
+      basePositionStyle.marginLeft = isMobile ? 0 : -200; // metade da largura para centralizar
     }
 
     // Posições verticais
     if (position.includes('top')) {
-      basePositionStyle.top = isMobile ? 50 : 24;
+      basePositionStyle.top = isMobile ? 80 : 24;
       basePositionStyle.bottom = 'auto';
     } else {
-      basePositionStyle.bottom = isMobile ? 50 : 24;
+      basePositionStyle.bottom = isMobile ? 80 : 24;
       basePositionStyle.top = 'auto';
     }
 
