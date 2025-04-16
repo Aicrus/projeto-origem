@@ -1660,19 +1660,75 @@ showToast({
           
           {/* Exemplo básico */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Theme Selector básico</Text>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Versão padrão</Text>
             <ThemeSelector />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Seletor de tema com animações suaves e ícones intuitivos.
             </Text>
           </View>
-          
-          {/* Exemplo com tamanho personalizado */}
+
+          {/* Variante pill */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Theme Selector com tamanho personalizado</Text>
-            <ThemeSelector className="scale-150" />
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Estilo pill (arredondado)</Text>
+            <ThemeSelector variant="pill" />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              O componente pode ser redimensionado usando classes de escala.
+              Versão com cantos completamente arredondados.
+            </Text>
+          </View>
+          
+          {/* Variante minimal */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Estilo minimal (sem fundo)</Text>
+            <ThemeSelector variant="minimal" />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Versão minimalista sem fundo ou slider.
+            </Text>
+          </View>
+
+          {/* Tamanhos diferentes */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Diferentes tamanhos</Text>
+            <View className="flex-row space-x-lg items-center">
+              <ThemeSelector size="sm" />
+              <ThemeSelector size="md" />
+              <ThemeSelector size="lg" />
+              <ThemeSelector size="xl" />
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Tamanhos disponíveis: sm, md (padrão), lg, xl
+            </Text>
+          </View>
+
+          {/* Exemplo com rótulos */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Com rótulos</Text>
+            <ThemeSelector variant="labeled" showLabels={true} />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Versão com rótulos abaixo dos ícones.
+            </Text>
+          </View>
+
+          {/* Sem opção de sistema */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Sem opção de sistema</Text>
+            <ThemeSelector showSystemOption={false} />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Versão com apenas dois modos (claro/escuro).
+            </Text>
+          </View>
+          
+          {/* Exemplo com cores personalizadas */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Cores personalizadas</Text>
+            <ThemeSelector 
+              customColors={{
+                background: isDark ? '#2A2D3A' : '#E8EAED',
+                sliderBackground: isDark ? '#6C5CE7' : '#6C5CE7',
+                activeIconColor: '#FFFFFF',
+              }} 
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Customização completa de cores.
             </Text>
           </View>
         </View>
@@ -1704,6 +1760,16 @@ showToast({
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Responsividade</Text>
             <Text className={`text-body-sm ${textSecondary}`}>Funciona igualmente bem em todas as plataformas</Text>
           </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Variantes de estilo</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Diferentes estilos visuais para adaptação ao design</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tamanhos múltiplos</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Opções de tamanho para diferentes contextos</Text>
+          </View>
         </View>
         
         <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
@@ -1717,6 +1783,31 @@ showToast({
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>className</Text>
             <Text className={`text-body-sm ${textSecondary}`}>Classes adicionais para personalização (string)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>size</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Tamanho do componente: 'sm', 'md', 'lg', 'xl' (padrão: 'md')</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>variant</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Estilo visual: 'default', 'pill', 'minimal', 'labeled' (padrão: 'default')</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>showLabels</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Exibir rótulos para os modos (boolean, padrão: false)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>showSystemOption</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Exibir opção de tema do sistema (boolean, padrão: true)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>customColors</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Objeto para personalização das cores (background, sliderBackground, activeIconColor, inactiveIconColor)</Text>
           </View>
         </View>
       </View>
