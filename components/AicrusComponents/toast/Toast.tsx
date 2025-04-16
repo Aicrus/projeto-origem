@@ -68,6 +68,18 @@ export type ToastPosition =
   | 'bottom-left' 
   | 'bottom-right';
 
+/**
+ * Nomes de posição formatados para exibição ao usuário
+ */
+export const ToastPositionLabels: Record<ToastPosition, string> = {
+  'top': 'Top',
+  'bottom': 'Bottom',
+  'top-left': 'Top Left',
+  'top-right': 'Top Right',
+  'bottom-left': 'Bottom Left',
+  'bottom-right': 'Bottom Right'
+};
+
 export interface ToastProps {
   /** Se o toast está visível */
   visible: boolean;
@@ -242,6 +254,35 @@ export function Toast({
     hideToast();
   };
 
+  // Função para renderizar a barra de progresso
+  const renderProgressBar = () => {
+    if (!showProgressBar || duration <= 0) return null;
+
+    const progressBarColor = {
+      success: isDark ? '#10B981' : '#059669',
+      error: isDark ? '#F87171' : '#DC2626',
+      warning: isDark ? '#FBBF24' : '#D97706',
+      info: isDark ? '#38BDF8' : '#0284C7',
+    };
+    
+    return (
+      <View style={styles.progressContainer}>
+        <Animated.View 
+          style={[
+            styles.progressBar, 
+            { 
+              width: progressAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+              }),
+              backgroundColor: progressBarColor[type]
+            }
+          ]} 
+        />
+      </View>
+    );
+  };
+
   if (!visible) return null;
 
   const transformStyle = {
@@ -349,6 +390,7 @@ export function Toast({
                 </Pressable>
               )}
             </View>
+            {renderProgressBar()}
           </View>
         </Animated.View>
       );
@@ -362,35 +404,6 @@ export function Toast({
       console.log('React DOM not available, using standard rendering');
     }
   }
-
-  // Função para renderizar a barra de progresso
-  const renderProgressBar = () => {
-    if (!showProgressBar || duration <= 0) return null;
-
-    const progressBarColor = {
-      success: isDark ? '#10B981' : '#059669',
-      error: isDark ? '#F87171' : '#DC2626',
-      warning: isDark ? '#FBBF24' : '#D97706',
-      info: isDark ? '#38BDF8' : '#0284C7',
-    };
-    
-    return (
-      <View style={styles.progressContainer}>
-        <Animated.View 
-          style={[
-            styles.progressBar, 
-            { 
-              width: progressAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0%', '100%'],
-              }),
-              backgroundColor: progressBarColor[type]
-            }
-          ]} 
-        />
-      </View>
-    );
-  };
 
   return (
     <Animated.View

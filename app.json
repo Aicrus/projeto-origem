@@ -70,6 +70,12 @@
       "eas": {
         "projectId": "seu-projeto-id"
       }
-    }
+    },
+    "fonts": [
+      {
+        "asset": "./assets/fonts/PlusJakartaSans-VariableFont_wght.ttf",
+        "family": "PlusJakartaSansVariable"
+      }
+    ]
   }
 }

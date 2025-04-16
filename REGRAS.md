@@ -62,7 +62,10 @@ Este documento é o guia mestre OBRIGATÓRIO que estabelece as regras invioláve
 //    Prefira usar os aliases semânticos: xs, sm, md, lg, xl, etc.
 
 // 3. TIPOGRAFIA - Consulte as seções fontFamily e fontSize em tailwind.config.js
-//    Use os nomes de classes definidos, como: text-body-md, font-inter-regular, etc.
+//    Use os nomes de classes definidos, como: text-body-md, font-jakarta-regular, etc.
+//    ATENÇÃO: O projeto suporta duas abordagens para fontes:
+//    1. Fontes do Google (@expo-google-fonts) - Preferencial, via NPM
+//    2. Fontes personalizadas (assets/fonts) - Para fontes não disponíveis no Google Fonts
 
 // 4. SOMBRAS - Consulte a seção boxShadow em tailwind.config.js
 

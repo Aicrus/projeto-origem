@@ -1,26 +1,25 @@
 import { useState, useRef } from 'react';
-import { TextInput, Pressable, ActivityIndicator, Platform, Keyboard, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { Pressable, Platform, Keyboard, View, Text, TouchableWithoutFeedback, Image, StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useTheme } from '@/hooks/ThemeContext';
 import { useWindowDimensions } from 'react-native';
 import { useAuth } from '@/contexts/auth';
 import { useToast } from '@/hooks/useToast';
-import { Eye, EyeOff } from 'lucide-react-native';
+import { Mail } from 'lucide-react-native';
+import { Input } from '@/components/AicrusComponents/input';
+import { Button } from '@/components/AicrusComponents/button';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isLinkHovered, setIsLinkHovered] = useState(false);
   const { currentTheme } = useTheme();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const isDesktopOrTablet = width >= 768;
   const isDark = currentTheme === 'dark';
   const { signIn, isLoading } = useAuth();
   const { showToast } = useToast();
   const router = useRouter();
-  const senhaRef = useRef<TextInput | null>(null);
+  const senhaRef = useRef<any>(null);
 
   const handleLogin = async () => {
     try {
@@ -51,145 +50,188 @@ export default function Login() {
     }
   };
 
-  const handleKeyPress = (e: any) => {
-    if (Platform.OS === 'web' && e.key === 'Enter') {
-      handleLogin();
-    }
-  };
-
   const handlePressOutside = () => {
     if (Platform.OS !== 'web') {
       Keyboard.dismiss();
     }
   };
 
+  // Estilos para garantir layout dinâmico
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      flexDirection: 'row',
+    },
+    formSection: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 24,
+      maxWidth: isDesktopOrTablet ? '50%' : '100%',
+    },
+    imageSection: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: isDark ? '#14181B' : '#F1F4F8',
+      display: isDesktopOrTablet ? 'flex' : 'none',
+    },
+    formContainer: {
+      width: '100%',
+      maxWidth: 400,
+    },
+    fullImage: {
+      width: '100%',
+      height: '100%',
+    }
+  });
+
   return (
     <TouchableWithoutFeedback onPress={handlePressOutside}>
-      <View 
-        className={`flex-1 ${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}`}
-      >
-        <View className="flex-1 flex-row">
-          <View className={`flex-1 justify-center items-center p-6 ${isDesktopOrTablet ? 'max-w-[50%]' : ''}`}>
-            <Text className={`text-2xl font-bold text-center mb-2 ${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
-              Bem-vindo de volta!
-            </Text>
-            
-            <Text className={`text-base text-center mb-8 ${isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light'}`}>
-              Entre com suas credenciais para acessar sua conta
-            </Text>
-
-            <View className="w-full max-w-[400px] mb-4 relative">
-              <TextInput
-                className={`w-full h-12 rounded-md px-4 shadow-sm border ${
-                  isDark 
-                    ? 'bg-bg-secondary-dark text-text-primary-dark border-divider-dark' 
-                    : 'bg-bg-secondary-light text-text-primary-light border-divider-light'
-                }`}
-                placeholder="E-mail"
-                placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                editable={!isLoading}
-                onKeyPress={handleKeyPress}
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  if (senhaRef.current) {
-                    senhaRef.current.focus();
-                  }
-                }}
-                textContentType="emailAddress"
-                autoComplete="email"
-                style={Platform.OS === 'web' ? { outline: 'none' as 'none' } : {}}
-              />
-            </View>
-
-            <View className="w-full max-w-[400px] mb-4 relative">
-              <TextInput
-                ref={senhaRef}
-                className={`w-full h-12 rounded-md px-4 shadow-sm border ${
-                  isDark 
-                    ? 'bg-bg-secondary-dark text-text-primary-dark border-divider-dark' 
-                    : 'bg-bg-secondary-light text-text-primary-light border-divider-light'
-                }`}
-                placeholder="Senha"
-                placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
-                value={senha}
-                onChangeText={setSenha}
-                secureTextEntry={!showPassword}
-                editable={!isLoading}
-                onKeyPress={handleKeyPress}
-                returnKeyType="go"
-                onSubmitEditing={handleLogin}
-                textContentType="password"
-                autoComplete="current-password"
-                style={Platform.OS === 'web' ? { outline: 'none' as 'none' } : {}}
-              />
-              <Pressable 
-                onPress={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-3 p-1"
-              >
-                {showPassword ? (
-                  <EyeOff size={20} color={isDark ? '#95A1AC' : '#8B97A2'} />
-                ) : (
-                  <Eye size={20} color={isDark ? '#95A1AC' : '#8B97A2'} />
-                )}
-              </Pressable>
-            </View>
-
-            <Pressable
-              className={`w-full max-w-[400px] h-12 rounded-md justify-center items-center mt-4 ${
-                isLoading 
-                  ? 'opacity-70' 
-                  : isHovered ? 'opacity-80' : 'opacity-100'
-              } ${isDark ? 'bg-primary-dark' : 'bg-primary-light'}`}
-              onPress={handleLogin}
-              disabled={isLoading}
-              onHoverIn={() => Platform.OS === 'web' && setIsHovered(true)}
-              onHoverOut={() => Platform.OS === 'web' && setIsHovered(false)}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text className="text-white font-semibold text-base">
-                  Entrar
-                </Text>
-              )}
-            </Pressable>
-
-            <View className="flex-row items-center mt-6">
-              <Text className={`text-base ${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
-                Ainda não tem uma conta?{' '}
+      <View className={isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'} style={{flex: 1}}>
+        <View style={styles.container}>
+          {/* Formulário de login */}
+          <View style={styles.formSection}>
+            <View style={styles.formContainer}>
+              {/* Títulos */}
+              <Text className={`text-headline-md font-jakarta-bold mb-2 ${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
+                Bem-vindo de volta
               </Text>
-              <Link href="/register" asChild>
-                <Pressable 
+              
+              <Text className={`text-body-md font-jakarta-regular mb-8 ${isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light'}`}>
+                Entre com suas credenciais para acessar sua conta
+              </Text>
+
+              {/* Campo de email */}
+              <View className="mb-4">
+                <Input
+                  label="Email"
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="Digite seu email"
+                  type="email"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
                   disabled={isLoading}
-                  onHoverIn={() => Platform.OS === 'web' && setIsLinkHovered(true)}
-                  onHoverOut={() => Platform.OS === 'web' && setIsLinkHovered(false)}
-                >
-                  <Text 
-                    className={`text-base font-semibold ${
-                      isDark ? 'text-secondary-dark' : 'text-secondary-light'
-                    } ${isLinkHovered ? 'opacity-80' : 'opacity-100'}`}
-                  >
-                    Cadastre-se
+                  onSubmitEditing={() => senhaRef.current?.focus()}
+                  returnKeyType="next"
+                  autoComplete="email"
+                />
+              </View>
+
+              {/* Campo de senha */}
+              <View className="mb-6">
+                <Input
+                  label="Senha"
+                  value={senha}
+                  onChangeText={setSenha}
+                  placeholder="Digite sua senha"
+                  type="password"
+                  disabled={isLoading}
+                  returnKeyType="go"
+                  onSubmitEditing={handleLogin}
+                  autoComplete="current-password"
+                />
+              </View>
+
+              {/* Esqueci minha senha */}
+              <View className="flex-row justify-end mb-6">
+                <Pressable>
+                  <Text className={`text-body-sm font-jakarta-medium ${isDark ? 'text-primary-dark' : 'text-primary-light'}`}>
+                    Esqueci minha senha
                   </Text>
                 </Pressable>
-              </Link>
+              </View>
+
+              {/* Botão de login */}
+              <Button
+                variant="primary"
+                onPress={handleLogin}
+                disabled={isLoading}
+                loading={isLoading}
+                loadingText="Entrando..."
+                fullWidth
+                leftIcon={<Mail size={18} color="#FFFFFF" />}
+              >
+                Entrar com Email
+              </Button>
+
+              {/* Separador "ou" */}
+              <View className="flex-row items-center my-6">
+                <View className={`flex-1 h-px ${isDark ? 'bg-divider-dark' : 'bg-divider-light'}`} />
+                <Text className={`mx-4 text-body-sm ${isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light'}`}>
+                  ou continue com
+                </Text>
+                <View className={`flex-1 h-px ${isDark ? 'bg-divider-dark' : 'bg-divider-light'}`} />
+              </View>
+
+              {/* Botões de login social */}
+              <View className="flex-row justify-center space-x-4 mb-6">
+                <Button
+                  variant="outline"
+                  onPress={() => {}}
+                  isIconOnly
+                  style={{
+                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                    borderWidth: 1,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                    width: 44,
+                    height: 44,
+                    borderRadius: 8,
+                  }}
+                >
+                  <Image
+                    source={require('@/assets/images/icon-apple.png')}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onPress={() => {}}
+                  isIconOnly
+                  style={{
+                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                    borderWidth: 1,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                    width: 44,
+                    height: 44,
+                    borderRadius: 8,
+                  }}
+                >
+                  <Image
+                    source={require('@/assets/images/icon-gmail.png')}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                </Button>
+              </View>
+
+              {/* Link para cadastro */}
+              <View className="flex-row justify-center mt-4">
+                <Text className={`text-body-md ${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
+                  Não tem uma conta?{' '}
+                </Text>
+                <Link href="/register" asChild>
+                  <Pressable>
+                    <Text className={`text-body-md font-jakarta-semibold ${isDark ? 'text-primary-dark' : 'text-primary-light'}`}>
+                      Cadastre-se
+                    </Text>
+                  </Pressable>
+                </Link>
+              </View>
             </View>
           </View>
 
-          {isDesktopOrTablet && (
-            <View className={`flex-1 ${isDark ? 'bg-primary-dark' : 'bg-primary-light'}`}>
-              <View className="flex-1 justify-center items-center">
-                <Text className="text-white text-2xl font-bold">Bem-vindo ao App</Text>
-                <Text className="text-white text-center mt-2 px-8">
-                  Uma plataforma simples e eficiente para gerenciar seus projetos
-                </Text>
-              </View>
-            </View>
-          )}
+          {/* Imagem lateral (visível apenas em desktop/tablet) */}
+          <View style={styles.imageSection}>
+            <Image
+              source={require('@/assets/images/placeholder-img.png')}
+              style={styles.fullImage}
+              resizeMode="cover"
+            />
+          </View>
         </View>
       </View>
     </TouchableWithoutFeedback>

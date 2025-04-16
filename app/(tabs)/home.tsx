@@ -82,7 +82,7 @@ export default function Home() {
       }}
     >
       <Text 
-        className={`mb-lg text-center text-headline-lg font-inter-bold ${textPrimary}`}
+        className={`mb-lg text-center text-headline-lg font-jakarta-bold ${textPrimary}`}
         style={{
           maxWidth: responsive({
             mobile: '90%',
@@ -236,7 +236,7 @@ export default function Home() {
       </View>
       
       <Text 
-        className={`mb-xl text-center mx-lg text-body-md font-inter-regular ${textSecondary}`}
+        className={`mb-xl text-center mx-lg text-body-md font-jakarta-regular ${textSecondary}`}
         style={{
           maxWidth: responsive({
             mobile: '95%',
@@ -275,7 +275,7 @@ export default function Home() {
             })
           }}
         >
-          <Text className={`text-center text-label-md font-inter-semibold ${buttonPrimaryText}`}>
+          <Text className={`text-center text-label-md font-jakarta-semibold ${buttonPrimaryText}`}>
             Sair do Aplicativo
           </Text>
         </Pressable>
@@ -293,7 +293,7 @@ export default function Home() {
               })
             }}
           >
-            <Text className={`text-center text-label-md font-inter-semibold ${buttonOutlineText}`}>
+            <Text className={`text-center text-label-md font-jakarta-semibold ${buttonOutlineText}`}>
               Botão Secundário
             </Text>
           </Pressable>
@@ -305,7 +305,7 @@ export default function Home() {
         onPress={() => router.push('/(tabs)/dev')}
         className={`mt-md px-md py-xs rounded-md ${isDark ? 'bg-secondary-dark' : 'bg-secondary-light'}`}
       >
-        <Text className={`text-label-sm font-inter-semibold text-white`}>
+        <Text className={`text-label-sm font-jakarta-semibold text-white`}>
           Abrir Ferramentas de Dev
         </Text>
       </Pressable>

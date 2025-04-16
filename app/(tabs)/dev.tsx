@@ -8,7 +8,7 @@ import { Accordion, AccordionGroup } from '../../components/AicrusComponents/acc
 import { colors } from '../../components/AicrusComponents/constants/theme';
 import { Button } from '../../components/AicrusComponents/button';
 import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X } from 'lucide-react-native';
-import { Toast } from '../../components/AicrusComponents/toast';
+import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
@@ -1018,10 +1018,10 @@ export default function DevPage() {
           message={`Toast de ${toastType === 'success' ? 'sucesso' : 
                           toastType === 'error' ? 'erro' : 
                           toastType === 'warning' ? 'alerta' : 'informação'}`}
-          description={`Este é um exemplo de toast do tipo ${toastType}, posicionado na posição ${toastPosition}.`}
+          description={`Este é um exemplo de toast do tipo ${toastType}, posicionado na posição ${ToastPositionLabels[toastPosition]}.`}
           closable={toastClosable}
           showProgressBar={toastProgressBar}
-          duration={10000}
+          duration={10000} // Aumentando a duração para testes
           onHide={() => setToastVisible(false)}
         />
 
@@ -1046,28 +1046,28 @@ export default function DevPage() {
                 onPress={() => showToast('success')}
                 leftIcon={<CheckCircle size={16} color="#FFFFFF" />}
               >
-                Success
+                Sucesso
               </Button>
               <Button 
                 variant="destructive" 
                 onPress={() => showToast('error')}
                 leftIcon={<AlertCircle size={16} color="#FFFFFF" />}
               >
-                Error
+                Erro
               </Button>
               <Button 
                 variant="outline" 
                 onPress={() => showToast('warning')}
                 leftIcon={<AlertTriangle size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
               >
-                Warning
+                Alerta
               </Button>
               <Button 
                 variant="ghost" 
                 onPress={() => showToast('info')}
                 leftIcon={<Info size={16} color={isDark ? "#FFFFFF" : "#14181B"} />}
               >
-                Info
+                Informação
               </Button>
             </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
@@ -1078,9 +1078,6 @@ export default function DevPage() {
           {/* Posições */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Posições</Text>
-            <Text className={`text-body-sm ${textSecondary} mb-sm`}>
-              Escolha a posição e depois clique em um dos botões de tipo acima para ver o Toast:
-            </Text>
             <View className="flex-row flex-wrap gap-sm mb-sm">
               <View className="flex-col gap-sm mr-sm">
                 <Text className={`text-body-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Topo</Text>
@@ -1088,28 +1085,31 @@ export default function DevPage() {
                   variant={toastPosition === 'top' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('top');
+                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Centro
+                  {ToastPositionLabels['top']}
                 </Button>
                 <Button 
                   variant={toastPosition === 'top-left' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('top-left');
+                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Esquerda
+                  {ToastPositionLabels['top-left']}
                 </Button>
                 <Button 
                   variant={toastPosition === 'top-right' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('top-right');
+                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Direita
+                  {ToastPositionLabels['top-right']}
                 </Button>
               </View>
               <View className="flex-col gap-sm">
@@ -1118,28 +1118,31 @@ export default function DevPage() {
                   variant={toastPosition === 'bottom' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('bottom');
+                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Centro
+                  {ToastPositionLabels['bottom']}
                 </Button>
                 <Button 
                   variant={toastPosition === 'bottom-left' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('bottom-left');
+                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Esquerda
+                  {ToastPositionLabels['bottom-left']}
                 </Button>
                 <Button 
                   variant={toastPosition === 'bottom-right' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('bottom-right');
+                    showToast(toastType);
                   }}
                   size="sm"
                 >
-                  Direita
+                  {ToastPositionLabels['bottom-right']}
                 </Button>
               </View>
             </View>
@@ -1156,6 +1159,7 @@ export default function DevPage() {
                 variant={toastClosable ? "primary" : "outline"} 
                 onPress={() => {
                   setToastClosable(!toastClosable);
+                  showToast(toastType);
                 }}
               >
                 {toastClosable ? "Com botão de fechar" : "Sem botão de fechar"}
@@ -1165,6 +1169,7 @@ export default function DevPage() {
                 variant={toastProgressBar ? "primary" : "outline"} 
                 onPress={() => {
                   setToastProgressBar(!toastProgressBar);
+                  showToast(toastType);
                 }}
               >
                 {toastProgressBar ? "Com barra de progresso" : "Sem barra de progresso"}
@@ -1191,7 +1196,7 @@ export default function DevPage() {
           
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Posições</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Flexibilidade para posicionamento em seis posições diferentes</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Flexibilidade para posicionamento em seis posições diferentes: ${Object.values(ToastPositionLabels).join(', ')}</Text>
           </View>
           
           <View className="mb-sm">
@@ -1259,13 +1264,13 @@ export default function DevPage() {
           </View>
           
           <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>showProgressBar</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Se deve mostrar a barra de progresso (boolean)</Text>
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>onHide</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Função chamada quando o toast é fechado (callback)</Text>
           </View>
           
           <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>onHide</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Função chamada quando o toast é fechado (callback)</Text>
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>showProgressBar</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se deve mostrar a barra de progresso (boolean)</Text>
           </View>
         </View>
         
@@ -1285,7 +1290,8 @@ const { showToast } = useToast();
 showToast({
   type: 'success',
   message: 'Operação concluída',
-  description: 'Os dados foram salvos com sucesso.'
+  description: 'Os dados foram salvos com sucesso.',
+  showProgressBar: true
 });
 
 // Mostrar um toast de erro com mais duração
@@ -1294,19 +1300,11 @@ showToast({
   message: 'Erro ao processar',
   description: 'Tente novamente mais tarde.',
   duration: 6000,
-  position: 'bottom'
+  position: 'bottom',
+  showProgressBar: true
 });`}
           </Text>
         </View>
-
-        <Button 
-          variant="primary"
-          onPress={() => showToast(toastType)}
-          className="mt-sm"
-          fullWidth
-        >
-          Mostrar Toast na posição selecionada
-        </Button>
       </View>
     );
   };

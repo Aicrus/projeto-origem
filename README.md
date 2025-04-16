@@ -255,33 +255,63 @@ Principais características:
 
 ### 🔤 Fontes do Projeto
 
-O projeto utiliza as seguintes fontes:
-- **Inter**: fonte principal para textos e interfaces
-- **SpaceMono**: fonte monoespaçada para códigos e dados técnicos
+O projeto utiliza fontes de duas maneiras:
 
-Para modificar as fontes do projeto:
+#### 1. Fontes via Expo Google Fonts (Recomendado)
 
-1. **Adicionar arquivos de fonte**:
-   - Coloque seus arquivos de fonte (.ttf ou .otf) na pasta `assets/fonts/`
-   - A pasta já contém o arquivo `SpaceMono-Regular.ttf` como exemplo
+A abordagem principal é usar o pacote `@expo-google-fonts` que oferece acesso a mais de 1000 fontes do Google Fonts:
 
-2. **Configurar no Tailwind**:
-   - Edite o arquivo `tailwind.config.js`
-   - Modifique a seção `fontFamily` para incluir suas fontes:
+```bash
+# Instalar uma nova fonte do Google Fonts
+npx expo install @expo-google-fonts/nome-da-fonte
+```
+
+Exemplo de configuração (no arquivo `app/_layout.tsx`):
+```jsx
+import { useFonts, 
+  PlusJakartaSans_200ExtraLight,
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_700Bold 
+} from '@expo-google-fonts/plus-jakarta-sans';
+
+// No componente principal
+const [fontsLoaded] = useFonts({
+  PlusJakartaSans_200ExtraLight,
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_700Bold,
+});
+```
+
+#### 2. Fontes personalizadas (via assets/fonts)
+
+Para fontes não disponíveis no Google Fonts ou fontes personalizadas:
+
+1. **Adicione os arquivos de fonte (.ttf ou .otf)** na pasta `assets/fonts/`
+2. **Registre a fonte no `app.json`**:
+   ```json
+   {
+     "expo": {
+       "fonts": [
+         {
+           "asset": "./assets/fonts/SuaFonte-Regular.ttf",
+           "family": "SuaFonte"
+         }
+       ]
+     }
+   }
+   ```
+3. **Configure no Tailwind**:
    ```js
+   // Em tailwind.config.js
    fontFamily: {
-     'inter-regular': ['Inter_400Regular'],
-     'inter-semibold': ['Inter_600SemiBold'],
-     'inter-bold': ['Inter_700Bold'],
-     // Adicione suas novas fontes aqui
-     'sua-fonte': ['SuaFonte-Regular'],
+     'sua-fonte': ['SuaFonte', 'sans-serif'],
    }
    ```
 
-3. **Importar fontes no projeto**:
-   - Caso use o Expo Font, importe e carregue as fontes no arquivo `app/_layout.tsx`
-
-> 💡 **Dica**: Para usar fontes carregadas pelo Expo, consulte a [documentação oficial do Expo sobre fontes](https://docs.expo.dev/guides/using-custom-fonts/).
+> 💡 **Quando usar cada abordagem?**
+> - Para fontes do Google: Use `@expo-google-fonts` (mais fácil e recomendado)
+> - Para fontes personalizadas ou proprietárias: Use `assets/fonts`
+> - Para fontes variáveis: Escolha com base na sua necessidade específica
 
 ### 🔎 SEO e Meta Tags
 
@@ -347,7 +377,7 @@ const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
 const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
 
 <View className={`p-md ${bgPrimary}`}>
-  <Text className={`text-headline-lg font-inter-bold ${textPrimary}`}>
+  <Text className={`text-headline-lg font-jakarta-bold ${textPrimary}`}>
     Título Principal
   </Text>
 </View>

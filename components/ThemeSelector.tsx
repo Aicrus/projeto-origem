@@ -26,7 +26,7 @@ const ThemeOption = ({
     ? 'text-text-primary-dark' 
     : (isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light');
     
-  const fontWeight = isActive ? 'font-inter-semibold' : 'font-inter-regular';
+  const fontWeight = isActive ? 'font-jakarta-semibold' : 'font-jakarta-regular';
 
   return (
     <Pressable

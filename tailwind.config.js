@@ -93,9 +93,14 @@ module.exports = {
         'gradient-tertiary-end': '#D3545D',
       },
       fontFamily: {
-        'inter-regular': ['Inter_400Regular'],
-        'inter-semibold': ['Inter_600SemiBold'],
-        'inter-bold': ['Inter_700Bold'],
+        'jakarta-thin': ['PlusJakartaSans_200ExtraLight'],
+        'jakarta-light': ['PlusJakartaSans_300Light'],
+        'jakarta-regular': ['PlusJakartaSans_400Regular'],
+        'jakarta-medium': ['PlusJakartaSans_500Medium'],
+        'jakarta-semibold': ['PlusJakartaSans_600SemiBold'],
+        'jakarta-bold': ['PlusJakartaSans_700Bold'],
+        'jakarta-extrabold': ['PlusJakartaSans_800ExtraBold'],
+        'mono-regular': ['SpaceMono-Regular', 'monospace'],
       },
       fontSize: {
         // Design system: escala de tipografia completa

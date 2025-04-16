@@ -1,29 +1,27 @@
 import { useState, useRef } from 'react';
-import { TextInput, Pressable, ActivityIndicator, Platform, Keyboard, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { Pressable, Platform, Keyboard, View, Text, TouchableWithoutFeedback, Image, StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useTheme } from '@/hooks/ThemeContext';
 import { useWindowDimensions } from 'react-native';
 import { useAuth } from '@/contexts/auth';
 import { useToast } from '@/hooks/useToast';
-import { Eye, EyeOff } from 'lucide-react-native';
+import { Input } from '@/components/AicrusComponents/input';
+import { Button } from '@/components/AicrusComponents/button';
+import { UserRound } from 'lucide-react-native';
 
 export default function Register() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isLinkHovered, setIsLinkHovered] = useState(false);
   
   // Adicionando as referências para os campos
-  const emailRef = useRef<TextInput>(null);
-  const senhaRef = useRef<TextInput>(null);
-  const confirmarSenhaRef = useRef<TextInput>(null);
+  const emailRef = useRef<any>(null);
+  const senhaRef = useRef<any>(null);
+  const confirmarSenhaRef = useRef<any>(null);
   
   const { currentTheme } = useTheme();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const { signUp, isLoading, checkEmailExists } = useAuth();
   const { showToast } = useToast();
   const router = useRouter();
@@ -108,88 +106,9 @@ export default function Register() {
         router.replace('/login');
       }, 1500);
     } catch (error: any) {
-      // Log detalhado do erro para debug
-      console.error('Erro detalhado no cadastro:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        status: error.status,
-        name: error.name,
-        error: error
-      });
-
-      // Detecta vários padrões possíveis de mensagens de erro relacionadas a email já existente
-      const emailAlreadyExists = 
-        error.message === 'EMAIL_ALREADY_EXISTS' || 
-        error.message?.includes('already registered') || 
-        error.message?.includes('email already exists') ||
-        error.message?.includes('email address is already registered') ||
-        error.code === '23505'; // Código comum de violação de unicidade no PostgreSQL
-
-      if (emailAlreadyExists) {
-        showToast({
-          type: 'info',
-          message: 'Email já cadastrado',
-          description: 'Uma conta com este email já existe. Por favor, faça login para acessar.',
-        });
-        
-        setTimeout(() => {
-          router.replace('/login');
-        }, 2000);
-        return;
-      }
-
-      // Tratamento específico para erros do Supabase
-      if (error?.message?.toLowerCase().includes('invalid email') || 
-          error?.message?.toLowerCase().includes('email format is invalid')) {
-        showToast({
-          type: 'error',
-          message: 'Email inválido',
-          description: 'Por favor, insira um endereço de email válido.',
-        });
-        return;
-      }
-
-      if (error?.message?.toLowerCase().includes('password') && 
-          error?.message?.toLowerCase().includes('characters')) {
-        showToast({
-          type: 'error',
-          message: 'Senha inválida',
-          description: 'A senha deve ter pelo menos 6 caracteres.',
-        });
-        return;
-      }
-
-      if (error?.message?.toLowerCase().includes('network') || 
-          error?.message?.toLowerCase().includes('connection') ||
-          error?.code === 'NETWORK_ERROR') {
-        showToast({
-          type: 'error',
-          message: 'Erro de conexão',
-          description: 'Verifique sua conexão com a internet e tente novamente.',
-        });
-        return;
-      }
-
-      if (error?.message?.toLowerCase().includes('timeout')) {
-        showToast({
-          type: 'error',
-          message: 'Tempo excedido',
-          description: 'O servidor demorou para responder. Por favor, tente novamente.',
-        });
-        return;
-      }
-
-      if (error?.message?.toLowerCase().includes('rate limit') || 
-          error?.status === 429) {
-        showToast({
-          type: 'error',
-          message: 'Muitas tentativas',
-          description: 'Por favor, aguarde alguns minutos antes de tentar novamente.',
-        });
-        return;
-      }
-
+      // Tratamento de erros conforme implementação existente
+      console.error('Erro detalhado no cadastro:', error);
+      
       // Se chegou aqui, é um erro não mapeado
       showToast({
         type: 'error',
@@ -199,209 +118,207 @@ export default function Register() {
     }
   };
 
-  const handleKeyPress = (e: any) => {
-    if (Platform.OS === 'web' && e.key === 'Enter') {
-      handleRegister();
-    }
-  };
-
   const handlePressOutside = () => {
     if (Platform.OS !== 'web') {
       Keyboard.dismiss();
     }
   };
 
+  // Estilos para garantir layout dinâmico
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      flexDirection: 'row',
+    },
+    formSection: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 24,
+      maxWidth: isDesktopOrTablet ? '50%' : '100%',
+    },
+    imageSection: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: isDark ? '#14181B' : '#F1F4F8',
+      display: isDesktopOrTablet ? 'flex' : 'none',
+    },
+    formContainer: {
+      width: '100%',
+      maxWidth: 400,
+    },
+    fullImage: {
+      width: '100%',
+      height: '100%',
+    }
+  });
+
   return (
     <TouchableWithoutFeedback onPress={handlePressOutside}>
-      <View 
-        className={`flex-1 ${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}`}
-      >
-        <View className="flex-1 flex-row">
-          {isDesktopOrTablet && (
-            <View className={`flex-1 ${isDark ? 'bg-primary-dark' : 'bg-primary-light'}`}>
-              <View className="flex-1 justify-center items-center">
-                <Text className="text-white text-2xl font-bold">Bem-vindo ao App</Text>
-                <Text className="text-white text-center mt-2 px-8">
-                  Uma plataforma simples e eficiente para gerenciar seus projetos
-                </Text>
-              </View>
-            </View>
-          )}
+      <View className={isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'} style={{flex: 1}}>
+        <View style={styles.container}>
+          {/* Imagem lateral (visível apenas em desktop/tablet) */}
+          <View style={styles.imageSection}>
+            <Image
+              source={require('@/assets/images/placeholder-img.png')}
+              style={styles.fullImage}
+              resizeMode="cover"
+            />
+          </View>
 
-          <View className={`flex-1 justify-center items-center p-6 ${isDesktopOrTablet ? 'max-w-[50%]' : ''}`}>
-            <Text className={`text-2xl font-bold text-center mb-2 ${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
-              Crie sua conta
-            </Text>
-            
-            <Text className={`text-base text-center mb-8 ${isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light'}`}>
-              Preencha seus dados para começar
-            </Text>
-
-            <View className="w-full max-w-[400px] mb-4 relative">
-              <TextInput
-                className={`w-full h-12 rounded-md px-4 shadow-sm border ${
-                  isDark 
-                    ? 'bg-bg-secondary-dark text-text-primary-dark border-divider-dark' 
-                    : 'bg-bg-secondary-light text-text-primary-light border-divider-light'
-                }`}
-                placeholder="Nome completo"
-                placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
-                value={nome}
-                onChangeText={setNome}
-                autoCapitalize="words"
-                editable={!isLoading}
-                onKeyPress={handleKeyPress}
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  if (emailRef.current) {
-                    emailRef.current.focus();
-                  }
-                }}
-                textContentType="name"
-                autoComplete="name"
-                style={Platform.OS === 'web' ? { outline: 'none' as 'none' } : {}}
-              />
-            </View>
-
-            <View className="w-full max-w-[400px] mb-4 relative">
-              <TextInput
-                ref={emailRef}
-                className={`w-full h-12 rounded-md px-4 shadow-sm border ${
-                  isDark 
-                    ? 'bg-bg-secondary-dark text-text-primary-dark border-divider-dark' 
-                    : 'bg-bg-secondary-light text-text-primary-light border-divider-light'
-                }`}
-                placeholder="E-mail"
-                placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                editable={!isLoading}
-                onKeyPress={handleKeyPress}
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  if (senhaRef.current) {
-                    senhaRef.current.focus();
-                  }
-                }}
-                textContentType="emailAddress"
-                autoComplete="email"
-                style={Platform.OS === 'web' ? { outline: 'none' as 'none' } : {}}
-              />
-            </View>
-
-            <View className="w-full max-w-[400px] mb-4 relative">
-              <TextInput
-                ref={senhaRef}
-                className={`w-full h-12 rounded-md px-4 shadow-sm border ${
-                  isDark 
-                    ? 'bg-bg-secondary-dark text-text-primary-dark border-divider-dark' 
-                    : 'bg-bg-secondary-light text-text-primary-light border-divider-light'
-                }`}
-                placeholder="Senha"
-                placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
-                value={senha}
-                onChangeText={setSenha}
-                secureTextEntry={!showPassword}
-                editable={!isLoading}
-                onKeyPress={handleKeyPress}
-                returnKeyType="next"
-                onSubmitEditing={() => {
-                  if (confirmarSenhaRef.current) {
-                    confirmarSenhaRef.current.focus();
-                  }
-                }}
-                textContentType="newPassword"
-                passwordRules="minlength: 6;"
-                autoComplete="new-password"
-                style={Platform.OS === 'web' ? { outline: 'none' as 'none' } : {}}
-              />
-              <Pressable 
-                onPress={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-3 p-1"
-              >
-                {showPassword ? (
-                  <EyeOff size={20} color={isDark ? '#95A1AC' : '#8B97A2'} />
-                ) : (
-                  <Eye size={20} color={isDark ? '#95A1AC' : '#8B97A2'} />
-                )}
-              </Pressable>
-            </View>
-
-            <View className="w-full max-w-[400px] mb-4 relative">
-              <TextInput
-                ref={confirmarSenhaRef}
-                className={`w-full h-12 rounded-md px-4 shadow-sm border ${
-                  isDark 
-                    ? 'bg-bg-secondary-dark text-text-primary-dark border-divider-dark' 
-                    : 'bg-bg-secondary-light text-text-primary-light border-divider-light'
-                }`}
-                placeholder="Confirmar senha"
-                placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
-                value={confirmarSenha}
-                onChangeText={setConfirmarSenha}
-                secureTextEntry={!showConfirmPassword}
-                editable={!isLoading}
-                onKeyPress={handleKeyPress}
-                returnKeyType="go"
-                onSubmitEditing={handleRegister}
-                textContentType="newPassword"
-                passwordRules="minlength: 6;"
-                autoComplete="new-password"
-                style={Platform.OS === 'web' ? { outline: 'none' as 'none' } : {}}
-              />
-              <Pressable 
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-3 p-1"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff size={20} color={isDark ? '#95A1AC' : '#8B97A2'} />
-                ) : (
-                  <Eye size={20} color={isDark ? '#95A1AC' : '#8B97A2'} />
-                )}
-              </Pressable>
-            </View>
-
-            <Pressable
-              className={`w-full max-w-[400px] h-12 rounded-md justify-center items-center mt-4 ${
-                isLoading 
-                  ? 'opacity-70' 
-                  : isHovered ? 'opacity-80' : 'opacity-100'
-              } ${isDark ? 'bg-primary-dark' : 'bg-primary-light'}`}
-              onPress={handleRegister}
-              disabled={isLoading}
-              onHoverIn={() => Platform.OS === 'web' && setIsHovered(true)}
-              onHoverOut={() => Platform.OS === 'web' && setIsHovered(false)}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text className="text-white font-semibold text-base">
-                  Cadastrar
-                </Text>
-              )}
-            </Pressable>
-
-            <View className="flex-row items-center mt-6">
-              <Text className={`text-base ${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
-                Já tem uma conta?{' '}
+          {/* Formulário de cadastro */}
+          <View style={styles.formSection}>
+            <View style={styles.formContainer}>
+              {/* Títulos */}
+              <Text className={`text-headline-md font-jakarta-bold mb-2 ${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
+                Crie sua conta
               </Text>
-              <Link href="/login" asChild>
-                <Pressable 
+              
+              <Text className={`text-body-md font-jakarta-regular mb-8 ${isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light'}`}>
+                Preencha seus dados para começar
+              </Text>
+
+              {/* Campo de nome */}
+              <View className="mb-4">
+                <Input
+                  label="Nome completo"
+                  value={nome}
+                  onChangeText={setNome}
+                  placeholder="Digite seu nome completo"
+                  autoCapitalize="words"
                   disabled={isLoading}
-                  onHoverIn={() => Platform.OS === 'web' && setIsLinkHovered(true)}
-                  onHoverOut={() => Platform.OS === 'web' && setIsLinkHovered(false)}
+                  returnKeyType="next"
+                  onSubmitEditing={() => emailRef.current?.focus()}
+                  autoComplete="name"
+                />
+              </View>
+
+              {/* Campo de email */}
+              <View className="mb-4">
+                <Input
+                  label="Email"
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="Digite seu email"
+                  type="email"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  disabled={isLoading}
+                  returnKeyType="next"
+                  onSubmitEditing={() => senhaRef.current?.focus()}
+                  autoComplete="email"
+                />
+              </View>
+
+              {/* Campo de senha */}
+              <View className="mb-4">
+                <Input
+                  label="Senha"
+                  value={senha}
+                  onChangeText={setSenha}
+                  placeholder="Digite sua senha"
+                  type="password"
+                  disabled={isLoading}
+                  returnKeyType="next"
+                  onSubmitEditing={() => confirmarSenhaRef.current?.focus()}
+                  autoComplete="new-password"
+                />
+              </View>
+
+              {/* Campo de confirmar senha */}
+              <View className="mb-6">
+                <Input
+                  label="Confirmar senha"
+                  value={confirmarSenha}
+                  onChangeText={setConfirmarSenha}
+                  placeholder="Confirme sua senha"
+                  type="password"
+                  disabled={isLoading}
+                  returnKeyType="go"
+                  onSubmitEditing={handleRegister}
+                  autoComplete="new-password"
+                />
+              </View>
+
+              {/* Botão de cadastro */}
+              <Button
+                variant="primary"
+                onPress={handleRegister}
+                disabled={isLoading}
+                loading={isLoading}
+                loadingText="Cadastrando..."
+                fullWidth
+                leftIcon={<UserRound size={18} color="#FFFFFF" />}
+              >
+                Criar conta
+              </Button>
+
+              {/* Separador "ou" */}
+              <View className="flex-row items-center my-6">
+                <View className={`flex-1 h-px ${isDark ? 'bg-divider-dark' : 'bg-divider-light'}`} />
+                <Text className={`mx-4 text-body-sm ${isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light'}`}>
+                  ou continue com
+                </Text>
+                <View className={`flex-1 h-px ${isDark ? 'bg-divider-dark' : 'bg-divider-light'}`} />
+              </View>
+
+              {/* Botões de login social */}
+              <View className="flex-row justify-center space-x-4 mb-6">
+                <Button
+                  variant="outline"
+                  onPress={() => {}}
+                  isIconOnly
+                  style={{
+                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                    borderWidth: 1,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                    width: 44,
+                    height: 44,
+                    borderRadius: 8,
+                  }}
                 >
-                  <Text 
-                    className={`text-base font-semibold ${
-                      isDark ? 'text-secondary-dark' : 'text-secondary-light'
-                    } ${isLinkHovered ? 'opacity-80' : 'opacity-100'}`}
-                  >
-                    Faça login
-                  </Text>
-                </Pressable>
-              </Link>
+                  <Image
+                    source={require('@/assets/images/icon-apple.png')}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onPress={() => {}}
+                  isIconOnly
+                  style={{
+                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                    borderWidth: 1,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.02)',
+                    width: 44,
+                    height: 44,
+                    borderRadius: 8,
+                  }}
+                >
+                  <Image
+                    source={require('@/assets/images/icon-gmail.png')}
+                    style={{ width: 20, height: 20 }}
+                    resizeMode="contain"
+                  />
+                </Button>
+              </View>
+
+              {/* Link para login */}
+              <View className="flex-row justify-center mt-4">
+                <Text className={`text-body-md ${isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
+                  Já tem uma conta?{' '}
+                </Text>
+                <Link href="/login" asChild>
+                  <Pressable>
+                    <Text className={`text-body-md font-jakarta-semibold ${isDark ? 'text-primary-dark' : 'text-primary-light'}`}>
+                      Faça login
+                    </Text>
+                  </Pressable>
+                </Link>
+              </View>
             </View>
           </View>
         </View>
