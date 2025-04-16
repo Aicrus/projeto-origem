@@ -11,13 +11,18 @@ import Animated, {
 import { useTheme } from '@/hooks/ThemeContext';
 import { colors } from '../constants/theme';
 
+/**
+ * Ícones para cada modo de tema
+ */
 const THEME_ICONS = {
   system: 'desktop-outline',
   light: 'sunny-outline',
   dark: 'moon-outline',
 } as const;
 
-// Tamanhos predefinidos para o componente
+/**
+ * Tamanhos predefinidos para o componente
+ */
 export const THEME_SELECTOR_SIZES = {
   sm: {
     buttonWidth: 28,
@@ -41,17 +46,21 @@ export const THEME_SELECTOR_SIZES = {
   },
 } as const;
 
-// Estilos visuais predefinidos
+/**
+ * Estilos visuais predefinidos
+ */
 export const THEME_SELECTOR_VARIANTS = {
   default: 'default',
   pill: 'pill',
   minimal: 'minimal',
   labeled: 'labeled',
   toggle: 'toggle',
-  single: 'single', // Novo estilo: botão único para alternar temas
+  single: 'single', // Botão único para alternar temas
 } as const;
 
-// Configurações específicas para cada plataforma com ajustes para evitar overshooting
+/**
+ * Configurações específicas para cada plataforma com ajustes para evitar overshooting
+ */
 const SPRING_CONFIG = Platform.select({
   web: {
     damping: 20,
@@ -69,12 +78,14 @@ const SPRING_CONFIG = Platform.select({
 export type ThemeSelectorSize = keyof typeof THEME_SELECTOR_SIZES;
 export type ThemeSelectorVariant = keyof typeof THEME_SELECTOR_VARIANTS;
 
-interface ThemeSelectorProps {
+export interface ThemeSelectorProps {
   className?: string;
   size?: ThemeSelectorSize;
   variant?: ThemeSelectorVariant;
   showLabels?: boolean;
   showSystemOption?: boolean;
+  transparentSingle?: boolean;
+  iconOnly?: boolean; // Nova prop para mostrar apenas o ícone sem fundo e sem borda
   customColors?: {
     background?: string;
     sliderBackground?: string;
@@ -85,6 +96,9 @@ interface ThemeSelectorProps {
   };
 }
 
+/**
+ * Calcula a posição inicial do slider com base no modo atual e opções disponíveis
+ */
 const getInitialPosition = (mode: 'system' | 'light' | 'dark', showSystemOption: boolean) => {
   if (!showSystemOption) {
     return mode === 'light' ? 0 : 1;
@@ -92,19 +106,75 @@ const getInitialPosition = (mode: 'system' | 'light' | 'dark', showSystemOption:
   return mode === 'light' ? 0 : mode === 'dark' ? 1 : 2;
 };
 
+/**
+ * Obtém a etiqueta baseada no modo
+ */
+const getLabel = (mode: 'system' | 'light' | 'dark') => {
+  switch(mode) {
+    case 'light': return 'Claro';
+    case 'dark': return 'Escuro';
+    case 'system': return 'Sistema';
+  }
+};
+
+/**
+ * ThemeSelector - Componente para alternar entre temas claro, escuro e sistema
+ * 
+ * Este componente oferece uma interface elegante e altamente personalizável para
+ * permitir que os usuários alternem entre temas claro, escuro ou sistema.
+ * 
+ * @param className - Classes CSS personalizadas (via tailwind ou styled-components)
+ * @param size - Tamanho do seletor (sm, md, lg, xl)
+ * @param variant - Estilo visual (default, pill, minimal, labeled, toggle, single)
+ * @param showLabels - Exibe texto junto aos ícones (para variant="labeled")
+ * @param showSystemOption - Exibe a opção de seguir o tema do sistema
+ * @param transparentSingle - Fundo transparente para variant="single"
+ * @param iconOnly - Mostra apenas o ícone sem fundo e sem borda (para variant="single")
+ * @param customColors - Objeto para personalizar cores
+ * 
+ * @returns Componente ThemeSelector renderizado
+ */
 export function ThemeSelector({ 
   className = '',
   size = 'md',
   variant = 'default',
   showLabels = false,
   showSystemOption = true,
+  transparentSingle = false,
+  iconOnly = false,
   customColors = {}
 }: ThemeSelectorProps) {
   const { themeMode, setThemeMode, currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   
   // Obter dimensões com base no tamanho selecionado
-  const { buttonWidth, height, iconSize } = THEME_SELECTOR_SIZES[size];
+  const { buttonWidth: baseButtonWidth, height: baseHeight, iconSize: baseIconSize } = THEME_SELECTOR_SIZES[size];
+  
+  // Ajustes específicos para variantes
+  const buttonWidth = variant === 'labeled' && showLabels 
+    ? Math.floor(baseButtonWidth * 1.6) // Mais largo para acomodar rótulos
+    : baseButtonWidth;
+    
+  const height = variant === 'labeled' && showLabels
+    ? Math.floor(baseHeight * 1.2) // Um pouco mais alto para acomodar rótulos
+    : baseHeight;
+    
+  const iconSize = variant === 'labeled' && showLabels
+    ? Math.floor(baseIconSize * 0.9) // Ícones um pouco menores com rótulos
+    : baseIconSize;
+  
+  // Para o estilo single, diminuir um pouco o tamanho para ficar mais clean
+  const singleSizeMultiplier = 0.85; // 15% menor
+  const singleButtonWidth = variant === 'single' 
+    ? Math.floor(baseButtonWidth * singleSizeMultiplier)
+    : buttonWidth;
+  const singleHeight = variant === 'single' 
+    ? Math.floor(baseHeight * singleSizeMultiplier)
+    : height;
+  const singleIconSize = variant === 'single' 
+    ? iconOnly ? Math.floor(baseIconSize * 1.2) : Math.floor(baseIconSize * singleSizeMultiplier)
+    : iconSize;
+    
   const padding = Math.max(2, Math.floor(buttonWidth * 0.05)); // Padding proporcional
   
   // Definir modos disponíveis com base em showSystemOption
@@ -119,7 +189,7 @@ export function ThemeSelector({
   const containerWidth = variant === 'toggle'
     ? buttonWidth * 2
     : variant === 'single'
-      ? buttonWidth
+      ? singleButtonWidth
       : buttonWidth * availableModes.length + padding * 2;
   
   // Calcular raio de borda com base na variante
@@ -132,7 +202,7 @@ export function ThemeSelector({
       case 'toggle':
         return height / 2;
       case 'single':
-        return height / 2; // Single é redondo como o pill
+        return singleHeight / 2; // Single é redondo como o pill
       default:
         return 6; // default e labeled
     }
@@ -182,6 +252,32 @@ export function ThemeSelector({
   const activeTextColor = customColors.activeTextColor || activeTextColors[variant];
   const textColor = customColors.textColor || textColors[variant];
   
+  // Função para obter a cor do ícone com base no modo
+  const getIconColor = (mode: 'system' | 'light' | 'dark') => {
+    // Para variantes com slider que cobre o ícone (default, pill, labeled, toggle)
+    if (mode === themeMode) {
+      if (variant === 'minimal') {
+        // Para minimal, usar apenas a cor primária
+        return isDark ? colors.primary.dark : colors.primary.main;
+      } else if (variant === 'single') {
+        // Para single: se for iconOnly, usar cor primária, caso contrário branco
+        if (iconOnly) {
+          return isDark ? colors.primary.dark : colors.primary.main;
+        } else if (transparentSingle) {
+          return isDark ? colors.primary.dark : colors.primary.main;
+        } else {
+          return '#FFFFFF';
+        }
+      } else {
+        // Para variantes com slider (default, pill, labeled, toggle), usar branco
+        return '#FFFFFF';
+      }
+    }
+    
+    // Ícones não selecionados são semi-transparentes
+    return isDark ? '#FFFFFF80' : '#00000080';
+  };
+  
   // Configurar posição inicial e animação
   const targetPosition = useSharedValue(getInitialPosition(themeMode, showSystemOption));
   
@@ -214,41 +310,6 @@ export function ThemeSelector({
     };
   });
 
-  // Função para determinar a cor do ícone
-  const getIconColor = (mode: 'system' | 'light' | 'dark') => {
-    // Se for o modo selecionado
-    if (mode === themeMode) {
-      // Cor personalizada ou cor ativa para o ícone
-      if (customColors.activeIconColor) {
-        return customColors.activeIconColor;
-      }
-      
-      // Para a variante minimal, usar cor primária
-      if (variant === 'minimal') {
-        return isDark ? colors.primary.dark : colors.primary.main;
-      }
-      
-      // Para outros estilos, usar branco
-      return activeTextColor;
-    } 
-    // Para os ícones não selecionados
-    else {
-      if (customColors.inactiveIconColor) {
-        return customColors.inactiveIconColor;
-      }
-      return textColor;
-    }
-  };
-  
-  // Obter etiqueta baseada no modo
-  const getLabel = (mode: 'system' | 'light' | 'dark') => {
-    switch(mode) {
-      case 'light': return 'Claro';
-      case 'dark': return 'Escuro';
-      case 'system': return 'Sistema';
-    }
-  };
-  
   const renderSlider = () => {
     // Não renderizar o slider para a variante minimal
     if (variant === 'minimal') {
@@ -282,28 +343,63 @@ export function ThemeSelector({
 
   // Estilo single - botão único para alternar entre claro/escuro
   if (variant === 'single') {
+    // Versão apenas ícone (sem fundo e sem borda)
+    if (iconOnly) {
+      return (
+        <View className={`${className}`}>
+          <Pressable
+            style={{
+              width: singleButtonWidth,
+              height: singleHeight,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onPress={handleSinglePress}
+          >
+            <Ionicons
+              name={themeMode === 'light' ? THEME_ICONS.light : THEME_ICONS.dark}
+              size={singleIconSize}
+              color={isDark ? colors.primary.dark : colors.primary.main}
+              style={themeMode === 'light' ? { marginLeft: -1 } : undefined}
+            />
+          </Pressable>
+        </View>
+      );
+    }
+    
+    // Versão com fundo transparente ou colorido
     return (
       <View className={`${className}`}>
         <Pressable
           style={{
-            width: buttonWidth,
-            height: height,
-            borderRadius: height / 2,
-            backgroundColor: isDark ? colors.primary.dark : colors.primary.main,
+            width: singleButtonWidth,
+            height: singleHeight,
+            borderRadius: singleHeight / 2,
+            backgroundColor: transparentSingle 
+              ? 'transparent' 
+              : isDark ? colors.primary.dark : colors.primary.main,
             alignItems: 'center',
             justifyContent: 'center',
-            shadowColor: '#000',
+            ...(transparentSingle && {
+              borderWidth: 1,
+              borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
+            }),
+            shadowColor: transparentSingle ? 'transparent' : '#000',
             shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-            elevation: 2,
+            shadowOpacity: transparentSingle ? 0 : 0.1,
+            shadowRadius: transparentSingle ? 0 : 2,
+            elevation: transparentSingle ? 0 : 2,
           }}
           onPress={handleSinglePress}
         >
           <Ionicons
             name={themeMode === 'light' ? THEME_ICONS.light : THEME_ICONS.dark}
-            size={iconSize}
-            color="#FFFFFF"
+            size={singleIconSize}
+            color={transparentSingle 
+              ? (isDark ? colors.primary.dark : colors.primary.main) 
+              : '#FFFFFF'
+            }
+            style={themeMode === 'light' ? { marginLeft: -1 } : undefined}
           />
         </Pressable>
       </View>
@@ -352,11 +448,13 @@ export function ThemeSelector({
               }}
               onPress={() => setThemeMode('light')}
             >
-              <Ionicons
-                name={THEME_ICONS.light}
-                size={iconSize}
-                color={themeMode === 'light' ? '#FFFFFF' : isDark ? '#FFFFFF' : colors.gray[600]}
-              />
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Ionicons
+                  name={THEME_ICONS.light}
+                  size={iconSize}
+                  color={themeMode === 'light' ? '#FFFFFF' : isDark ? '#FFFFFF' : colors.gray[600]}
+                />
+              </View>
             </Pressable>
             <Pressable
               style={{ 
@@ -368,11 +466,13 @@ export function ThemeSelector({
               }}
               onPress={() => setThemeMode('dark')}
             >
-              <Ionicons
-                name={THEME_ICONS.dark}
-                size={iconSize}
-                color={themeMode === 'dark' ? '#FFFFFF' : isDark ? '#FFFFFF' : colors.gray[600]}
-              />
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Ionicons
+                  name={THEME_ICONS.dark}
+                  size={iconSize}
+                  color={themeMode === 'dark' ? '#FFFFFF' : isDark ? '#FFFFFF' : colors.gray[600]}
+                />
+              </View>
             </Pressable>
           </View>
         </View>
@@ -384,7 +484,7 @@ export function ThemeSelector({
   return (
     <View className={`${className}`}>
       <View 
-        className={`flex-row rounded-md relative items-center ${variant === 'labeled' ? 'mb-1' : ''}`}
+        className={`flex-row rounded-md relative items-center`}
         style={[
           { 
             flexDirection: 'row',
@@ -402,54 +502,58 @@ export function ThemeSelector({
         ]}>
         {renderSlider()}
         
-        {availableModes.map((mode, index) => (
-          <Pressable
-            key={mode}
-            className={`items-center justify-center z-10 ${
-              variant === 'pill' 
-                ? index === 0 
-                  ? 'rounded-l-full' 
-                  : index === availableModes.length - 1 
-                    ? 'rounded-r-full' 
-                    : '' 
-                : index === 0 
-                  ? 'rounded-l-md' 
-                  : index === availableModes.length - 1 
-                    ? 'rounded-r-md' 
-                    : ''
-            }`}
-            style={{
-              width: buttonWidth,
-              height: height - 2, // Pequeno ajuste para alinhar com o container
-              alignItems: 'center',
-              justifyContent: 'center',
-              paddingBottom: Math.floor(buttonWidth * 0.02),
-            }}
-            onPress={() => handlePress(mode)}>
-            <Ionicons
-              name={THEME_ICONS[mode]}
-              size={iconSize}
-              color={getIconColor(mode)}
-            />
-            
-            {variant === 'labeled' && showLabels && (
-              <Text
-                className="text-center mt-0.5"
-                style={{
-                  fontSize: Math.max(8, Math.floor(buttonWidth * 0.3)),
-                  lineHeight: Math.max(10, Math.floor(buttonWidth * 0.36)),
-                  color: getIconColor(mode),
-                  opacity: mode === themeMode ? 1 : 0.8,
-                }}
-              >
-                {getLabel(mode)}
-              </Text>
-            )}
-          </Pressable>
-        ))}
+        {availableModes.map((mode, index) => {
+          const isActive = mode === themeMode;
+          
+          return (
+            <Pressable
+              key={mode}
+              className={`items-center justify-center z-10 ${
+                variant === 'pill' 
+                  ? index === 0 
+                    ? 'rounded-l-full' 
+                    : index === availableModes.length - 1 
+                      ? 'rounded-r-full' 
+                      : '' 
+                  : index === 0 
+                    ? 'rounded-l-md' 
+                    : index === availableModes.length - 1 
+                      ? 'rounded-r-md' 
+                      : ''
+              }`}
+              style={{
+                width: buttonWidth,
+                height: height - 2, // Pequeno ajuste para alinhar com o container
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingBottom: variant === 'labeled' && showLabels ? 0 : Math.floor(buttonWidth * 0.02),
+              }}
+              onPress={() => handlePress(mode)}>
+              <Ionicons
+                name={THEME_ICONS[mode]}
+                size={iconSize}
+                color={getIconColor(mode)}
+                style={variant === 'labeled' && showLabels ? { marginBottom: 4 } : null}
+              />
+              
+              {variant === 'labeled' && showLabels && (
+                <Text
+                  className="text-center"
+                  style={{
+                    fontSize: Math.max(7, Math.floor(buttonWidth * 0.22)),
+                    lineHeight: Math.max(9, Math.floor(buttonWidth * 0.26)),
+                    color: getIconColor(mode),
+                    opacity: mode === themeMode ? 1 : 0.8,
+                    fontWeight: isActive ? '500' : '400',
+                  }}
+                >
+                  {getLabel(mode)}
+                </Text>
+              )}
+            </Pressable>
+          );
+        })}
       </View>
-      
-      {/* Removido o bloco de rótulos abaixo do componente para a variante labeled */}
     </View>
   );
-} 
+}

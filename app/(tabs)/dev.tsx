@@ -7,7 +7,7 @@ import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
 import { colors } from '../../components/AicrusComponents/constants/theme';
 import { Button } from '../../components/AicrusComponents/button';
-import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun } from 'lucide-react-native';
+import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
 import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
 
@@ -73,7 +73,7 @@ export default function DevPage() {
     { id: 'accordion', name: 'Accordion', icon: 'ChevronsUpDown' },
     { id: 'button', name: 'Button', icon: 'Square' },
     { id: 'toast', name: 'Toast', icon: 'Bell' },
-    { id: 'themeSelector', name: 'Theme Selector', icon: 'Sun' },
+    { id: 'themeSelector', name: 'Theme Selector', icon: 'SunMoon' },
   ];
   
   // Função para renderizar o ícone correto
@@ -95,6 +95,8 @@ export default function DevPage() {
         return <MessageSquare strokeWidth={1.5} />;
       case 'Sun':
         return <Sun strokeWidth={1.5} />;
+      case 'SunMoon':
+        return <SunMoon strokeWidth={1.5} />;
       default:
         return <Settings strokeWidth={1.5} />;
     }
@@ -1695,14 +1697,14 @@ showToast({
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Com rótulos integrados</Text>
             <ThemeSelector variant="labeled" showLabels={true} size="lg" />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Versão com rótulos abaixo dos ícones.
+              Versão com rótulos abaixo dos ícones para melhor compreensão.
             </Text>
           </View>
 
           {/* Estilo toggle */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Alternância simples (toggle)</Text>
-            <ThemeSelector variant="toggle" size="md" />
+            <ThemeSelector variant="toggle" size="lg" />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Versão simplificada para alternar entre claro e escuro.
             </Text>
@@ -1711,9 +1713,13 @@ showToast({
           {/* Estilo Single */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Botão único</Text>
-            <ThemeSelector variant="single" size="lg" />
+            <View className="flex-row items-center space-x-lg">
+              <ThemeSelector variant="single" size="md" />
+              <ThemeSelector variant="single" size="md" transparentSingle={true} />
+              <ThemeSelector variant="single" size="md" iconOnly={true} />
+            </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Um único botão que alterna entre temas ao ser clicado.
+              Um único botão que alterna entre temas ao ser clicado. Versões com fundo colorido (esquerda), transparente com borda (centro) e apenas ícone sem fundo/borda (direita).
             </Text>
           </View>
 
@@ -1739,6 +1745,21 @@ showToast({
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Customização completa de cores.
             </Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>transparentSingle</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Tornar o botão único (single) transparente (boolean, padrão: false)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>iconOnly</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Mostrar apenas o ícone sem fundo e sem borda (boolean, padrão: false)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>customColors</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Objeto para personalização das cores (background, sliderBackground, activeIconColor, inactiveIconColor)</Text>
           </View>
         </View>
         
