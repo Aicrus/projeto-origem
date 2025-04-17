@@ -11,6 +11,7 @@ import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Se
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
 import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
 import { HoverableView } from '@/components/AicrusComponents/hoverable-view';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
@@ -1118,15 +1119,48 @@ export default function DevPage() {
           {/* Cores de Gradiente */}
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Gradientes</Text>
           <View className="flex-row flex-wrap gap-md mb-xl">
-            <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-primary-start to-gradient-primary-end">
-              <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Primário</Text>
-            </View>
-            <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-secondary-start to-gradient-secondary-end">
-              <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Secundário</Text>
-            </View>
-            <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-tertiary-start to-gradient-tertiary-end">
-              <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Terciário</Text>
-            </View>
+            {Platform.OS === 'web' ? (
+              // Na versão web, usamos as classes do tailwind
+              <>
+                <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-primary-start to-gradient-primary-end">
+                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Primário</Text>
+                </View>
+                <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-secondary-start to-gradient-secondary-end">
+                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Secundário</Text>
+                </View>
+                <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-tertiary-start to-gradient-tertiary-end">
+                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Terciário</Text>
+                </View>
+              </>
+            ) : (
+              // Na versão nativa, usamos LinearGradient do Expo
+              <>
+                <LinearGradient
+                  colors={['#892CDC', '#BC6FF1']} // primary-start, primary-end
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ height: 80, width: 192, borderRadius: 8 }}
+                >
+                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Primário</Text>
+                </LinearGradient>
+                <LinearGradient
+                  colors={['#52B69A', '#76C893']} // secondary-start, secondary-end
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ height: 80, width: 192, borderRadius: 8 }}
+                >
+                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Secundário</Text>
+                </LinearGradient>
+                <LinearGradient
+                  colors={['#4A6FA5', '#5E7CB9']} // tertiary-start, tertiary-end
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ height: 80, width: 192, borderRadius: 8 }}
+                >
+                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Terciário</Text>
+                </LinearGradient>
+              </>
+            )}
           </View>
 
           {/* Seção de Tipografia */}
@@ -1239,20 +1273,25 @@ export default function DevPage() {
               <SpacingExample size="32" value="128px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
             </View>
             
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Gigantes (144-384px)</Text>
-            <View className="flex-row flex-wrap mb-md">
-              <SpacingExample size="36" value="144px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="40" value="160px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="44" value="176px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="48" value="192px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="52" value="208px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="56" value="224px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="60" value="240px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="64" value="256px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="72" value="288px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="80" value="320px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="96" value="384px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-            </View>
+            {/* Gigantes só são mostrados em telas maiores */}
+            {!isMobile && (
+              <>
+                <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Gigantes (144-384px)</Text>
+                <View className="flex-row flex-wrap mb-md">
+                  <SpacingExample size="36" value="144px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                  <SpacingExample size="40" value="160px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                  <SpacingExample size="44" value="176px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                  <SpacingExample size="48" value="192px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                  <SpacingExample size="52" value="208px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                  <SpacingExample size="56" value="224px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                  <SpacingExample size="60" value="240px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                  <SpacingExample size="64" value="256px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                  <SpacingExample size="72" value="288px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                  <SpacingExample size="80" value="320px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                  <SpacingExample size="96" value="384px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
+                </View>
+              </>
+            )}
           </View>
           
           {/* Seção de Border Radius */}
@@ -2400,13 +2439,21 @@ const ShadowExample = ({ name, shadow, textColor, bgColor }: ShadowExampleProps)
   </View>
 );
 
-const OpacityExample = ({ name, value, bgColor, textColor }: OpacityExampleProps) => (
-  <View className="items-center mb-md">
-    <View className={`${bgColor} h-12 w-full rounded-md mb-xs opacity-${name}`} />
-    <Text className={`text-label-sm ${textColor}`}>{name}</Text>
-    <Text className={`text-body-xs ${textColor} opacity-60`}>{value}</Text>
-  </View>
-);
+const OpacityExample = ({ name, value, bgColor, textColor }: OpacityExampleProps) => {
+  // Convertemos o nome (string) para um número para poder aplicar diretamente como estilo
+  const opacityValue = parseFloat(value);
+  
+  return (
+    <View className="items-center mb-md">
+      <View 
+        className={`${bgColor} h-12 w-full rounded-md mb-xs`} 
+        style={{ opacity: opacityValue }}
+      />
+      <Text className={`text-label-sm ${textColor}`}>{name}</Text>
+      <Text className={`text-body-xs ${textColor} opacity-60`}>{value}</Text>
+    </View>
+  );
+};
 
 const ValueDisplay = ({ name, value, textColor }: ValueDisplayProps) => (
   <View className="items-center mb-md p-xs border border-divider-light dark:border-divider-dark rounded-md">
