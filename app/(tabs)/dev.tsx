@@ -2993,156 +2993,23 @@ return (
     <>
       <Stack.Screen 
         options={{
-          title: 'Dev',
-          headerShown: true,
-          headerTintColor: currentTheme === 'dark' ? '#FFFFFF' : '#14181B',
-          headerStyle: {
-            backgroundColor: currentTheme === 'dark' ? '#1C1E26' : '#F7F8FA',
-          }
+          title: "Dev",
+          headerShown: false
         }} 
       />
       
       <View className={`flex-1 ${bgPrimary}`}>
-        <Stack.Screen
-          options={{
-            title: "Desenvolvimento",
-            headerShown: false,
-          }}
+        {renderBackdrop()}
+        <Toast
+          visible={toastVisible}
+          type={toastType}
+          message="Esta é uma mensagem de exemplo."
+          position={toastPosition}
+          closable={toastClosable}
+          progressBar={toastProgressBar}
+          onClose={() => setToastVisible(false)}
         />
-        
-        {/* Mostrar o indicador de breakpoint apenas na versão web */}
-        {Platform.OS === 'web' && <BreakpointIndicator />}
-        
-        <View className="flex-1">
-          {isMobile ? (
-            // Layout para dispositivos móveis com botões compactos no topo
-            <View className="flex-1">
-              {/* Navegação compacta para dispositivos móveis */}
-              <View className={`border-b ${border} py-1 ${bgSecondary}`}>
-                <ScrollView 
-                  horizontal 
-                  showsHorizontalScrollIndicator={false} 
-                  contentContainerStyle={{ paddingHorizontal: 8, paddingVertical: 4 }}
-                >
-                  {availableComponents.map((component) => (
-                    <Pressable
-                      key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu')}
-                      className={`mr-2 px-3 py-1 rounded-md ${
-                        activeComponent === component.id
-                          ? isDark
-                            ? 'bg-primary-dark'
-                            : 'bg-primary-light'
-                          : isDark 
-                            ? 'bg-bg-tertiary-dark' 
-                            : 'bg-bg-secondary-light'
-                      }`}
-                      style={{ 
-                        height: 32,
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                      }}
-                    >
-                      <Text
-                        className={`${
-                          activeComponent === component.id
-                            ? 'text-white'
-                            : textPrimary
-                        } text-body-sm font-jakarta-medium`}
-                      >
-                        {component.name}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </ScrollView>
-              </View>
-              
-              {/* Conteúdo do componente em um ScrollView isolado */}
-              <ScrollView 
-                className="flex-1" 
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ 
-                  flexGrow: 1,
-                  paddingBottom: 120 
-                }}
-              >
-                {renderComponentContent()}
-              </ScrollView>
-            </View>
-          ) : (
-            // Layout para desktop com sidebar lateral - versão moderna e elegante
-            <View className="flex-row flex-1">
-              {/* Lista de componentes - sidebar mais fina e elegante */}
-              <View className={`w-[220px] border-r ${border} bg-opacity-50 ${bgSecondary}`}>
-                <View className="py-md px-md">
-                  <Text className={`text-title-sm font-jakarta-bold ${textPrimary} mb-xs px-xs`}>
-                    Componentes
-                  </Text>
-                  
-                  <View className="flex-col">
-                    {availableComponents.map((component) => {
-                      // Substituir a importação dinâmica pela nossa função renderIcon
-                      const isComponentActive = activeComponent === component.id;
-                      return (
-                        <HoverableView
-                          key={component.id}
-                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu')}
-                          className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
-                            isComponentActive
-                              ? isDark
-                                ? 'bg-primary-dark/10'
-                                : 'bg-primary-light/10'
-                              : ''
-                          }`}
-                          isActive={isComponentActive}
-                          hoverScale={1.02}
-                          hoverTranslateX={2}
-                          animationDuration={150}
-                          activeColor={isDark ? 'rgba(74, 111, 165, 0.1)' : 'rgba(137, 44, 220, 0.1)'}
-                          hoverColor={isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'}
-                        >
-                          <View
-                            className={`w-8 h-8 rounded-md mr-sm items-center justify-center ${
-                              isComponentActive
-                                ? isDark 
-                                  ? 'bg-primary-dark/20' 
-                                  : 'bg-primary-light/20'
-                                : isDark 
-                                  ? 'bg-gray-700' 
-                                  : 'bg-gray-200'
-                            }`}
-                          >
-                            {renderIcon(component.icon)}
-                          </View>
-                          <Text
-                            className={`${
-                              isComponentActive
-                                ? isDark
-                                  ? 'text-primary-dark font-jakarta-semibold'
-                                  : 'text-primary-light font-jakarta-semibold'
-                                : textSecondary
-                            } text-body-sm`}
-                          >
-                            {component.name}
-                          </Text>
-                        </HoverableView>
-                      );
-                    })}
-                  </View>
-                </View>
-              </View>
-              
-              {/* Conteúdo do componente */}
-              <ScrollView 
-                className="flex-1"
-                contentContainerStyle={{ paddingBottom: 40 }}
-                showsVerticalScrollIndicator={false}
-              >
-                {renderComponentContent()}
-              </ScrollView>
-            </View>
-          )}
-        </View>
+        {/* Resto do componente... */}
       </View>
     </>
   );

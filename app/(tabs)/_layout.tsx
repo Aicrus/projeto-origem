@@ -88,6 +88,12 @@ export default function TabsLayout() {
           name="home"
           options={{
             title: 'Home',
+            tabBarLabel: Platform.select({
+              ios: 'Home',
+              android: 'Home',
+              web: 'Home',
+              default: 'Home'
+            }),
             tabBarIcon: ({ color, focused }: { color: string, focused: boolean }) => (
               <HomeIcon 
                 size={24} 
@@ -101,6 +107,12 @@ export default function TabsLayout() {
           name="dev"
           options={{
             title: 'Dev',
+            tabBarLabel: Platform.select({
+              ios: 'Dev',
+              android: 'Dev',
+              web: 'Dev',
+              default: 'Dev'
+            }),
             tabBarIcon: ({ color, focused }: { color: string, focused: boolean }) => (
               <CodeIcon 
                 size={24} 
