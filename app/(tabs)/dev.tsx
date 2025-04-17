@@ -96,29 +96,31 @@ export default function DevPage() {
   
   // Função para renderizar o ícone correto
   const renderIcon = (iconName: string) => {
+    const iconColor = isDark ? '#FFFFFF' : '#57636C'; // Branco para modo escuro, cor original para claro
+    
     switch (iconName) {
       case 'Type':
-        return <Type strokeWidth={1.5} />;
+        return <Type strokeWidth={1.5} color={iconColor} />;
       case 'ChevronDown':
-        return <ChevronDown strokeWidth={1.5} />;
+        return <ChevronDown strokeWidth={1.5} color={iconColor} />;
       case 'ChevronsUpDown':
-        return <ChevronsUpDown strokeWidth={1.5} />;
+        return <ChevronsUpDown strokeWidth={1.5} color={iconColor} />;
       case 'Square':
-        return <Square strokeWidth={1.5} />;
+        return <Square strokeWidth={1.5} color={iconColor} />;
       case 'Settings':
-        return <Settings strokeWidth={1.5} />;
+        return <Settings strokeWidth={1.5} color={iconColor} />;
       case 'Bell':
-        return <Bell strokeWidth={1.5} />;
+        return <Bell strokeWidth={1.5} color={iconColor} />;
       case 'MessageSquare':
-        return <MessageSquare strokeWidth={1.5} />;
+        return <MessageSquare strokeWidth={1.5} color={iconColor} />;
       case 'Sun':
-        return <Sun strokeWidth={1.5} />;
+        return <Sun strokeWidth={1.5} color={iconColor} />;
       case 'SunMoon':
-        return <SunMoon strokeWidth={1.5} />;
+        return <SunMoon strokeWidth={1.5} color={iconColor} />;
       case 'MousePointer':
-        return <MousePointer strokeWidth={1.5} />;
+        return <MousePointer strokeWidth={1.5} color={iconColor} />;
       default:
-        return <Settings strokeWidth={1.5} />;
+        return <Settings strokeWidth={1.5} color={iconColor} />;
     }
   };
   
@@ -2261,7 +2263,7 @@ showToast({
                                   ? 'bg-primary-dark/20' 
                                   : 'bg-primary-light/20'
                                 : isDark 
-                                  ? 'bg-gray-800/50' 
+                                  ? 'bg-gray-700' 
                                   : 'bg-gray-200'
                             }`}
                           >
