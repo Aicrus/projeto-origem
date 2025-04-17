@@ -229,17 +229,11 @@ export function NotificationsMenu({
     }
   }, [isDark]);
 
-  // Verificar se o menu deve abrir para cima ou para baixo com base no espaço disponível
-  const { height: windowHeight } = Dimensions.get('window');
-  const shouldOpenUp = position && position.y > windowHeight / 2;
-
-  // Não renderiza nada se não estiver visível
-  if (!isVisible) return null;
-
   // Determinar a posição com base nas coordenadas fornecidas
   const getPositionStyle = () => {
-    if (position) {
-      // Se temos uma posição definida pelo usuário
+    if (position && Platform.OS === 'web') {
+      // Se temos uma posição definida pelo usuário e estamos na web
+      // Manter o comportamento atual para web
       const windowWidth = Dimensions.get('window').width;
       const menuWidth = isMobile ? Math.min(320, windowWidth * 0.9) : 320;
       
@@ -261,11 +255,10 @@ export function NotificationsMenu({
       }
       
       // Altura definida para a viewport
-      const windowHeight = Platform.OS === 'web' ? window.innerHeight : Dimensions.get('window').height;
+      const windowHeight = window.innerHeight;
       
-      // Define valores para posicionamento - menu completamente colado ao botão
-      // Sem espaço no nativo e com espaço mínimo na web
-      const spacingDown = Platform.OS === 'web' ? 1 : -2;  // Valor negativo no nativo para sobrepor levemente
+      // Define valores para posicionamento
+      const spacingDown = 1;
       
       // Calcula se o menu cabe abaixo da posição
       const menuHeight = Math.min(maxHeight + 100, windowHeight * 0.8); // Altura do menu com cabeçalho e rodapé
@@ -274,45 +267,30 @@ export function NotificationsMenu({
       
       if (fitsBelow) {
         // O menu cabe abaixo do botão
-        return Platform.select({
-          web: {
-            position: 'fixed' as 'fixed',
-            top: position.y + spacingDown,
-            left: leftPosition,
-            zIndex: 2147483647,
-          },
-          default: {
-            position: 'absolute' as 'absolute',
-            top: position.y + spacingDown,
-            left: leftPosition,
-            zIndex: 2147483647,
-          }
-        });
+        return {
+          position: 'fixed' as 'fixed',
+          top: position.y + spacingDown,
+          left: leftPosition,
+          zIndex: 2147483647,
+        };
       } else {
         // O menu não cabe abaixo, então vamos posicioná-lo acima
-        const spacingUp = Platform.OS === 'web' ? 1 : -2; // Valor negativo no nativo para sobrepor levemente
+        const spacingUp = 1;
         
         // Posição Y considerando o espaço para o menu acima
         const topPosition = Math.max(spacingUp, position.y - menuHeight - spacingUp);
         
-        return Platform.select({
-          web: {
-            position: 'fixed' as 'fixed',
-            top: topPosition,
-            left: leftPosition,
-            zIndex: 2147483647,
-          },
-          default: {
-            position: 'absolute' as 'absolute',
-            top: topPosition,
-            left: leftPosition,
-            zIndex: 2147483647,
-          }
-        });
+        return {
+          position: 'fixed' as 'fixed',
+          top: topPosition,
+          left: leftPosition,
+          zIndex: 2147483647,
+        };
       }
     }
     
-    // Posição padrão (canto superior direito)
+    // Posicionamento para ambiente nativo (posições fixas conforme especificação)
+    // Ou posição padrão para web sem position
     return Platform.select({
       web: {
         position: 'fixed' as 'fixed',
@@ -322,8 +300,9 @@ export function NotificationsMenu({
       },
       default: {
         position: 'absolute' as 'absolute',
-        top: 55,
-        right: 16,
+        right: 16 + 50, // SPACING.lg + 50 equivalente (mais à direita que o menu de perfil)
+        top: -21, // Ajuste inicial muito mais elevado para subir o menu
+        width: 320, // Largura específica para notificações
         zIndex: 2147483647,
       }
     });
@@ -355,6 +334,9 @@ export function NotificationsMenu({
     },
     container: getPositionStyle() as any
   };
+
+  // Não renderiza nada se não estiver visível
+  if (!isVisible) return null;
 
   return (
     <View style={{ 
@@ -389,6 +371,7 @@ export function NotificationsMenu({
         shadowRadius: 6,
         elevation: 4,
         backgroundColor: 'transparent',
+        ...(Platform.OS === 'ios' || Platform.OS === 'android' ? { top: 10 } : {}), // Ajuste específico para ambiente nativo na mesma altura do perfil
       } : {}}>
         <Animated.View
           style={[
@@ -399,7 +382,7 @@ export function NotificationsMenu({
               borderColor: themeColors.divider,
               opacity: fadeAnim,
               transform: [{ translateY: translateYAnim }],
-              width: isMobile ? '90%' : 320,
+              width: isMobile ? (Platform.OS === 'web' ? '90%' : 320) : 320,
               maxWidth: 320,
               // Sombra para web baseada no estilo 'md' do tailwind.config.js
               ...(Platform.OS === 'web' 

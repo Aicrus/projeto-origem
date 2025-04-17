@@ -126,20 +126,20 @@ export function ProfileMenu({
 
   // Determinar a posição com base nas coordenadas fornecidas
   const getPositionStyle = () => {
-    if (position) {
-      // Se temos uma posição definida pelo usuário
+    if (position && Platform.OS === 'web') {
+      // Se temos uma posição definida pelo usuário e estamos na web
+      // Manter o comportamento atual para web
       const windowWidth = Dimensions.get('window').width;
       const menuWidth = isMobile ? Math.min(220, windowWidth * 0.85) : 220;
       
       // Calcular posição horizontal mantendo o menu dentro da tela
-      // Garantir que o menu fique pelo menos a 16px da borda da tela
       const leftPosition = Math.max(16, Math.min(position.x - (menuWidth / 2), windowWidth - menuWidth - 16));
       
       // Altura definida para a viewport
-      const windowHeight = Platform.OS === 'web' ? window.innerHeight : Dimensions.get('window').height;
+      const windowHeight = window.innerHeight;
       
       // Define valores para posicionamento
-      const spacingDown = 1;  // Reduzindo o espaçamento de 8 para 1, para subir o menu
+      const spacingDown = 1;
       
       // Calcula se o menu cabe abaixo da posição
       const menuHeight = 320; // Altura aproximada do menu
@@ -148,45 +148,30 @@ export function ProfileMenu({
       
       if (fitsBelow) {
         // O menu cabe abaixo do botão
-        return Platform.select({
-          web: {
-            position: 'fixed' as 'fixed',
-            top: position.y + spacingDown,
-            left: leftPosition,
-            zIndex: 2147483647,
-          },
-          default: {
-            position: 'absolute' as 'absolute',
-            top: position.y + spacingDown,
-            left: leftPosition,
-            zIndex: 2147483647,
-          }
-        });
+        return {
+          position: 'fixed' as 'fixed',
+          top: position.y + spacingDown,
+          left: leftPosition,
+          zIndex: 2147483647,
+        };
       } else {
         // O menu não cabe abaixo, então vamos posicioná-lo acima
-        const spacingUp = 1; // Reduzindo o espaçamento para consistência
+        const spacingUp = 1;
         
-        // Posição Y acima do elemento, garantindo que fique pelo menos a 16px do topo da tela
+        // Posição Y acima do elemento
         const topPosition = Math.max(16, position.y - menuHeight - spacingUp);
         
-        return Platform.select({
-          web: {
-            position: 'fixed' as 'fixed',
-            top: topPosition,
-            left: leftPosition,
-            zIndex: 2147483647,
-          },
-          default: {
-            position: 'absolute' as 'absolute',
-            top: topPosition,
-            left: leftPosition,
-            zIndex: 2147483647,
-          }
-        });
+        return {
+          position: 'fixed' as 'fixed',
+          top: topPosition,
+          left: leftPosition,
+          zIndex: 2147483647,
+        };
       }
     }
     
-    // Posição padrão (canto superior direito)
+    // Posicionamento para ambiente nativo (posições fixas conforme especificação)
+    // Ou posição padrão para web sem position
     return Platform.select({
       web: {
         position: 'fixed' as 'fixed',
@@ -196,8 +181,9 @@ export function ProfileMenu({
       },
       default: {
         position: 'absolute' as 'absolute',
-        top: 55,
-        right: 16,
+        right: 16, // SPACING.lg equivalente
+        width: 200, // Largura específica conforme mencionado
+        top: -10, // Posicionando muito mais próximo do header
         zIndex: 2147483647,
       }
     });
@@ -273,8 +259,8 @@ export function ProfileMenu({
               borderColor: themeColors.divider,
               opacity: fadeAnim,
               transform: [{ translateY: translateYAnim }],
-              width: isMobile ? '85%' : 220,
-              maxWidth: 220,
+              width: isMobile ? (Platform.OS === 'web' ? '85%' : 200) : 220,
+              maxWidth: Platform.OS === 'web' ? 220 : undefined,
               // Sombra para web
               ...(Platform.OS === 'web' 
                 ? { boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' } 
