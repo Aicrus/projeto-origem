@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet, ScrollView, Platform, Dimensions, StatusBar } from 'react-native';
 import { useTheme } from '../hooks/ThemeContext';
 import { Home, Settings, User, HelpCircle, FileText, LogOut } from 'lucide-react-native';
+import { useResponsive } from '../hooks/useResponsive';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export function Sidebar({ isOpen, onClose, withHeader = true }: SidebarProps) {
   const isDark = currentTheme === 'dark';
   const windowDimensions = Dimensions.get('window');
   const statusBarHeight = StatusBar.currentHeight || 0;
+  const { isMobile, currentBreakpoint } = useResponsive();
 
   // Classes e cores baseadas no tema
   const bgColor = isDark ? 'bg-bg-secondary-dark' : 'bg-bg-secondary-light';
@@ -39,6 +41,14 @@ export function Sidebar({ isOpen, onClose, withHeader = true }: SidebarProps) {
     { icon: Settings, label: 'Configurações', route: '/settings' },
     { icon: HelpCircle, label: 'Ajuda', route: '/help' },
   ];
+
+  // Fechar o sidebar quando a tela mudar de tamanho (de mobile para tablet/desktop)
+  useEffect(() => {
+    if (!isMobile && isOpen) {
+      // Se não estiver mais no mobile mas o sidebar estiver aberto, fechá-lo
+      onClose();
+    }
+  }, [isMobile, isOpen, onClose, currentBreakpoint]);
 
   if (!isOpen) return null;
 
