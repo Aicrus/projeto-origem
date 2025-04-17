@@ -1,3 +1,6 @@
+// Importar polyfills antes de tudo para garantir compatibilidade
+import '@/lib/polyfills';
+
 import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { useFonts, 
   PlusJakartaSans_200ExtraLight,

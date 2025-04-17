@@ -30,5 +30,25 @@ module.exports = async function (env, argv) {
     })
   );
   
+  // Resolver problemas de compatibilidade do Supabase
+  config.resolve.alias = {
+    ...config.resolve.alias,
+    // Substituir o node-fetch e metro-runtime por mocks
+    '@supabase/node-fetch': path.resolve(__dirname, 'lib/mocks/node-fetch.js'),
+    'metro-runtime': path.resolve(__dirname, 'node_modules/react-native'),
+  };
+
+  // Forçar o uso do fetch nativo do navegador
+  config.resolve.fallback = {
+    ...config.resolve.fallback,
+    'node-fetch': false,
+    'fetch': false,
+    'fs': false,
+    'crypto': require.resolve('crypto-browserify'),
+    'stream': require.resolve('stream-browserify'),
+    'path': require.resolve('path-browserify'),
+    'os': require.resolve('os-browserify/browser'),
+  };
+
   return config;
 }; 

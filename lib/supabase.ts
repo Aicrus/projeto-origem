@@ -1,7 +1,16 @@
-import 'react-native-url-polyfill/auto';
+// Importar os polyfills primeiro, antes de qualquer coisa
+import './polyfills';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
+
+// Patch para resolver o problema de importação do node-fetch no ambiente React Native/Expo
+// Isso deve ser executado antes de qualquer inicialização do Supabase
+if (Platform.OS !== 'web' || typeof window !== 'undefined') {
+  // @ts-ignore - Hack para evitar que o Supabase tente usar node-fetch em ambientes não-Node.js
+  global.navigator.product = 'ReactNative';
+}
 
 // Verifica se as variáveis de ambiente estão definidas
 if (!process.env.EXPO_PUBLIC_SUPABASE_URL || !process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY) {
@@ -68,5 +77,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
     flowType: 'implicit',
+  },
+  global: {
+    fetch: (url, options) => {
+      // Usar o fetch nativo e evitar usar node-fetch
+      return fetch(url, options);
+    }
   },
 }); 
