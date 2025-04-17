@@ -20,7 +20,7 @@ import { ProfileMenu } from '@/components/AicrusComponents/profile-menu';
 import { router } from 'expo-router';
 
 // Definir tipos para os componentes disponíveis
-type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'cards' | null;
+type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | null;
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
@@ -76,6 +76,13 @@ export default function DevPage() {
   // Verifica se estamos em ambiente móvel/nativo
   const isNative = Platform.OS !== 'web';
   
+  // Efeito para converter activeComponent 'cards' para 'dropdownMenu'
+  useEffect(() => {
+    if ((activeComponent as string) === 'cards') {
+      setActiveComponent('dropdownMenu');
+    }
+  }, [activeComponent]);
+  
   // Ajusta posição do toast para ambiente nativo
   useEffect(() => {
     if (isNative) {
@@ -127,7 +134,7 @@ export default function DevPage() {
     { id: 'themeSelector', name: 'Theme Selector', icon: 'SunMoon' },
     { id: 'hoverableView', name: 'Hoverable View', icon: 'MousePointer' },
     { id: 'gradientView', name: 'Gradient View', icon: 'Palette' },
-    { id: 'cards', name: 'Cards', icon: 'MessageSquare' },
+    { id: 'dropdownMenu', name: 'Dropdown Menu', icon: 'MessageSquare' },
   ];
   
   // Função para renderizar o ícone correto
@@ -196,8 +203,8 @@ export default function DevPage() {
         return renderHoverableViewComponent();
       case 'gradientView':
         return renderGradientViewComponent();
-      case 'cards':
-        return renderCardsComponent();
+      case 'dropdownMenu':
+        return renderDropdownMenuComponent();
       default:
         return null;
     }
@@ -2711,8 +2718,8 @@ const renderBackdrop = () => {
     );
   };
 
-  // Função para renderizar os Cards (NotificationsMenu e ProfileMenu)
-  const renderCardsComponent = () => {
+  // Função para renderizar os Dropdown Menus (NotificationsMenu e ProfileMenu)
+  const renderDropdownMenuComponent = () => {
     // Função para capturar a posição e abrir o menu de notificações
     const handleNotificationsOpen = () => {
       if (notificationsButtonRef.current && Platform.OS === 'web') {
@@ -2734,10 +2741,12 @@ const renderBackdrop = () => {
         // @ts-ignore - API DOM específica para web
         const rect = profileCardButtonRef.current.getBoundingClientRect?.();
         if (rect) {
-          // Calcular o centro do botão para melhor posicionamento
-          const centerX = rect.left + (rect.width / 2);
+          // Obter dimensões da janela
+          const windowWidth = window.innerWidth;
+          
+          // Posicionando no meio da tela
           setProfilePosition({
-            x: centerX,
+            x: windowWidth / 2, // Centro da tela horizontalmente
             y: rect.bottom
           });
         }
@@ -2774,10 +2783,10 @@ const renderBackdrop = () => {
     return (
       <View className="p-lg">
         <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
-          Componentes de Cards
+          Componentes de Dropdown Menu
         </Text>
         <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          Esta seção demonstra os componentes NotificationsMenu e ProfileMenu integrados como cards de interface.
+          Esta seção demonstra os componentes NotificationsMenu e ProfileMenu integrados como menus dropdown de interface.
         </Text>
 
         <View className={`flex-row flex-wrap`}>
@@ -2876,7 +2885,7 @@ const renderBackdrop = () => {
         
         {/* Documentação técnica */}
         <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mt-lg mb-sm`}>
-          Implementação dos Cards
+          Implementação dos Dropdown Menus
         </Text>
         <Text className={`text-body-md ${textSecondary} mb-md`}>
           Abaixo você encontra a documentação sobre como utilizar os componentes NotificationsMenu e ProfileMenu.
@@ -3018,7 +3027,7 @@ return (
                   {availableComponents.map((component) => (
                     <Pressable
                       key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'cards')}
+                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu')}
                       className={`mr-2 px-3 py-1 rounded-md ${
                         activeComponent === component.id
                           ? isDark
@@ -3077,7 +3086,7 @@ return (
                       return (
                         <HoverableView
                           key={component.id}
-                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'cards')}
+                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu')}
                           className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
                             isComponentActive
                               ? isDark
