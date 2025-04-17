@@ -5,6 +5,7 @@ import { Home as HomeIcon, Code as CodeIcon } from 'lucide-react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { ProtectedRoute } from '../../components/ProtectedRoute';
 import { useResponsive } from '../../hooks/useResponsive';
+import { HapticTab } from '../../components/HapticTab';
 
 /**
  * Estrutura base simplificada para o TabsLayout
@@ -42,6 +43,7 @@ export default function TabsLayout() {
           tabBarInactiveTintColor: inactiveTabColor,
           headerShown: false,
           tabBarLabelPosition: 'below-icon',
+          ...(Platform.OS === 'ios' && { tabBarButton: HapticTab }),
           tabBarStyle: [
             styles.tabBar,
             Platform.select({
