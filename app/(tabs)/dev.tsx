@@ -1120,15 +1120,36 @@ export default function DevPage() {
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Gradientes</Text>
           <View className="flex-row flex-wrap gap-md mb-xl">
             {Platform.OS === 'web' ? (
-              // Na versão web, usamos as classes do tailwind
+              // Na versão web, usamos estilos inline para garantir que as cores sejam exatamente as mesmas do nativo
               <>
-                <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-primary-start to-gradient-primary-end">
+                <View 
+                  style={{
+                    height: 80,
+                    width: 192,
+                    borderRadius: 8,
+                    backgroundImage: 'linear-gradient(to right, #892CDC, #BC6FF1)'
+                  }}
+                >
                   <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Primário</Text>
                 </View>
-                <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-secondary-start to-gradient-secondary-end">
+                <View 
+                  style={{
+                    height: 80,
+                    width: 192,
+                    borderRadius: 8,
+                    backgroundImage: 'linear-gradient(to right, #52B69A, #76C893)'
+                  }}
+                >
                   <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Secundário</Text>
                 </View>
-                <View className="h-20 w-48 rounded-lg bg-gradient-to-r from-gradient-tertiary-start to-gradient-tertiary-end">
+                <View 
+                  style={{
+                    height: 80,
+                    width: 192,
+                    borderRadius: 8,
+                    backgroundImage: 'linear-gradient(to right, #4A6FA5, #5E7CB9)'
+                  }}
+                >
                   <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Terciário</Text>
                 </View>
               </>
