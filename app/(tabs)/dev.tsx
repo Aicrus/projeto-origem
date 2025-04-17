@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Stack } from 'expo-router';
-import { StyleSheet, View, Text, ScrollView, Pressable, Platform, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Switch, Image, Platform, useWindowDimensions, Pressable } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { Input } from '../../components/AicrusComponents/input';
 import { Select } from '../../components/AicrusComponents/select';
@@ -10,7 +10,7 @@ import { Button } from '../../components/AicrusComponents/button';
 import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
 import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
-import { HoverableView } from '../../components/AicrusComponents/hoverable-view';
+import { HoverableView } from '@/components/AicrusComponents/hoverable-view';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
@@ -1876,7 +1876,21 @@ showToast({
               <Text className={`${textPrimary}`}>Passe o mouse sobre este elemento</Text>
             </HoverableView>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Versão básica com efeito de hover padrão (cor de fundo alterada).
+              Versão básica com efeito de hover padrão (apenas cor de fundo alterada).
+            </Text>
+          </View>
+          
+          {/* Exemplo com múltiplos efeitos - igual ao básico, mas com escala */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Combinação de efeitos</Text>
+            <HoverableView 
+              className="p-md rounded-md border border-divider-light"
+              hoverScale={1.02}
+            >
+              <Text className={`${textPrimary}`}>Básico + efeito de escala</Text>
+            </HoverableView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Adiciona um sutil efeito de escala ao hover básico.
             </Text>
           </View>
           
@@ -1891,7 +1905,7 @@ showToast({
               <Text className={`${textPrimary}`}>Efeito de escala (zoom) no hover</Text>
             </HoverableView>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Efeito de escala (zoom) quando o cursor passa sobre o elemento. O fundo não muda.
+              Efeito de escala (zoom) quando o cursor passa sobre o elemento, sem alteração de cor.
             </Text>
           </View>
           
@@ -1902,7 +1916,8 @@ showToast({
               className="p-md rounded-md border border-divider-light"
               hoverTranslateX={8}
               hoverTranslateY={0}
-              disableHoverBackground={true}
+              disableHoverBackground={false}
+              hoverColor={isDark ? 'rgba(137, 44, 220, 0.08)' : 'rgba(137, 44, 220, 0.05)'}
             >
               <View className="flex-row items-center">
                 <Text className={`${textPrimary} mr-xs`}>Movimento horizontal</Text>
@@ -1910,39 +1925,7 @@ showToast({
               </View>
             </HoverableView>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              O elemento se move horizontalmente ao passar o mouse.
-            </Text>
-          </View>
-          
-          {/* Exemplo com rotação */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Efeito de rotação</Text>
-            <HoverableView 
-              className="p-md rounded-md border border-divider-light"
-              hoverRotate={5}
-              disableHoverBackground={true}
-            >
-              <Text className={`${textPrimary}`}>Rotação leve no hover</Text>
-            </HoverableView>
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              O elemento gira levemente quando o cursor passa sobre ele.
-            </Text>
-          </View>
-          
-          {/* Exemplo com múltiplos efeitos */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Combinação de efeitos</Text>
-            <HoverableView 
-              className="p-md rounded-md"
-              hoverScale={1.03}
-              hoverTranslateY={-3}
-              hoverElevation={4}
-              backgroundColor={isDark ? colors.primary.dark : colors.primary.light}
-            >
-              <Text className={`text-white`}>Múltiplos efeitos combinados</Text>
-            </HoverableView>
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Combina escala, movimento vertical e elevação (sombra) para um efeito mais rico.
+              O elemento se move horizontalmente e muda sutilmente a cor de fundo.
             </Text>
           </View>
           
@@ -1955,10 +1938,11 @@ showToast({
                   key={item}
                   className="p-md rounded-md m-xs"
                   isActive={activeItem === item}
-                  activeColor={isDark ? 'rgba(137, 44, 220, 0.3)' : 'rgba(137, 44, 220, 0.15)'}
+                  activeBackgroundColor={activeItem === item ? colors.primary.main : undefined}
+                  hoverColor={isDark ? 'rgba(137, 44, 220, 0.15)' : 'rgba(137, 44, 220, 0.1)'}
                   onPress={() => setActiveItem(item)}
                 >
-                  <Text className={`${textPrimary}`}>Item {item}</Text>
+                  <Text className={activeItem === item ? 'text-white' : textPrimary}>Item {item}</Text>
                 </HoverableView>
               ))}
             </View>
@@ -1972,13 +1956,28 @@ showToast({
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Cores personalizadas</Text>
             <HoverableView 
               className="p-md rounded-md"
-              hoverColor={isDark ? 'rgba(22, 163, 74, 0.2)' : 'rgba(22, 163, 74, 0.1)'}
-              backgroundColor={isDark ? 'rgba(22, 163, 74, 0.1)' : 'rgba(22, 163, 74, 0.05)'}
+              hoverColor={isDark ? 'rgba(22, 163, 74, 0.25)' : 'rgba(22, 163, 74, 0.15)'}
+              backgroundColor={isDark ? 'rgba(22, 163, 74, 0.15)' : 'rgba(22, 163, 74, 0.05)'}
             >
               <Text className={`${textPrimary}`}>Cores personalizadas para hover</Text>
             </HoverableView>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               É possível definir cores personalizadas para os estados normal e hover.
+            </Text>
+          </View>
+          
+          {/* Hover sem animações */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Hover sem animações</Text>
+            <HoverableView 
+              className="p-md rounded-md border border-divider-light"
+              disableAnimation={true}
+              hoverColor={isDark ? 'rgba(0, 0, 0, 0.06)' : 'rgba(0, 0, 0, 0.04)'}
+            >
+              <Text className={`${textPrimary}`}>Mesmo que o básico, mas sem animação</Text>
+            </HoverableView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Igual ao Hover básico, mas sem as animações suaves na transição.
             </Text>
           </View>
         </View>
@@ -2022,7 +2021,7 @@ showToast({
         <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverScale</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Escala ao passar o mouse (number, padrão: 1.005)</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Escala ao passar o mouse (number, padrão: 1 - sem escala)</Text>
           </View>
           
           <View className="mb-sm">
@@ -2038,6 +2037,11 @@ showToast({
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverElevation</Text>
             <Text className={`text-body-sm ${textSecondary}`}>Sombra/elevação adicional (number, padrão: 0)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverOpacity</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Opacidade ao passar o mouse (number, 0 a 1)</Text>
           </View>
           
           <View className="mb-sm">
@@ -2063,6 +2067,11 @@ showToast({
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>backgroundColor/hoverColor/activeColor</Text>
             <Text className={`text-body-sm ${textSecondary}`}>Cores personalizadas para os diferentes estados</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>onHoverStateChange</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Callback quando o estado de hover muda (function)</Text>
           </View>
         </View>
         
