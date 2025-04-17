@@ -2322,7 +2322,7 @@ showToast({
   };
 
   // Estado específico para o menu de notificações
-  const [notificationsMenuVisible, setNotificationsMenuVisible] = useState(true); // Começa visível
+  const [notificationsMenuVisible, setNotificationsMenuVisible] = useState(false);
   const [clickPosition, setClickPosition] = useState({ x: 200, y: 100 }); // Posição fixa para demonstração
   const notificationsButtonRef = useRef<View | null>(null);
   const secondButtonRef = useRef<View | null>(null);
@@ -2338,8 +2338,7 @@ showToast({
   // Adicionar useFocusEffect para fechar menu quando a tela perde foco
   useFocusEffect(
     useCallback(() => {
-      // Tornar o menu visível automaticamente quando a tela ganha foco
-      setNotificationsMenuVisible(true);
+      // Não abrir o menu automaticamente
       
       return () => {
         // Quando a tela perde foco, fechamos o menu de notificações
@@ -2407,8 +2406,36 @@ showToast({
         <Text className={`text-body-md ${textSecondary} mb-lg`}>
           Esta é uma demonstração completa do menu de notificações com todas as melhorias implementadas:
           overlay transparente em toda a tela, posicionamento contextual e fechamento automático ao navegar.
-          O menu é exibido automaticamente para demonstração.
         </Text>
+  
+        {/* Botão para abrir o menu de notificações */}
+        <View className="mb-lg">
+          <Button
+            variant="primary"
+            style={{ width: 250, alignSelf: 'flex-start' }}
+            onPress={() => {
+              // Capturar a posição do clique para posicionar o menu
+              if (Platform.OS === 'web') {
+                // Para web, usar coordenadas fixas perto do botão
+                setClickPosition({
+                  x: Dimensions.get('window').width > 768 ? 300 : 200,
+                  y: 200,
+                });
+              } else {
+                // Para dispositivos móveis, posicionar o menu na parte superior
+                setClickPosition({
+                  x: Dimensions.get('window').width / 2,
+                  y: 100,
+                });
+              }
+              // Abrir o menu
+              setNotificationsMenuVisible(true);
+            }}
+            rightIcon={<Bell size={16} color="#FFFFFF" />}
+          >
+            Abrir Menu de Notificações
+          </Button>
+        </View>
   
         {/* Renderizar backdrop transparente */}
         {renderBackdrop()}
