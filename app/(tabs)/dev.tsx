@@ -7,16 +7,17 @@ import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
 import { colors } from '../../components/AicrusComponents/constants/theme';
 import { Button } from '../../components/AicrusComponents/button';
-import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move } from 'lucide-react-native';
+import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
 import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
 import { HoverableView } from '@/components/AicrusComponents/hoverable-view';
+import { GradientView } from '@/components/AicrusComponents/gradient';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | null>('designSystem');
+  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | null>('designSystem');
   const [toastVisible, setToastVisible] = useState(false);
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const [toastPosition, setToastPosition] = useState<'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('top');
@@ -93,6 +94,7 @@ export default function DevPage() {
     { id: 'toast', name: 'Toast', icon: 'Bell' },
     { id: 'themeSelector', name: 'Theme Selector', icon: 'SunMoon' },
     { id: 'hoverableView', name: 'Hoverable View', icon: 'MousePointer' },
+    { id: 'gradientView', name: 'Gradient View', icon: 'Palette' },
   ];
   
   // Função para renderizar o ícone correto
@@ -120,6 +122,8 @@ export default function DevPage() {
         return <SunMoon strokeWidth={1.5} color={iconColor} />;
       case 'MousePointer':
         return <MousePointer strokeWidth={1.5} color={iconColor} />;
+      case 'Palette':
+        return <Palette strokeWidth={1.5} color={iconColor} />;
       default:
         return <Settings strokeWidth={1.5} color={iconColor} />;
     }
@@ -157,6 +161,8 @@ export default function DevPage() {
         return renderThemeSelectorComponent();
       case 'hoverableView':
         return renderHoverableViewComponent();
+      case 'gradientView':
+        return renderGradientViewComponent();
       default:
         return null;
     }
@@ -1116,74 +1122,6 @@ export default function DevPage() {
             </View>
           </View>
           
-          {/* Cores de Gradiente */}
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Gradientes</Text>
-          <View className="flex-row flex-wrap gap-md mb-xl">
-            {Platform.OS === 'web' ? (
-              // Na versão web, usamos estilos inline para garantir que as cores sejam exatamente as mesmas do nativo
-              <>
-                <View 
-                  style={{
-                    height: 80,
-                    width: 192,
-                    borderRadius: 8,
-                    backgroundImage: 'linear-gradient(to right, #892CDC, #BC6FF1)'
-                  }}
-                >
-                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Primário</Text>
-                </View>
-                <View 
-                  style={{
-                    height: 80,
-                    width: 192,
-                    borderRadius: 8,
-                    backgroundImage: 'linear-gradient(to right, #52B69A, #76C893)'
-                  }}
-                >
-                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Secundário</Text>
-                </View>
-                <View 
-                  style={{
-                    height: 80,
-                    width: 192,
-                    borderRadius: 8,
-                    backgroundImage: 'linear-gradient(to right, #4A6FA5, #5E7CB9)'
-                  }}
-                >
-                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Terciário</Text>
-                </View>
-              </>
-            ) : (
-              // Na versão nativa, usamos LinearGradient do Expo
-              <>
-                <LinearGradient
-                  colors={['#892CDC', '#BC6FF1']} // primary-start, primary-end
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={{ height: 80, width: 192, borderRadius: 8 }}
-                >
-                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Primário</Text>
-                </LinearGradient>
-                <LinearGradient
-                  colors={['#52B69A', '#76C893']} // secondary-start, secondary-end
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={{ height: 80, width: 192, borderRadius: 8 }}
-                >
-                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Secundário</Text>
-                </LinearGradient>
-                <LinearGradient
-                  colors={['#4A6FA5', '#5E7CB9']} // tertiary-start, tertiary-end
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={{ height: 80, width: 192, borderRadius: 8 }}
-                >
-                  <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Terciário</Text>
-                </LinearGradient>
-              </>
-            )}
-          </View>
-
           {/* Seção de Tipografia */}
           <SectionTitle title="Tipografia" textColor={textPrimary} />
           
@@ -2221,6 +2159,161 @@ showToast({
     );
   };
 
+  // Função para renderizar o componente GradientView e seus exemplos
+  const renderGradientViewComponent = () => {
+    return (
+      <View className="p-lg">
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+          Componente GradientView
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O GradientView é um componente que unifica a implementação de gradientes 
+          entre plataformas web e nativas. Nas plataformas nativas, utiliza o LinearGradient 
+          do Expo, enquanto na web usa CSS backgroundImage.
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+          
+          {/* Gradientes predefinidos */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Gradientes predefinidos</Text>
+            <View className="flex-row flex-wrap gap-md mb-md">
+              <GradientView
+                type="primary"
+                style={{ height: 80, width: 192, borderRadius: 8 }}
+              >
+                <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Primário</Text>
+              </GradientView>
+              
+              <GradientView
+                type="secondary"
+                style={{ height: 80, width: 192, borderRadius: 8 }}
+              >
+                <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Secundário</Text>
+              </GradientView>
+              
+              <GradientView
+                type="tertiary"
+                style={{ height: 80, width: 192, borderRadius: 8 }}
+              >
+                <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Terciário</Text>
+              </GradientView>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Gradientes predefinidos do sistema de design, acessados pela propriedade "type".
+            </Text>
+          </View>
+          
+          {/* Gradiente customizado */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Gradiente personalizado</Text>
+            <GradientView
+              type="custom"
+              colors={['#6366F1', '#14B8A6']}
+              style={{ height: 80, width: 240, borderRadius: 8 }}
+            >
+              <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Gradiente Personalizado</Text>
+            </GradientView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Você pode definir cores personalizadas através da propriedade "colors".
+            </Text>
+          </View>
+          
+          {/* Gradiente com direção personalizada */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Direção personalizada (apenas nativo)</Text>
+            <GradientView
+              type="primary"
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={{ height: 80, width: 192, borderRadius: 8 }}
+            >
+              <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">De cima para baixo</Text>
+            </GradientView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Em plataformas nativas, você pode controlar a direção com start/end.
+            </Text>
+          </View>
+        </View>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>API</Text>
+          
+          <View className="mb-md">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Propriedades</Text>
+            <View className="border border-divider-light dark:border-divider-dark rounded-md overflow-hidden">
+              <View className="flex-row py-xs">
+                <Text className={`text-body-sm font-jakarta-semibold ${textPrimary} w-1/4 px-sm`}>Prop</Text>
+                <Text className={`text-body-sm font-jakarta-semibold ${textPrimary} w-1/4 px-sm`}>Tipo</Text>
+                <Text className={`text-body-sm font-jakarta-semibold ${textPrimary} w-2/4 px-sm`}>Descrição</Text>
+              </View>
+              
+              <View className="flex-row py-xs bg-divider-light/20 dark:bg-divider-dark/20">
+                <Text className={`text-body-sm ${textPrimary} w-1/4 px-sm`}>type</Text>
+                <Text className={`text-body-sm font-mono-regular ${textPrimary} w-1/4 px-sm`}>GradientType</Text>
+                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Tipo de gradiente: 'primary', 'secondary', 'tertiary' ou 'custom'</Text>
+              </View>
+              
+              <View className="flex-row py-xs">
+                <Text className={`text-body-sm ${textPrimary} w-1/4 px-sm`}>colors</Text>
+                <Text className={`text-body-sm font-mono-regular ${textPrimary} w-1/4 px-sm`}>[string, string]</Text>
+                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Array com duas cores para gradiente personalizado</Text>
+              </View>
+              
+              <View className="flex-row py-xs bg-divider-light/20 dark:bg-divider-dark/20">
+                <Text className={`text-body-sm ${textPrimary} w-1/4 px-sm`}>start</Text>
+                <Text className={`text-body-sm font-mono-regular ${textPrimary} w-1/4 px-sm`}>{"{ x: number, y: number }"}</Text>
+                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Ponto inicial do gradiente (apenas nativo)</Text>
+              </View>
+              
+              <View className="flex-row py-xs">
+                <Text className={`text-body-sm ${textPrimary} w-1/4 px-sm`}>end</Text>
+                <Text className={`text-body-sm font-mono-regular ${textPrimary} w-1/4 px-sm`}>{"{ x: number, y: number }"}</Text>
+                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Ponto final do gradiente (apenas nativo)</Text>
+              </View>
+              
+              <View className="flex-row py-xs bg-divider-light/20 dark:bg-divider-dark/20">
+                <Text className={`text-body-sm ${textPrimary} w-1/4 px-sm`}>style</Text>
+                <Text className={`text-body-sm font-mono-regular ${textPrimary} w-1/4 px-sm`}>ViewStyle</Text>
+                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Estilo personalizado para o componente</Text>
+              </View>
+              
+              <View className="flex-row py-xs">
+                <Text className={`text-body-sm ${textPrimary} w-1/4 px-sm`}>children</Text>
+                <Text className={`text-body-sm font-mono-regular ${textPrimary} w-1/4 px-sm`}>ReactNode</Text>
+                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Conteúdo a ser renderizado dentro do gradiente</Text>
+              </View>
+            </View>
+          </View>
+          
+          <View className="mb-md">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Exemplo de uso</Text>
+            <View className={`bg-bg-tertiary-light dark:bg-bg-tertiary-dark p-sm rounded-md mb-sm`}>
+              <Text className={`text-mono-sm font-mono-regular text-text-primary-light dark:text-text-primary-dark`}>
+                {`import { GradientView } from '@/components/AicrusComponents/gradient';
+
+// Usando gradiente predefinido
+<GradientView type="primary" style={{ height: 80, width: 200 }}>
+  <Text style={{ color: 'white' }}>Conteúdo</Text>
+</GradientView>
+
+// Usando gradiente personalizado
+<GradientView 
+  type="custom"
+  colors={['#FF5733', '#FFC300']}
+  style={{ height: 80, width: 200 }}
+>
+  <Text style={{ color: 'white' }}>Conteúdo</Text>
+</GradientView>`}
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <>
       <Stack.Screen 
@@ -2249,7 +2342,7 @@ showToast({
                   {availableComponents.map((component) => (
                     <Pressable
                       key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView')}
+                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView')}
                       className={`mr-2 px-3 py-1 rounded-md ${
                         activeComponent === component.id
                           ? isDark
@@ -2308,7 +2401,7 @@ showToast({
                       return (
                         <HoverableView
                           key={component.id}
-                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView')}
+                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView')}
                           className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
                             isComponentActive
                               ? isDark

@@ -16,4 +16,8 @@ export * from './theme-selector';
 export * from './hoverable-view';
 
 // Exportações de constantes
-export * from './constants/theme'; 
+export * from './constants/theme';
+
+// Exportando o componente GradientView
+export { GradientView, GRADIENTS } from './gradient';
+export type { GradientViewProps, GradientType } from './gradient'; 
