@@ -350,19 +350,77 @@ O projeto já vem com configurações de SEO otimizadas para web. Para personali
 
 ### 📱 Configuração da StatusBar
 
-A barra de status (onde aparecem as horas, sinal, bateria) está configurada para respeitar o tema atual do aplicativo:
+A barra de status (onde aparecem as horas, sinal, bateria) está configurada para respeitar o tema atual do aplicativo.
+
+#### Configuração Completa (Recomendada)
+
+Para garantir que a StatusBar esteja perfeitamente integrada com o tema e o Header da aplicação, use a seguinte abordagem:
 
 ```typescript
-// Configuração da StatusBar do Expo
-import { StatusBar } from 'expo-status-bar';
+// Em app/_layout.tsx
+import { StatusBar } from 'react-native'; // StatusBar nativa para controle avançado
+import { StatusBar as ExpoStatusBar } from 'expo-status-bar'; // StatusBar do Expo para compatibilidade
 
-<StatusBar 
-  style={currentTheme === 'dark' ? 'light' : 'dark'} // Texto branco em fundo escuro, texto preto em fundo claro
-  backgroundColor={currentTheme === 'dark' ? '#1C1E26' : '#F7F8FA'} // Fundo transparente ou cores do tema
+// Cores do tema conforme definidos em tailwind.config.js e theme.ts
+const headerColors = {
+  light: '#FFFFFF', // Deve corresponder à cor do Header no tema claro
+  dark: '#1C1E26'   // Deve corresponder à cor do Header no tema escuro
+};
+
+// Configurar a StatusBar nativa para ter a mesma cor do Header
+useEffect(() => {
+  if (Platform.OS !== 'web') {
+    // Configurações para Android e iOS
+    StatusBar.setBarStyle(isDark ? 'light-content' : 'dark-content');
+    
+    if (Platform.OS === 'android') {
+      StatusBar.setBackgroundColor(isDark ? headerColors.dark : headerColors.light);
+    }
+  }
+}, [isDark, headerColors]);
+
+// Use a ExpoStatusBar para manter compatibilidade
+<ExpoStatusBar 
+  style={currentTheme === 'dark' ? 'light' : 'dark'} 
+  backgroundColor={isDark ? headerColors.dark : headerColors.light}
 />
+
+// Importante: Configure o SafeAreaView para a mesma cor do Header
+return (
+  <SafeAreaView 
+    className={`flex-1 ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}
+    edges={['top', 'right', 'left']}
+    style={{ 
+      backgroundColor: isDark ? headerColors.dark : headerColors.light 
+    }}
+  >
+    {MainContent}
+  </SafeAreaView>
+);
 ```
 
-Esta configuração pode ser encontrada no arquivo `app/_layout.tsx` e garante que a StatusBar sempre se ajuste ao tema atual do aplicativo.
+#### Por que é desafiador configurar a StatusBar?
+
+Configurar a StatusBar adequadamente pode ser complexo por vários motivos:
+
+1. **Sistema dual de cores**: Como explicado na documentação dos componentes, o projeto usa cores definidas em dois lugares: `tailwind.config.js` e `constants/theme.ts`.
+
+2. **Diferenças entre plataformas**: iOS e Android tratam a área da StatusBar de formas diferentes:
+   - No iOS, a área da StatusBar é parte do SafeAreaInsets
+   - No Android, a StatusBar pode ser configurada separadamente
+
+3. **Integração com o Header**: Para que a StatusBar pareça parte do Header, ambos precisam compartilhar a mesma cor de fundo.
+
+4. **Modos claro e escuro**: A StatusBar precisa se adaptar automaticamente aos temas.
+
+#### Dicas importantes
+
+- **Consistência de cores**: Certifique-se de que as cores da StatusBar correspondam exatamente às cores do Header
+- **SafeAreaView**: Configure o backgroundColor do SafeAreaView para a mesma cor da StatusBar
+- **Android**: Use `StatusBar.setBackgroundColor()` para Android
+- **iOS**: O iOS requer apenas a configuração de estilo ('light-content' ou 'dark-content')
+
+> 💡 **Dica importante**: Sempre que alterar as cores do tema no `tailwind.config.js` ou no `theme.ts`, atualize também as cores na configuração da StatusBar no arquivo `_layout.tsx`.
 
 ### 🎨 Cores do Sistema e NativeWind
 

@@ -86,6 +86,10 @@ export function Header({
   const avatarButtonRef = useRef<View>(null);
   const [avatarPosition, setAvatarPosition] = useState({ x: 0, y: 0 });
 
+  // Definir cores conforme o tema do Tailwind
+  const bgColor = isDark ? '#1C1E26' : '#FFFFFF'; // bg-primary-dark ou bg-secondary-light do tailwind.config.js
+  const borderColor = isDark ? '#262D34' : '#E0E3E7'; // divider-dark ou divider-light do tailwind.config.js
+
   // Fechar menus quando a tela for redimensionada
   useEffect(() => {
     if (Platform.OS === 'web') {
@@ -118,7 +122,8 @@ export function Header({
     // Fecha menu de notificações se estiver aberto
     if (isNotificationsMenuOpen) setIsNotificationsMenuOpen(false);
     
-    // Captura a posição do botão de perfil para posicionar o menu adequadamente
+    // Captura a posição do botão de perfil apenas na web
+    // Em ambiente nativo, os menus usam posicionamento fixo
     if (avatarButtonRef.current && Platform.OS === 'web') {
       // @ts-ignore - API DOM específica para web
       const rect = avatarButtonRef.current.getBoundingClientRect?.();
@@ -142,7 +147,8 @@ export function Header({
     // Fecha o menu de perfil se estiver aberto
     if (isProfileMenuOpen) setIsProfileMenuOpen(false);
     
-    // Captura a posição do botão de notificações para posicionar o menu adequadamente
+    // Captura a posição do botão de notificações apenas na web
+    // Em ambiente nativo, os menus usam posicionamento fixo
     if (bellButtonRef.current && Platform.OS === 'web') {
       // @ts-ignore - API DOM específica para web
       const rect = bellButtonRef.current.getBoundingClientRect?.();
@@ -231,7 +237,10 @@ export function Header({
         <View style={styles.wrapper}>
           <View style={[
             styles.header,
-            isDark && styles.headerDark,
+            {
+              backgroundColor: bgColor,
+              borderBottomColor: borderColor,
+            },
             Platform.OS !== 'web' && styles.headerMobileNative
           ]}>
             <View style={[
@@ -357,7 +366,10 @@ export function Header({
       <View style={styles.wrapper}>
         <View style={[
           styles.header,
-          isDark && styles.headerDark
+          {
+            backgroundColor: bgColor,
+            borderBottomColor: borderColor,
+          },
         ]}>
           <View style={styles.container}>
             <View style={styles.rightContent}>
@@ -462,16 +474,10 @@ const styles = StyleSheet.create({
   header: {
     height: 64,
     borderBottomWidth: 1,
-    borderBottomColor: colors.gray[200],
-    backgroundColor: colors.white,
     zIndex: Z_INDEX.HEADER,
   },
-  headerDark: {
-    borderBottomColor: colors.gray[800],
-    backgroundColor: colors.gray[900],
-  },
   headerMobileNative: {
-    height: 114,
+    height: 65,
   },
   container: {
     flexDirection: 'row',
@@ -488,7 +494,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   containerMobileNative: {
-    paddingTop: 50, // Área para a barra de status
+    paddingTop: 0,
   },
   rightContent: {
     flexDirection: 'row',

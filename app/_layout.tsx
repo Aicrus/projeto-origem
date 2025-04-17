@@ -10,9 +10,9 @@ import { useFonts,
 } from '@expo-google-fonts/plus-jakarta-sans';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useEffect, useState, memo } from 'react';
-import { ActivityIndicator, Platform, View } from 'react-native';
+import { ActivityIndicator, Platform, View, StatusBar } from 'react-native';
 import 'react-native-reanimated';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
@@ -39,7 +39,7 @@ const LoadingScreen = memo(function LoadingScreen() {
   
   return (
     <View className={`flex-1 justify-center items-center ${currentTheme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
-      <StatusBar 
+      <ExpoStatusBar 
         style={currentTheme === 'dark' ? 'light' : 'dark'}
         backgroundColor={currentTheme === 'dark' ? '#111827' : '#f9fafb'}
       />
@@ -145,12 +145,31 @@ const RootLayoutNav = memo(function RootLayoutNav() {
     return <LoadingScreen />;
   }
 
+  // Cores do tema conforme definidos em tailwind.config.js e theme.ts
+  const headerColors = {
+    light: '#FFFFFF', // bg-secondary-light no tailwind.config.js
+    dark: '#1C1E26'   // bg-primary-dark no tailwind.config.js
+  };
+
+  // Configurar a StatusBar nativa para ter a mesma cor do Header
+  useEffect(() => {
+    if (Platform.OS !== 'web') {
+      // Configurações para Android e iOS
+      StatusBar.setBarStyle(isDark ? 'light-content' : 'dark-content');
+      
+      if (Platform.OS === 'android') {
+        StatusBar.setBackgroundColor(isDark ? headerColors.dark : headerColors.light);
+      }
+    }
+  }, [isDark, headerColors]);
+
   const MainContent = (
     <NavigationThemeProvider value={currentTheme === 'dark' ? DarkTheme : DefaultTheme}>
       <View className={`flex-1 ${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}`}>
-        <StatusBar 
+        {/* Usando a ExpoStatusBar apenas para manter compatibilidade, mas as configurações reais vêm do StatusBar nativo */}
+        <ExpoStatusBar 
           style={currentTheme === 'dark' ? 'light' : 'dark'}
-          backgroundColor={currentTheme === 'dark' ? '#14181B' : '#F7F8FA'}
+          backgroundColor={isDark ? headerColors.dark : headerColors.light}
         />
         <Stack 
           screenOptions={{
@@ -197,6 +216,9 @@ const RootLayoutNav = memo(function RootLayoutNav() {
     <SafeAreaView 
       className={`flex-1 ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}
       edges={['top', 'right', 'left']}
+      style={{ 
+        backgroundColor: isDark ? headerColors.dark : headerColors.light 
+      }}
     >
       {MainContent}
     </SafeAreaView>
