@@ -129,7 +129,7 @@ export function ProfileMenu({
     if (position) {
       // Se temos uma posição definida pelo usuário
       const windowWidth = Dimensions.get('window').width;
-      const menuWidth = isMobile ? Math.min(250, windowWidth * 0.9) : 250;
+      const menuWidth = isMobile ? Math.min(220, windowWidth * 0.85) : 220;
       
       // Calcular posição horizontal mantendo o menu dentro da tela
       // Garantir que o menu fique pelo menos a 16px da borda da tela
@@ -273,8 +273,8 @@ export function ProfileMenu({
               borderColor: themeColors.divider,
               opacity: fadeAnim,
               transform: [{ translateY: translateYAnim }],
-              width: isMobile ? '90%' : 250,
-              maxWidth: 250,
+              width: isMobile ? '85%' : 220,
+              maxWidth: 220,
               // Sombra para web
               ...(Platform.OS === 'web' 
                 ? { boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' } 

@@ -4,6 +4,7 @@ import { Share2, Bell, Search, MessageSquare, Settings, Menu } from 'lucide-reac
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { NotificationsMenu } from '../../AicrusComponents/notifications-menu/NotificationsMenu';
+import { ProfileMenu } from '../../AicrusComponents/profile-menu/ProfileMenu';
 
 // Definição de cores temporária até termos acesso ao arquivo de tema
 const colors = {
@@ -59,8 +60,9 @@ const Z_INDEX = {
 export interface HeaderProps {
   /** Componente personalizado para o menu de perfil */
   ProfileMenuComponent?: React.ComponentType<{
-    isOpen: boolean;
+    isVisible: boolean;
     onClose: () => void;
+    position?: { x: number, y: number };
   }>;
   /** Componente personalizado para a barra lateral */
   SidebarComponent?: React.ComponentType<{
@@ -81,6 +83,8 @@ export function Header({
   const [isNotificationsMenuOpen, setIsNotificationsMenuOpen] = useState(false);
   const bellButtonRef = useRef<View>(null);
   const [bellPosition, setBellPosition] = useState({ x: 0, y: 0 });
+  const avatarButtonRef = useRef<View>(null);
+  const [avatarPosition, setAvatarPosition] = useState({ x: 0, y: 0 });
 
   // Fechar menus quando a tela for redimensionada
   useEffect(() => {
@@ -113,6 +117,19 @@ export function Header({
   const handleProfileClick = () => {
     // Fecha menu de notificações se estiver aberto
     if (isNotificationsMenuOpen) setIsNotificationsMenuOpen(false);
+    
+    // Captura a posição do botão de perfil para posicionar o menu adequadamente
+    if (avatarButtonRef.current && Platform.OS === 'web') {
+      // @ts-ignore - API DOM específica para web
+      const rect = avatarButtonRef.current.getBoundingClientRect?.();
+      if (rect) {
+        // Posiciona o menu abaixo e à direita do botão
+        setAvatarPosition({
+          x: rect.right,
+          y: rect.bottom
+        });
+      }
+    }
     
     setIsProfileMenuOpen(!isProfileMenuOpen);
   };
@@ -186,23 +203,6 @@ export function Header({
     return null;
   };
 
-  // Componente de menu de perfil padrão
-  const DefaultProfileMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-    if (!isOpen) return null;
-    
-    return (
-      <View style={[
-        styles.profileMenu,
-        isDark && styles.profileMenuDark
-      ]}>
-        <Pressable onPress={onClose} style={styles.closeButton}>
-          <Text style={styles.closeButtonText}>Fechar</Text>
-        </Pressable>
-        {/* Conteúdo do menu de perfil */}
-      </View>
-    );
-  };
-
   // Componente de barra lateral padrão
   const DefaultSidebar = ({ isDrawerVisible, onClose }: { isDrawerVisible: boolean; onClose: () => void }) => {
     if (!isDrawerVisible) return null;
@@ -221,7 +221,6 @@ export function Header({
   };
 
   // Componentes a serem utilizados
-  const ProfileMenu = ProfileMenuComponent || DefaultProfileMenu;
   const Sidebar = SidebarComponent || DefaultSidebar;
 
   // Para mobile, renderiza um header simplificado com botão de menu
@@ -270,6 +269,7 @@ export function Header({
                 </Pressable>
                 
                 <Pressable 
+                  ref={avatarButtonRef}
                   style={styles.avatarContainer}
                   onPress={handleProfileClick}
                 >
@@ -296,10 +296,33 @@ export function Header({
 
         {/* Menu de perfil */}
         {isProfileMenuOpen && (
-          <ProfileMenu 
-            isOpen={isProfileMenuOpen}
-            onClose={() => setIsProfileMenuOpen(false)}
-          />
+          <View 
+            style={Platform.OS === 'web' ? {
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: Z_INDEX.NOTIFICATION_MENU,
+              pointerEvents: 'none'
+            } : null}
+          >
+            <View style={{ pointerEvents: 'auto' }}>
+              {ProfileMenuComponent ? (
+                <ProfileMenuComponent
+                  isVisible={isProfileMenuOpen}
+                  onClose={() => setIsProfileMenuOpen(false)}
+                  position={avatarPosition}
+                />
+              ) : (
+                <ProfileMenu
+                  isVisible={isProfileMenuOpen}
+                  onClose={() => setIsProfileMenuOpen(false)}
+                  position={avatarPosition}
+                />
+              )}
+            </View>
+          </View>
         )}
 
         {/* Menu de notificações por último para ficar acima de tudo */}
@@ -346,20 +369,6 @@ export function Header({
               </Pressable>
 
               <Pressable 
-                style={[styles.iconButton, isDark && styles.iconButtonDark]}
-                onPress={() => {}}
-              >
-                <MessageSquare size={18} color={isDark ? colors.gray[300] : colors.gray[500]} strokeWidth={1.5} />
-              </Pressable>
-
-              <Pressable 
-                style={[styles.iconButton, isDark && styles.iconButtonDark]}
-                onPress={() => {}}
-              >
-                <Share2 size={18} color={isDark ? colors.gray[300] : colors.gray[500]} strokeWidth={1.5} />
-              </Pressable>
-
-              <Pressable 
                 ref={bellButtonRef}
                 style={[styles.iconButton, isDark && styles.iconButtonDark]}
                 onPress={handleNotificationsClick}
@@ -369,13 +378,7 @@ export function Header({
               </Pressable>
 
               <Pressable 
-                style={[styles.iconButton, isDark && styles.iconButtonDark]}
-                onPress={() => {}}
-              >
-                <Settings size={18} color={isDark ? colors.gray[300] : colors.gray[500]} strokeWidth={1.5} />
-              </Pressable>
-
-              <Pressable 
+                ref={avatarButtonRef}
                 style={styles.avatarContainer}
                 onPress={handleProfileClick}
               >
@@ -396,10 +399,33 @@ export function Header({
 
       {/* Terceiro o perfil */}
       {isProfileMenuOpen && (
-        <ProfileMenu 
-          isOpen={isProfileMenuOpen}
-          onClose={() => setIsProfileMenuOpen(false)}
-        />
+        <View 
+          style={Platform.OS === 'web' ? {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: Z_INDEX.NOTIFICATION_MENU,
+            pointerEvents: 'none'
+          } : null}
+        >
+          <View style={{ pointerEvents: 'auto' }}>
+            {ProfileMenuComponent ? (
+              <ProfileMenuComponent
+                isVisible={isProfileMenuOpen}
+                onClose={() => setIsProfileMenuOpen(false)}
+                position={avatarPosition}
+              />
+            ) : (
+              <ProfileMenu
+                isVisible={isProfileMenuOpen}
+                onClose={() => setIsProfileMenuOpen(false)}
+                position={avatarPosition}
+              />
+            )}
+          </View>
+        </View>
       )}
 
       {/* Por último o menu de notificações */}
