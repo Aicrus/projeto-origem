@@ -16,11 +16,16 @@ import { GradientView } from '@/components/AicrusComponents/gradient';
 import { NotificationsMenu } from '@/components/AicrusComponents/notifications-menu';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
+import { ProfileMenu } from '@/components/AicrusComponents/profile-menu';
+import { router } from 'expo-router';
+
+// Definir tipos para os componentes disponíveis
+type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'cards' | null;
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'notificationsMenu' | null>('designSystem');
+  const [activeComponent, setActiveComponent] = useState<ComponentType>('designSystem');
   const [toastVisible, setToastVisible] = useState(false);
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const [toastPosition, setToastPosition] = useState<'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('top');
@@ -44,6 +49,29 @@ export default function DevPage() {
   const [selectBasico, setSelectBasico] = useState('');
   const [selectBusca, setSelectBusca] = useState('');
   const [multiSelect, setMultiSelect] = useState<string[]>([]);
+  
+  // Notificações - estados
+  const [notificationsVisible, setNotificationsVisible] = useState(false);
+  const [notificationsPosition, setNotificationsPosition] = useState({ x: 0, y: 0 });
+  
+  // ProfileMenu - estados
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false); 
+  const profileButtonRef = useRef<View>(null);
+  const [profileButtonPosition, setProfileButtonPosition] = useState({ x: 0, y: 0 });
+  
+  // Cards - estados específicos para a seção de Cards
+  const [profileVisible, setProfileVisible] = useState(false);
+  const [profilePosition, setProfilePosition] = useState({ x: 0, y: 0 });
+  const profileCardButtonRef = useRef<View>(null);
+  
+  // Estado para o menu de notificações na UI
+  const [notificationsMenuVisible, setNotificationsMenuVisible] = useState(false);
+  const [clickPosition, setClickPosition] = useState({ x: 200, y: 100 }); // Posição fixa para demonstração
+  
+  // Refs
+  const notificationsButtonRef = useRef<View>(null);
+  const secondButtonRef = useRef<View | null>(null);
+  const [activeButtonRef, setActiveButtonRef] = useState<React.RefObject<View | null> | null>(null);
   
   // Verifica se estamos em ambiente móvel/nativo
   const isNative = Platform.OS !== 'web';
@@ -99,7 +127,7 @@ export default function DevPage() {
     { id: 'themeSelector', name: 'Theme Selector', icon: 'SunMoon' },
     { id: 'hoverableView', name: 'Hoverable View', icon: 'MousePointer' },
     { id: 'gradientView', name: 'Gradient View', icon: 'Palette' },
-    { id: 'notificationsMenu', name: 'Notifications Menu', icon: 'bell' },
+    { id: 'cards', name: 'Cards', icon: 'MessageSquare' },
   ];
   
   // Função para renderizar o ícone correto
@@ -168,8 +196,8 @@ export default function DevPage() {
         return renderHoverableViewComponent();
       case 'gradientView':
         return renderGradientViewComponent();
-      case 'notificationsMenu':
-        return renderNotificationsMenuComponent();
+      case 'cards':
+        return renderCardsComponent();
       default:
         return null;
     }
@@ -2322,11 +2350,6 @@ showToast({
   };
 
   // Estado específico para o menu de notificações
-  const [notificationsMenuVisible, setNotificationsMenuVisible] = useState(false);
-  const [clickPosition, setClickPosition] = useState({ x: 200, y: 100 }); // Posição fixa para demonstração
-  const notificationsButtonRef = useRef<View | null>(null);
-  const secondButtonRef = useRef<View | null>(null);
-  const [activeButtonRef, setActiveButtonRef] = useState<React.RefObject<View | null> | null>(null);
   
   // Constantes para z-index, garantindo a hierarquia correta
   const Z_INDEX = {
@@ -2588,6 +2611,95 @@ const renderBackdrop = () => {
     );
   };
 
+  const renderProfileMenuComponent = () => {
+    const handleProfileClick = () => {
+      if (profileButtonRef.current && Platform.OS === 'web') {
+        // @ts-ignore - API DOM específica para web
+        const rect = profileButtonRef.current.getBoundingClientRect?.();
+        if (rect) {
+          // Posiciona o menu abaixo e à direita do botão
+          setProfileButtonPosition({
+            x: rect.right,
+            y: rect.bottom
+          });
+        }
+      }
+      setProfileMenuOpen(!profileMenuOpen);
+    };
+
+    return (
+      <View className="p-lg">
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+          Componente ProfileMenu
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O ProfileMenu é um componente que exibe informações do usuário e opções como configuração de tema e logout.
+        </Text>
+
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Demonstração:</Text>
+          
+          <View className="flex-row items-center mb-lg">
+            <View ref={profileButtonRef}>
+              <Pressable
+                onPress={handleProfileClick}
+                className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
+              >
+                <Text className="text-white font-jakarta-medium">
+                  Abrir menu de perfil
+                </Text>
+              </Pressable>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} ml-md`}>
+              Clique para abrir o menu de perfil
+            </Text>
+          </View>
+          
+          <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+            O menu de perfil exibe informações do usuário, opções de tema e função de logout.
+          </Text>
+        </View>
+        
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Características
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          O ProfileMenu oferece diversas características para uma experiência de usuário fluida:
+        </Text>
+        
+        <View className="flex-row flex-wrap">
+          <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} w-1/2 flex-grow basis-60`}>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Informações do usuário</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Exibe nome e email do usuário logado.</Text>
+          </View>
+          
+          <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} w-1/2 flex-grow basis-60`}>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Seleção de tema</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Permite escolher entre tema claro, escuro ou sistema.</Text>
+          </View>
+          
+          <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} w-1/2 flex-grow basis-60`}>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Animações suaves</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Apresenta animações de entrada e saída para uma experiência fluida.</Text>
+          </View>
+          
+          <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} w-1/2 flex-grow basis-60`}>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Posicionamento inteligente</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Posiciona-se automaticamente próximo ao elemento que o invocou.</Text>
+          </View>
+        </View>
+        
+        {profileMenuOpen && (
+          <ProfileMenu
+            isVisible={profileMenuOpen}
+            onClose={() => setProfileMenuOpen(false)}
+            position={profileButtonPosition}
+          />
+        )}
+      </View>
+    );
+  };
+
   // Componente para mostrar o breakpoint atual
   const BreakpointIndicator = () => {
     return (
@@ -2595,6 +2707,273 @@ const renderBackdrop = () => {
         <Text className={`text-body-sm text-center ${textSecondary}`}>
           Breakpoint: {currentBreakpoint} ({width}px)
         </Text>
+      </View>
+    );
+  };
+
+  // Função para renderizar os Cards (NotificationsMenu e ProfileMenu)
+  const renderCardsComponent = () => {
+    // Função para capturar a posição e abrir o menu de notificações
+    const handleNotificationsOpen = () => {
+      if (notificationsButtonRef.current && Platform.OS === 'web') {
+        // @ts-ignore - API DOM específica para web
+        const rect = notificationsButtonRef.current.getBoundingClientRect?.();
+        if (rect) {
+          setNotificationsPosition({
+            x: rect.right,
+            y: rect.bottom
+          });
+        }
+      }
+      setNotificationsVisible(true);
+    };
+
+    // Função para capturar a posição e abrir o menu de perfil
+    const handleProfileOpen = () => {
+      if (profileCardButtonRef.current && Platform.OS === 'web') {
+        // @ts-ignore - API DOM específica para web
+        const rect = profileCardButtonRef.current.getBoundingClientRect?.();
+        if (rect) {
+          setProfilePosition({
+            x: rect.right,
+            y: rect.bottom
+          });
+        }
+      }
+      setProfileVisible(true);
+    };
+
+    // Backdrop para fechar menus quando clicado fora
+    const renderBackdrop = () => {
+      if (notificationsVisible || profileVisible) {
+        return (
+          <Pressable
+            style={{
+              position: Platform.OS === 'web' ? 'fixed' : 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'transparent',
+              zIndex: 2000,
+            }}
+            onPress={() => {
+              setNotificationsVisible(false);
+              setProfileVisible(false);
+            }}
+          />
+        );
+      }
+      return null;
+    };
+
+    return (
+      <View className="p-lg">
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+          Componentes de Cards
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          Esta seção demonstra os componentes NotificationsMenu e ProfileMenu integrados como cards de interface.
+        </Text>
+
+        <View className={`flex-row flex-wrap`}>
+          {/* Card do NotificationsMenu */}
+          <View className={`${bgSecondary} rounded-lg p-md mb-lg mr-lg flex-1 min-w-[300px]`}>
+            <View className="flex-row items-center mb-sm">
+              <View className={`w-8 h-8 rounded-md items-center justify-center ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'} mr-sm`}>
+                <Bell size={18} color={isDark ? '#FFFFFF' : '#57636C'} strokeWidth={1.5} />
+              </View>
+              <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary}`}>
+                Menu de Notificações
+              </Text>
+            </View>
+            
+            <Text className={`text-body-sm ${textSecondary} mb-md`}>
+              Menu de notificações para exibir alertas e informações ao usuário com animações suaves e adaptação automática ao tema.
+            </Text>
+            
+            <View className="mb-md">
+              <View ref={notificationsButtonRef}>
+                <Pressable
+                  onPress={handleNotificationsOpen}
+                  className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
+                >
+                  <Text className="text-white font-jakarta-medium">
+                    Abrir menu de notificações
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+            
+            <View className="flex-row flex-wrap">
+              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
+                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Notificações não lidas</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Indicadores visuais para itens não lidos.</Text>
+              </View>
+              
+              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
+                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Animação suave</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Transições com fade e deslizamento.</Text>
+              </View>
+              
+              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
+                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Posicionamento</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Adjacente ao elemento que o acionou.</Text>
+              </View>
+            </View>
+          </View>
+          
+          {/* Card do ProfileMenu */}
+          <View className={`${bgSecondary} rounded-lg p-md mb-lg flex-1 min-w-[300px]`}>
+            <View className="flex-row items-center mb-sm">
+              <View className={`w-8 h-8 rounded-md items-center justify-center ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'} mr-sm`}>
+                <Settings size={18} color={isDark ? '#FFFFFF' : '#57636C'} strokeWidth={1.5} />
+              </View>
+              <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary}`}>
+                Menu de Perfil
+              </Text>
+            </View>
+            
+            <Text className={`text-body-sm ${textSecondary} mb-md`}>
+              Menu de perfil que exibe informações do usuário, opções de tema e funcionalidade de logout com interface adaptativa.
+            </Text>
+            
+            <View className="mb-md">
+              <View ref={profileCardButtonRef}>
+                <Pressable
+                  onPress={handleProfileOpen}
+                  className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
+                >
+                  <Text className="text-white font-jakarta-medium">
+                    Abrir menu de perfil
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+            
+            <View className="flex-row flex-wrap">
+              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
+                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Seleção de tema</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Claro, escuro ou sistema.</Text>
+              </View>
+              
+              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
+                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Dados do perfil</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Exibe nome e email.</Text>
+              </View>
+              
+              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
+                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Multiplataforma</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Funciona em iOS, Android e Web.</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+        
+        {/* Documentação técnica */}
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mt-lg mb-sm`}>
+          Implementação dos Cards
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          Abaixo você encontra a documentação sobre como utilizar os componentes NotificationsMenu e ProfileMenu.
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className="font-mono text-xs" style={{ color: textPrimary.includes('dark') ? '#E5E7EB' : '#374151' }}>
+{`// Importando os componentes
+import { NotificationsMenu } from '@/components/AicrusComponents/notifications-menu';
+import { ProfileMenu } from '@/components/AicrusComponents/profile-menu';
+
+// Estados para controle de visibilidade e posição
+const [menuVisible, setMenuVisible] = useState(false);
+const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+const buttonRef = useRef<View>(null);
+
+// Função para abrir o menu com posicionamento correto
+const handleOpenMenu = () => {
+  if (buttonRef.current && Platform.OS === 'web') {
+    // @ts-ignore - API DOM específica para web
+    const rect = buttonRef.current.getBoundingClientRect?.();
+    if (rect) {
+      setMenuPosition({
+        x: rect.right,
+        y: rect.bottom
+      });
+    }
+  }
+  setMenuVisible(true);
+};
+
+// Renderização do componente
+return (
+  <>
+    <View ref={buttonRef}>
+      <Pressable onPress={handleOpenMenu}>
+        <Text>Abrir Menu</Text>
+      </Pressable>
+    </View>
+    
+    {menuVisible && (
+      <NotificationsMenu
+        // ou <ProfileMenu
+        isVisible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        position={menuPosition}
+      />
+    )}
+  </>
+);`}
+          </Text>
+        </View>
+        
+        {/* Renderizar o backdrop e os menus */}
+        {renderBackdrop()}
+        
+        {notificationsVisible && (
+          <View 
+            style={Platform.OS === 'web' ? {
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 3000,
+              pointerEvents: 'none'
+            } : null}
+          >
+            <View style={{ pointerEvents: 'auto' }}>
+              <NotificationsMenu
+                isVisible={true}
+                onClose={() => setNotificationsVisible(false)}
+                position={notificationsPosition}
+              />
+            </View>
+          </View>
+        )}
+        
+        {profileVisible && (
+          <View 
+            style={Platform.OS === 'web' ? {
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 3000,
+              pointerEvents: 'none'
+            } : null}
+          >
+            <View style={{ pointerEvents: 'auto' }}>
+              <ProfileMenu
+                isVisible={profileVisible}
+                onClose={() => setProfileVisible(false)}
+                position={profilePosition}
+              />
+            </View>
+          </View>
+        )}
       </View>
     );
   };
@@ -2637,7 +3016,7 @@ const renderBackdrop = () => {
                   {availableComponents.map((component) => (
                     <Pressable
                       key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'notificationsMenu')}
+                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'cards')}
                       className={`mr-2 px-3 py-1 rounded-md ${
                         activeComponent === component.id
                           ? isDark
@@ -2696,7 +3075,7 @@ const renderBackdrop = () => {
                       return (
                         <HoverableView
                           key={component.id}
-                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'notificationsMenu')}
+                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'cards')}
                           className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
                             isComponentActive
                               ? isDark
