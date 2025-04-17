@@ -1,7 +1,7 @@
 {
-  "name": "Projeto Base",
-  "short_name": "Projeto Base",
-  "description": "Projeto base para desenvolvimento de aplicativos React Native/Expo multiplataforma",
+  "name": "Projeto Origem",
+  "short_name": "Projeto Origem",
+  "description": "Projeto Origem para desenvolvimento de aplicativos React Native/Expo multiplataforma",
   "icons": [
     {
       "src": "/favicon-192x192.png",
