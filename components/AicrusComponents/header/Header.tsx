@@ -49,6 +49,9 @@ const Z_INDEX = {
  * // Header simples
  * <Header />
  * 
+ * // Header com handler para controlar sidebar externa
+ * <Header onToggleDrawer={handleToggleSidebar} />
+ * 
  * // Header com componentes personalizados
  * <Header
  *   ProfileMenuComponent={CustomProfileMenu}
@@ -69,11 +72,14 @@ export interface HeaderProps {
     isDrawerVisible: boolean;
     onClose: () => void;
   }>;
+  /** Handler opcional para controlar a abertura/fechamento da sidebar externa */
+  onToggleDrawer?: () => void;
 }
 
 export function Header({
   ProfileMenuComponent,
   SidebarComponent,
+  onToggleDrawer,
 }: HeaderProps) {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
@@ -140,6 +146,13 @@ export function Header({
   };
 
   const toggleDrawer = () => {
+    // Se existir um handler externo para controlar uma sidebar externa
+    if (onToggleDrawer) {
+      onToggleDrawer();
+      return;
+    }
+
+    // Caso contrário, usa o comportamento padrão do drawer interno
     setIsDrawerOpen(!isDrawerOpen);
   };
 
@@ -166,7 +179,9 @@ export function Header({
 
   // Renderiza o backdrop global
   const renderBackdrop = () => {
-    if ((isNotificationsMenuOpen || isProfileMenuOpen || isDrawerOpen)) {
+    // Só renderiza o backdrop se algum menu interno estiver aberto
+    // (não inclui o caso onde apenas a sidebar externa está aberta)
+    if ((isNotificationsMenuOpen || isProfileMenuOpen || (isDrawerOpen && !onToggleDrawer))) {
       // Estilos específicos para cada plataforma
       const backdropStyle = Platform.OS === 'web' 
         ? {
