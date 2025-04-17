@@ -250,11 +250,11 @@ export function Header({
                   <Text style={[
                     styles.logoTextBold,
                     isDark && styles.textDark
-                  ]}>Evolução</Text>
+                  ]}>Projeto</Text>
                   <Text style={[
                     styles.logoText,
                     isDark && styles.textDark
-                  ]}>Vistoria</Text>
+                  ]}>Origem</Text>
                 </View>
               </View>
               
