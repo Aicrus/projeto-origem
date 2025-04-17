@@ -11,12 +11,12 @@ import { Button } from '../../components/AicrusComponents/button';
 import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
 import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
-import { HoverableView } from '@/components/AicrusComponents/hoverable-view';
-import { GradientView } from '@/components/AicrusComponents/gradient';
-import { NotificationsMenu } from '@/components/AicrusComponents/notifications-menu';
+import { HoverableView } from '../../components/AicrusComponents/hoverable-view';
+import { GradientView } from '../../components/AicrusComponents/gradient';
+import { NotificationsMenu } from '../../components/AicrusComponents/notifications-menu';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
-import { ProfileMenu } from '@/components/AicrusComponents/profile-menu';
+import { ProfileMenu } from '../../components/AicrusComponents/profile-menu';
 import { router } from 'expo-router';
 
 // Definir tipos para os componentes disponíveis
