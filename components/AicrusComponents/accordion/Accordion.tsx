@@ -476,10 +476,10 @@ export const Accordion = ({
       // Otimização para Android/iOS
       ...(Platform.OS !== 'web' ? {
         opacity: 1, // Controlado por LayoutAnimation
-        transform: [{
-          translateY: 0 as const, // Permite animação de hardware-accelerated
-          scale: 1 as const,     // Permite animação de hardware-accelerated
-        }],
+        transform: [
+          { translateY: 0 }, // Separado em objetos individuais
+          { scale: 1 }       // Cada propriedade em seu próprio objeto
+        ],
       } : {})
     } as ViewStyle,
     contentText: {
