@@ -2,7 +2,6 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { Header } from '../../components/AicrusComponents/header';
-import { Stack } from 'expo-router';
 
 export default function Home() {
   const { currentTheme } = useTheme();
@@ -12,19 +11,10 @@ export default function Home() {
   const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
 
   return (
-    <>
-      <Stack.Screen 
-        options={{
-          title: "Home",
-          headerShown: false
-        }} 
-      />
-      
-      <View className={`flex-1 ${bgPrimary}`} style={styles.container}>
-        <Header />
-        {/* Resto do conteúdo da página */}
-      </View>
-    </>
+    <View className={`flex-1 ${bgPrimary}`} style={styles.container}>
+      <Header />
+      {/* Resto do conteúdo da página */}
+    </View>
   );
 }
 

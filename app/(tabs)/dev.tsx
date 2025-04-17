@@ -2993,23 +2993,23 @@ return (
     <>
       <Stack.Screen 
         options={{
-          title: "Dev",
-          headerShown: false
+          title: 'Dev',
+          headerShown: true,
+          headerTintColor: currentTheme === 'dark' ? '#FFFFFF' : '#14181B',
+          headerStyle: {
+            backgroundColor: currentTheme === 'dark' ? '#1C1E26' : '#F7F8FA',
+          }
         }} 
       />
       
       <View className={`flex-1 ${bgPrimary}`}>
-        {renderBackdrop()}
-        <Toast
-          visible={toastVisible}
-          type={toastType}
-          message="Esta é uma mensagem de exemplo."
-          position={toastPosition}
-          closable={toastClosable}
-          showProgressBar={toastProgressBar}
-          onHide={() => setToastVisible(false)}
+        <Stack.Screen
+          options={{
+            title: "Desenvolvimento",
+            headerShown: false,
+          }}
         />
-
+        
         {/* Mostrar o indicador de breakpoint apenas na versão web */}
         {Platform.OS === 'web' && <BreakpointIndicator />}
         
