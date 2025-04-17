@@ -7,30 +7,6 @@ import { ProtectedRoute } from '../../components/ProtectedRoute';
 import { useResponsive } from '../../hooks/useResponsive';
 
 /**
- * Mostra um indicador de depuração do breakpoint atual quando em desenvolvimento
- * Útil para testar e verificar os breakpoints
- */
-const BreakpointDebugger = ({ currentBreakpoint, width }: { currentBreakpoint: string, width: number }) => {
-  if (process.env.NODE_ENV !== 'development') return null;
-  
-  return (
-    <View style={{
-      position: 'absolute',
-      top: 4,
-      right: 4,
-      backgroundColor: 'rgba(0,0,0,0.7)',
-      padding: 4,
-      borderRadius: 4,
-      zIndex: 9999,
-    }}>
-      <Text style={{ color: 'white', fontSize: 10 }}>
-        {currentBreakpoint} ({width}px)
-      </Text>
-    </View>
-  );
-};
-
-/**
  * Estrutura base simplificada para o TabsLayout
  */
 export default function TabsLayout() {
@@ -60,8 +36,6 @@ export default function TabsLayout() {
 
   return (
     <ProtectedRoute>
-      <BreakpointDebugger currentBreakpoint={currentBreakpoint} width={width} />
-      
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: activeTabColor,

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Stack } from 'expo-router';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Switch, Image, Platform, useWindowDimensions, Pressable } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
+import { useResponsive } from '../../hooks/useResponsive';
 import { Input } from '../../components/AicrusComponents/input';
 import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
@@ -24,6 +25,7 @@ export default function DevPage() {
   const [toastClosable, setToastClosable] = useState(false);
   const [toastProgressBar, setToastProgressBar] = useState(true);
   const { width } = useWindowDimensions();
+  const { currentBreakpoint } = useResponsive();
   const isMobile = width < 768;
   
   // HoverableView estados de exemplo
@@ -2314,6 +2316,17 @@ showToast({
     );
   };
 
+  // Componente para mostrar o breakpoint atual
+  const BreakpointIndicator = () => {
+    return (
+      <View className={`self-end mr-md mt-md py-xs px-md rounded-md ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}>
+        <Text className={`text-body-sm text-center ${textSecondary}`}>
+          Breakpoint: {currentBreakpoint} ({width}px)
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <>
       <Stack.Screen 
@@ -2328,6 +2341,15 @@ showToast({
       />
       
       <View className={`flex-1 ${bgPrimary}`}>
+        <Stack.Screen
+          options={{
+            title: "Desenvolvimento",
+            headerShown: false,
+          }}
+        />
+        
+        <BreakpointIndicator />
+        
         <View className="flex-1">
           {isMobile ? (
             // Layout para dispositivos móveis com botões compactos no topo
