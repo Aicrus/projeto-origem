@@ -123,10 +123,10 @@ export function Header({
       // @ts-ignore - API DOM específica para web
       const rect = avatarButtonRef.current.getBoundingClientRect?.();
       if (rect) {
-        // Posiciona o menu abaixo e à direita do botão
+        // Posiciona o menu abaixo do botão com posição Y específica
         setAvatarPosition({
           x: rect.right,
-          y: rect.bottom
+          y: rect.bottom + 10 // Adiciona espaço para alinhar com o menu de notificações
         });
       }
     }
@@ -147,10 +147,10 @@ export function Header({
       // @ts-ignore - API DOM específica para web
       const rect = bellButtonRef.current.getBoundingClientRect?.();
       if (rect) {
-        // Posiciona o menu abaixo e à direita do botão
+        // Posiciona o menu abaixo do botão com posição Y específica
         setBellPosition({
           x: rect.right,
-          y: rect.bottom
+          y: rect.bottom + 10 // Adiciona espaço para alinhar com o menu de perfil
         });
       }
     }
