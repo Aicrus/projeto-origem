@@ -2734,8 +2734,10 @@ const renderBackdrop = () => {
         // @ts-ignore - API DOM específica para web
         const rect = profileCardButtonRef.current.getBoundingClientRect?.();
         if (rect) {
+          // Calcular o centro do botão para melhor posicionamento
+          const centerX = rect.left + (rect.width / 2);
           setProfilePosition({
-            x: rect.right,
+            x: centerX,
             y: rect.bottom
           });
         }
