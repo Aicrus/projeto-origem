@@ -3,19 +3,15 @@ import { View, StyleSheet, Text } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { Header } from '../../components/AicrusComponents/header';
 import { Sidebar } from '../../components/Sidebar';
-import { DesktopSidebar } from '../../components/DesktopSidebar';
 import { Portal } from '@gorhom/portal';
 import { useResponsive } from '../../hooks/useResponsive';
 
 export default function Home() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { isMobile, isTablet, isDesktop } = useResponsive();
 
-  // Layout para tablets e desktop terá um sidebar fixo
-  const hasFixedSidebar = !isMobile;
-  
   // Exemplo de opção para controlar a exibição do Header
   // Isto deixa explícito que o Header é opcional e a pessoa que desenvolve pode escolher
   // mostrar ou não o Header em cada tela
@@ -25,39 +21,45 @@ export default function Home() {
   const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
   const textColor = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
 
-  // Função para abrir/fechar o sidebar
+  // Função para abrir/fechar o sidebar móvel
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
   };
+
+  const sidebarWidth = 256; // A largura do nosso sidebar, deve ser o mesmo valor usado no componente
 
   return (
     <>
       <View className={`flex-1 ${bgPrimary}`} style={styles.container}>
         {/* 
-          O Header é opcional e pode ser incluído ou não pelo desenvolvedor,
-          dependendo da sua necessidade. Cada tela é independente e pode
-          decidir se quer usar o Header ou não.
-          
-          Quando incluído, passamos onToggleDrawer para controlar nossa sidebar
+          Sidebar fixa para tablet/desktop
+          Renderizada diretamente no layout (sem Portal)
         */}
-        {showHeader && (
-          <Header 
-            onToggleDrawer={isMobile ? toggleSidebar : undefined} 
-          />
+        {!isMobile && (
+          <Sidebar fixed withHeader={showHeader} />
         )}
 
-        <View style={{ flex: 1, flexDirection: 'row' }}>
-          {/* Sidebar fixo para tablet/desktop */}
-          {hasFixedSidebar && (
-            <DesktopSidebar withHeader={showHeader} />
+        {/* Área principal de conteúdo que dá espaço para a sidebar fixa */}
+        <View style={{ 
+          flex: 1, 
+          marginLeft: isMobile ? 0 : sidebarWidth
+        }}>
+          {/* 
+            O Header é opcional e pode ser incluído ou não pelo desenvolvedor.
+            Quando em tablet/desktop, informamos a largura da sidebar para que o Header se ajuste.
+          */}
+          {showHeader && (
+            <Header 
+              onToggleDrawer={isMobile ? toggleSidebar : undefined}
+              sidebarWidth={!isMobile ? sidebarWidth : 0}
+            />
           )}
 
           {/* Conteúdo principal da tela */}
           <View 
             className="flex-1 p-4" 
             style={{ 
-              marginTop: showHeader ? 64 : 0,
-              paddingTop: 16
+              marginTop: showHeader ? 64 : 0
             }}
           >
             <Text className={`text-lg font-bold ${textColor}`}>
@@ -70,17 +72,11 @@ export default function Home() {
             </Text>
             
             <Text className={`mt-4 ${textColor}`}>
-              {isMobile 
-                ? "Em dispositivos móveis, o sidebar aparece sobreposto quando o botão de menu é clicado." 
-                : "Em tablets e desktops, o sidebar fica fixo ao lado, dando espaço para o conteúdo."
-              }
+              Em tablets e desktops, o sidebar fica fixo ao lado, dando espaço para o conteúdo.
             </Text>
             
             <Text className={`mt-4 ${textColor}`}>
-              {isMobile
-                ? "A sidebar móvel fecha automaticamente quando a tela aumenta de tamanho."
-                : "O sidebar fixo se adapta ao layout da tela, respeitando o espaço do Header."
-              }
+              O sidebar fixo se adapta ao layout da tela, respeitando o espaço do Header.
             </Text>
 
             <Text className={`mt-8 text-sm ${textColor}`}>
@@ -91,15 +87,16 @@ export default function Home() {
       </View>
 
       {/* 
-        Sidebar móvel renderizado via Portal, fora da hierarquia normal.
-        Só é usado em dispositivos móveis.
+        Sidebar móvel renderizada via Portal.
+        Só é renderizada quando estamos em dispositivos móveis e o sidebar é aberto.
       */}
       {isMobile && (
         <Portal>
           <Sidebar 
-            isOpen={isSidebarOpen} 
-            onClose={() => setIsSidebarOpen(false)} 
+            isOpen={isMobileSidebarOpen} 
+            onClose={() => setIsMobileSidebarOpen(false)} 
             withHeader={showHeader}
+            fixed={false}
           />
         </Portal>
       )}

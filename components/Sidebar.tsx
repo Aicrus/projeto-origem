@@ -5,9 +5,10 @@ import { Home, Settings, User, HelpCircle, FileText, LogOut } from 'lucide-react
 import { useResponsive } from '../hooks/useResponsive';
 
 interface SidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   withHeader?: boolean;
+  fixed?: boolean; // Nova propriedade para determinar se o sidebar é fixo (para tablet/desktop) ou flutuante (mobile)
 }
 
 // Z-index absurdamente alto para garantir que esteja acima de tudo
@@ -17,7 +18,12 @@ const EXTREME_Z_INDEX = {
   SIDEBAR: 9999999
 };
 
-export function Sidebar({ isOpen, onClose, withHeader = true }: SidebarProps) {
+export function Sidebar({ 
+  isOpen = true, 
+  onClose, 
+  withHeader = true,
+  fixed = false 
+}: SidebarProps) {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   const windowDimensions = Dimensions.get('window');
@@ -43,19 +49,131 @@ export function Sidebar({ isOpen, onClose, withHeader = true }: SidebarProps) {
   ];
 
   // Fechar o sidebar quando a tela mudar de tamanho (de mobile para tablet/desktop)
+  // Só aplicamos isso quando não é fixo (mode mobile)
   useEffect(() => {
-    if (!isMobile && isOpen) {
+    if (!fixed && !isMobile && isOpen && onClose) {
       // Se não estiver mais no mobile mas o sidebar estiver aberto, fechá-lo
       onClose();
     }
-  }, [isMobile, isOpen, onClose, currentBreakpoint]);
+  }, [isMobile, isOpen, onClose, currentBreakpoint, fixed]);
 
-  if (!isOpen) return null;
+  // Se estiver fechado e for tipo flutuante (mobile), não renderizamos nada
+  if (!isOpen && !fixed) return null;
 
   // Usar a altura e largura totais da tela para cobrir inclusive a TabBar
   const screenHeight = Dimensions.get('screen').height;
   const screenWidth = Dimensions.get('screen').width;
 
+  // O conteúdo interno do sidebar é o mesmo, independente do modo
+  const sidebarContent = (
+    <>
+      <View className={`py-6 px-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} 
+        style={Platform.OS !== 'web' ? {
+          paddingVertical: 24,
+          paddingHorizontal: 16,
+          borderBottomWidth: 1,
+          borderBottomColor: isDark ? '#374151' : '#e5e7eb',
+        } : null}
+      >
+        <Text 
+          className={`text-xl font-bold ${textColor}`}
+          style={Platform.OS !== 'web' ? {
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: isDark ? '#f3f4f6' : '#1f2937'
+          } : null}
+        >
+          Menu
+        </Text>
+      </View>
+
+      <ScrollView className="flex-1" style={styles.scrollView}>
+        <View className="py-2" style={Platform.OS !== 'web' ? { paddingVertical: 8 } : null}>
+          {menuItems.map((item, index) => (
+            <Pressable 
+              key={index}
+              className={`flex-row items-center px-4 py-3 mx-2 my-1 rounded-md hover:${itemHoverBg}`}
+              style={[
+                styles.menuItem,
+                Platform.OS !== 'web' ? { 
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  marginHorizontal: 8,
+                  marginVertical: 4,
+                  borderRadius: 6,
+                } : null
+              ]}
+            >
+              <item.icon size={20} color={isDark ? '#E5E7EB' : '#374151'} />
+              <Text 
+                className={`ml-3 ${textColor}`}
+                style={Platform.OS !== 'web' ? { 
+                  marginLeft: 12,
+                  color: isDark ? '#f3f4f6' : '#1f2937'
+                } : null}
+              >
+                {item.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </ScrollView>
+
+      <View 
+        className={`py-4 px-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
+        style={Platform.OS !== 'web' ? {
+          paddingVertical: 16,
+          paddingHorizontal: 16,
+          borderTopWidth: 1,
+          borderTopColor: isDark ? '#374151' : '#e5e7eb'
+        } : null}
+      >
+        <Pressable 
+          className="flex-row items-center px-4 py-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+          style={[
+            styles.menuItem,
+            Platform.OS !== 'web' ? {
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingHorizontal: 16,
+              paddingVertical: 12,
+              borderRadius: 6,
+            } : null
+          ]}
+        >
+          <LogOut size={20} color={isDark ? '#E5E7EB' : '#374151'} />
+          <Text 
+            className={`ml-3 ${textColor}`}
+            style={Platform.OS !== 'web' ? {
+              marginLeft: 12,
+              color: isDark ? '#f3f4f6' : '#1f2937'
+            } : null}
+          >
+            Sair
+          </Text>
+        </Pressable>
+      </View>
+    </>
+  );
+
+  // Para sidebar fixa (tablet/desktop) - sem backdrop, posição fixa
+  if (fixed) {
+    return (
+      <View 
+        className={`${bgColor} h-full border-r ${borderColor} w-64`}
+        style={[
+          styles.fixedSidebar,
+          { marginTop: withHeader ? 64 : 0 }
+        ]}
+      >
+        {sidebarContent}
+      </View>
+    );
+  }
+
+  // Para sidebar flutuante (mobile) - com backdrop, posição absoluta
   return (
     <>
       {/* Backdrop para fechar o menu ao clicar fora */}
@@ -74,10 +192,12 @@ export function Sidebar({ isOpen, onClose, withHeader = true }: SidebarProps) {
           }
         ]}
       >
-        <Pressable 
-          style={StyleSheet.absoluteFillObject}
-          onPress={onClose}
-        />
+        {onClose && (
+          <Pressable 
+            style={StyleSheet.absoluteFillObject}
+            onPress={onClose}
+          />
+        )}
       </View>
 
       {/* Sidebar */}
@@ -99,94 +219,7 @@ export function Sidebar({ isOpen, onClose, withHeader = true }: SidebarProps) {
           } : null
         ]}
       >
-        <View className={`py-6 px-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`} 
-          style={Platform.OS !== 'web' ? {
-            paddingVertical: 24,
-            paddingHorizontal: 16,
-            borderBottomWidth: 1,
-            borderBottomColor: isDark ? '#374151' : '#e5e7eb',
-          } : null}
-        >
-          <Text 
-            className={`text-xl font-bold ${textColor}`}
-            style={Platform.OS !== 'web' ? {
-              fontSize: 20,
-              fontWeight: 'bold',
-              color: isDark ? '#f3f4f6' : '#1f2937'
-            } : null}
-          >
-            Menu
-          </Text>
-        </View>
-
-        <ScrollView className="flex-1" style={styles.scrollView}>
-          <View className="py-2" style={Platform.OS !== 'web' ? { paddingVertical: 8 } : null}>
-            {menuItems.map((item, index) => (
-              <Pressable 
-                key={index}
-                className={`flex-row items-center px-4 py-3 mx-2 my-1 rounded-md hover:${itemHoverBg}`}
-                style={[
-                  styles.menuItem,
-                  Platform.OS !== 'web' ? { 
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
-                    marginHorizontal: 8,
-                    marginVertical: 4,
-                    borderRadius: 6,
-                  } : null
-                ]}
-              >
-                <item.icon size={20} color={isDark ? '#E5E7EB' : '#374151'} />
-                <Text 
-                  className={`ml-3 ${textColor}`}
-                  style={Platform.OS !== 'web' ? { 
-                    marginLeft: 12,
-                    color: isDark ? '#f3f4f6' : '#1f2937'
-                  } : null}
-                >
-                  {item.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </ScrollView>
-
-        <View 
-          className={`py-4 px-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
-          style={Platform.OS !== 'web' ? {
-            paddingVertical: 16,
-            paddingHorizontal: 16,
-            borderTopWidth: 1,
-            borderTopColor: isDark ? '#374151' : '#e5e7eb'
-          } : null}
-        >
-          <Pressable 
-            className="flex-row items-center px-4 py-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
-            style={[
-              styles.menuItem,
-              Platform.OS !== 'web' ? {
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                borderRadius: 6,
-              } : null
-            ]}
-          >
-            <LogOut size={20} color={isDark ? '#E5E7EB' : '#374151'} />
-            <Text 
-              className={`ml-3 ${textColor}`}
-              style={Platform.OS !== 'web' ? {
-                marginLeft: 12,
-                color: isDark ? '#f3f4f6' : '#1f2937'
-              } : null}
-            >
-              Sair
-            </Text>
-          </Pressable>
-        </View>
+        {sidebarContent}
       </View>
     </>
   );
@@ -201,6 +234,18 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  fixedSidebar: {
+    width: 256, // 64 * 4 = 256px (equivalente a w-64)
+    height: '100%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 3.84,
+    elevation: 2,
   },
   scrollView: {
     flex: 1,

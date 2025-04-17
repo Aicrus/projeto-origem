@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Image, Platform, Pressable, Text, Dimensions } from 'react-native';
+import { StyleSheet, View, Image, Platform, Pressable, Text, Dimensions, ViewStyle } from 'react-native';
 import { Share2, Bell, Search, MessageSquare, Settings, Menu } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
@@ -52,11 +52,8 @@ const Z_INDEX = {
  * // Header com handler para controlar sidebar externa
  * <Header onToggleDrawer={handleToggleSidebar} />
  * 
- * // Header com componentes personalizados
- * <Header
- *   ProfileMenuComponent={CustomProfileMenu}
- *   SidebarComponent={CustomSidebar}
- * />
+ * // Header com ajuste para sidebar fixa
+ * <Header sidebarWidth={256} />
  * ```
  */
 
@@ -74,12 +71,15 @@ export interface HeaderProps {
   }>;
   /** Handler opcional para controlar a abertura/fechamento da sidebar externa */
   onToggleDrawer?: () => void;
+  /** Largura do sidebar para ajustar o header quando em tablet/desktop */
+  sidebarWidth?: number;
 }
 
 export function Header({
   ProfileMenuComponent,
   SidebarComponent,
   onToggleDrawer,
+  sidebarWidth = 0,
 }: HeaderProps) {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
@@ -202,7 +202,7 @@ export function Header({
             height: Dimensions.get('window').height,
             zIndex: Z_INDEX.BACKDROP,
           };
-        
+      
       return (
         <Pressable
           style={[
@@ -223,6 +223,12 @@ export function Header({
     
     return null;
   };
+
+  // Estilos adicionais para o header quando temos um sidebar
+  const headerWithSidebarStyle = !isMobile && sidebarWidth > 0 ? { 
+    width: Dimensions.get('window').width - sidebarWidth,
+    marginLeft: sidebarWidth
+  } : {};
 
   // Componente de barra lateral padrão
   const DefaultSidebar = ({ isDrawerVisible, onClose }: { isDrawerVisible: boolean; onClose: () => void }) => {
@@ -378,7 +384,7 @@ export function Header({
   return (
     <>
       {/* Header primeiro */}
-      <View style={styles.wrapper}>
+      <View style={[styles.wrapper, headerWithSidebarStyle]}>
         <View style={[
           styles.header,
           {
