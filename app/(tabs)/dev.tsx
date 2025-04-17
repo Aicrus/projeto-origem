@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Stack } from 'expo-router';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Switch, Image, Platform, useWindowDimensions, Pressable } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Switch, Image, Platform, useWindowDimensions, Pressable, Dimensions } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { Input } from '../../components/AicrusComponents/input';
@@ -13,12 +13,14 @@ import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/to
 import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
 import { HoverableView } from '@/components/AicrusComponents/hoverable-view';
 import { GradientView } from '@/components/AicrusComponents/gradient';
+import { NotificationsMenu } from '@/components/AicrusComponents/notifications-menu';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect } from 'expo-router';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | null>('designSystem');
+  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'notificationsMenu' | null>('designSystem');
   const [toastVisible, setToastVisible] = useState(false);
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const [toastPosition, setToastPosition] = useState<'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('top');
@@ -97,6 +99,7 @@ export default function DevPage() {
     { id: 'themeSelector', name: 'Theme Selector', icon: 'SunMoon' },
     { id: 'hoverableView', name: 'Hoverable View', icon: 'MousePointer' },
     { id: 'gradientView', name: 'Gradient View', icon: 'Palette' },
+    { id: 'notificationsMenu', name: 'Notifications Menu', icon: 'bell' },
   ];
   
   // Função para renderizar o ícone correto
@@ -165,6 +168,8 @@ export default function DevPage() {
         return renderHoverableViewComponent();
       case 'gradientView':
         return renderGradientViewComponent();
+      case 'notificationsMenu':
+        return renderNotificationsMenuComponent();
       default:
         return null;
     }
@@ -2316,6 +2321,246 @@ showToast({
     );
   };
 
+  // Estado específico para o menu de notificações
+  const [notificationsMenuVisible, setNotificationsMenuVisible] = useState(true); // Começa visível
+  const [clickPosition, setClickPosition] = useState({ x: 200, y: 100 }); // Posição fixa para demonstração
+  const notificationsButtonRef = useRef<View | null>(null);
+  const secondButtonRef = useRef<View | null>(null);
+  const [activeButtonRef, setActiveButtonRef] = useState<React.RefObject<View | null> | null>(null);
+  
+  // Constantes para z-index, garantindo a hierarquia correta
+  const Z_INDEX = {
+    CONTENT: 1,
+    BACKDROP: 2000,
+    NOTIFICATION_MENU: 4000
+  };
+  
+  // Adicionar useFocusEffect para fechar menu quando a tela perde foco
+  useFocusEffect(
+    useCallback(() => {
+      // Tornar o menu visível automaticamente quando a tela ganha foco
+      setNotificationsMenuVisible(true);
+      
+      return () => {
+        // Quando a tela perde foco, fechamos o menu de notificações
+        if (notificationsMenuVisible) {
+          setNotificationsMenuVisible(false);
+        }
+      };
+    }, [notificationsMenuVisible])
+  );
+  
+  // Efeito adicional para observar mudanças de rota (útil para navegação programática)
+  useEffect(() => {
+    const handleRouteChange = () => {
+      if (notificationsMenuVisible) {
+        setNotificationsMenuVisible(false);
+      }
+    };
+  
+    // Adicionar event listener para o evento de navegação
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      window.addEventListener('popstate', handleRouteChange);
+    }
+  
+    return () => {
+      // Limpar event listener
+      if (Platform.OS === 'web' && typeof window !== 'undefined') {
+        window.removeEventListener('popstate', handleRouteChange);
+      }
+    };
+  }, [notificationsMenuVisible]);
+  
+  // Renderiza o backdrop transparente para capturar cliques
+  const renderBackdrop = () => {
+    if (notificationsMenuVisible) {
+      return (
+        <Pressable
+          style={{
+            position: Platform.OS === 'web' ? 'fixed' : 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            ...(Platform.OS === 'web' ? {} : {
+              width: Dimensions.get('window').width,
+              height: Dimensions.get('window').height,
+            }),
+            zIndex: Z_INDEX.BACKDROP,
+            backgroundColor: 'transparent'
+          } as any}
+          onPress={() => setNotificationsMenuVisible(false)}
+        />
+      );
+    }
+    
+    return null;
+  };
+  
+  // Modificar a função renderNotificationsMenuComponent para usar posicionamento próximo ao botão
+  const renderNotificationsMenuComponent = () => {
+    return (
+      <View className="p-lg">
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+          Menu de Notificações - Implementação Completa
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          Esta é uma demonstração completa do menu de notificações com todas as melhorias implementadas:
+          overlay transparente em toda a tela, posicionamento contextual e fechamento automático ao navegar.
+          O menu é exibido automaticamente para demonstração.
+        </Text>
+  
+        {/* Renderizar backdrop transparente */}
+        {renderBackdrop()}
+  
+        {/* Renderizar menu de notificações com z-index alto */}
+        {notificationsMenuVisible && (
+          <View 
+            style={Platform.OS === 'web' ? {
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: Z_INDEX.NOTIFICATION_MENU,
+              pointerEvents: 'none'
+            } : undefined}
+          >
+            <View style={{ pointerEvents: 'auto' }}>
+              <NotificationsMenu
+                isVisible={true}
+                onClose={() => setNotificationsMenuVisible(false)}
+                position={clickPosition}
+                viewAllRoute="/(tabs)/dev"
+              />
+            </View>
+          </View>
+        )}
+  
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>
+            Técnicas Implementadas:
+          </Text>
+  
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>1. Overlay transparente em toda a tela</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              Implementamos um Pressable transparente que cobre toda a viewport,
+              permitindo fechar o menu ao clicar em qualquer lugar fora dele, sem escurecer o conteúdo.
+            </Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>2. Z-Index hierárquico</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              Definimos valores de z-index específicos para garantir a ordem correta:
+              Conteúdo (1) → Backdrop (2000) → Menu (4000)
+            </Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>3. Posicionamento fixo</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              Usamos position: fixed na web e position: absolute no mobile,
+              com coordenadas específicas para garantir que o menu apareça no local correto.
+            </Text>
+          </View>
+  
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>4. Estratégia PointerEvents</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              Usamos pointerEvents: 'none' no container e pointerEvents: 'auto' no menu
+              para permitir interação com o menu enquanto o resto do overlay captura cliques.
+            </Text>
+          </View>
+  
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>5. Fechamento automático</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              O menu fecha automaticamente quando:
+              - O usuário clica fora do menu (no overlay transparente)
+              - O usuário navega para outra tela (useFocusEffect)
+              - A janela é redimensionada (event listener de resize)
+            </Text>
+          </View>
+        </View>
+  
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Implementação no código
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          Trecho de código mostrando como implementar o menu de notificações:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className="font-mono text-xs" style={{ color: textPrimary.includes('dark') ? '#E5E7EB' : '#374151' }}>
+{`// 1. Definir z-index com valores altos
+const Z_INDEX = {
+  CONTENT: 1,
+  BACKDROP: 2000,
+  NOTIFICATION_MENU: 4000
+};
+
+// 2. Detectar quando a tela perde foco (para fechar o menu)
+import { useFocusEffect } from 'expo-router';
+
+useFocusEffect(
+  useCallback(() => {
+    // Código ao ganhar foco
+    return () => {
+      // Quando a tela perde foco, fechar o menu
+      if (isNotificationsMenuOpen) {
+        setIsNotificationsMenuOpen(false);
+      }
+    };
+  }, [isNotificationsMenuOpen])
+);
+
+// 3. Renderizar overlay transparente em toda a tela
+const renderBackdrop = () => {
+  if (isNotificationsMenuOpen) {
+    return (
+      <Pressable
+        style={{
+          position: Platform.OS === 'web' ? 'fixed' : 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          width: '100vw', // Garante cobertura total na web
+          height: '100vh',
+          zIndex: Z_INDEX.BACKDROP,
+          backgroundColor: 'transparent'
+        }}
+        onPress={() => setIsNotificationsMenuOpen(false)}
+      />
+    );
+  }
+  return null;
+};
+
+// 4. Renderizar o menu com z-index mais alto
+{isNotificationsMenuOpen && (
+  <View 
+    style={{
+      position: 'fixed',
+      top: 0, left: 0, right: 0, bottom: 0,
+      zIndex: Z_INDEX.NOTIFICATION_MENU,
+      pointerEvents: 'none' // Permite clicar através deste container
+    }}
+  >
+    <View style={{ pointerEvents: 'auto' }}> {/* Apenas o menu recebe eventos */}
+      <NotificationsMenu
+        isVisible={true}
+        onClose={() => setIsNotificationsMenuOpen(false)}
+        position={clickPosition}
+      />
+    </View>
+  </View>
+)}`}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
   // Componente para mostrar o breakpoint atual
   const BreakpointIndicator = () => {
     return (
@@ -2348,7 +2593,8 @@ showToast({
           }}
         />
         
-        <BreakpointIndicator />
+        {/* Mostrar o indicador de breakpoint apenas na versão web */}
+        {Platform.OS === 'web' && <BreakpointIndicator />}
         
         <View className="flex-1">
           {isMobile ? (
@@ -2364,7 +2610,7 @@ showToast({
                   {availableComponents.map((component) => (
                     <Pressable
                       key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView')}
+                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'notificationsMenu')}
                       className={`mr-2 px-3 py-1 rounded-md ${
                         activeComponent === component.id
                           ? isDark
@@ -2423,7 +2669,7 @@ showToast({
                       return (
                         <HoverableView
                           key={component.id}
-                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView')}
+                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'notificationsMenu')}
                           className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
                             isComponentActive
                               ? isDark

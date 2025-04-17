@@ -14,6 +14,7 @@ export * from './button';
 export * from './toast';
 export * from './theme-selector';
 export * from './hoverable-view';
+export * from './notifications-menu';
 
 // Exportações de constantes
 export * from './constants/theme';
