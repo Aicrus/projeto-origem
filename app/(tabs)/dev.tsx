@@ -38,7 +38,20 @@ export default function DevPage() {
   const [selectBasico, setSelectBasico] = useState('');
   const [selectBusca, setSelectBusca] = useState('');
   const [multiSelect, setMultiSelect] = useState<string[]>([]);
-
+  
+  // Verifica se estamos em ambiente móvel/nativo
+  const isNative = Platform.OS !== 'web';
+  
+  // Ajusta posição do toast para ambiente nativo
+  useEffect(() => {
+    if (isNative) {
+      // Em ambiente nativo, apenas 'top' e 'bottom' são posições válidas
+      if (!['top', 'bottom'].includes(toastPosition)) {
+        setToastPosition('top');
+      }
+    }
+  }, [isNative, toastPosition]);
+  
   // Validar email
   const isValidEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1355,6 +1368,9 @@ export default function DevPage() {
       }, 100);
     };
 
+    // Verifica se estamos em ambiente móvel/nativo - removido pois já existe no escopo global
+    const mobilePositions = ['top', 'bottom'];
+
     return (
       <View className="p-lg">
         <Toast
@@ -1424,9 +1440,9 @@ export default function DevPage() {
           {/* Posições */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Posições</Text>
-            <View className="flex-row flex-wrap gap-sm mb-sm">
-              <View className="flex-col gap-sm mr-sm">
-                <Text className={`text-body-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Topo</Text>
+            {isNative ? (
+              // Em dispositivos nativos, mostramos apenas top e bottom
+              <View className="flex-row flex-wrap gap-sm mb-sm">
                 <Button 
                   variant={toastPosition === 'top' ? "primary" : "outline"} 
                   onPress={() => {
@@ -1438,29 +1454,6 @@ export default function DevPage() {
                   {ToastPositionLabels['top']}
                 </Button>
                 <Button 
-                  variant={toastPosition === 'top-left' ? "primary" : "outline"} 
-                  onPress={() => {
-                    setToastPosition('top-left');
-                    showToast(toastType);
-                  }}
-                  size="sm"
-                >
-                  {ToastPositionLabels['top-left']}
-                </Button>
-                <Button 
-                  variant={toastPosition === 'top-right' ? "primary" : "outline"} 
-                  onPress={() => {
-                    setToastPosition('top-right');
-                    showToast(toastType);
-                  }}
-                  size="sm"
-                >
-                  {ToastPositionLabels['top-right']}
-                </Button>
-              </View>
-              <View className="flex-col gap-sm">
-                <Text className={`text-body-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Base</Text>
-                <Button 
                   variant={toastPosition === 'bottom' ? "primary" : "outline"} 
                   onPress={() => {
                     setToastPosition('bottom');
@@ -1470,30 +1463,86 @@ export default function DevPage() {
                 >
                   {ToastPositionLabels['bottom']}
                 </Button>
-                <Button 
-                  variant={toastPosition === 'bottom-left' ? "primary" : "outline"} 
-                  onPress={() => {
-                    setToastPosition('bottom-left');
-                    showToast(toastType);
-                  }}
-                  size="sm"
-                >
-                  {ToastPositionLabels['bottom-left']}
-                </Button>
-                <Button 
-                  variant={toastPosition === 'bottom-right' ? "primary" : "outline"} 
-                  onPress={() => {
-                    setToastPosition('bottom-right');
-                    showToast(toastType);
-                  }}
-                  size="sm"
-                >
-                  {ToastPositionLabels['bottom-right']}
-                </Button>
+                <Text className={`text-body-sm ${textSecondary} mt-sm`}>
+                  Em dispositivos móveis, o Toast é exibido apenas nas posições superior e inferior.
+                </Text>
               </View>
-            </View>
+            ) : (
+              // Na web, mostramos todas as opções de posição
+              <View className="flex-row flex-wrap gap-sm mb-sm">
+                <View className="flex-col gap-sm mr-sm">
+                  <Text className={`text-body-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Topo</Text>
+                  <Button 
+                    variant={toastPosition === 'top' ? "primary" : "outline"} 
+                    onPress={() => {
+                      setToastPosition('top');
+                      showToast(toastType);
+                    }}
+                    size="sm"
+                  >
+                    {ToastPositionLabels['top']}
+                  </Button>
+                  <Button 
+                    variant={toastPosition === 'top-left' ? "primary" : "outline"} 
+                    onPress={() => {
+                      setToastPosition('top-left');
+                      showToast(toastType);
+                    }}
+                    size="sm"
+                  >
+                    {ToastPositionLabels['top-left']}
+                  </Button>
+                  <Button 
+                    variant={toastPosition === 'top-right' ? "primary" : "outline"} 
+                    onPress={() => {
+                      setToastPosition('top-right');
+                      showToast(toastType);
+                    }}
+                    size="sm"
+                  >
+                    {ToastPositionLabels['top-right']}
+                  </Button>
+                </View>
+                <View className="flex-col gap-sm">
+                  <Text className={`text-body-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Base</Text>
+                  <Button 
+                    variant={toastPosition === 'bottom' ? "primary" : "outline"} 
+                    onPress={() => {
+                      setToastPosition('bottom');
+                      showToast(toastType);
+                    }}
+                    size="sm"
+                  >
+                    {ToastPositionLabels['bottom']}
+                  </Button>
+                  <Button 
+                    variant={toastPosition === 'bottom-left' ? "primary" : "outline"} 
+                    onPress={() => {
+                      setToastPosition('bottom-left');
+                      showToast(toastType);
+                    }}
+                    size="sm"
+                  >
+                    {ToastPositionLabels['bottom-left']}
+                  </Button>
+                  <Button 
+                    variant={toastPosition === 'bottom-right' ? "primary" : "outline"} 
+                    onPress={() => {
+                      setToastPosition('bottom-right');
+                      showToast(toastType);
+                    }}
+                    size="sm"
+                  >
+                    {ToastPositionLabels['bottom-right']}
+                  </Button>
+                </View>
+              </View>
+            )}
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              O Toast pode ser posicionado em diferentes áreas da tela, incluindo todos os cantos.
+              {isNative 
+                ? "Em dispositivos móveis, o Toast é posicionado no topo (acima da StatusBar) ou na parte inferior (acima da TabBar)."
+                : "O Toast pode ser posicionado em diferentes áreas da tela, incluindo todos os cantos."
+              }
             </Text>
           </View>
           
@@ -1656,6 +1705,11 @@ showToast({
   };
 
   const renderThemeSelectorComponent = () => {
+    // Para verificar se estamos em ambiente móvel/nativo ou desktop
+    const isNative = Platform.OS !== 'web';
+    const isMobile = width < 768;
+    const isSmallScreen = isNative || isMobile;
+
     return (
       <View className="p-lg">
         <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
@@ -1672,21 +1726,34 @@ showToast({
           {/* Tamanhos diferentes */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Diferentes tamanhos</Text>
-            <View className="flex-row space-x-lg items-center">
-              <ThemeSelector size="sm" />
-              <ThemeSelector size="md" />
-              <ThemeSelector size="lg" />
-              <ThemeSelector size="xl" />
-            </View>
+            {isSmallScreen ? (
+              // Em dispositivos móveis e nativos, mostrar apenas o tamanho pequeno (sm)
+              <View className="flex-row space-x-lg items-center">
+                <ThemeSelector size="sm" />
+                <Text className={`text-body-sm ${textSecondary} ml-sm`}>
+                  Tamanho SM (recomendado para mobile)
+                </Text>
+              </View>
+            ) : (
+              // Em tablets e desktop, mostrar todos os tamanhos
+              <View className="flex-row space-x-lg items-center">
+                <ThemeSelector size="sm" />
+                <ThemeSelector size="md" />
+                <ThemeSelector size="lg" />
+                <ThemeSelector size="xl" />
+              </View>
+            )}
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Tamanhos disponíveis: sm, md (padrão), lg, xl
+              {isSmallScreen 
+                ? "Em dispositivos móveis, recomendamos usar apenas o tamanho pequeno (sm)."
+                : "Tamanhos disponíveis: sm, md (padrão), lg, xl"}
             </Text>
           </View>
 
           {/* Variante pill */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Estilo pill (arredondado)</Text>
-            <ThemeSelector variant="pill" />
+            <ThemeSelector variant="pill" size={isSmallScreen ? "sm" : "md"} />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Versão com cantos completamente arredondados.
             </Text>
@@ -1695,7 +1762,7 @@ showToast({
           {/* Variante minimal */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Estilo minimal (sem fundo)</Text>
-            <ThemeSelector variant="minimal" />
+            <ThemeSelector variant="minimal" size={isSmallScreen ? "sm" : "md"} />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Versão minimalista sem fundo ou slider.
             </Text>
@@ -1704,7 +1771,7 @@ showToast({
           {/* Exemplo com rótulos */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Com rótulos integrados</Text>
-            <ThemeSelector variant="labeled" showLabels={true} size="lg" />
+            <ThemeSelector variant="labeled" showLabels={true} size={isSmallScreen ? "sm" : "lg"} />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Versão com rótulos abaixo dos ícones para melhor compreensão.
             </Text>
@@ -1713,7 +1780,7 @@ showToast({
           {/* Estilo toggle */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Alternância simples (toggle)</Text>
-            <ThemeSelector variant="toggle" size="lg" />
+            <ThemeSelector variant="toggle" size={isSmallScreen ? "sm" : "lg"} />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Versão simplificada para alternar entre claro e escuro.
             </Text>
@@ -1723,9 +1790,9 @@ showToast({
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Botão único</Text>
             <View className="flex-row items-center space-x-lg">
-              <ThemeSelector variant="single" size="md" />
-              <ThemeSelector variant="single" size="md" transparentSingle={true} />
-              <ThemeSelector variant="single" size="md" iconOnly={true} />
+              <ThemeSelector variant="single" size={isSmallScreen ? "sm" : "md"} />
+              <ThemeSelector variant="single" size={isSmallScreen ? "sm" : "md"} transparentSingle={true} />
+              <ThemeSelector variant="single" size={isSmallScreen ? "sm" : "md"} iconOnly={true} />
             </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Um único botão que alterna entre temas ao ser clicado. Versões com fundo colorido (esquerda), transparente com borda (centro) e apenas ícone sem fundo/borda (direita).
@@ -1735,7 +1802,7 @@ showToast({
           {/* Sem opção de sistema */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Sem opção de sistema</Text>
-            <ThemeSelector showSystemOption={false} />
+            <ThemeSelector showSystemOption={false} size={isSmallScreen ? "sm" : "md"} />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Versão com apenas dois modos (claro/escuro).
             </Text>
@@ -1750,6 +1817,7 @@ showToast({
                 sliderBackground: isDark ? '#6C5CE7' : '#6C5CE7',
                 activeIconColor: '#FFFFFF',
               }} 
+              size={isSmallScreen ? "sm" : "md"}
             />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Customização completa de cores.
@@ -2110,7 +2178,7 @@ showToast({
             // Layout para dispositivos móveis com botões compactos no topo
             <View className="flex-1">
               {/* Navegação compacta para dispositivos móveis */}
-              <View className={`border-b ${border} py-1 bg-bg-tertiary-light dark:bg-bg-tertiary-dark`}>
+              <View className={`border-b ${border} py-1 ${bgSecondary}`}>
                 <ScrollView 
                   horizontal 
                   showsHorizontalScrollIndicator={false} 
@@ -2126,7 +2194,7 @@ showToast({
                             ? 'bg-primary-dark'
                             : 'bg-primary-light'
                           : isDark 
-                            ? 'bg-bg-secondary-dark' 
+                            ? 'bg-bg-tertiary-dark' 
                             : 'bg-bg-secondary-light'
                       }`}
                       style={{ 
