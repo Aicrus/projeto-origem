@@ -139,7 +139,7 @@ export function ProfileMenu({
       const windowHeight = Platform.OS === 'web' ? window.innerHeight : Dimensions.get('window').height;
       
       // Define valores para posicionamento
-      const spacingDown = 8;  // Espaço abaixo do elemento que acionou o menu
+      const spacingDown = 1;  // Reduzindo o espaçamento de 8 para 1, para subir o menu
       
       // Calcula se o menu cabe abaixo da posição
       const menuHeight = 320; // Altura aproximada do menu
@@ -164,7 +164,7 @@ export function ProfileMenu({
         });
       } else {
         // O menu não cabe abaixo, então vamos posicioná-lo acima
-        const spacingUp = 8;
+        const spacingUp = 1; // Reduzindo o espaçamento para consistência
         
         // Posição Y acima do elemento, garantindo que fique pelo menos a 16px do topo da tela
         const topPosition = Math.max(16, position.y - menuHeight - spacingUp);
