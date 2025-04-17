@@ -2244,21 +2244,28 @@ showToast({
                   <View className="flex-col">
                     {availableComponents.map((component) => {
                       // Substituir a importação dinâmica pela nossa função renderIcon
+                      const isComponentActive = activeComponent === component.id;
                       return (
-                        <Pressable
+                        <HoverableView
                           key={component.id}
                           onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView')}
                           className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
-                            activeComponent === component.id
+                            isComponentActive
                               ? isDark
                                 ? 'bg-primary-dark/10'
                                 : 'bg-primary-light/10'
                               : ''
                           }`}
+                          isActive={isComponentActive}
+                          hoverScale={1.02}
+                          hoverTranslateX={2}
+                          animationDuration={150}
+                          activeColor={isDark ? 'rgba(74, 111, 165, 0.1)' : 'rgba(137, 44, 220, 0.1)'}
+                          hoverColor={isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'}
                         >
                           <View
                             className={`w-8 h-8 rounded-md mr-sm items-center justify-center ${
-                              activeComponent === component.id
+                              isComponentActive
                                 ? isDark 
                                   ? 'bg-primary-dark/20' 
                                   : 'bg-primary-light/20'
@@ -2271,7 +2278,7 @@ showToast({
                           </View>
                           <Text
                             className={`${
-                              activeComponent === component.id
+                              isComponentActive
                                 ? isDark
                                   ? 'text-primary-dark font-jakarta-semibold'
                                   : 'text-primary-light font-jakarta-semibold'
@@ -2280,7 +2287,7 @@ showToast({
                           >
                             {component.name}
                           </Text>
-                        </Pressable>
+                        </HoverableView>
                       );
                     })}
                   </View>
