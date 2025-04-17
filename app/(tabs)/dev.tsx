@@ -7,14 +7,15 @@ import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
 import { colors } from '../../components/AicrusComponents/constants/theme';
 import { Button } from '../../components/AicrusComponents/button';
-import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon } from 'lucide-react-native';
+import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
 import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
+import { HoverableView } from '../../components/AicrusComponents/hoverable-view';
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | null>('designSystem');
+  const [activeComponent, setActiveComponent] = useState<'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | null>('designSystem');
   const [toastVisible, setToastVisible] = useState(false);
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const [toastPosition, setToastPosition] = useState<'top' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'>('top');
@@ -22,6 +23,9 @@ export default function DevPage() {
   const [toastProgressBar, setToastProgressBar] = useState(true);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  
+  // HoverableView estados de exemplo
+  const [activeItem, setActiveItem] = useState<number | null>(null);
   
   // Estados separados para cada exemplo de Input
   const [inputBasico, setInputBasico] = useState('');
@@ -74,6 +78,7 @@ export default function DevPage() {
     { id: 'button', name: 'Button', icon: 'Square' },
     { id: 'toast', name: 'Toast', icon: 'Bell' },
     { id: 'themeSelector', name: 'Theme Selector', icon: 'SunMoon' },
+    { id: 'hoverableView', name: 'Hoverable View', icon: 'MousePointer' },
   ];
   
   // Função para renderizar o ícone correto
@@ -97,6 +102,8 @@ export default function DevPage() {
         return <Sun strokeWidth={1.5} />;
       case 'SunMoon':
         return <SunMoon strokeWidth={1.5} />;
+      case 'MousePointer':
+        return <MousePointer strokeWidth={1.5} />;
       default:
         return <Settings strokeWidth={1.5} />;
     }
@@ -132,6 +139,8 @@ export default function DevPage() {
         return renderToastComponent();
       case 'themeSelector':
         return renderThemeSelectorComponent();
+      case 'hoverableView':
+        return renderHoverableViewComponent();
       default:
         return null;
     }
@@ -1844,6 +1853,235 @@ showToast({
     );
   };
 
+  // Função para renderizar o componente HoverableView e seus exemplos
+  const renderHoverableViewComponent = () => {
+    return (
+      <View className="p-lg">
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+          Componente HoverableView
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O HoverableView é um componente para criar elementos interativos com efeitos de hover 
+          personalizáveis. Melhora a experiência do usuário ao fornecer feedback visual quando 
+          o cursor do mouse passa sobre o elemento.
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+          
+          {/* Exemplo básico */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Hover básico</Text>
+            <HoverableView className="p-md rounded-md border border-divider-light">
+              <Text className={`${textPrimary}`}>Passe o mouse sobre este elemento</Text>
+            </HoverableView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Versão básica com efeito de hover padrão (cor de fundo alterada).
+            </Text>
+          </View>
+          
+          {/* Exemplo com escala */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Efeito de escala</Text>
+            <HoverableView 
+              className="p-md rounded-md border border-divider-light"
+              hoverScale={1.05}
+              disableHoverBackground={true}
+            >
+              <Text className={`${textPrimary}`}>Efeito de escala (zoom) no hover</Text>
+            </HoverableView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Efeito de escala (zoom) quando o cursor passa sobre o elemento. O fundo não muda.
+            </Text>
+          </View>
+          
+          {/* Exemplo com movimento */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Efeito de movimento</Text>
+            <HoverableView 
+              className="p-md rounded-md border border-divider-light"
+              hoverTranslateX={8}
+              hoverTranslateY={0}
+              disableHoverBackground={true}
+            >
+              <View className="flex-row items-center">
+                <Text className={`${textPrimary} mr-xs`}>Movimento horizontal</Text>
+                <ChevronRight size={16} color={isDark ? '#FFFFFF' : '#000000'} />
+              </View>
+            </HoverableView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              O elemento se move horizontalmente ao passar o mouse.
+            </Text>
+          </View>
+          
+          {/* Exemplo com rotação */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Efeito de rotação</Text>
+            <HoverableView 
+              className="p-md rounded-md border border-divider-light"
+              hoverRotate={5}
+              disableHoverBackground={true}
+            >
+              <Text className={`${textPrimary}`}>Rotação leve no hover</Text>
+            </HoverableView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              O elemento gira levemente quando o cursor passa sobre ele.
+            </Text>
+          </View>
+          
+          {/* Exemplo com múltiplos efeitos */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Combinação de efeitos</Text>
+            <HoverableView 
+              className="p-md rounded-md"
+              hoverScale={1.03}
+              hoverTranslateY={-3}
+              hoverElevation={4}
+              backgroundColor={isDark ? colors.primary.dark : colors.primary.light}
+            >
+              <Text className={`text-white`}>Múltiplos efeitos combinados</Text>
+            </HoverableView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Combina escala, movimento vertical e elevação (sombra) para um efeito mais rico.
+            </Text>
+          </View>
+          
+          {/* Exemplo de estado ativo */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Estado ativo</Text>
+            <View className="flex-row flex-wrap">
+              {[1, 2, 3].map((item) => (
+                <HoverableView 
+                  key={item}
+                  className="p-md rounded-md m-xs"
+                  isActive={activeItem === item}
+                  activeColor={isDark ? 'rgba(137, 44, 220, 0.3)' : 'rgba(137, 44, 220, 0.15)'}
+                  onPress={() => setActiveItem(item)}
+                >
+                  <Text className={`${textPrimary}`}>Item {item}</Text>
+                </HoverableView>
+              ))}
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Os itens têm estados ativos quando selecionados. Clique em um item para ativá-lo.
+            </Text>
+          </View>
+          
+          {/* Exemplo com cores personalizadas */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Cores personalizadas</Text>
+            <HoverableView 
+              className="p-md rounded-md"
+              hoverColor={isDark ? 'rgba(22, 163, 74, 0.2)' : 'rgba(22, 163, 74, 0.1)'}
+              backgroundColor={isDark ? 'rgba(22, 163, 74, 0.1)' : 'rgba(22, 163, 74, 0.05)'}
+            >
+              <Text className={`${textPrimary}`}>Cores personalizadas para hover</Text>
+            </HoverableView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              É possível definir cores personalizadas para os estados normal e hover.
+            </Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Características
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          O HoverableView oferece diversas características para melhorar a interatividade:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Efeitos visuais</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Escala, movimento, rotação e elevação</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Transições suaves</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Animações configuráveis com duração personalizada</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Compatibilidade</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Funciona em todas as plataformas (efeitos completos na web)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tema adaptativo</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Cores adaptadas automaticamente ao tema atual</Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Propriedades
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          O componente HoverableView possui as seguintes propriedades:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverScale</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Escala ao passar o mouse (number, padrão: 1.005)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverTranslateX/Y</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Deslocamento horizontal/vertical (number, padrão: 0)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverRotate</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Rotação em graus (number, padrão: 0)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverElevation</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Sombra/elevação adicional (number, padrão: 0)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>disableHoverBackground</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Desativa a mudança de cor de fundo (boolean, padrão: false)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>disableAnimation</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Desativa todas as animações (boolean, padrão: false)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>animationDuration</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Duração da animação em ms (number, padrão: 200)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>isActive</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Estado ativo do elemento (boolean, padrão: false)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>backgroundColor/hoverColor/activeColor</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Cores personalizadas para os diferentes estados</Text>
+          </View>
+        </View>
+        
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Uso com Tailwind
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          O componente suporta a propriedade className para estilização com Tailwind CSS:
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-body-sm font-mono ${textSecondary}`}>
+            {`<HoverableView className="p-4 rounded-md bg-primary-light">\n  <Text>Conteúdo com estilo Tailwind</Text>\n</HoverableView>`}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <>
       <Stack.Screen 
@@ -1872,7 +2110,7 @@ showToast({
                   {availableComponents.map((component) => (
                     <Pressable
                       key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector')}
+                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView')}
                       className={`mr-2 px-3 py-1 rounded-md ${
                         activeComponent === component.id
                           ? isDark
@@ -1930,7 +2168,7 @@ showToast({
                       return (
                         <Pressable
                           key={component.id}
-                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector')}
+                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView')}
                           className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
                             activeComponent === component.id
                               ? isDark

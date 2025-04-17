@@ -13,6 +13,7 @@ export * from './accordion';
 export * from './button';
 export * from './toast';
 export * from './theme-selector';
+export * from './hoverable-view';
 
 // Exportações de constantes
 export * from './constants/theme'; 
