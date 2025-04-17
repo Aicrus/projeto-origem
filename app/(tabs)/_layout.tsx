@@ -7,6 +7,18 @@ import { ProtectedRoute } from '../../components/ProtectedRoute';
 import { useResponsive } from '../../hooks/useResponsive';
 import { HapticTab } from '../../components/HapticTab';
 
+// Definindo cores baseadas no tema dinamicamente
+const getThemeColors = (isDark: boolean) => ({
+  activeTabColor: isDark ? '#4A6FA5' : '#892CDC', // primary-dark / primary-light
+  inactiveTabColor: isDark ? '#95A1AC' : '#57636C', // text-tertiary-dark / text-secondary-light
+  tabBackgroundColor: isDark 
+    ? '#14181B' // bg-secondary-dark sem transparência
+    : '#FFFFFF', // bg-secondary-light sem transparência
+  tabBorderColor: isDark 
+    ? '#262D34' // divider-dark sem transparência
+    : '#E0E3E7' // divider-light sem transparência
+});
+
 /**
  * Estrutura base simplificada para o TabsLayout
  */
@@ -19,16 +31,7 @@ export default function TabsLayout() {
   } = useResponsive();
   
   const isDark = currentTheme === 'dark';
-
-  // Definindo cores baseadas no tema
-  const activeTabColor = isDark ? '#4A6FA5' : '#892CDC'; // primary-dark / primary-light
-  const inactiveTabColor = isDark ? '#95A1AC' : '#57636C'; // text-tertiary-dark / text-secondary-light
-  const tabBackgroundColor = isDark 
-    ? 'rgba(20, 24, 27, 0.75)' // bg-secondary-dark com transparência
-    : 'rgba(255, 255, 255, 0.75)'; // bg-secondary-light com transparência
-  const tabBorderColor = isDark 
-    ? 'rgba(38, 45, 52, 0.5)' // divider-dark com transparência
-    : 'rgba(224, 227, 231, 0.5)'; // divider-light com transparência
+  const { activeTabColor, inactiveTabColor, tabBackgroundColor, tabBorderColor } = getThemeColors(isDark);
 
   // Log para debug apenas uma vez quando o componente é montado
   useEffect(() => {
@@ -43,17 +46,28 @@ export default function TabsLayout() {
           tabBarInactiveTintColor: inactiveTabColor,
           headerShown: false,
           tabBarLabelPosition: 'below-icon',
+          lazy: false,
           ...(Platform.OS === 'ios' && { tabBarButton: HapticTab }),
           tabBarStyle: [
             styles.tabBar,
             Platform.select({
-              ios: styles.iosTabBar,
-              android: styles.androidTabBar,
+              ios: {
+                ...styles.iosTabBar,
+                height: 88,
+                backgroundColor: tabBackgroundColor,
+                borderTopWidth: StyleSheet.hairlineWidth,
+                borderTopColor: tabBorderColor,
+              },
+              android: {
+                ...styles.androidTabBar,
+                height: 60,
+                backgroundColor: tabBackgroundColor,
+                borderTopWidth: StyleSheet.hairlineWidth,
+                borderTopColor: tabBorderColor,
+              },
               web: {
                 ...styles.webTabBar,
                 backgroundColor: tabBackgroundColor,
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
                 borderTopColor: tabBorderColor,
                 // Esconde a tab bar em tablets e telas grandes
                 display: isMobile ? 'flex' : 'none',
@@ -88,12 +102,6 @@ export default function TabsLayout() {
           name="home"
           options={{
             title: 'Home',
-            tabBarLabel: Platform.select({
-              ios: 'Home',
-              android: 'Home',
-              web: 'Home',
-              default: 'Home'
-            }),
             tabBarIcon: ({ color, focused }: { color: string, focused: boolean }) => (
               <HomeIcon 
                 size={24} 
@@ -107,12 +115,8 @@ export default function TabsLayout() {
           name="dev"
           options={{
             title: 'Dev',
-            tabBarLabel: Platform.select({
-              ios: 'Dev',
-              android: 'Dev',
-              web: 'Dev',
-              default: 'Dev'
-            }),
+            headerTitle: 'Dev',
+            tabBarLabel: 'Dev',
             tabBarIcon: ({ color, focused }: { color: string, focused: boolean }) => (
               <CodeIcon 
                 size={24} 
@@ -130,13 +134,16 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   tabBar: {
     display: 'flex',
-    height: 80,
+    height: 70,
     paddingBottom: 25,
   },
   iosTabBar: {
     position: 'absolute',
+    paddingBottom: 25,
   },
-  androidTabBar: {},
+  androidTabBar: {
+    paddingBottom: 12,
+  },
   webTabBar: {
     height: 70,
     paddingTop: 4,
