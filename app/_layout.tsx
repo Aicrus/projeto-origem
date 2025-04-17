@@ -17,6 +17,7 @@ import 'react-native-reanimated';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 import { Session } from '@supabase/supabase-js';
+import { PortalProvider } from '@gorhom/portal';
 import Head from './head';
 
 // Importação do arquivo global.css para NativeWind
@@ -120,11 +121,13 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <ThemeProvider>
           <Head />
-          <ToastProvider>
-            <AuthProvider initialSession={initialSession}>
-              <RootLayoutNav />
-            </AuthProvider>
-          </ToastProvider>
+          <PortalProvider>
+            <ToastProvider>
+              <AuthProvider initialSession={initialSession}>
+                <RootLayoutNav />
+              </AuthProvider>
+            </ToastProvider>
+          </PortalProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </HelmetProvider>

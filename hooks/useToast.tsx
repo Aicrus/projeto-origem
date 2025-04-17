@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { Toast, ToastPosition, ToastType } from '@/components/AicrusComponents/toast';
 
 interface ToastContextData {
@@ -35,11 +35,13 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     message: '',
     description: '',
     type: 'info',
-    position: 'bottom-right',
+    position: Platform.OS === 'web' ? 'bottom-right' : 'top', // Por padrão, topo para mobile
     duration: 3000,
     closable: false,
     showProgressBar: true,
   });
+
+  const isNative = Platform.OS !== 'web';
 
   // Inicializa o container do portal para web
   useEffect(() => {
@@ -75,27 +77,34 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     type, 
     message, 
     description, 
-    position = 'bottom-right',
+    position = Platform.OS === 'web' ? 'bottom-right' : 'top', // Padrão para nativo é top
     duration = 3000,
     closable = false,
     showProgressBar = true 
   }: ShowToastParams) => {
+    // Para ambiente nativo, limitamos as posições a top e bottom
+    let finalPosition = position;
+    if (isNative) {
+      finalPosition = position.includes('top') ? 'top' : 'bottom';
+    }
+    
     setToast({
       visible: true,
       type,
       message,
       description,
-      position,
+      position: finalPosition,
       duration,
       closable,
       showProgressBar,
     });
-  }, []);
+  }, [isNative]);
 
   const hideToast = useCallback(() => {
     setToast(state => ({ ...state, visible: false }));
   }, []);
 
+  // Como estamos usando o Portal, não precisamos mais do wrapper View
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}

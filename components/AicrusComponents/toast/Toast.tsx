@@ -8,8 +8,12 @@ import {
   TouchableOpacity, 
   Platform,
   useWindowDimensions,
-  Pressable
+  Pressable,
+  StatusBar,
+  Dimensions
 } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Portal } from '@gorhom/portal';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from 'lucide-react-native';
 
@@ -125,6 +129,27 @@ export function Toast({
   const progressAnim = React.useRef(new Animated.Value(1)).current;
   const { width: windowWidth } = useWindowDimensions();
   const isMobile = windowWidth < 768;
+  const isNative = Platform.OS !== 'web';
+  const statusBarHeight = StatusBar.currentHeight || 0;
+  const insets = useSafeAreaInsets();
+  
+  // A altura total da tela para posicionamento absoluto
+  const screenHeight = Dimensions.get('window').height;
+  const screenWidth = Dimensions.get('window').width;
+  
+  // Simplifica a posição para ambientes nativos (só usando top e bottom)
+  const getNativePosition = (): ToastPosition => {
+    if (isNative) {
+      if (position.includes('top')) {
+        return 'top';
+      } else {
+        return 'bottom';
+      }
+    }
+    return position;
+  };
+  
+  const effectivePosition = isNative ? getNativePosition() : position;
   
   // Configurações visuais baseadas no tipo
   const toastConfig = useMemo(() => ({
@@ -157,35 +182,51 @@ export function Toast({
   // Calcula posição baseada na prop position
   const getPositionStyle = (): ViewStyle => {
     // Em plataformas web, usamos posição fixa para evitar problemas com scroll
+    // Em plataformas nativas, usamos position absolute com valores que colocam o toast sobre tudo
     const positionType = Platform.OS === 'web' ? 'fixed' : 'absolute';
     
     const basePositionStyle: ViewStyle = {
       position: positionType as any,
       zIndex: 9999,
-      width: isMobile ? '90%' : 400,
+      elevation: 9999, // Para Android
+      width: isNative ? screenWidth * 0.9 : (isMobile ? '90%' : 400),
     };
 
-    // Posições horizontais
-    if (position.includes('left')) {
-      basePositionStyle.left = isMobile ? 16 : 24;
-      basePositionStyle.right = 'auto';
-    } else if (position.includes('right')) {
-      basePositionStyle.right = isMobile ? 16 : 24;
-      basePositionStyle.left = 'auto';
+    // No ambiente nativo, precisamos posicionar o componente de forma absoluta na tela inteira
+    if (isNative) {
+      // Centralizar horizontalmente
+      basePositionStyle.left = screenWidth * 0.05; // 5% da largura da tela
+      
+      if (effectivePosition === 'top') {
+        // Topo da tela, considerando a área segura
+        basePositionStyle.top = insets.top + 10;
+      } else {
+        // Base da tela, considerando a área segura
+        basePositionStyle.bottom = insets.bottom + 60; // Considerando a TabBar
+      }
     } else {
-      // Centralizado
-      basePositionStyle.left = isMobile ? '5%' : '50%';
-      basePositionStyle.right = 'auto';
-      basePositionStyle.marginLeft = isMobile ? 0 : -200; // metade da largura para centralizar
-    }
+      // Posições horizontais para web
+      if (effectivePosition.includes('left')) {
+        basePositionStyle.left = isMobile ? 16 : 24;
+        basePositionStyle.right = 'auto';
+      } else if (effectivePosition.includes('right')) {
+        basePositionStyle.right = isMobile ? 16 : 24;
+        basePositionStyle.left = 'auto';
+      } else {
+        // Centralizado
+        basePositionStyle.left = isMobile ? '5%' : '50%';
+        basePositionStyle.right = 'auto';
+        basePositionStyle.marginLeft = isMobile ? 0 : -200; // metade da largura para centralizar
+      }
 
-    // Posições verticais
-    if (position.includes('top')) {
-      basePositionStyle.top = isMobile ? 80 : 24;
-      basePositionStyle.bottom = 'auto';
-    } else {
-      basePositionStyle.bottom = isMobile ? 80 : 24;
-      basePositionStyle.top = 'auto';
+      // Posições verticais para web
+      if (effectivePosition.includes('top')) {
+        basePositionStyle.top = isMobile ? 80 : 24;
+        basePositionStyle.bottom = 'auto';
+      } else {
+        basePositionStyle.bottom = isMobile ? 80 : 24;
+        basePositionStyle.top = 'auto';
+      }
     }
 
     return basePositionStyle;
@@ -195,7 +236,7 @@ export function Toast({
   useEffect(() => {
     if (visible) {
       // Reset initial position for animation
-      offset.setValue(position.includes('top') ? -20 : 20);
+      offset.setValue(effectivePosition.includes('top') ? -20 : 20);
       progressAnim.setValue(1); // Reset progress animation
       
       // Animate in
@@ -241,7 +282,7 @@ export function Toast({
         useNativeDriver: true,
       }),
       Animated.timing(offset, {
-        toValue: position.includes('top') ? -20 : 20,
+        toValue: effectivePosition.includes('top') ? -20 : 20,
         duration: 300,
         useNativeDriver: true,
       })
@@ -288,6 +329,106 @@ export function Toast({
   const transformStyle = {
     transform: [{ translateY: offset }],
   };
+
+  // Em plataformas nativas, vamos usar o Portal para garantir que o toast seja exibido corretamente
+  if (isNative && visible) {
+    // O conteúdo do Toast para ambiente nativo
+    const toastContent = (
+      <Animated.View
+        testID={testID || `toast-${type}`}
+        style={[
+          { 
+            position: 'absolute',
+            width: screenWidth * 0.9,
+            left: screenWidth * 0.05,
+            zIndex: 9999,
+            elevation: 9999,
+            ...(effectivePosition === 'top' 
+              ? { top: insets.top + 10 } 
+              : { bottom: insets.bottom + 60 }),
+            opacity,
+            transform: [{ translateY: offset }]
+          },
+          style,
+        ]}
+      >
+        <View 
+          className={`${toastConfig[type].backgroundColor} border ${toastConfig[type].borderColor} rounded-lg overflow-hidden`}
+          style={[styles.container, {
+            shadowColor: isDark ? '#000000' : '#000000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: isDark ? 0.2 : 0.1,
+            shadowRadius: 10,
+            elevation: 10,
+            borderWidth: isDark ? 0.5 : 0.7,
+            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+            backgroundColor: isDark ? 
+              (type === 'success' ? '#064E3B' : 
+               type === 'error' ? '#450A0A' : 
+               type === 'warning' ? '#451A03' : 
+               '#082F49') : 
+              (type === 'success' ? '#ECFDF5' : 
+               type === 'error' ? '#FEF2F2' : 
+               type === 'warning' ? '#FFFBEB' : 
+               '#EFF6FF'),
+          }]}
+        >
+          <View style={styles.contentContainer}>
+            <View style={styles.iconContainer}>
+              {toastConfig[type].icon()}
+            </View>
+            
+            <View style={styles.textContainer}>
+              <Text 
+                className={`${toastConfig[type].textColor} font-jakarta-semibold`}
+                style={styles.message}
+                numberOfLines={2}
+              >
+                {message}
+              </Text>
+              
+              {description ? (
+                <Text 
+                  className={`${toastConfig[type].textColor} opacity-90 font-jakarta-regular`}
+                  style={styles.description}
+                  numberOfLines={3}
+                >
+                  {description}
+                </Text>
+              ) : null}
+            </View>
+            
+            {closable && (
+              <Pressable 
+                onPress={handleClose} 
+                style={styles.closeButton}
+                hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                accessibilityLabel="Fechar notificação"
+              >
+                <X 
+                  size={16} 
+                  color={isDark ? 
+                    (type === 'info' ? '#38BDF8' : 
+                     type === 'success' ? '#10B981' : 
+                     type === 'warning' ? '#FBBF24' : 
+                     '#F87171') : 
+                    (type === 'info' ? '#0284C7' : 
+                     type === 'success' ? '#059669' : 
+                     type === 'warning' ? '#D97706' : 
+                     '#DC2626')
+                  } 
+                />
+              </Pressable>
+            )}
+          </View>
+          {renderProgressBar()}
+        </View>
+      </Animated.View>
+    );
+
+    // Usar o Portal para renderizar o Toast fora da hierarquia atual
+    return <Portal>{toastContent}</Portal>;
+  }
 
   // No web, renderizamos em um portal para garantir que o Toast esteja fora de qualquer
   // container com scrolling ou com position: relative
@@ -405,6 +546,7 @@ export function Toast({
     }
   }
 
+  // Fallback para casos onde não se aplica nem web nem nativo com configuração especial
   return (
     <Animated.View
       testID={testID || `toast-${type}`}
