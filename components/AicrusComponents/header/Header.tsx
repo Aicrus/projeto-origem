@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     zIndex: Z_INDEX.HEADER,
   },
   header: {
-    height: 56,
+    height: 64,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray[200],
     backgroundColor: colors.white,
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray[900],
   },
   headerMobileNative: {
-    height: 106, // 56 + 50 (espaço extra para status bar)
+    height: 114,
   },
   container: {
     flexDirection: 'row',
