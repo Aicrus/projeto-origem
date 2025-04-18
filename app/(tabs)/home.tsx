@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, Platform, ScrollView, ViewStyle } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { Header } from '../../components/AicrusComponents/header';
 import { Sidebar } from '../../components/AicrusComponents/sidebar';
 import { PageContainer } from '../../components/AicrusComponents/page-container';
 import { Portal } from '@gorhom/portal';
 import { useResponsive } from '../../hooks/useResponsive';
+import { BREAKPOINTS } from '../../constants/responsive';
 
 export default function Home() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isMobile, isTablet, isDesktop } = useResponsive();
+  const { isMobile, isTablet, isDesktop, width, responsive } = useResponsive();
   
   const showHeader = true;
   const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
@@ -33,24 +34,109 @@ export default function Home() {
   );
 
   const renderContent = () => {
-    // Define o layout baseado no tamanho da tela
-    const topCardsLayout = isMobile ? 'flex-col' : isTablet ? 'grid-cols-2' : 'grid-cols-4';
-    const bottomCardsLayout = isMobile ? 'flex-col' : 'grid-cols-2';
+    // Definição dinâmica do layout baseado no tamanho exato da tela
+    const getGridColumns = () => {
+      if (width < BREAKPOINTS.SMALL_MOBILE) return 1; // Dispositivos muito pequenos
+      if (width < BREAKPOINTS.TABLET) return 1; // Mobile
+      if (width < BREAKPOINTS.DESKTOP) return 2; // Tablet
+      if (width < BREAKPOINTS.LARGE_DESKTOP) return 3; // Desktop
+      return 4; // Telas grandes
+    };
+
+    // Ajustes dinâmicos baseados no tipo de dispositivo atual
+    const gridColumns = getGridColumns();
+    
+    // Espaçamento dinâmico entre cards
+    const cardGap = responsive({
+      mobile: 12,
+      tablet: 16,
+      desktop: 24,
+      default: 16
+    });
+    
+    // Altura dinâmica dos cards superiores
+    const topCardHeight = responsive({
+      mobile: 120,
+      tablet: 140,
+      desktop: 140,
+      default: 140
+    });
+    
+    // Altura mínima para os cards inferiores
+    const bottomCardMinHeight = responsive({
+      mobile: 350,
+      tablet: 400,
+      desktop: 500,
+      default: 400
+    });
+
+    // Definição do estilo de layout para os cards superiores
+    const topCardsContainerStyle: ViewStyle = {
+      flexDirection: gridColumns === 1 ? 'column' : 'row',
+      flexWrap: 'wrap',
+      marginBottom: cardGap * 1.5
+    };
+
+    // Cálculo da largura dos cards superiores e margens
+    const topCardStyle: any = {
+      width: gridColumns === 1 
+        ? '100%' 
+        : `calc(${100 / Math.min(gridColumns, 4)}% - ${(cardGap * (Math.min(gridColumns, 4) - 1)) / Math.min(gridColumns, 4)}px)`,
+      marginBottom: cardGap,
+      ...(gridColumns > 1 && {
+        marginRight: cardGap
+      })
+    };
+
+    // Ajuste para remover margem do último card em cada linha quando em layout de múltiplas colunas
+    const topCardLastInRowStyle: any = {
+      ...topCardStyle,
+      ...(gridColumns > 1 && {
+        marginRight: 0
+      })
+    };
+
+    // Definição do estilo de layout para os cards inferiores
+    const bottomCardsContainerStyle: ViewStyle = {
+      flexDirection: gridColumns === 1 ? 'column' : 'row',
+      flex: 1,
+      minHeight: bottomCardMinHeight
+    };
+
+    // Cálculo da largura dos cards inferiores
+    const bottomCardLeftStyle: any = {
+      width: gridColumns === 1 ? '100%' : `calc(50% - ${cardGap / 2}px)`,
+      minHeight: gridColumns === 1 ? bottomCardMinHeight : '100%',
+      ...(gridColumns > 1 && {
+        marginRight: cardGap / 2
+      }),
+      ...(gridColumns === 1 && {
+        marginBottom: cardGap
+      })
+    };
+
+    const bottomCardRightStyle: any = {
+      width: gridColumns === 1 ? '100%' : `calc(50% - ${cardGap / 2}px)`,
+      minHeight: gridColumns === 1 ? bottomCardMinHeight : '100%',
+      ...(gridColumns > 1 && {
+        marginLeft: cardGap / 2
+      })
+    };
     
     return (
       <View style={styles.contentContainer}>
-        {/* Cards superiores - altura fixa */}
-        <View className={`gap-4 mb-4 ${isMobile ? 'flex' : 'grid'} ${topCardsLayout}`} style={styles.topSection}>
-          <EmptyCard height={140} />
-          <EmptyCard height={140} />
-          <EmptyCard height={140} />
-          <EmptyCard height={140} />
+        {/* Cards superiores com layout responsivo */}
+        <View style={topCardsContainerStyle}>
+          <EmptyCard height={topCardHeight} style={topCardStyle} />
+          <EmptyCard height={topCardHeight} style={gridColumns === 4 ? topCardStyle : gridColumns === 3 ? topCardLastInRowStyle : topCardStyle} />
+          <EmptyCard height={topCardHeight} style={gridColumns === 2 ? topCardLastInRowStyle : topCardStyle} />
+          <EmptyCard height={topCardHeight} style={topCardLastInRowStyle} />
         </View>
 
-        {/* Cards inferiores - ocupando espaço restante */}
-        <View className={`gap-4 ${isMobile ? 'flex' : 'grid'} ${bottomCardsLayout}`} style={styles.bottomSection}>
-          <EmptyCard className="flex-1" style={styles.bottomCard} />
-          <EmptyCard className="flex-1" style={styles.bottomCard} />
+        {/* Cards inferiores com layout responsivo */}
+        <View style={bottomCardsContainerStyle}>
+          <EmptyCard style={[styles.bottomCard, bottomCardLeftStyle]} />
+          <EmptyCard style={[styles.bottomCard, bottomCardRightStyle]} />
         </View>
       </View>
     );
@@ -150,16 +236,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     minHeight: '100%',
-    display: 'flex',
     flexDirection: 'column',
-  },
-  topSection: {
-    flexShrink: 0,
-  },
-  bottomSection: {
-    flex: 1,
-    minHeight: Platform.select({ web: 500, default: 400 }),
-    height: '100%',
   },
   bottomCard: {
     height: '100%',
