@@ -26,6 +26,7 @@
     "@react-navigation/native": "^7.0.14",
     "@supabase/node-fetch": "2.6.15",
     "@supabase/supabase-js": "2.49.4",
+    "@tanstack/react-table": "8.21.3",
     "@types/react-helmet": "6.1.11",
     "expo-blur": "~14.0.3",
     "expo-checkbox": "4.0.1",

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { Dimensions, Platform, ScaledSize } from 'react-native';
+import { Dimensions, Platform, ScaledSize, useWindowDimensions } from 'react-native';
 import { 
   BREAKPOINTS, 
   isMobileWidth, 
@@ -9,25 +9,64 @@ import {
 } from '../constants/responsive';
 
 /**
+ * Obtém breakpoint inicial baseado no user agent ou dimensões da janela
+ * Evita flash de conteúdo durante o carregamento
+ */
+const getInitialBreakpoint = (): {
+  dimensions: ScaledSize; 
+  breakpoint: string;
+} => {
+  // Em ambientes nativos, usa as dimensões normalmente
+  if (Platform.OS !== 'web') {
+    const dims = Dimensions.get('window');
+    return {
+      dimensions: dims,
+      breakpoint: getCurrentBreakpoint(dims.width)
+    };
+  }
+  
+  // No SSR, fornece valores padrão para desktop
+  // para evitar layout shift durante a hidratação
+  if (typeof window === 'undefined') {
+    return {
+      dimensions: { width: BREAKPOINTS.DESKTOP, height: 900, scale: 1, fontScale: 1 },
+      breakpoint: 'DESKTOP'
+    };
+  }
+  
+  // No navegador, obtém dimensões da janela
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const dims = { width, height, scale: 1, fontScale: 1 };
+  
+  return {
+    dimensions: dims,
+    breakpoint: getCurrentBreakpoint(width)
+  };
+};
+
+/**
  * Hook que fornece informações sobre o tamanho da tela e breakpoints
  * para ajudar na implementação de layouts responsivos
  */
 export function useResponsive() {
-  // Obtém as dimensões iniciais e calcula breakpoints imediatamente
-  const initialDimensions = Dimensions.get('window');
-  const initialBreakpoint = getCurrentBreakpoint(initialDimensions.width);
+  // Obtém as dimensões iniciais e calcula breakpoints usando a otimização para web
+  const initialState = getInitialBreakpoint();
+  
+  // Para dispositivos nativos, useWindowDimensions é mais eficiente
+  const windowDimensions = useWindowDimensions();
   
   // Define estados com valores pré-calculados para evitar atrasos iniciais
-  const [dimensions, setDimensions] = useState<ScaledSize>(initialDimensions);
-  const [currentBreakpoint, setCurrentBreakpoint] = useState<string>(initialBreakpoint);
+  const [dimensions, setDimensions] = useState<ScaledSize>(initialState.dimensions);
+  const [currentBreakpoint, setCurrentBreakpoint] = useState<string>(initialState.breakpoint);
   
   // Armazena o último breakpoint detectado para comparação rápida
-  const lastBreakpointRef = useRef(initialBreakpoint);
-  const dimensionsRef = useRef(initialDimensions);
+  const lastBreakpointRef = useRef(initialState.breakpoint);
+  const dimensionsRef = useRef(initialState.dimensions);
   
   // Cria flags de breakpoint diretamente a partir das dimensões atuais
   // em vez de depender do estado, para maior responsividade
-  const { width, height } = dimensions;
+  const { width, height } = Platform.OS === 'web' ? dimensions : windowDimensions;
   const isMobile = isMobileWidth(width);
   const isTablet = isTabletWidth(width);
   const isDesktop = isDesktopWidth(width);
@@ -38,7 +77,10 @@ export function useResponsive() {
   
   // Função otimizada para atualizar dimensões sem debounce para maior rapidez
   const updateDimensions = useCallback(() => {
-    const newDimensions = Dimensions.get('window');
+    const newDimensions = Platform.OS === 'web' 
+      ? { width: window.innerWidth, height: window.innerHeight, scale: 1, fontScale: 1 }
+      : Dimensions.get('window');
+    
     const newWidth = newDimensions.width;
     const newHeight = newDimensions.height;
     
@@ -91,26 +133,20 @@ export function useResponsive() {
         };
       }
     } else {
-      // Em dispositivos móveis, usamos a API de dimensões
-      updateDimensions();
-      
-      const subscription = Dimensions.addEventListener('change', ({ window }) => {
-        // Atualiza os refs e estados imediatamente
-        dimensionsRef.current = window;
-        setDimensions(window);
+      // Em dispositivos nativos, useWindowDimensions já cuidará das atualizações
+      // mas ainda atualizamos o breakpoint quando necessário
+      if (width !== dimensionsRef.current.width || height !== dimensionsRef.current.height) {
+        dimensionsRef.current = { width, height, scale: 1, fontScale: 1 };
         
-        const newBreakpoint = getCurrentBreakpoint(window.width);
+        const newBreakpoint = getCurrentBreakpoint(width);
         if (lastBreakpointRef.current !== newBreakpoint) {
           lastBreakpointRef.current = newBreakpoint;
           setCurrentBreakpoint(newBreakpoint);
+          console.log(`[Responsive] Breakpoint mudou para: ${newBreakpoint}, largura: ${width}px`);
         }
-      });
-      
-      return () => {
-        subscription.remove();
-      };
+      }
     }
-  }, [updateDimensions]);
+  }, [updateDimensions, width, height]);
   
   /**
    * Função que retorna um valor de acordo com o breakpoint atual
@@ -125,7 +161,7 @@ export function useResponsive() {
   }): T {
     // Usar verificações diretas com base na largura atual
     // em vez de confiar nos estados para maior responsividade
-    const currentWidth = dimensionsRef.current.width;
+    const currentWidth = Platform.OS === 'web' ? dimensionsRef.current.width : width;
     
     if (isMobileWidth(currentWidth) && options.mobile !== undefined) {
       return options.mobile;

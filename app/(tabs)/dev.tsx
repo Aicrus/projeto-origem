@@ -8,7 +8,7 @@ import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
 import { colors } from '../../components/AicrusComponents/constants/theme';
 import { Button } from '../../components/AicrusComponents/button';
-import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette, Layout } from 'lucide-react-native';
+import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette, Layout, ArrowUpDown, MoreHorizontal } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
 import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
 import { HoverableView } from '../../components/AicrusComponents/hoverable-view';
@@ -19,9 +19,12 @@ import { useFocusEffect } from 'expo-router';
 import { ProfileMenu } from '../../components/AicrusComponents/profile-menu';
 import { router } from 'expo-router';
 import { PageContainer } from '../../components/AicrusComponents/page-container';
+import { DataTable } from '../../components/AicrusComponents/data-table';
+import { Checkbox } from '../../components/AicrusComponents/checkbox';
+import { ColumnDef } from '@tanstack/react-table';
 
 // Definir tipos para os componentes disponíveis
-type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | null;
+type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | null;
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
@@ -137,6 +140,7 @@ export default function DevPage() {
     { id: 'gradientView', name: 'Gradient View', icon: 'Palette' },
     { id: 'dropdownMenu', name: 'Dropdown Menu', icon: 'MessageSquare' },
     { id: 'pageContainer', name: 'Page Container', icon: 'Layout' },
+    { id: 'dataTable', name: 'Data Table', icon: 'Settings' },
   ];
   
   // Função para renderizar o ícone correto
@@ -211,6 +215,8 @@ export default function DevPage() {
         return renderDropdownMenuComponent();
       case 'pageContainer':
         return renderPageContainerComponent();
+      case 'dataTable':
+        return renderDataTableComponent();
       default:
         return null;
     }
@@ -3279,6 +3285,240 @@ return (
           <Text className={`text-mono-sm ${textPrimary}`}>
             {`// Layout Dashboard (4x2) Home\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4x1 */}\n    <View className={\`gap-4 mb-4 \${isMobile ? 'flex' : 'grid'} \${topCardsLayout}\`}>\n      {/* 4 cards aqui */}\n    </View>\n    {/* Cards inferiores - 2x1 */}\n    <View className={\`gap-4 \${isMobile ? 'flex' : 'grid'} \${bottomCardsLayout}\`}>\n      {/* 2 cards aqui */}\n    </View>\n  </View>\n</PageContainer>`}
           </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderDataTableComponent = () => {
+    // Define o tipo de dados para a tabela
+    type Payment = {
+      id: string;
+      amount: number;
+      status: "pending" | "processing" | "success" | "failed";
+      email: string;
+    };
+
+    // Dados de exemplo
+    const exampleData: Payment[] = [
+      {
+        id: "m5gr84i9",
+        amount: 316,
+        status: "success",
+        email: "ken99@example.com",
+      },
+      {
+        id: "3u1reuv4",
+        amount: 242,
+        status: "success",
+        email: "Abe45@example.com",
+      },
+      {
+        id: "derv1ws0",
+        amount: 837,
+        status: "processing",
+        email: "Monserrat44@example.com",
+      },
+      {
+        id: "5kma53ae",
+        amount: 874,
+        status: "success",
+        email: "Silas22@example.com",
+      },
+      {
+        id: "bhqecj4p",
+        amount: 721,
+        status: "failed",
+        email: "carmella@example.com",
+      },
+    ];
+
+    // Definição das colunas
+    const columns: ColumnDef<Payment>[] = [
+      {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            accessibilityLabel="Selecionar todos"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            accessibilityLabel="Selecionar linha"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
+        accessorKey: "status",
+        header: "Status",
+        cell: ({ row }) => (
+          <View>
+            <Text className={`capitalize ${textPrimary}`}>{row.getValue("status")}</Text>
+          </View>
+        ),
+      },
+      {
+        accessorKey: "email",
+        header: ({ column }) => {
+          return (
+            <TouchableOpacity
+              className="flex-row items-center gap-1"
+              onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            >
+              <Text className={textPrimary}>Email</Text>
+              <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+            </TouchableOpacity>
+          );
+        },
+        cell: ({ row }) => (
+          <View>
+            <Text className={`lowercase ${textPrimary}`}>{row.getValue("email")}</Text>
+          </View>
+        ),
+      },
+      {
+        accessorKey: "amount",
+        header: () => <Text className={`text-right ${textPrimary}`}>Valor</Text>,
+        cell: ({ row }) => {
+          const amount = parseFloat(row.getValue("amount"));
+
+          // Formatar o valor como monetário em BRL
+          const formatted = new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(amount);
+
+          return (
+            <View className="items-end">
+              <Text className={`font-medium ${textPrimary}`}>{formatted}</Text>
+            </View>
+          );
+        },
+      },
+      {
+        id: "actions",
+        enableHiding: false,
+        cell: () => (
+          <View className="items-center justify-center">
+            <TouchableOpacity className="p-1">
+              <MoreHorizontal size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+            </TouchableOpacity>
+          </View>
+        ),
+      },
+    ];
+
+    return (
+      <View className="flex-1 p-4">
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-md`}>
+          Data Table
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          Componente de tabela de dados que suporta ordenação, filtros, seleção e paginação.
+        </Text>
+
+        <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
+          <Text className={`text-subtitle-md font-jakarta-medium ${textPrimary} mb-2`}>
+            Exemplo Básico
+          </Text>
+          <DataTable 
+            data={exampleData}
+            columns={columns}
+            enableRowSelection
+            enableSorting
+            enableFiltering
+            enablePagination
+            searchPlaceholder="Filtrar emails..."
+          />
+        </View>
+
+        <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
+          <Text className={`text-subtitle-md font-jakarta-medium ${textPrimary} mb-2`}>
+            Como usar
+          </Text>
+          <View className="p-3 bg-gray-100 dark:bg-gray-800 rounded-md">
+            <Text className={`font-mono text-xs ${isDark ? 'text-gray-300' : 'text-gray-800'}`}>
+              {`
+import { DataTable } from '../../components/AicrusComponents';
+import { ColumnDef } from '@tanstack/react-table';
+
+// Definir tipo dos dados
+type Payment = {
+  id: string;
+  amount: number;
+  status: string;
+  email: string;
+};
+
+// Definir colunas
+const columns: ColumnDef<Payment>[] = [
+  // ... definições de colunas
+];
+
+// Uso do componente
+<DataTable 
+  data={data}
+  columns={columns}
+  enableSorting
+  enableFiltering
+  enablePagination
+  searchPlaceholder="Filtrar emails..."
+/>
+              `.trim()}
+            </Text>
+          </View>
+        </View>
+
+        <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
+          <Text className={`text-subtitle-md font-jakarta-medium ${textPrimary} mb-2`}>
+            Props
+          </Text>
+          <View className="mb-4">
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 font-medium ${textPrimary}`}>Prop</Text>
+              <Text className={`w-1/3 font-medium ${textPrimary}`}>Tipo</Text>
+              <Text className={`w-1/3 font-medium ${textPrimary}`}>Descrição</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>data</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Array</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Dados para exibir na tabela</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>columns</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>ColumnDef[]</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Definição das colunas</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>enableSorting</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>boolean</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Habilita ordenação</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>enableFiltering</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>boolean</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Habilita filtragem</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>enablePagination</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>boolean</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Habilita paginação</Text>
+            </View>
+          </View>
         </View>
       </View>
     );
