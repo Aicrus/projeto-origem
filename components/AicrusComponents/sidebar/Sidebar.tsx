@@ -43,11 +43,11 @@ type AppRoute = {
 
 const navItems: AppRoute[] = [
   { path: '/(tabs)', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/(tabs)/vistorias', label: 'Vistorias', icon: ClipboardList },
-  { path: '/(tabs)/imoveis', label: 'Imóveis', icon: Building },
-  { path: '/(tabs)/imobiliarias', label: 'Imobiliárias', icon: Building2 },
-  { path: '/(tabs)/vistoriadores', label: 'Vistoriadores', icon: Users },
-  { path: '/(tabs)/configuracoes', label: 'Configurações', icon: Settings },
+  { path: '/projetos', label: 'Projetos', icon: ClipboardList },
+  { path: '/clientes', label: 'Clientes', icon: Users },
+  { path: '/relatorios', label: 'Relatórios', icon: BarChart2 },
+  { path: '/recursos', label: 'Recursos', icon: Building },
+  { path: '/configuracoes', label: 'Configurações', icon: Settings },
 ];
 
 export interface SidebarProps {
@@ -185,12 +185,11 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
 
   // Na versão desktop para o botão de atualizar plano
   const [isUpdateButtonHovered, setIsUpdateButtonHovered] = useState(false);
+  // Para a versão mobile do botão
+  const [isMobileUpdateButtonHovered, setIsMobileUpdateButtonHovered] = useState(false);
 
   // Se for mobile, renderiza como um drawer modal
   if (isMobile) {
-    // Para a versão mobile do botão
-    const [isMobileUpdateButtonHovered, setIsMobileUpdateButtonHovered] = useState(false);
-
     return (
       <Modal
         visible={isOpen}
@@ -215,12 +214,12 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
           >
             {/* Logo */}
             <View style={styles.logoContainer}>
-              <View style={styles.logoBox}>
-                <Building size={20} color={colors.white} strokeWidth={1.5} />
+              <View style={getConditionalStyle(styles.logoBox, styles.logoBoxCompact)}>
+                <Building size={20} color="#333333" strokeWidth={1.5} />
               </View>
               <View>
-                <Text style={[styles.logoText, isDark && styles.logoTextDark]}>Evolução</Text>
-                <Text style={[styles.subLogoText, isDark && styles.subLogoTextDark]}>Vistoria</Text>
+                <Text style={[styles.logoText, isDark && styles.logoTextDark]}>Projeto</Text>
+                <Text style={[styles.subLogoText, isDark && styles.subLogoTextDark]}>Origem</Text>
               </View>
             </View>
             
@@ -239,7 +238,9 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                       style={styles.navItemContainer}
                     >
                       <GradientView
-                        colors={['#4A1866', colors.primary.main]}
+                        colors={['#8A40CF', '#5F2D85']}
+                        start={{ x: 0.2, y: 0 }}
+                        end={{ x: 0.8, y: 1 }}
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
@@ -263,9 +264,9 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                           styles.activeNavText,
                           isDark && styles.navTextDark,
                           isDashboardActive && {
-                            fontWeight: '800',
+                            fontWeight: '600',
                             color: 'white',
-                            fontSize: 16
+                            fontSize: 15
                           }
                         ]}>
                           {item.label}
@@ -302,9 +303,9 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                         isDark && styles.navTextDark,
                         isActive && styles.activeNavText,
                         isDashboardActive && {
-                          fontWeight: '800',
+                          fontWeight: '600',
                           color: 'white',
-                          fontSize: 16
+                          fontSize: 15
                         }
                       ]}>
                         {item.label}
@@ -325,7 +326,9 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
             <View style={styles.footerMobile}>
               {/* Plano Free */}
               <GradientView
-                colors={['#4A1866', colors.primary.main]}
+                colors={['#733AAB', '#9945E8']}
+                start={{ x: 0.1, y: 0 }}
+                end={{ x: 0.9, y: 1 }}
                 style={{
                   padding: 14,
                   borderRadius: 12,
@@ -346,25 +349,23 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                   <Text style={styles.planTitle}>Plano Free</Text>
                 </View>
                 <Text style={styles.planDays}>14 dias restantes no seu trial</Text>
-                <Pressable 
-                  style={({ hovered }) => [
-                    styles.updateButton,
-                    hovered && Platform.OS === 'web' ? { backgroundColor: colors.primary.main } : {}
-                  ]}
+                <Pressable
+                  style={{
+                    ...styles.updateButton,
+                    ...(isMobileUpdateButtonHovered && Platform.OS === 'web' ? { backgroundColor: colors.primary.main } : {})
+                  }}
                   onPress={() => {
                     // Lógica para atualizar plano
                   }}
                   onHoverIn={() => setIsMobileUpdateButtonHovered(true)}
                   onHoverOut={() => setIsMobileUpdateButtonHovered(false)}
                 >
-                  <View style={styles.updateButtonContent}>
-                    <Text style={[
-                      styles.updateButtonText,
-                      isMobileUpdateButtonHovered && Platform.OS === 'web' && { color: 'white' }
-                    ]}>
-                      Atualizar Plano ✨
-                    </Text>
-                  </View>
+                  <Text style={[
+                    styles.updateButtonText,
+                    isMobileUpdateButtonHovered && Platform.OS === 'web' && { color: 'white' }
+                  ]}>
+                    Atualizar Plano ✨
+                  </Text>
                 </Pressable>
               </GradientView>
 
@@ -402,12 +403,12 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
       {/* Logo */}
       <View style={getConditionalStyle(styles.logoContainer, styles.logoContainerCompact)}>
         <View style={getConditionalStyle(styles.logoBox, styles.logoBoxCompact)}>
-          <Building size={20} color={colors.white} strokeWidth={1.5} />
+          <Building size={20} color="#333333" strokeWidth={1.5} />
         </View>
         {!isTablet && (
           <View>
-            <Text style={[styles.logoText, isDark && styles.logoTextDark]}>Evolução</Text>
-            <Text style={[styles.subLogoText, isDark && styles.subLogoTextDark]}>Vistoria</Text>
+            <Text style={[styles.logoText, isDark && styles.logoTextDark]}>Projeto</Text>
+            <Text style={[styles.subLogoText, isDark && styles.subLogoTextDark]}>Origem</Text>
           </View>
         )}
       </View>
@@ -423,7 +424,9 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
             return (
               <Link key={item.path} href={item.path as any} asChild>
                 <GradientView
-                  colors={['#4A1866', colors.primary.main]}
+                  colors={['#8A40CF', '#5F2D85']}
+                  start={{ x: 0.2, y: 0 }}
+                  end={{ x: 0.8, y: 1 }}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -452,9 +455,9 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                       styles.activeNavText,
                       isDark && styles.navTextDark,
                       isDashboardActive && {
-                        fontWeight: '800',
+                        fontWeight: '600',
                         color: 'white',
-                        fontSize: 16
+                        fontSize: 15
                       }
                     ]}>
                       {item.label}
@@ -496,9 +499,9 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                     isDark && styles.navTextDark,
                     isActive && styles.activeNavText,
                     isDashboardActive && {
-                      fontWeight: '800',
+                      fontWeight: '600',
                       color: 'white',
-                      fontSize: 16
+                      fontSize: 15
                     }
                   ]}>
                     {item.label}
@@ -520,17 +523,39 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
       {/* Footer */}
       <View style={styles.footer}>
         {isTablet ? (
-          <Pressable 
-            style={styles.planBoxCompact}
+          <HoverableView
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 8,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 12,
+              backgroundColor: 'transparent',
+              ...(Platform.OS === 'web' && {
+                backgroundImage: `radial-gradient(circle at center, #9945E8 30%, #733AAB 100%)`,
+                boxShadow: '0 4px 8px rgba(38, 68, 80, 0.15)',
+                cursor: 'pointer',
+              }),
+            }}
             onPress={() => {
               // Lógica para mostrar detalhes do plano
             }}
           >
-            <Crown size={18} color="#FFD700" strokeWidth={1.5} />
-          </Pressable>
+            <HoverableView
+              hoverScale={1.25}
+              style={{
+                backgroundColor: 'transparent',
+              }}
+            >
+              <Crown size={18} color="#FFD700" strokeWidth={1.5} />
+            </HoverableView>
+          </HoverableView>
         ) : (
           <GradientView
-            colors={['#4A1866', colors.primary.main]}
+            colors={['#733AAB', '#9945E8']}
+            start={{ x: 0.1, y: 0 }}
+            end={{ x: 0.9, y: 1 }}
             style={{
               padding: 14,
               borderRadius: 12,
@@ -552,20 +577,17 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
             </View>
             <Text style={styles.planDays}>14 dias restantes no seu trial</Text>
             <HoverableView 
-              style={styles.updateButton}
+              style={{
+                ...styles.updateButton,
+              }}
               hoverScale={1.03}
-              hoverColor={colors.primary.main}
+              disableHoverBackground={true}
               onPress={() => {
                 // Lógica para atualizar plano
               }}
-              onHoverIn={() => setIsUpdateButtonHovered(true)}
-              onHoverOut={() => setIsUpdateButtonHovered(false)}
             >
               <View style={styles.updateButtonContent}>
-                <Text style={[
-                  styles.updateButtonText,
-                  isUpdateButtonHovered && { color: 'white' }
-                ]}>
+                <Text style={styles.updateButtonText}>
                   Atualizar Plano ✨
                 </Text>
               </View>
@@ -630,17 +652,17 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logoBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: colors.primary.main,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(174, 100, 242, 0.4)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoBoxCompact: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   logoText: {
     fontSize: 18,
@@ -763,8 +785,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 12,
     ...(Platform.OS === 'web' && {
-      backgroundImage: 'linear-gradient(145deg, #264450 0%, #3A6B7E 35%, #264450 65%, #1a2f37 100%)',
-      boxShadow: '0 4px 8px rgba(38, 68, 80, 0.15)',
       cursor: 'pointer',
     }),
   },
@@ -801,12 +821,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   updateButtonText: {
-    color: colors.primary.main,
+    color: '#AC47FC',
     fontSize: 13,
     fontWeight: '500',
-    ...(Platform.OS === 'web' && {
-      transition: 'color 0.2s ease-in-out',
-    }),
   },
   logoutButton: {
     flexDirection: 'row',

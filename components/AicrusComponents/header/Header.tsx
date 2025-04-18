@@ -52,8 +52,11 @@ const Z_INDEX = {
  * // Header com handler para controlar sidebar externa
  * <Header onToggleDrawer={handleToggleSidebar} />
  * 
- * // Header com ajuste para sidebar fixa
- * <Header sidebarWidth={256} />
+ * // Header com componentes personalizados
+ * <Header
+ *   ProfileMenuComponent={CustomProfileMenu}
+ *   SidebarComponent={CustomSidebar}
+ * />
  * ```
  */
 
@@ -71,7 +74,7 @@ export interface HeaderProps {
   }>;
   /** Handler opcional para controlar a abertura/fechamento da sidebar externa */
   onToggleDrawer?: () => void;
-  /** Largura do sidebar para ajustar o header quando em tablet/desktop */
+  /** Largura da sidebar para ajustar o header em dispositivos não-móveis */
   sidebarWidth?: number;
 }
 
@@ -202,7 +205,7 @@ export function Header({
             height: Dimensions.get('window').height,
             zIndex: Z_INDEX.BACKDROP,
           };
-      
+        
       return (
         <Pressable
           style={[
@@ -224,12 +227,6 @@ export function Header({
     return null;
   };
 
-  // Estilos adicionais para o header quando temos um sidebar
-  const headerWithSidebarStyle = !isMobile && sidebarWidth > 0 ? { 
-    width: Dimensions.get('window').width - sidebarWidth,
-    marginLeft: sidebarWidth
-  } : {};
-
   // Componente de barra lateral padrão
   const DefaultSidebar = ({ isDrawerVisible, onClose }: { isDrawerVisible: boolean; onClose: () => void }) => {
     if (!isDrawerVisible) return null;
@@ -249,6 +246,22 @@ export function Header({
 
   // Componentes a serem utilizados
   const Sidebar = SidebarComponent || DefaultSidebar;
+
+  // Estilo condicional para o wrapper do header em dispositivos não-móveis
+  const getDesktopHeaderStyles = (): ViewStyle => {
+    if (isMobile) return {};
+
+    return {
+      position: 'fixed',
+      top: 0,
+      right: 0,
+      left: sidebarWidth,
+      marginLeft: sidebarWidth,
+      width: `calc(100% - ${sidebarWidth}px)` as any,
+      zIndex: Z_INDEX.HEADER,
+      height: 64, // altura específica para garantir alinhamento
+    };
+  };
 
   // Para mobile, renderiza um header simplificado com botão de menu
   if (isMobile) {
@@ -381,18 +394,26 @@ export function Header({
     );
   }
 
+  // Para tablet e desktop, renderiza um header completo
   return (
     <>
-      {/* Header primeiro */}
-      <View style={[styles.wrapper, headerWithSidebarStyle]}>
+      {/* Header primeiro - com posição fixa ao lado da sidebar */}
+      <View style={[
+        styles.wrapper,
+        getDesktopHeaderStyles()
+      ]}>
         <View style={[
           styles.header,
           {
             backgroundColor: bgColor,
             borderBottomColor: borderColor,
-          },
+            width: '100%', // Garantir que ocupe toda a largura disponível
+          }
         ]}>
-          <View style={styles.container}>
+          <View style={[
+            styles.container,
+            {paddingRight: 24} // Espaçamento maior à direita para melhor alinhamento
+          ]}>
             <View style={styles.rightContent}>
               <Pressable 
                 style={[styles.iconButton, isDark && styles.iconButtonDark]}
@@ -496,6 +517,9 @@ const styles = StyleSheet.create({
     height: 64,
     borderBottomWidth: 1,
     zIndex: Z_INDEX.HEADER,
+    ...(Platform.OS === 'web' && {
+      boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    }),
   },
   headerMobileNative: {
     height: 65,

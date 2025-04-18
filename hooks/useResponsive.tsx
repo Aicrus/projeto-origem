@@ -13,18 +13,21 @@ import {
  * para ajudar na implementação de layouts responsivos
  */
 export function useResponsive() {
-  const [dimensions, setDimensions] = useState<ScaledSize>(Dimensions.get('window'));
-  const [currentBreakpoint, setCurrentBreakpoint] = useState<string>(
-    getCurrentBreakpoint(Dimensions.get('window').width)
-  );
+  // Obtém as dimensões iniciais e calcula breakpoints imediatamente
+  const initialDimensions = Dimensions.get('window');
+  const initialBreakpoint = getCurrentBreakpoint(initialDimensions.width);
   
-  // Referência para evitar renderizações desnecessárias
-  const dimensionsRef = useRef(dimensions);
+  // Define estados com valores pré-calculados para evitar atrasos iniciais
+  const [dimensions, setDimensions] = useState<ScaledSize>(initialDimensions);
+  const [currentBreakpoint, setCurrentBreakpoint] = useState<string>(initialBreakpoint);
   
-  // Largura e altura da tela atual
+  // Armazena o último breakpoint detectado para comparação rápida
+  const lastBreakpointRef = useRef(initialBreakpoint);
+  const dimensionsRef = useRef(initialDimensions);
+  
+  // Cria flags de breakpoint diretamente a partir das dimensões atuais
+  // em vez de depender do estado, para maior responsividade
   const { width, height } = dimensions;
-  
-  // Flags para os diferentes breakpoints - usando os limites exatos definidos
   const isMobile = isMobileWidth(width);
   const isTablet = isTabletWidth(width);
   const isDesktop = isDesktopWidth(width);
@@ -33,39 +36,49 @@ export function useResponsive() {
   const isPortrait = height > width;
   const isLandscape = width > height;
   
-  // Função para atualizar dimensões com debounce
+  // Função otimizada para atualizar dimensões sem debounce para maior rapidez
   const updateDimensions = useCallback(() => {
     const newDimensions = Dimensions.get('window');
+    const newWidth = newDimensions.width;
+    const newHeight = newDimensions.height;
     
     // Verifica se as dimensões realmente mudaram
-    if (
-      dimensionsRef.current.width !== newDimensions.width || 
-      dimensionsRef.current.height !== newDimensions.height
-    ) {
-      const newBreakpoint = getCurrentBreakpoint(newDimensions.width);
-      setDimensions(newDimensions);
+    if (dimensionsRef.current.width !== newWidth || dimensionsRef.current.height !== newHeight) {
+      // Executa atualizações de dimensão de forma síncrona
       dimensionsRef.current = newDimensions;
+      setDimensions(newDimensions);
       
-      if (newBreakpoint !== currentBreakpoint) {
+      // Calcula o novo breakpoint imediatamente
+      const newBreakpoint = getCurrentBreakpoint(newWidth);
+      
+      // Só atualiza o estado se o breakpoint realmente mudou
+      if (lastBreakpointRef.current !== newBreakpoint) {
+        lastBreakpointRef.current = newBreakpoint;
         setCurrentBreakpoint(newBreakpoint);
-        console.log(`[Responsive] Breakpoint mudou para: ${newBreakpoint}, largura: ${newDimensions.width}px`);
+        console.log(`[Responsive] Breakpoint mudou para: ${newBreakpoint}, largura: ${newWidth}px`);
       }
     }
-  }, [currentBreakpoint]);
+  }, []);
   
   useEffect(() => {
     // Configura os listeners de mudança de dimensões
     if (Platform.OS === 'web') {
-      let debounceTimer: NodeJS.Timeout | null = null;
+      // Executa imediatamente para garantir o estado correto
+      updateDimensions();
+      
+      // Adiciona verificação redundante para garantir que o breakpoint foi aplicado
+      requestAnimationFrame(() => {
+        updateDimensions();
+      });
       
       const handleResize = () => {
-        if (debounceTimer) {
-          clearTimeout(debounceTimer);
-        }
+        // Executa a atualização imediatamente, sem debounce
+        updateDimensions();
         
-        debounceTimer = setTimeout(() => {
+        // Verifica novamente após o processo de renderização para garantir consistência
+        requestAnimationFrame(() => {
           updateDimensions();
-        }, 150);
+        });
       };
       
       if (typeof window !== 'undefined') {
@@ -75,15 +88,22 @@ export function useResponsive() {
         return () => {
           window.removeEventListener('resize', handleResize);
           window.removeEventListener('orientationchange', handleResize);
-          if (debounceTimer) clearTimeout(debounceTimer);
         };
       }
     } else {
       // Em dispositivos móveis, usamos a API de dimensões
+      updateDimensions();
+      
       const subscription = Dimensions.addEventListener('change', ({ window }) => {
-        setDimensions(window);
+        // Atualiza os refs e estados imediatamente
         dimensionsRef.current = window;
-        setCurrentBreakpoint(getCurrentBreakpoint(window.width));
+        setDimensions(window);
+        
+        const newBreakpoint = getCurrentBreakpoint(window.width);
+        if (lastBreakpointRef.current !== newBreakpoint) {
+          lastBreakpointRef.current = newBreakpoint;
+          setCurrentBreakpoint(newBreakpoint);
+        }
       });
       
       return () => {
@@ -103,13 +123,17 @@ export function useResponsive() {
     desktop?: T;
     default: T;
   }): T {
-    if (isMobile && options.mobile !== undefined) {
+    // Usar verificações diretas com base na largura atual
+    // em vez de confiar nos estados para maior responsividade
+    const currentWidth = dimensionsRef.current.width;
+    
+    if (isMobileWidth(currentWidth) && options.mobile !== undefined) {
       return options.mobile;
     }
-    if (isTablet && options.tablet !== undefined) {
+    if (isTabletWidth(currentWidth) && options.tablet !== undefined) {
       return options.tablet;
     }
-    if (isDesktop && options.desktop !== undefined) {
+    if (isDesktopWidth(currentWidth) && options.desktop !== undefined) {
       return options.desktop;
     }
     return options.default;
