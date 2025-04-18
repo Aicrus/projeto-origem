@@ -341,22 +341,13 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                 </View>
                 <Text style={styles.planDays}>14 dias restantes no seu trial</Text>
                 <Pressable 
-                  style={styles.updateButton}
+                  style={({ hovered }) => [
+                    styles.updateButton,
+                    hovered && Platform.OS === 'web' ? { backgroundColor: colors.primary.main } : {}
+                  ]}
                   onPress={() => {
                     // Lógica para atualizar plano
                   }}
-                  onHoverIn={Platform.OS === 'web' ? (e) => {
-                    // @ts-ignore
-                    e.currentTarget.style.backgroundColor = colors.primary.main;
-                    // @ts-ignore
-                    e.currentTarget.querySelector('p').style.color = 'white';
-                  } : undefined}
-                  onHoverOut={Platform.OS === 'web' ? (e) => {
-                    // @ts-ignore
-                    e.currentTarget.style.backgroundColor = colors.white;
-                    // @ts-ignore
-                    e.currentTarget.querySelector('p').style.color = colors.primary.main;
-                  } : undefined}
                 >
                   <View style={styles.updateButtonContent}>
                     <Text style={styles.updateButtonText}>
@@ -556,14 +547,6 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
               onPress={() => {
                 // Lógica para atualizar plano
               }}
-              onHoverIn={Platform.OS === 'web' ? (e) => {
-                // @ts-ignore
-                e.currentTarget.querySelector('p').style.color = 'white';
-              } : undefined}
-              onHoverOut={Platform.OS === 'web' ? (e) => {
-                // @ts-ignore
-                e.currentTarget.querySelector('p').style.color = colors.primary.main;
-              } : undefined}
             >
               <View style={styles.updateButtonContent}>
                 <Text style={styles.updateButtonText}>
@@ -794,7 +777,12 @@ const styles = StyleSheet.create({
     marginTop: 2,
     ...(Platform.OS === 'web' && {
       cursor: 'pointer',
-      transition: 'all 0.2s ease-in-out',
+      ':hover': {
+        backgroundColor: `${colors.primary.main} !important`,
+      },
+      ':hover > div > p': {
+        color: 'white !important',
+      },
     }),
   },
   updateButtonContent: {
