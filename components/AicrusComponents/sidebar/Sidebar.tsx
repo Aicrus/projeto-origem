@@ -183,8 +183,14 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
     };
   });
 
+  // Na versão desktop para o botão de atualizar plano
+  const [isUpdateButtonHovered, setIsUpdateButtonHovered] = useState(false);
+
   // Se for mobile, renderiza como um drawer modal
   if (isMobile) {
+    // Para a versão mobile do botão
+    const [isMobileUpdateButtonHovered, setIsMobileUpdateButtonHovered] = useState(false);
+
     return (
       <Modal
         visible={isOpen}
@@ -257,7 +263,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                           styles.activeNavText,
                           isDark && styles.navTextDark,
                           isDashboardActive && {
-                            fontWeight: 'bold',
+                            fontWeight: '800',
                             color: 'white',
                             fontSize: 16
                           }
@@ -296,7 +302,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                         isDark && styles.navTextDark,
                         isActive && styles.activeNavText,
                         isDashboardActive && {
-                          fontWeight: 'bold',
+                          fontWeight: '800',
                           color: 'white',
                           fontSize: 16
                         }
@@ -348,9 +354,14 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                   onPress={() => {
                     // Lógica para atualizar plano
                   }}
+                  onHoverIn={() => setIsMobileUpdateButtonHovered(true)}
+                  onHoverOut={() => setIsMobileUpdateButtonHovered(false)}
                 >
                   <View style={styles.updateButtonContent}>
-                    <Text style={styles.updateButtonText}>
+                    <Text style={[
+                      styles.updateButtonText,
+                      isMobileUpdateButtonHovered && Platform.OS === 'web' && { color: 'white' }
+                    ]}>
                       Atualizar Plano ✨
                     </Text>
                   </View>
@@ -441,7 +452,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                       styles.activeNavText,
                       isDark && styles.navTextDark,
                       isDashboardActive && {
-                        fontWeight: 'bold',
+                        fontWeight: '800',
                         color: 'white',
                         fontSize: 16
                       }
@@ -485,7 +496,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                     isDark && styles.navTextDark,
                     isActive && styles.activeNavText,
                     isDashboardActive && {
-                      fontWeight: 'bold',
+                      fontWeight: '800',
                       color: 'white',
                       fontSize: 16
                     }
@@ -547,9 +558,14 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
               onPress={() => {
                 // Lógica para atualizar plano
               }}
+              onHoverIn={() => setIsUpdateButtonHovered(true)}
+              onHoverOut={() => setIsUpdateButtonHovered(false)}
             >
               <View style={styles.updateButtonContent}>
-                <Text style={styles.updateButtonText}>
+                <Text style={[
+                  styles.updateButtonText,
+                  isUpdateButtonHovered && { color: 'white' }
+                ]}>
                   Atualizar Plano ✨
                 </Text>
               </View>
@@ -710,7 +726,7 @@ const styles = StyleSheet.create({
   },
   activeNavText: {
     color: colors.white,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   footer: {
     marginTop: 'auto',
@@ -777,12 +793,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
     ...(Platform.OS === 'web' && {
       cursor: 'pointer',
-      ':hover': {
-        backgroundColor: `${colors.primary.main} !important`,
-      },
-      ':hover > div > p': {
-        color: 'white !important',
-      },
     }),
   },
   updateButtonContent: {
@@ -794,6 +804,9 @@ const styles = StyleSheet.create({
     color: colors.primary.main,
     fontSize: 13,
     fontWeight: '500',
+    ...(Platform.OS === 'web' && {
+      transition: 'color 0.2s ease-in-out',
+    }),
   },
   logoutButton: {
     flexDirection: 'row',
