@@ -172,9 +172,7 @@ export function PageContainer({
   // Estilos do container principal seguindo o Design System
   const containerStyle: ViewStyle = {
     marginTop: effectiveHeaderHeight,
-    paddingHorizontal: isMobile ? SPACING.md : isTablet ? SPACING.lg : SPACING.xl,
-    paddingTop: isMobile ? 0 : isTablet ? SPACING.lg : SPACING.xl,
-    paddingBottom: isMobile ? SPACING.md : isTablet ? SPACING.lg : SPACING.xl,
+    padding: isMobile ? SPACING.md : isTablet ? SPACING.lg : SPACING.xl,
   };
 
   // Ajustes para sidebar em tablets e desktops
@@ -188,10 +186,11 @@ export function PageContainer({
     }
   }
 
-  // Estilos do container interno
+  // Estilos do container interno - removendo a limitação de largura
   const contentContainerStyle: ViewStyle = {
-    maxWidth: isDesktop ? (Dimensions.get('window').width > 1440 ? 1800 : 1200) : isTablet ? 800 : '100%',
-    ...(isMobile && { paddingTop: SPACING.md }),
+    maxWidth: '100%', // Removendo limitação de largura máxima
+    width: '100%', // Garantindo que ocupe toda a largura disponível
+    ...(isMobile && { paddingTop: 0 }), // Apenas ajustando para mobile
   };
 
   return (

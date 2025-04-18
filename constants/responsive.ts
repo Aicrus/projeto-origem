@@ -8,23 +8,17 @@ export const BREAKPOINTS = {
   // Celulares pequenos (até iPhone SE)
   SMALL_MOBILE: 320, 
   
-  // Celulares maiores (até iPhone Pro Max)
-  MOBILE: 480,
+  // Breakpoint principal para mobile
+  MOBILE: 740,
   
-  // Tablets pequenos e celulares em landscape
-  SMALL_TABLET: 640,
+  // Tablets
+  TABLET: 1200,
   
-  // Tablets (iPad, etc)
-  TABLET: 768,
-  
-  // Tablets grandes e pequenos laptops
-  LARGE_TABLET: 900,
-  
-  // Laptops e desktops
-  DESKTOP: 1024,
+  // Desktops
+  DESKTOP: 1200,
   
   // Telas grandes
-  LARGE_DESKTOP: 1280,
+  LARGE_DESKTOP: 1600,
 };
 
 /**
@@ -33,8 +27,8 @@ export const BREAKPOINTS = {
  * @returns true se estiver na faixa de celular
  */
 export const isMobileWidth = (width: number): boolean => {
-  // Considera apenas dispositivos com tela até 480px como mobile
-  return width <= BREAKPOINTS.MOBILE;
+  // Mobile: < 740px
+  return width < BREAKPOINTS.MOBILE;
 };
 
 /**
@@ -43,7 +37,8 @@ export const isMobileWidth = (width: number): boolean => {
  * @returns true se estiver na faixa de tablet pequeno
  */
 export const isSmallTabletWidth = (width: number): boolean => {
-  return width > BREAKPOINTS.MOBILE && width <= BREAKPOINTS.SMALL_TABLET;
+  // Função mantida para compatibilidade, mas não usamos mais este breakpoint
+  return width >= BREAKPOINTS.MOBILE && width < BREAKPOINTS.TABLET;
 };
 
 /**
@@ -52,7 +47,8 @@ export const isSmallTabletWidth = (width: number): boolean => {
  * @returns true se estiver na faixa de tablet
  */
 export const isTabletWidth = (width: number): boolean => {
-  return width > BREAKPOINTS.MOBILE && width < BREAKPOINTS.DESKTOP;
+  // Tablet: >= 740px e < 1200px
+  return width >= BREAKPOINTS.MOBILE && width < BREAKPOINTS.DESKTOP;
 };
 
 /**
@@ -61,6 +57,7 @@ export const isTabletWidth = (width: number): boolean => {
  * @returns true se estiver na faixa de desktop
  */
 export const isDesktopWidth = (width: number): boolean => {
+  // Desktop: >= 1200px
   return width >= BREAKPOINTS.DESKTOP;
 };
 
@@ -71,11 +68,9 @@ export const isDesktopWidth = (width: number): boolean => {
  */
 export const getCurrentBreakpoint = (width: number): string => {
   if (width <= BREAKPOINTS.SMALL_MOBILE) return 'SMALL_MOBILE';
-  if (width <= BREAKPOINTS.MOBILE) return 'MOBILE';
-  if (width <= BREAKPOINTS.SMALL_TABLET) return 'SMALL_TABLET';
-  if (width <= BREAKPOINTS.TABLET) return 'TABLET';
-  if (width <= BREAKPOINTS.LARGE_TABLET) return 'LARGE_TABLET';
-  if (width <= BREAKPOINTS.DESKTOP) return 'DESKTOP';
+  if (width < BREAKPOINTS.MOBILE) return 'MOBILE';
+  if (width < BREAKPOINTS.TABLET) return 'TABLET';
+  if (width < BREAKPOINTS.LARGE_DESKTOP) return 'DESKTOP';
   return 'LARGE_DESKTOP';
 };
 
