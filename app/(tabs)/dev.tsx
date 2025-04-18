@@ -2995,11 +2995,87 @@ return (
     );
   };
 
+  // Mova isso para fora da função renderPageContainerComponent
+  function HomeStyleCards({ 
+    bgClass = '', 
+    bgPrimaryClass = '', 
+    isMobile = false, 
+    isTablet = false, 
+    layout = '4x2' // Opções: '4x2', '3x2', '2x2', 'single'
+  }) {
+    const cardClass = `${bgClass} rounded-lg`;
+    
+    // Definir layouts com base nos parâmetros passados
+    let topCardsLayout = '';
+    let bottomCardsLayout = '';
+    let topCards: number[] = [];
+    let bottomCards: number[] = [];
+    
+    // Layout principal 4x2
+    if (layout === '4x2') {
+      topCardsLayout = isMobile ? 'flex-col' : isTablet ? 'grid grid-cols-2' : 'grid grid-cols-4';
+      bottomCardsLayout = isMobile ? 'flex-col' : 'grid grid-cols-2';
+      topCards = [1, 2, 3, 4];
+      bottomCards = [1, 2];
+    } 
+    // Layout principal 3x2
+    else if (layout === '3x2') {
+      topCardsLayout = isMobile ? 'flex-col' : isTablet ? 'grid grid-cols-2' : 'grid grid-cols-3';
+      bottomCardsLayout = isMobile ? 'flex-col' : 'grid grid-cols-2';
+      topCards = [1, 2, 3];
+      bottomCards = [1, 2];
+    } 
+    // Layout principal 2x2
+    else if (layout === '2x2') {
+      topCardsLayout = isMobile ? 'flex-col' : 'grid grid-cols-2';
+      bottomCardsLayout = isMobile ? 'flex-col' : 'grid grid-cols-2';
+      topCards = [1, 2];
+      bottomCards = [1, 2];
+    }
+    // Layout single (apenas um card)
+    else if (layout === 'single') {
+      topCardsLayout = 'flex-col';
+      topCards = [];
+      bottomCards = [1];
+    }
+    
+    // Card vazio reutilizável
+    const EmptyCard = ({ height, className = '', style }: { height?: number, className?: string, style?: any }) => (
+      <View className={`${cardClass} ${className}`} style={[style, height ? { height } : {}]} />
+    );
+    
+    return (
+      <View style={{ minHeight: 400, flex: 1, flexDirection: 'column' }} className={`p-4 rounded-lg ${bgPrimaryClass}`}>
+        {/* Cards superiores */}
+        {topCards.length > 0 && (
+          <View className={`gap-4 mb-4 ${isMobile ? 'flex' : 'grid'} ${topCardsLayout}`}>
+            {topCards.map(index => (
+              <EmptyCard key={`top-${index}`} height={140} />
+            ))}
+          </View>
+        )}
+        
+        {/* Cards inferiores */}
+        <View className={`gap-4 ${isMobile ? 'flex' : 'grid'} ${bottomCardsLayout}`} style={{ flex: 1, minHeight: isMobile ? 200 : 300 }}>
+          {bottomCards.map(index => (
+            <EmptyCard key={`bottom-${index}`} className="flex-1" style={{ height: '100%' }} />
+          ))}
+        </View>
+      </View>
+    );
+  }
+
   const renderPageContainerComponent = () => {
     const bgSecondary = isDark ? 'bg-bg-secondary-dark' : 'bg-bg-secondary-light';
+    const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
     const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
     const textSecondary = isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light';
     const borderColor = isDark ? 'border-divider-dark' : 'border-divider-light';
+    
+    // Aqui usamos as variáveis já disponíveis no escopo do componente principal
+    const screenWidth = Dimensions.get('window').width;
+    const _isMobile = screenWidth < 768;
+    const _isTablet = screenWidth >= 768 && screenWidth < 1024;
 
     return (
       <View className="p-lg">
@@ -3008,94 +3084,135 @@ return (
         </Text>
         <Text className={`text-body-md ${textSecondary} mb-lg`}>
           Componente responsável por gerenciar os espaçamentos e layout padrão da aplicação.
-          Oferece diferentes variações para atender diversos casos de uso.
+          É transparente por padrão e oferece diversas opções de customização.
         </Text>
 
         <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos de Layouts:</Text>
 
-          {/* Modo Padrão */}
+          {/* Removi o exemplo "Container Básico" por ser desnecessário */}
+
+          {/* Layout Dashboard 4x2 */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Modo Padrão</Text>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 4x2</Text>
             <PageContainer>
-              <View className={`${bgSecondary} rounded-lg p-lg`}>
-                <Text className={`text-body-md ${textPrimary}`}>Conteúdo do Container</Text>
-              </View>
+              <HomeStyleCards 
+                bgClass={bgSecondary}
+                bgPrimaryClass={bgPrimary}
+                isMobile={_isMobile} 
+                isTablet={_isTablet}
+                layout="4x2"
+              />
             </PageContainer>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Container básico com espaçamentos padronizados e responsivos.
+              Layout com 4 cards superiores e 2 inferiores. Totalmente responsivo.
             </Text>
+            <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
+              <Text className={`text-mono-sm ${textPrimary}`}>
+                {`// Código pronto para usar:\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4 cards */}\n    <View className={\`gap-4 mb-4 \${isMobile ? 'flex' : isTablet ? 'grid grid-cols-2' : 'grid grid-cols-4'}\`}>
+      <Card1 height={140} />
+      <Card2 height={140} />
+      <Card3 height={140} />
+      <Card4 height={140} />
+    </View>
+    {/* Cards inferiores - 2 cards */}\n    <View className={\`gap-4 \${isMobile ? 'flex' : 'grid grid-cols-2'}\`} style={{ flex: 1 }}>\n      <Card5 className="flex-1" style={{ height: '100%' }} />\n      <Card6 className="flex-1" style={{ height: '100%' }} />\n    </View>\n  </View>\n</PageContainer>`}
+              </Text>
+            </View>
           </View>
 
-          {/* Layout Dashboard 4x1 */}
+          {/* Layout Dashboard 3x2 - Modificado para ter 2 em cima, 1 embaixo ocupando toda a largura */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 4x1</Text>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 3x2</Text>
             <PageContainer>
-              <View className="flex-row flex-wrap gap-md mb-md">
-                {[1, 2, 3, 4].map((i) => (
-                  <View key={i} className={`flex-1 min-w-[200px] ${bgSecondary} rounded-lg p-lg`}>
-                    <Text className={`text-body-md ${textPrimary}`}>Container {i}</Text>
-                  </View>
-                ))}
-              </View>
-              <View className={`${bgSecondary} rounded-lg p-lg`}>
-                <Text className={`text-body-md ${textPrimary}`}>Container Principal</Text>
-              </View>
+              <HomeStyleCards 
+                bgClass={bgSecondary}
+                bgPrimaryClass={bgPrimary}
+                isMobile={_isMobile} 
+                isTablet={_isTablet}
+                layout="3x2"
+              />
             </PageContainer>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Layout com 4 containers superiores e 1 container inferior, ideal para dashboards.
+              Layout com 2 cards superiores e 1 card inferior ocupando toda a largura.
             </Text>
+            <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
+              <Text className={`text-mono-sm ${textPrimary}`}>
+                {`// Código pronto para usar:\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 2 cards */}\n    <View className={\`gap-4 mb-4 \${isMobile ? 'flex' : 'grid grid-cols-2'}\`}>
+      <Card1 height={140} />
+      <Card2 height={140} />
+    </View>
+    {/* Card inferior - 1 card ocupando toda a largura */}\n    <View className="gap-4" style={{ flex: 1 }}>\n      <Card3 className="flex-1" style={{ height: '100%' }} />\n    </View>\n  </View>\n</PageContainer>`}
+              </Text>
+            </View>
           </View>
 
-          {/* Layout Dashboard 3x1 */}
+          {/* Layout Dashboard 2x2 */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 3x1</Text>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 2x2</Text>
             <PageContainer>
-              <View className="flex-row flex-wrap gap-md mb-md">
-                {[1, 2, 3].map((i) => (
-                  <View key={i} className={`flex-1 min-w-[250px] ${bgSecondary} rounded-lg p-lg`}>
-                    <Text className={`text-body-md ${textPrimary}`}>Container {i}</Text>
-                  </View>
-                ))}
-              </View>
-              <View className={`${bgSecondary} rounded-lg p-lg`}>
-                <Text className={`text-body-md ${textPrimary}`}>Container Principal</Text>
-              </View>
+              <HomeStyleCards 
+                bgClass={bgSecondary}
+                bgPrimaryClass={bgPrimary}
+                isMobile={_isMobile} 
+                isTablet={_isTablet}
+                layout="2x2"
+              />
             </PageContainer>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Layout com 3 containers superiores e 1 container inferior.
+              Layout com 2 cards superiores e 2 inferiores.
             </Text>
+            <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
+              <Text className={`text-mono-sm ${textPrimary}`}>
+                {`// Código pronto para usar:\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 2 cards */}\n    <View className={\`gap-4 mb-4 \${isMobile ? 'flex' : 'grid grid-cols-2'}\`}>
+      <Card1 height={140} />
+      <Card2 height={140} />
+    </View>
+    {/* Cards inferiores - 2 cards */}\n    <View className={\`gap-4 \${isMobile ? 'flex' : 'grid grid-cols-2'}\`} style={{ flex: 1 }}>\n      <Card3 className="flex-1" style={{ height: '100%' }} />\n      <Card4 className="flex-1" style={{ height: '100%' }} />\n    </View>\n  </View>\n</PageContainer>`}
+              </Text>
+            </View>
           </View>
 
-          {/* Layout Dashboard 2x1 */}
+          {/* Layout Container Único */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 2x1</Text>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Container Único</Text>
             <PageContainer>
-              <View className="flex-row flex-wrap gap-md mb-md">
-                {[1, 2].map((i) => (
-                  <View key={i} className={`flex-1 min-w-[300px] ${bgSecondary} rounded-lg p-lg`}>
-                    <Text className={`text-body-md ${textPrimary}`}>Container {i}</Text>
-                  </View>
-                ))}
-              </View>
-              <View className={`${bgSecondary} rounded-lg p-lg`}>
-                <Text className={`text-body-md ${textPrimary}`}>Container Principal</Text>
-              </View>
+              <HomeStyleCards 
+                bgClass={bgSecondary}
+                bgPrimaryClass={bgPrimary}
+                isMobile={_isMobile} 
+                isTablet={_isTablet}
+                layout="single"
+              />
             </PageContainer>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Layout com 2 containers superiores e 1 container inferior.
+              Layout com apenas um card principal.
             </Text>
+            <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
+              <Text className={`text-mono-sm ${textPrimary}`}>
+                {`// Código pronto para usar:\n<PageContainer>\n  <View className={\`\${bgSecondary} rounded-lg flex-1\`} style={{ minHeight: 400 }}>\n    {/* Conteúdo do card */}\n  </View>\n</PageContainer>`}
+              </Text>
+            </View>
           </View>
         </View>
 
         <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Características
+          Características e Customização
         </Text>
         <Text className={`text-body-md ${textSecondary} mb-md`}>
-          O PageContainer oferece diversas características para uma experiência consistente:
+          O PageContainer oferece diversas possibilidades de customização:
         </Text>
 
         <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Transparência</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>O container é transparente por padrão, permitindo definir qualquer cor de fundo</Text>
+          </View>
+
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Espaçamentos Customizáveis</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Padding lateral, superior e inferior podem ser customizados</Text>
+          </View>
+
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Responsividade</Text>
             <Text className={`text-body-sm ${textSecondary}`}>Adapta-se automaticamente para desktop, tablet e mobile</Text>
@@ -3103,42 +3220,37 @@ return (
 
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Suporte a Sidebar</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Ajusta o layout quando há uma sidebar presente</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Ajusta o layout quando há uma sidebar presente (propriedade withSidebar)</Text>
           </View>
 
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Suporte a Header</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Adiciona margem superior apropriada</Text>
-          </View>
-
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Espaçamento Consistente</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Segue o Design System</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Adiciona margem superior apropriada (propriedade withHeader)</Text>
           </View>
         </View>
 
         <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Propriedades
+          Propriedades Disponíveis
         </Text>
         <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>children</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Conteúdo do container</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Conteúdo do container (obrigatório)</Text>
           </View>
 
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>withSidebar</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Se deve considerar espaço para sidebar (boolean)</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se deve considerar espaço para sidebar (boolean, default: true)</Text>
           </View>
 
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>withHeader</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Se deve considerar espaço para header (boolean)</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se deve considerar espaço para header (boolean, default: true)</Text>
           </View>
 
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>sidebarWidth</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Largura da sidebar em pixels (number)</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Largura da sidebar em pixels (number, default: 250 ou 65 para tablet)</Text>
           </View>
 
           <View className="mb-sm">
@@ -3153,7 +3265,7 @@ return (
         </View>
 
         <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Exemplos de Uso
+          Exemplos de Código
         </Text>
         <View className={`${bgSecondary} rounded-lg p-md`}>
           <Text className={`text-mono-sm ${textPrimary}`}>
@@ -3162,6 +3274,10 @@ return (
           <View className={`my-md border-t ${borderColor}`} />
           <Text className={`text-mono-sm ${textPrimary}`}>
             {`// Com Header e Sidebar\n<PageContainer\n  withHeader\n  withSidebar\n  sidebarWidth={250}\n>\n  {/* seu conteúdo */}\n</PageContainer>`}
+          </Text>
+          <View className={`my-md border-t ${borderColor}`} />
+          <Text className={`text-mono-sm ${textPrimary}`}>
+            {`// Layout Dashboard (4x2) Home\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4x1 */}\n    <View className={\`gap-4 mb-4 \${isMobile ? 'flex' : 'grid'} \${topCardsLayout}\`}>\n      {/* 4 cards aqui */}\n    </View>\n    {/* Cards inferiores - 2x1 */}\n    <View className={\`gap-4 \${isMobile ? 'flex' : 'grid'} \${bottomCardsLayout}\`}>\n      {/* 2 cards aqui */}\n    </View>\n  </View>\n</PageContainer>`}
           </Text>
         </View>
       </View>
@@ -3439,3 +3555,32 @@ const ValueDisplay = ({ name, value, textColor }: ValueDisplayProps) => (
     <Text className={`text-body-sm ${textColor} opacity-70`}>{value}</Text>
   </View>
 );
+
+// Adicionar componente para botão de copiar
+const CopyButton = ({ text }: { text: string }) => {
+  const [copied, setCopied] = useState(false);
+  const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
+  
+  const handleCopy = () => {
+    if (Platform.OS === 'web') {
+      navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+  
+  // Renderiza apenas na web
+  if (Platform.OS !== 'web') return null;
+  
+  return (
+    <Pressable 
+      onPress={handleCopy}
+      className={`absolute top-2 right-2 p-1 rounded-md ${copied ? 'bg-success-bg-light' : 'bg-gray-200 dark:bg-gray-700'}`}
+    >
+      <Text className={`text-xs ${copied ? 'text-success-text-light' : isDark ? 'text-text-primary-dark' : 'text-text-primary-light'}`}>
+        {copied ? 'Copiado!' : 'Copiar'}
+      </Text>
+    </Pressable>
+  );
+}
