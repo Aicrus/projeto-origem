@@ -24,8 +24,10 @@ import Animated, {
   interpolate,
   Extrapolate
 } from 'react-native-reanimated';
-import { colors } from '../../../components/AicrusComponents/constants/theme';
+import { colors } from '../constants/theme';
 import { useTheme } from '../../../hooks/ThemeContext';
+import { HoverableView } from '../hoverable-view/HoverableView';
+import { GradientView } from '../gradient/GradientView';
 
 // Constante para z-index
 const Z_INDEX = {
@@ -77,25 +79,87 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
   // Update animation value when drawer visibility changes
   useEffect(() => {
     if (isOpen) {
-      drawerProgress.value = withTiming(1, { duration: 300 });
-      backdropOpacity.value = withTiming(1, { duration: 250 });
+      drawerProgress.value = withTiming(1, { duration: 120 });
+      backdropOpacity.value = withTiming(1, { duration: 150 });
     } else {
-      drawerProgress.value = withTiming(0, { duration: 250 });
-      backdropOpacity.value = withTiming(0, { duration: 200 });
+      drawerProgress.value = withTiming(0, { duration: 100 });
+      backdropOpacity.value = withTiming(0, { duration: 80 });
     }
   }, [isOpen]);
 
+  const handleNavigation = useCallback((path: string) => {
+    // Para caminhos absolutos, precisamos usar push ou navegação simples
+    const pathToNavigate = path as any;
+    
+    if (isMobile) {
+      // Primeiro fechar o drawer
+      if (onClose) {
+        onClose();
+      }
+      
+      // Navegar após um pequeno delay para garantir que o drawer fechou
+      setTimeout(() => {
+        router.push(pathToNavigate);
+      }, 300);
+    } else {
+      // Em desktop, apenas navega diretamente
+      router.push(pathToNavigate);
+    }
+  }, [isMobile, onClose, router]);
+  
   // Função para determinar se um item de menu está ativo com base no pathname atual
   const isMenuItemActive = (itemPath: string) => {
     if (!pathname) return false;
     
-    // Dashboard é ativo apenas quando estamos na home
+    // Debug do pathname e window.location
+    const windowPath = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.pathname : '';
+    const windowHref = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.href : '';
+    
+    // Para o item Dashboard, verificar se estamos em home ou em PerfilGestor
     if (itemPath === '/(tabs)') {
-      return pathname === '/' || pathname === '/(tabs)' || pathname === '/(tabs)/index';
+      // Verificar se estamos em qualquer página que tenha "Perfil" no caminho
+      const hasPerfilInPath = 
+        pathname.includes('Perfil') || 
+        pathname.includes('perfil') || 
+        windowPath.includes('Perfil') || 
+        windowPath.includes('perfil') ||
+        windowHref.includes('Perfil') ||
+        windowHref.includes('perfil');
+      
+      // Verificar se estamos na página inicial
+      const isHomePage = 
+        pathname === '/' || 
+        pathname === '' || 
+        pathname === '/(tabs)' || 
+        pathname === '/(tabs)/index' ||
+        pathname === '/home' ||
+        windowPath === '/' || 
+        windowPath === '/home' ||
+        windowHref.endsWith('/') ||
+        windowHref.endsWith('/home');
+      
+      // Debug para averiguar qual condição está sendo atendida
+      console.log('Dashboard ativo?', {
+        itemPath,
+        pathname,
+        windowPath,
+        isHomePage,
+        hasPerfilInPath,
+        forceActive: true
+      });
+      
+      // O Dashboard está ativo se estivermos na página inicial OU em uma página com "Perfil"
+      // OU forçamos a ativação para rotas específicas como /home
+      return isHomePage || hasPerfilInPath || pathname === '/home' || windowPath === '/home';
     }
     
-    // Para as outras rotas, verificamos se o pathname contém o nome da página
+    // Para outros itens de menu
     return pathname.includes(itemPath.replace('/(tabs)', ''));
+  };
+  
+  const getConditionalStyle = (baseStyle: ViewStyle, compactStyle?: ViewStyle): ViewStyle => {
+    if (!isTablet || !compactStyle) return baseStyle;
+    return StyleSheet.flatten([baseStyle, compactStyle]);
   };
   
   // Animated styles
@@ -103,7 +167,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
     const translateX = interpolate(
       drawerProgress.value,
       [0, 1],
-      [-260, 0],
+      [-300, 0],
       Extrapolate.CLAMP
     );
     
@@ -119,65 +183,6 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
     };
   });
 
-  // Componente de item de navegação
-  const NavItem = ({ path, label, icon: Icon }: AppRoute) => {
-    const isActive = isMenuItemActive(path);
-    
-    const handleNavigation = () => {
-      if (isMobile && onClose) {
-        onClose();
-        
-        // Pequeno delay para navegação após animação de fechamento
-        setTimeout(() => {
-          router.push(path as any);
-        }, 300);
-      } else {
-        router.push(path as any);
-      }
-    };
-    
-    return (
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={handleNavigation}
-        style={styles.navItemContainer}
-      >
-        <View style={[
-          styles.navItem,
-          isActive && styles.activeNavItem,
-          isDark && styles.navItemDark,
-          isActive && isDark && styles.activeNavItemDark
-        ]}>
-          <Icon 
-            size={20} 
-            color={isActive 
-              ? isDark ? colors.white : colors.white 
-              : isDark ? colors.gray[300] : colors.gray[600]
-            }
-            strokeWidth={1.5}
-          />
-          <Text style={[
-            styles.navText,
-            isActive && styles.activeNavText,
-            { color: isActive 
-              ? colors.white 
-              : isDark ? colors.gray[300] : colors.gray[600] 
-            }
-          ]}>
-            {label}
-          </Text>
-          {isActive && (
-            <ChevronRight 
-              size={16} 
-              color={colors.white}
-              strokeWidth={1.5}
-            />
-          )}
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
   // Se for mobile, renderiza como um drawer modal
   if (isMobile) {
     return (
@@ -189,56 +194,195 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
       >
         <View style={styles.modalContainer}>
           {/* Backdrop com animação */}
-          <Animated.View 
-            style={[styles.backdrop, backdropAnimatedStyle]} 
-            onTouchEnd={onClose}
-          />
+          <TouchableWithoutFeedback onPress={onClose}>
+            <Animated.View style={[styles.backdrop, backdropAnimatedStyle]} />
+          </TouchableWithoutFeedback>
           
           {/* Sidebar com animação */}
           <Animated.View 
             style={[
-              styles.sidebar, 
+              styles.drawer, 
               drawerAnimatedStyle,
               isDark && styles.sidebarDark,
               withHeader && styles.withHeaderMobile
             ]}
           >
-            <View style={styles.sidebarHeader}>
-              <View style={styles.logoContainer}>
-                <Text style={[
-                  styles.logoTextBold,
-                  { color: isDark ? colors.white : colors.gray[900] }
-                ]}>Projeto</Text>
-                <Text style={[
-                  styles.logoText,
-                  { color: isDark ? colors.gray[300] : colors.gray[600] }
-                ]}>Origem</Text>
+            {/* Logo */}
+            <View style={styles.logoContainer}>
+              <View style={styles.logoBox}>
+                <Building size={20} color={colors.white} strokeWidth={1.5} />
               </View>
-              
-              <Pressable onPress={onClose} style={styles.closeButton}>
-                <X size={24} color={isDark ? colors.gray[300] : colors.gray[600]} />
-              </Pressable>
+              <View>
+                <Text style={[styles.logoText, isDark && styles.logoTextDark]}>Evolução</Text>
+                <Text style={[styles.subLogoText, isDark && styles.subLogoTextDark]}>Vistoria</Text>
+              </View>
             </View>
             
             <View style={styles.navContainer}>
-              {navItems.map((item, index) => (
-                <NavItem 
-                  key={index}
-                  path={item.path}
-                  label={item.label}
-                  icon={item.icon}
-                />
-              ))}
+              {navItems.map((item) => {
+                const isActive = isMenuItemActive(item.path);
+                const isDashboardActive = item.path === '/(tabs)' && isActive;
+                
+                // Para o item Dashboard ativo, vamos usar um wrapper diferente
+                if (isDashboardActive) {
+                  return (
+                    <TouchableOpacity
+                      key={item.path}
+                      activeOpacity={0.7}
+                      onPress={() => handleNavigation(item.path)}
+                      style={styles.navItemContainer}
+                    >
+                      <GradientView
+                        colors={['#4A1866', colors.primary.main]}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          padding: 10,
+                          borderRadius: 10,
+                          gap: 10,
+                          height: 40,
+                          width: '100%',
+                          paddingLeft: 8,
+                          paddingRight: 8,
+                          justifyContent: 'space-between'
+                        }}
+                      >
+                        <item.icon 
+                          size={22}
+                          color={colors.white}
+                          strokeWidth={1.5}
+                        />
+                        <Text style={[
+                          styles.navText,
+                          styles.activeNavText,
+                          isDark && styles.navTextDark,
+                          isDashboardActive && {
+                            fontWeight: 'bold',
+                            color: 'white',
+                            fontSize: 16
+                          }
+                        ]}>
+                          {item.label}
+                        </Text>
+                        <ChevronRight 
+                          size={20} 
+                          color={colors.white}
+                          strokeWidth={1.5}
+                        />
+                      </GradientView>
+                    </TouchableOpacity>
+                  );
+                }
+                
+                // Para outros itens, mantém o comportamento original
+                return (
+                  <TouchableOpacity
+                    key={item.path}
+                    activeOpacity={0.7}
+                    onPress={() => handleNavigation(item.path)}
+                    style={styles.navItemContainer}
+                  >
+                    <View style={StyleSheet.flatten([
+                      styles.navItem,
+                      isActive && styles.activeNavItem,
+                    ]) as ViewStyle}>
+                      <item.icon 
+                        size={20}
+                        color={isActive ? colors.white : isDark ? colors.gray[300] : colors.gray[600]}
+                        strokeWidth={1.5}
+                      />
+                      <Text style={[
+                        styles.navText,
+                        isDark && styles.navTextDark,
+                        isActive && styles.activeNavText,
+                        isDashboardActive && {
+                          fontWeight: 'bold',
+                          color: 'white',
+                          fontSize: 16
+                        }
+                      ]}>
+                        {item.label}
+                      </Text>
+                      {isActive && (
+                        <ChevronRight 
+                          size={16} 
+                          color={colors.white}
+                          strokeWidth={1.5}
+                        />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
             
-            <View style={styles.sidebarFooter}>
-              <TouchableOpacity style={styles.footerButton}>
-                <LogOut size={18} color={isDark ? colors.gray[300] : colors.gray[600]} />
-                <Text style={[
-                  styles.footerButtonText,
-                  { color: isDark ? colors.gray[300] : colors.gray[600] }
-                ]}>Sair</Text>
-              </TouchableOpacity>
+            <View style={styles.footerMobile}>
+              {/* Plano Free */}
+              <GradientView
+                colors={['#4A1866', colors.primary.main]}
+                style={{
+                  padding: 14,
+                  borderRadius: 12,
+                  marginBottom: 12,
+                  ...(Platform.OS !== 'web' ? {
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 3 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 4,
+                    elevation: 5,
+                  } : {
+                    boxShadow: '0 4px 8px rgba(38, 68, 80, 0.15)',
+                  })
+                }}
+              >
+                <View style={styles.planHeader}>
+                  <Crown size={18} color="#FFD700" strokeWidth={1.5} />
+                  <Text style={styles.planTitle}>Plano Free</Text>
+                </View>
+                <Text style={styles.planDays}>14 dias restantes no seu trial</Text>
+                <Pressable 
+                  style={styles.updateButton}
+                  onPress={() => {
+                    // Lógica para atualizar plano
+                  }}
+                  onHoverIn={Platform.OS === 'web' ? (e) => {
+                    // @ts-ignore
+                    e.currentTarget.style.backgroundColor = colors.primary.main;
+                    // @ts-ignore
+                    e.currentTarget.querySelector('p').style.color = 'white';
+                  } : undefined}
+                  onHoverOut={Platform.OS === 'web' ? (e) => {
+                    // @ts-ignore
+                    e.currentTarget.style.backgroundColor = colors.white;
+                    // @ts-ignore
+                    e.currentTarget.querySelector('p').style.color = colors.primary.main;
+                  } : undefined}
+                >
+                  <View style={styles.updateButtonContent}>
+                    <Text style={styles.updateButtonText}>
+                      Atualizar Plano ✨
+                    </Text>
+                  </View>
+                </Pressable>
+              </GradientView>
+
+              {/* Botão de Sair */}
+              <Pressable 
+                style={styles.logoutButton}
+                onPress={() => {
+                  if (onClose) onClose();
+                  // Aqui pode ser implementada a lógica de logout
+                }}
+              >
+                <View style={styles.logoutContent}>
+                  <LogOut 
+                    size={20} 
+                    color={isDark ? colors.gray[300] : colors.gray[600]}
+                    strokeWidth={1.5}
+                  />
+                  <Text style={[styles.logoutText, isDark && styles.logoutTextDark]}>Sair</Text>
+                </View>
+              </Pressable>
             </View>
           </Animated.View>
         </View>
@@ -248,85 +392,449 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
 
   // Para tablet e desktop, renderiza uma sidebar fixa
   return (
-    <View 
-      style={[
-        styles.sidebarFixed, 
-        isDark && styles.sidebarDark,
-        withHeader && styles.withHeaderDesktop
-      ]}
-    >
-      <View style={styles.sidebarHeader}>
-        <View style={styles.logoContainer}>
-          <Text style={[
-            styles.logoTextBold,
-            { color: isDark ? colors.white : colors.gray[900] }
-          ]}>Projeto</Text>
-          <Text style={[
-            styles.logoText,
-            { color: isDark ? colors.gray[300] : colors.gray[600] }
-          ]}>Origem</Text>
+    <View style={[
+      getConditionalStyle(styles.sidebar, styles.sidebarCompact),
+      isDark && styles.sidebarDark,
+      withHeader && styles.withHeaderDesktop,
+    ]}>
+      {/* Logo */}
+      <View style={getConditionalStyle(styles.logoContainer, styles.logoContainerCompact)}>
+        <View style={getConditionalStyle(styles.logoBox, styles.logoBoxCompact)}>
+          <Building size={20} color={colors.white} strokeWidth={1.5} />
         </View>
+        {!isTablet && (
+          <View>
+            <Text style={[styles.logoText, isDark && styles.logoTextDark]}>Evolução</Text>
+            <Text style={[styles.subLogoText, isDark && styles.subLogoTextDark]}>Vistoria</Text>
+          </View>
+        )}
       </View>
-      
-      <View style={styles.navContainer}>
-        {navItems.map((item, index) => (
-          <NavItem 
-            key={index}
-            path={item.path}
-            label={item.label}
-            icon={item.icon}
-          />
-        ))}
+
+      {/* Links de Navegação */}
+      <View style={styles.nav}>
+        {navItems.map((item) => {
+          const isActive = isMenuItemActive(item.path);
+          const isDashboardActive = item.path === '/(tabs)' && isActive;
+          
+          // Para o Dashboard ativo, usar GradientView
+          if (isDashboardActive) {
+            return (
+              <Link key={item.path} href={item.path as any} asChild>
+                <GradientView
+                  colors={['#4A1866', colors.primary.main]}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: 10,
+                    borderRadius: 10,
+                    gap: 10,
+                    height: 40,
+                    width: '100%',
+                    paddingLeft: 8,
+                    paddingRight: 8,
+                    justifyContent: 'space-between',
+                    ...(isTablet ? {
+                      justifyContent: 'center',
+                      padding: 8,
+                    } : {})
+                  }}
+                >
+                  <item.icon 
+                    size={22}
+                    color={colors.white}
+                    strokeWidth={1.5}
+                  />
+                  {!isTablet && (
+                    <Text style={[
+                      styles.navText,
+                      styles.activeNavText,
+                      isDark && styles.navTextDark,
+                      isDashboardActive && {
+                        fontWeight: 'bold',
+                        color: 'white',
+                        fontSize: 16
+                      }
+                    ]}>
+                      {item.label}
+                    </Text>
+                  )}
+                  {!isTablet && (
+                    <ChevronRight 
+                      size={20} 
+                      color={colors.white}
+                      strokeWidth={1.5}
+                    />
+                  )}
+                </GradientView>
+              </Link>
+            );
+          }
+          
+          // Para outros itens, comportamento original
+          return (
+            <Link key={item.path} href={item.path as any} asChild>
+              <HoverableView
+                isActive={isActive}
+                style={StyleSheet.flatten([
+                  getConditionalStyle(styles.navItem, styles.navItemCompact),
+                  isActive && styles.activeNavItem,
+                ]) as ViewStyle}
+                hoverColor={isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'}
+                activeColor={isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'}
+                hoverScale={1.02}
+              >
+                <item.icon 
+                  size={20}
+                  color={isActive ? colors.white : isDark ? colors.gray[300] : colors.gray[600]}
+                  strokeWidth={1.5}
+                />
+                {!isTablet && (
+                  <Text style={[
+                    styles.navText,
+                    isDark && styles.navTextDark,
+                    isActive && styles.activeNavText,
+                    isDashboardActive && {
+                      fontWeight: 'bold',
+                      color: 'white',
+                      fontSize: 16
+                    }
+                  ]}>
+                    {item.label}
+                  </Text>
+                )}
+                {!isTablet && isActive && (
+                  <ChevronRight 
+                    size={16} 
+                    color={colors.white}
+                    strokeWidth={1.5}
+                  />
+                )}
+              </HoverableView>
+            </Link>
+          );
+        })}
       </View>
-      
-      <View style={styles.sidebarFooter}>
-        <TouchableOpacity style={styles.footerButton}>
-          <LogOut size={18} color={isDark ? colors.gray[300] : colors.gray[600]} />
-          <Text style={[
-            styles.footerButtonText,
-            { color: isDark ? colors.gray[300] : colors.gray[600] }
-          ]}>Sair</Text>
-        </TouchableOpacity>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        {isTablet ? (
+          <Pressable 
+            style={styles.planBoxCompact}
+            onPress={() => {
+              // Lógica para mostrar detalhes do plano
+            }}
+          >
+            <Crown size={18} color="#FFD700" strokeWidth={1.5} />
+          </Pressable>
+        ) : (
+          <GradientView
+            colors={['#4A1866', colors.primary.main]}
+            style={{
+              padding: 14,
+              borderRadius: 12,
+              marginBottom: 12,
+              ...(Platform.OS !== 'web' ? {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 3 },
+                shadowOpacity: 0.15,
+                shadowRadius: 4,
+                elevation: 5,
+              } : {
+                boxShadow: '0 4px 8px rgba(38, 68, 80, 0.15)',
+              })
+            }}
+          >
+            <View style={styles.planHeader}>
+              <Crown size={18} color="#FFD700" strokeWidth={1.5} />
+              <Text style={styles.planTitle}>Plano Free</Text>
+            </View>
+            <Text style={styles.planDays}>14 dias restantes no seu trial</Text>
+            <HoverableView 
+              style={styles.updateButton}
+              hoverScale={1.03}
+              hoverColor={colors.primary.main}
+              onPress={() => {
+                // Lógica para atualizar plano
+              }}
+              onHoverIn={Platform.OS === 'web' ? (e) => {
+                // @ts-ignore
+                e.currentTarget.querySelector('p').style.color = 'white';
+              } : undefined}
+              onHoverOut={Platform.OS === 'web' ? (e) => {
+                // @ts-ignore
+                e.currentTarget.querySelector('p').style.color = colors.primary.main;
+              } : undefined}
+            >
+              <View style={styles.updateButtonContent}>
+                <Text style={styles.updateButtonText}>
+                  Atualizar Plano ✨
+                </Text>
+              </View>
+            </HoverableView>
+          </GradientView>
+        )}
+
+        {/* Botão de Sair */}
+        <HoverableView 
+          style={getConditionalStyle(styles.logoutButton, styles.logoutButtonCompact)}
+          hoverColor={isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'}
+          onPress={() => {
+            // Aqui pode ser implementada a lógica de logout
+          }}
+        >
+          <View style={getConditionalStyle(styles.logoutContent, styles.logoutContentCompact)}>
+            <LogOut 
+              size={20} 
+              color={isDark ? colors.gray[300] : colors.gray[600]}
+              strokeWidth={1.5}
+            />
+            {!isTablet && <Text style={[styles.logoutText, isDark && styles.logoutTextDark]}>Sair</Text>}
+          </View>
+        </HoverableView>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
   sidebar: {
-    position: 'absolute',
-    width: 260,
-    height: '100%',
+    width: 250,
     backgroundColor: colors.white,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-    zIndex: Z_INDEX.SIDEBAR,
-    flexDirection: 'column',
-  },
-  sidebarDark: {
-    backgroundColor: colors.gray[800],
-  },
-  sidebarFixed: {
-    width: '100%',
     height: '100%',
-    backgroundColor: colors.white,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
     borderRightWidth: 1,
     borderRightColor: colors.gray[200],
-    flexDirection: 'column',
+    ...(Platform.OS === 'web' && {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      zIndex: Z_INDEX.SIDEBAR,
+    }),
   },
-  withHeaderMobile: {
-    paddingTop: 0,
+  sidebarDark: {
+    backgroundColor: '#1C1E26',
+    borderRightColor: '#262D34',
   },
-  withHeaderDesktop: {
-    paddingTop: 0,
+  sidebarCompact: {
+    width: 65,
+    paddingHorizontal: 10,
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 30,
+  },
+  logoContainerCompact: {
+    justifyContent: 'center',
+    marginBottom: 32,
+  },
+  logoBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: colors.primary.main,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoBoxCompact: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+  },
+  logoText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.gray[900],
+  },
+  logoTextDark: {
+    color: colors.white,
+  },
+  subLogoText: {
+    fontSize: 14,
+    color: colors.gray[600],
+  },
+  subLogoTextDark: {
+    color: colors.gray[300],
+  },
+  nav: {
+    gap: 4,
+  },
+  navContainer: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+  },
+  navItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 10,
+    gap: 10,
+    height: 40,
+    width: '100%',
+    ...(Platform.OS === 'web' && {
+      cursor: 'pointer',
+    }),
+  },
+  navItemContainer: {
+    marginBottom: 4,
+  },
+  navItemCompact: {
+    justifyContent: 'center',
+    padding: 8,
+  },
+  activeNavItem: {
+    ...(Platform.OS === 'web' ? {
+      backgroundImage: 'linear-gradient(135deg, #3A6B7E 0%, #264450 50%, #1a2f37 100%)',
+      boxShadow: '0 2px 6px rgba(38, 68, 80, 0.2)',
+      cursor: 'pointer',
+    } : {
+      backgroundColor: colors.primary.main,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      elevation: 4,
+    }),
+    borderLeftWidth: Platform.OS === 'web' ? 3 : 0,
+    borderLeftColor: '#4FADCF',
+    borderRadius: 10,
+    transform: [{ scale: 1.02 }]
+  },
+  dashboardActiveItem: {
+    ...(Platform.OS === 'web' ? {
+      backgroundImage: 'linear-gradient(145deg, #f5f5f5 0%, #e0e0e0 100%)',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+    } : {
+      backgroundColor: '#eeeeee',
+    }),
+    borderRadius: 10,
+    borderLeftWidth: 0,
+    paddingLeft: 8,
+    paddingRight: 8,
+    justifyContent: 'space-between',
+    transform: [{ scale: 1 }]
+  },
+  navText: {
+    fontSize: 15,
+    flex: 1,
+    color: colors.gray[600],
+  },
+  navTextDark: {
+    color: colors.gray[300],
+  },
+  activeNavText: {
+    color: colors.white,
+    fontWeight: '700',
+  },
+  footer: {
+    marginTop: 'auto',
+    gap: 16,
+  },
+  footerMobile: {
+    marginTop: 'auto',
+    gap: 10,
+    paddingBottom: 10,
+  },
+  planBox: {
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 12,
+    ...(Platform.OS !== 'web' ? {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.15,
+      shadowRadius: 4,
+      elevation: 5,
+    } : {
+      boxShadow: '0 4px 8px rgba(38, 68, 80, 0.15)',
+    }),
+  },
+  planBoxDark: {
+    backgroundColor: 'transparent',
+  },
+  planBoxCompact: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: colors.primary.main,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+    ...(Platform.OS === 'web' && {
+      backgroundImage: 'linear-gradient(145deg, #264450 0%, #3A6B7E 35%, #264450 65%, #1a2f37 100%)',
+      boxShadow: '0 4px 8px rgba(38, 68, 80, 0.15)',
+      cursor: 'pointer',
+    }),
+  },
+  planHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginBottom: 8,
+  },
+  planTitle: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: colors.white,
+  },
+  planDays: {
+    fontSize: 12,
+    color: colors.white,
+    opacity: 0.9,
+    marginBottom: 12,
+  },
+  updateButton: {
+    backgroundColor: colors.white,
+    padding: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 2,
+    ...(Platform.OS === 'web' && {
+      cursor: 'pointer',
+      transition: 'all 0.2s ease-in-out',
+    }),
+  },
+  updateButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  updateButtonText: {
+    color: colors.primary.main,
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderRadius: 10,
+    height: 40,
+  },
+  logoutButtonCompact: {
+    justifyContent: 'center',
+  },
+  logoutContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  logoutContentCompact: {
+    gap: 0,
+  },
+  logoutText: {
+    fontSize: 14,
+    color: colors.gray[600],
+  },
+  logoutTextDark: {
+    color: colors.gray[300],
+  },
+  modalContainer: {
+    flex: 1,
+    flexDirection: 'row',
   },
   backdrop: {
     ...Platform.select({
@@ -350,81 +858,27 @@ const styles = StyleSheet.create({
       }
     }) as any,
   },
-  sidebarHeader: {
-    height: 64,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  drawer: {
+    width: 280,
+    height: '100%',
+    backgroundColor: colors.white,
+    paddingTop: Platform.OS === 'ios' ? 65 : 40,
+    paddingBottom: 24,
     paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.gray[200],
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 10,
+    zIndex: Z_INDEX.SIDEBAR,
   },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
+  withHeaderMobile: {
+    paddingTop: Platform.OS === 'ios' ? 65 : 40,
   },
-  logoTextBold: {
-    fontWeight: 'bold',
-    fontSize: 16,
+  withHeaderDesktop: {
+    paddingTop: 24,
   },
-  logoText: {
-    fontSize: 16,
-  },
-  closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  navContainer: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-  },
-  navItemContainer: {
-    marginBottom: 4,
-  },
-  navItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: 'transparent',
-  },
-  navItemDark: {
-    backgroundColor: 'transparent',
-  },
-  activeNavItem: {
-    backgroundColor: colors.primary.main,
-  },
-  activeNavItemDark: {
-    backgroundColor: colors.primary.main,
-  },
-  navText: {
-    marginLeft: 12,
-    fontSize: 14,
-    fontWeight: '500',
-    flex: 1,
-  },
-  activeNavText: {
-    color: colors.white,
-  },
-  sidebarFooter: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: colors.gray[200],
-  },
-  footerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-  },
-  footerButtonText: {
-    marginLeft: 12,
-    fontSize: 14,
-    fontWeight: '500',
+  pressedItem: {
+    opacity: 0.7,
   },
 });
