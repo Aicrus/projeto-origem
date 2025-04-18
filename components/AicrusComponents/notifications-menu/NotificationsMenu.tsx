@@ -232,78 +232,35 @@ export function NotificationsMenu({
   // Determinar a posição com base nas coordenadas fornecidas
   const getPositionStyle = () => {
     if (position && Platform.OS === 'web') {
-      // Se temos uma posição definida pelo usuário e estamos na web
-      // Manter o comportamento atual para web
-      const windowWidth = Dimensions.get('window').width;
-      const menuWidth = isMobile ? Math.min(320, windowWidth * 0.9) : 320;
+      const menuWidth = 320;
       
-      // Calcular posição horizontal mantendo o menu dentro da tela
-      let leftPosition;
-      
-      // Verificar em qual lado da tela o botão está
-      const isRightSide = position.x > windowWidth / 2;
-      
-      if (isRightSide) {
-        // Botão à direita: alinhar à direita do botão
-        // Garantir que o menu não saia pela direita
-        const rightEdgePosition = Math.min(position.x, windowWidth - 16);
-        leftPosition = Math.max(16, rightEdgePosition - menuWidth);
-      } else {
-        // Botão à esquerda: alinhar à esquerda do botão
-        // Garantir que o menu não saia pela esquerda
-        leftPosition = Math.max(16, Math.min(position.x, windowWidth - menuWidth - 16));
-      }
-      
-      // Altura definida para a viewport
-      const windowHeight = window.innerHeight;
-      
-      // Define valores para posicionamento
-      const spacingDown = 1;
-      
-      // Calcula se o menu cabe abaixo da posição
-      const menuHeight = Math.min(maxHeight + 100, windowHeight * 0.8); // Altura do menu com cabeçalho e rodapé
-      const spaceBelow = windowHeight - position.y;
-      const fitsBelow = spaceBelow >= menuHeight;
-      
-      if (fitsBelow) {
-        // O menu cabe abaixo do botão
-        return {
-          position: 'fixed' as 'fixed',
-          top: position.y + spacingDown,
-          left: leftPosition,
-          zIndex: 2147483647,
-        };
-      } else {
-        // O menu não cabe abaixo, então vamos posicioná-lo acima
-        const spacingUp = 1;
-        
-        // Posição Y considerando o espaço para o menu acima
-        const topPosition = Math.max(spacingUp, position.y - menuHeight - spacingUp);
-        
-        return {
-          position: 'fixed' as 'fixed',
-          top: topPosition,
-          left: leftPosition,
-          zIndex: 2147483647,
-        };
-      }
+      // Ajuste para posicionamento consistente em todos os breakpoints
+      return {
+        position: 'fixed' as 'fixed',
+        top: position.y + 1, // Mesma altura do ProfileMenu
+        right: 60, // Mais para a esquerda
+        width: isMobile ? '90%' : menuWidth,
+        maxWidth: menuWidth,
+        zIndex: 4000,
+      };
     }
     
-    // Posicionamento para ambiente nativo (posições fixas conforme especificação)
-    // Ou posição padrão para web sem position
+    // Posicionamento padrão para mobile ou quando não há position
     return Platform.select({
       web: {
         position: 'fixed' as 'fixed',
         top: 60,
-        right: 20,
-        zIndex: 2147483647,
+        right: 48, // Mais para a esquerda
+        width: isMobile ? '90%' : 320,
+        maxWidth: 320,
+        zIndex: 4000,
       },
       default: {
         position: 'absolute' as 'absolute',
-        right: 16 + 50, // SPACING.lg + 50 equivalente (mais à direita que o menu de perfil)
-        top: -21, // Ajuste inicial muito mais elevado para subir o menu
-        width: 320, // Largura específica para notificações
-        zIndex: 2147483647,
+        right: 16,
+        top: -10,
+        width: 320,
+        zIndex: 4000,
       }
     });
   };
@@ -318,7 +275,7 @@ export function NotificationsMenu({
           left: 0,
           right: 0,
           bottom: 0,
-          zIndex: 2147483646,
+          zIndex: 3999,
           backgroundColor: 'transparent'
         },
         default: {
@@ -327,7 +284,7 @@ export function NotificationsMenu({
           left: 0,
           width: Dimensions.get('window').width,
           height: Dimensions.get('window').height,
-          zIndex: 2147483646,
+          zIndex: 3999,
           backgroundColor: 'transparent'
         }
       }) as any
@@ -345,7 +302,7 @@ export function NotificationsMenu({
       left: 0, 
       right: 0, 
       bottom: 0, 
-      zIndex: 9999 
+      zIndex: 3999
     }}>
       {/* Overlay para fechar o menu ao clicar fora */}
       <Pressable
@@ -364,14 +321,12 @@ export function NotificationsMenu({
       
       {/* Menu de notificações */}
       <View style={Platform.OS !== 'web' ? {
-        // Sombra suave baseada no estilo 'md' do tailwind.config.js 
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 6,
         elevation: 4,
         backgroundColor: 'transparent',
-        ...(Platform.OS === 'ios' || Platform.OS === 'android' ? { top: 10 } : {}), // Ajuste específico para ambiente nativo na mesma altura do perfil
       } : {}}>
         <Animated.View
           style={[
@@ -382,16 +337,11 @@ export function NotificationsMenu({
               borderColor: themeColors.divider,
               opacity: fadeAnim,
               transform: [{ translateY: translateYAnim }],
-              width: isMobile ? (Platform.OS === 'web' ? '90%' : 320) : 320,
-              maxWidth: 320,
-              // Sombra para web baseada no estilo 'md' do tailwind.config.js
-              ...(Platform.OS === 'web' 
-                ? { boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' } 
-                : {}
-              ),
+              ...(Platform.OS === 'web' && { 
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' 
+              }),
             },
           ]}
-          // @ts-ignore - Para compatibilidade web
           data-notifications-menu="true"
         >
           {/* Cabeçalho */}
@@ -408,7 +358,6 @@ export function NotificationsMenu({
             ref={scrollViewRef}
             style={[styles.notificationsList, { maxHeight }]}
             showsVerticalScrollIndicator={false}
-            // @ts-ignore - Para compatibilidade web
             data-notifications-content="true"
             nestedScrollEnabled={true}
           >
