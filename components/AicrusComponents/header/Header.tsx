@@ -109,8 +109,8 @@ export function Header({
   const [avatarPosition, setAvatarPosition] = useState({ x: 0, y: 0 });
 
   // Definir cores conforme o tema do Tailwind
-  const bgColor = isDark ? '#1C1E26' : '#FFFFFF'; // bg-primary-dark ou bg-secondary-light do tailwind.config.js
-  const borderColor = isDark ? '#262D34' : '#E0E3E7'; // divider-dark ou divider-light do tailwind.config.js
+  const bgColor = isDark ? '#1C1E26' : '#FFFFFF';
+  const borderColor = isDark ? '#262D34' : '#E0E3E7';
 
   // Fechar menus quando a tela for redimensionada
   useEffect(() => {
@@ -195,8 +195,6 @@ export function Header({
 
   // Renderiza o backdrop global
   const renderBackdrop = () => {
-    // Só renderiza o backdrop se algum menu interno estiver aberto
-    // (não inclui o caso onde apenas a sidebar externa está aberta)
     if ((isNotificationsMenuOpen || isProfileMenuOpen || (isDrawerOpen && !onToggleDrawer))) {
       // Estilos específicos para cada plataforma
       const backdropStyle = Platform.OS === 'web' 
@@ -259,30 +257,6 @@ export function Header({
 
   // Componentes a serem utilizados
   const Sidebar = SidebarComponent || DefaultSidebar;
-
-  // Estilo condicional para o wrapper do header em dispositivos não-móveis
-  const getDesktopHeaderStyles = (): ViewStyle => {
-    if (isMobile) return {};
-
-    return {
-      position: 'fixed',
-      top: 0,
-      right: 0,
-      left: sidebarWidth,
-      width: `calc(100% - ${sidebarWidth}px)` as any,
-      zIndex: Z_INDEX.HEADER,
-      height: 64, // altura específica para garantir alinhamento
-    };
-  };
-
-  // Estilos adicionais para tablets e desktops
-  const desktopStyles: ViewStyle = !isMobile ? {
-    marginLeft: sidebarWidth,
-    width: Platform.OS === 'web' 
-      ? '100%' as any // Força o tipo para evitar erro
-      : Dimensions.get('window').width - sidebarWidth,
-    // Removendo o transform que está deslocando o header para fora da tela
-  } : {};
 
   // Para mobile, renderiza um header simplificado com botão de menu
   if (isMobile) {
@@ -415,13 +389,20 @@ export function Header({
     );
   }
 
-  // Para tablet e desktop, renderiza um header completo
+  // Para tablet e desktop, header com posicionamento fixo simplificado
   return (
     <>
-      {/* Header primeiro - com posição fixa ao lado da sidebar */}
+      {/* Header com posicionamento fixo */}
       <View style={[
         styles.wrapper,
-        getDesktopHeaderStyles()
+        !isMobile && { // Aplicar estilos fixos apenas em não-mobile
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          left: sidebarWidth,
+          height: 64,
+          zIndex: Z_INDEX.HEADER,
+        }
       ]}>
         <View style={[
           styles.header,
@@ -431,10 +412,7 @@ export function Header({
             width: '100%', // Garantir que ocupe toda a largura disponível
           }
         ]}>
-          <View style={[
-            styles.container,
-            {paddingRight: 24} // Espaçamento maior à direita para melhor alinhamento
-          ]}>
+          <View style={styles.container}>
             <View style={styles.rightContent}>
               <Pressable 
                 style={[styles.iconButton, isDark && styles.iconButtonDark]}
@@ -469,23 +447,20 @@ export function Header({
         </View>
       </View>
 
-      {/* Segundo o backdrop */}
+      {/* Backdrop global */}
       {renderBackdrop()}
 
-      {/* Terceiro o perfil */}
+      {/* Menus posicionados separadamente */}
       {isProfileMenuOpen && (
-        <View 
+        <View
           style={Platform.OS === 'web' ? {
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: Z_INDEX.NOTIFICATION_MENU,
-            pointerEvents: 'none'
-          } : null}
+            top: 0, left: 0, right: 0, bottom: 0,
+            zIndex: Z_INDEX.MENU, pointerEvents: 'none'
+          } : undefined}
         >
           <View style={{ pointerEvents: 'auto' }}>
+            {/* Renderização do ProfileMenu */}
             {ProfileMenuComponent ? (
               <ProfileMenuComponent
                 isVisible={isProfileMenuOpen}
@@ -503,28 +478,27 @@ export function Header({
         </View>
       )}
 
-      {/* Por último o menu de notificações */}
       {isNotificationsMenuOpen && (
-        <View 
+        <View
           style={Platform.OS === 'web' ? {
             position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: Z_INDEX.NOTIFICATION_MENU,
-            pointerEvents: 'none'
-          } : null}
+            top: 0, left: 0, right: 0, bottom: 0,
+            zIndex: Z_INDEX.NOTIFICATION_MENU, pointerEvents: 'none'
+          } : undefined}
         >
           <View style={{ pointerEvents: 'auto' }}>
+            {/* Renderização do NotificationsMenu */}
             <NotificationsMenu
-              isVisible={true}
+              isVisible={true} // Assume sempre visível quando aberto
               onClose={() => setIsNotificationsMenuOpen(false)}
               position={bellPosition}
             />
           </View>
         </View>
       )}
+
+      {/* Sidebar para mobile (já tratado no if isMobile) */}
+      {/* A sidebar de desktop é renderizada na tela pai (home.tsx) */}
     </>
   );
 }
@@ -537,7 +511,6 @@ const styles = StyleSheet.create({
   header: {
     height: 64,
     borderBottomWidth: 1,
-    zIndex: Z_INDEX.HEADER,
     ...(Platform.OS === 'web' && {
       boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
     }),

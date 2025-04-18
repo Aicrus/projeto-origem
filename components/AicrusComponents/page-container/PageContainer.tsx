@@ -175,7 +175,6 @@ export function PageContainer({
     paddingHorizontal: isMobile ? SPACING.md : isTablet ? SPACING.lg : SPACING.xl,
     paddingTop: isMobile ? 0 : isTablet ? SPACING.lg : SPACING.xl,
     paddingBottom: isMobile ? SPACING.md : isTablet ? SPACING.lg : SPACING.xl,
-    backgroundColor: '#FFEB3B',
   };
 
   // Ajustes para sidebar em tablets e desktops

@@ -86,21 +86,28 @@ export default function Home() {
   
   return (
     <View className={`flex-1 ${bgPrimary}`} style={styles.containerDesktop}>
+      {/* Sidebar mantida */}
       <View style={[styles.sidebarColumn, { width: sidebarWidth }]}>
         <Sidebar withHeader={showHeader} />
       </View>
 
-      <View style={[styles.mainArea, { marginLeft: sidebarWidth }]}>
-        {showHeader && <Header sidebarWidth={sidebarWidth} />}
+      {/* mainArea sem marginLeft */}
+      <View style={styles.mainArea}>
+        {/* Header ocupa largura total (sem offset da sidebar aqui) */}
+        {showHeader && <Header sidebarWidth={0} />}
         
+        {/* Restaurando ScrollView com paddingLeft para compensar a Sidebar */}
         <ScrollView 
           style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={{
+            ...styles.scrollContent,
+            paddingLeft: sidebarWidth // Adicionado padding aqui
+          }}
           showsVerticalScrollIndicator={false}
         >
           <PageContainer 
             withHeader={showHeader}
-            withSidebar={false}
+            withSidebar={false} // Sidebar está fora, PageContainer não precisa saber
           >
             {renderContent()}
           </PageContainer>
@@ -128,15 +135,16 @@ const styles = StyleSheet.create({
   },
   mainArea: {
     flex: 1,
-    width: '100%',
+    // marginLeft removido permanentemente
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
+    // paddingLeft será adicionado dinamicamente acima
     ...(Platform.OS !== 'web' && {
-      paddingBottom: 100, // Padding extra para nativo, permitindo rolar acima da tab
+      paddingBottom: 100, 
     }),
   },
   contentContainer: {
