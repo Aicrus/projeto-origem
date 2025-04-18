@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, Platform } from 'react-native';
+import { View, StyleSheet, Platform, ScrollView } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { Header } from '../../components/AicrusComponents/header';
 import { Sidebar } from '../../components/AicrusComponents/sidebar';
@@ -13,53 +13,49 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isMobile, isTablet, isDesktop } = useResponsive();
   
-  // Exemplo de opção para controlar a exibição do Header
   const showHeader = true;
-  
-  // Classe de fundo baseada no tema
   const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
-  const textColor = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
-
-  // Largura da sidebar
+  const cardBg = isDark ? 'bg-bg-secondary-dark' : 'bg-bg-secondary-light';
   const sidebarWidth = isTablet ? 65 : 250;
 
-  // Função para abrir/fechar o sidebar
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Renderização do conteúdo principal - reutilizado em ambos os layouts
-  const renderContent = () => (
-    <View style={styles.contentContainer}>
-      <Text className={`text-lg font-bold ${textColor}`}>
-        Tela Home
-      </Text>
-      
-      <Text className={`mt-4 ${textColor}`}>
-        Esta é uma tela de exemplo que mostra como o componente Header é opcional. Cada tela pode decidir se quer incluir o Header ou não.
-      </Text>
-      
-      <Text className={`mt-4 ${textColor}`}>
-        {isMobile 
-          ? "Em dispositivos móveis, o sidebar aparece sobreposto quando o botão de menu é clicado." 
-          : "Em tablets e desktops, o sidebar fica fixo ao lado, dando espaço para o conteúdo."
-        }
-      </Text>
-      
-      <Text className={`mt-4 ${textColor}`}>
-        {isMobile
-          ? "A sidebar móvel fecha automaticamente quando a tela aumenta de tamanho."
-          : "O sidebar fixo se adapta ao layout da tela, respeitando o espaço do Header."
-        }
-      </Text>
+  interface EmptyCardProps {
+    height?: number;
+    className?: string;
+    style?: any;
+  }
 
-      <Text className={`mt-8 text-sm ${textColor}`}>
-        Breakpoint atual: {isMobile ? "Mobile" : isTablet ? "Tablet" : "Desktop"}
-      </Text>
-    </View>
+  const EmptyCard = ({ height, className = '', style }: EmptyCardProps) => (
+    <View className={`${cardBg} rounded-lg ${className}`} style={[style, height ? { height } : null]} />
   );
 
-  // Layout para dispositivos móveis
+  const renderContent = () => {
+    // Define o layout baseado no tamanho da tela
+    const topCardsLayout = isMobile ? 'flex-col' : isTablet ? 'grid-cols-2' : 'grid-cols-4';
+    const bottomCardsLayout = isMobile ? 'flex-col' : 'grid-cols-2';
+    
+    return (
+      <View style={styles.contentContainer}>
+        {/* Cards superiores - altura fixa */}
+        <View className={`gap-4 mb-4 ${isMobile ? 'flex' : 'grid'} ${topCardsLayout}`} style={styles.topSection}>
+          <EmptyCard height={140} />
+          <EmptyCard height={140} />
+          <EmptyCard height={140} />
+          <EmptyCard height={140} />
+        </View>
+
+        {/* Cards inferiores - ocupando espaço restante */}
+        <View className={`gap-4 ${isMobile ? 'flex' : 'grid'} ${bottomCardsLayout}`} style={styles.bottomSection}>
+          <EmptyCard className="flex-1" style={styles.bottomCard} />
+          <EmptyCard className="flex-1" style={styles.bottomCard} />
+        </View>
+      </View>
+    );
+  };
+
   if (isMobile) {
     return (
       <View className={`flex-1 ${bgPrimary}`} style={styles.container}>
@@ -67,9 +63,15 @@ export default function Home() {
           <Header onToggleDrawer={toggleSidebar} />
         )}
         
-        <PageContainer withHeader={showHeader}>
-          {renderContent()}
-        </PageContainer>
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <PageContainer withHeader={showHeader}>
+            {renderContent()}
+          </PageContainer>
+        </ScrollView>
         
         <Portal>
           <Sidebar 
@@ -82,27 +84,27 @@ export default function Home() {
     );
   }
   
-  // Layout para tablets e desktops com Sidebar fixa
   return (
     <View className={`flex-1 ${bgPrimary}`} style={styles.containerDesktop}>
-      {/* Sidebar fixa à esquerda */}
       <View style={[styles.sidebarColumn, { width: sidebarWidth }]}>
         <Sidebar withHeader={showHeader} />
       </View>
 
-      {/* Área de conteúdo */}
       <View style={[styles.mainArea, { marginLeft: sidebarWidth }]}>
-        {/* Header no topo */}
         {showHeader && <Header sidebarWidth={sidebarWidth} />}
         
-        {/* PageContainer para gerenciar o layout do conteúdo */}
-        <PageContainer 
-          withHeader={showHeader}
-          withSidebar={false} 
-          // Não precisamos passar sidebarWidth aqui pois já aplicamos marginLeft acima
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          {renderContent()}
-        </PageContainer>
+          <PageContainer 
+            withHeader={showHeader}
+            withSidebar={false}
+          >
+            {renderContent()}
+          </PageContainer>
+        </ScrollView>
       </View>
     </View>
   );
@@ -128,7 +130,30 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
   },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    ...(Platform.OS !== 'web' && {
+      paddingBottom: 100, // Padding extra para nativo, permitindo rolar acima da tab
+    }),
+  },
   contentContainer: {
     flex: 1,
+    minHeight: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  topSection: {
+    flexShrink: 0,
+  },
+  bottomSection: {
+    flex: 1,
+    minHeight: Platform.select({ web: 500, default: 400 }),
+    height: '100%',
+  },
+  bottomCard: {
+    height: '100%',
   }
 }); 

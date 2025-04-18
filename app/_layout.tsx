@@ -14,7 +14,7 @@ import { useFonts,
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState, memo, useRef } from 'react';
 import { ActivityIndicator, Platform, View, StatusBar } from 'react-native';
 import 'react-native-reanimated';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -39,14 +39,18 @@ SplashScreen.preventAutoHideAsync();
 // Memoize o componente LoadingScreen para evitar renderizações desnecessárias
 const LoadingScreen = memo(function LoadingScreen() {
   const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
   
   return (
-    <View className={`flex-1 justify-center items-center ${currentTheme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+    <View className={`flex-1 justify-center items-center ${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}`}>
       <ExpoStatusBar 
-        style={currentTheme === 'dark' ? 'light' : 'dark'}
-        backgroundColor={currentTheme === 'dark' ? '#111827' : '#f9fafb'}
+        style={isDark ? 'light' : 'dark'}
+        backgroundColor={isDark ? '#1C1E26' : '#FFFFFF'}
       />
-      <ActivityIndicator size="large" color={currentTheme === 'dark' ? '#60a5fa' : '#2563eb'} />
+      <ActivityIndicator 
+        size="large" 
+        color="#892CDC" // Cor primária fixa do tema
+      />
     </View>
   );
 });
@@ -66,6 +70,7 @@ export default function RootLayout() {
   });
   const [initialCheckDone, setInitialCheckDone] = useState(false);
   const [initialSession, setInitialSession] = useState<Session | null>(null);
+  const sessionCheckTimeout = useRef<NodeJS.Timeout>();
 
   // Verificar e limpar tokens inválidos na inicialização
   useEffect(() => {
@@ -83,11 +88,20 @@ export default function RootLayout() {
         console.error('Erro ao verificar sessão inicial:', e);
         setInitialSession(null);
       } finally {
-        setInitialCheckDone(true);
+        // Usa um pequeno timeout para suavizar a transição
+        sessionCheckTimeout.current = setTimeout(() => {
+          setInitialCheckDone(true);
+        }, 100);
       }
     };
 
     checkSession();
+
+    return () => {
+      if (sessionCheckTimeout.current) {
+        clearTimeout(sessionCheckTimeout.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -101,9 +115,7 @@ export default function RootLayout() {
     return (
       <SafeAreaProvider>
         <ThemeProvider>
-          <View className="flex-1 justify-center items-center bg-white dark:bg-gray-900">
-            <ActivityIndicator size="large" color="#2563eb" />
-          </View>
+          <LoadingScreen />
         </ThemeProvider>
       </SafeAreaProvider>
     );

@@ -178,19 +178,28 @@ const WebDropdownOptions = ({
     if (Platform.OS === 'web' && searchable && typeof document !== 'undefined') {
       const style = document.createElement('style');
       style.textContent = `
-        /* Remover outline azul padrão nos inputs de busca do Select */
-        [data-search-input="true"]:focus {
+        input[data-search-input="true"] {
           outline: none !important;
-          outline-width: 0 !important;
-          box-shadow: none !important;
-          -moz-box-shadow: none !important;
-          -webkit-box-shadow: none !important;
+          -webkit-appearance: none !important;
+          -moz-appearance: none !important;
+          appearance: none !important;
         }
         
-        /* Remover cor de seleção padrão (azul) */
-        [data-search-input="true"]::selection {
-          background-color: rgba(128, 128, 128, 0.2) !important;
-          color: inherit !important;
+        input[data-search-input="true"]:focus {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        
+        input[data-search-input="true"]:focus-visible {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        
+        input[data-search-input="true"]::-webkit-search-decoration,
+        input[data-search-input="true"]::-webkit-search-cancel-button,
+        input[data-search-input="true"]::-webkit-search-results-button,
+        input[data-search-input="true"]::-webkit-search-results-decoration {
+          -webkit-appearance: none !important;
         }
       `;
       document.head.appendChild(style);
@@ -199,7 +208,7 @@ const WebDropdownOptions = ({
         document.head.removeChild(style);
       };
     }
-  }, [searchable, visible]);
+  }, [searchable]);
   
   // Salvar posição de scroll quando o componente estiver montado
   useEffect(() => {
@@ -379,14 +388,25 @@ const WebDropdownOptions = ({
       paddingHorizontal: 8,
       paddingVertical: 6,
     },
-    searchInput: {
-      flex: 1,
-      color: isDark ? '#FFFFFF' : '#14181B',
-      fontSize: 14,
-      paddingVertical: 4,
-      height: 30, // Mais compacto que o Input padrão
-      marginLeft: 4,
-    },
+    searchInput: Platform.select({
+      web: {
+        flex: 1,
+        color: isDark ? '#FFFFFF' : '#14181B',
+        fontSize: 14,
+        paddingVertical: 4,
+        height: 30,
+        marginLeft: 4,
+        backgroundColor: 'transparent',
+      },
+      default: {
+        flex: 1,
+        color: isDark ? '#FFFFFF' : '#14181B',
+        fontSize: 14,
+        paddingVertical: 4,
+        height: 30,
+        marginLeft: 4,
+      }
+    }),
     searchIcon: {
       marginRight: 4,
     },
@@ -437,9 +457,16 @@ const WebDropdownOptions = ({
               onChangeText={handleSearchChange}
               placeholder="Pesquisar..."
               placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
-              // @ts-ignore - Para compatibilidade web
               data-search-input="true"
               autoFocus={autoFocus}
+              // @ts-ignore - Evento específico para web
+              onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
+                if (Platform.OS === 'web') {
+                  const input = e.target as HTMLInputElement;
+                  input.style.outline = 'none';
+                  input.style.boxShadow = 'none';
+                }
+              }}
             />
             {searchValue.length > 0 && (
               <TouchableOpacity 
@@ -728,14 +755,19 @@ const MobileSelectModal = ({
                 style={dropdownStyle.searchIcon}
               />
               <TextInput
-                style={dropdownStyle.searchInput}
+                style={[
+                  dropdownStyle.searchInput,
+                  Platform.OS === 'web' && {
+                    // @ts-ignore - Estilos específicos para web que mantêm o input sem contorno
+                    WebkitAppearance: 'none'
+                  }
+                ]}
                 value={searchValue}
                 onChangeText={handleSearchChange}
                 placeholder="Pesquisar..."
                 placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
-                autoFocus={autoFocus}
-                // @ts-ignore - Para compatibilidade web
                 data-search-input-mobile="true"
+                autoFocus={autoFocus}
               />
               {searchValue.length > 0 && (
                 <TouchableOpacity 
@@ -806,7 +838,7 @@ export const Select = ({
   max,
   onOpen,
   onClose,
-  autoFocus = false,
+  autoFocus = Platform.OS === 'web',
   superBaseTable = false,
 }: SelectProps) => {
   // Estado para controlar abertura do dropdown
@@ -828,10 +860,9 @@ export const Select = ({
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   
-  // Calcular posição para o dropdown web
+  // Otimizar recálculo de posição para evitar tremedeira
   useEffect(() => {
     if (Platform.OS === 'web' && open && selectRef.current) {
-      console.log("Recalculando posição do dropdown, total de opções:", options.length);
       const rect = selectRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       
@@ -839,69 +870,67 @@ export const Select = ({
       // Caso contrário, verifica se há espaço disponível abaixo
       const openDown = superBaseTable || rect.bottom + maxHeight <= viewportHeight || rect.top < maxHeight;
       
-      console.log("Abrirá para:", openDown ? "baixo" : "cima", "espaço abaixo:", viewportHeight - rect.bottom);
-      
-      // Espaçamento consistente para cima e para baixo
-      const spacingUp = 3; // Mantido em 3px para cima
-      const spacingDown = 3; // Mantido em 3px para baixo
-      
-      // Se abrir para baixo, usa top, senão usa bottom
-      if (openDown) {
-        // Abre para baixo - padrão
-        setPosition({
-          top: rect.bottom + spacingDown + window.scrollY,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-          openDown: true
-        });
-      } else {
-        // Abre para cima - só quando não tiver espaço suficiente abaixo
-        setPosition({
-          top: rect.top - spacingUp + window.scrollY,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-          openDown: false
-        });
-      }
-    }
-  }, [open, maxHeight, options]); // Adicionado options para recalcular quando os dados mudam
-  
-  // Efeito adicional para garantir o recálculo quando os dados mudam
-  useEffect(() => {
-    // Se o dropdown estiver aberto, forçar recálculo da posição quando as opções mudarem
-    if (open && options.length > 0 && Platform.OS === 'web' && selectRef.current) {
-      console.log("Forçando recálculo após dados carregados, opções:", options.length);
-      const rect = selectRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      
-      // Se estiver em uma tabela, força sempre abrir para baixo
-      // Caso contrário, verifica se há espaço disponível abaixo
-      const openDown = superBaseTable || rect.bottom + maxHeight <= viewportHeight || rect.top < maxHeight;
-      
-      // Espaçamento consistente 
-      const spacingUp = 3; 
+      // Espaçamento consistente
+      const spacingUp = 3;
       const spacingDown = 3;
       
-      // Se abrir para baixo, usa top, senão usa bottom
-      if (openDown) {
-        // Abre para baixo - padrão
-        setPosition({
-          top: rect.bottom + spacingDown + window.scrollY,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-          openDown: true
-        });
-      } else {
-        // Abre para cima - só quando não tiver espaço suficiente abaixo
-        setPosition({
-          top: rect.top - spacingUp + window.scrollY,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-          openDown: false
-        });
-      }
+      // Usar requestAnimationFrame para suavizar a atualização
+      requestAnimationFrame(() => {
+        if (openDown) {
+          setPosition({
+            top: rect.bottom + spacingDown + window.scrollY,
+            left: rect.left + window.scrollX,
+            width: rect.width,
+            openDown: true
+          });
+        } else {
+          setPosition({
+            top: rect.top - spacingUp + window.scrollY,
+            left: rect.left + window.scrollX,
+            width: rect.width,
+            openDown: false
+          });
+        }
+      });
     }
-  }, [options, open, maxHeight, superBaseTable]);
+  }, [open, maxHeight]); // Removido options da dependência para evitar recálculos desnecessários
+  
+  // Adicionar estilos para remover outline de foco no campo de busca
+  useEffect(() => {
+    if (Platform.OS === 'web' && searchable && typeof document !== 'undefined') {
+      const style = document.createElement('style');
+      style.textContent = `
+        input[data-search-input="true"] {
+          outline: none !important;
+          -webkit-appearance: none !important;
+          -moz-appearance: none !important;
+          appearance: none !important;
+        }
+        
+        input[data-search-input="true"]:focus {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        
+        input[data-search-input="true"]:focus-visible {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        
+        input[data-search-input="true"]::-webkit-search-decoration,
+        input[data-search-input="true"]::-webkit-search-cancel-button,
+        input[data-search-input="true"]::-webkit-search-results-button,
+        input[data-search-input="true"]::-webkit-search-results-decoration {
+          -webkit-appearance: none !important;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      return () => {
+        document.head.removeChild(style);
+      };
+    }
+  }, [searchable]);
   
   // Bloquear scroll da página quando dropdown está aberto (web)
   useEffect(() => {

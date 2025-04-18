@@ -6,7 +6,6 @@ import {
   Users, 
   ClipboardList, 
   Settings,
-  Crown,
   LogOut,
   ChevronRight,
   Building,
@@ -324,51 +323,6 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
             </View>
             
             <View style={styles.footerMobile}>
-              {/* Plano Free */}
-              <GradientView
-                colors={['#733AAB', '#9945E8']}
-                start={{ x: 0.1, y: 0 }}
-                end={{ x: 0.9, y: 1 }}
-                style={{
-                  padding: 14,
-                  borderRadius: 12,
-                  marginBottom: 12,
-                  ...(Platform.OS !== 'web' ? {
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.15,
-                    shadowRadius: 4,
-                    elevation: 5,
-                  } : {
-                    boxShadow: '0 4px 8px rgba(38, 68, 80, 0.15)',
-                  })
-                }}
-              >
-                <View style={styles.planHeader}>
-                  <Crown size={18} color="#FFD700" strokeWidth={1.5} />
-                  <Text style={styles.planTitle}>Plano Free</Text>
-                </View>
-                <Text style={styles.planDays}>14 dias restantes no seu trial</Text>
-                <Pressable
-                  style={{
-                    ...styles.updateButton,
-                    ...(isMobileUpdateButtonHovered && Platform.OS === 'web' ? { backgroundColor: colors.primary.main } : {})
-                  }}
-                  onPress={() => {
-                    // Lógica para atualizar plano
-                  }}
-                  onHoverIn={() => setIsMobileUpdateButtonHovered(true)}
-                  onHoverOut={() => setIsMobileUpdateButtonHovered(false)}
-                >
-                  <Text style={[
-                    styles.updateButtonText,
-                    isMobileUpdateButtonHovered && Platform.OS === 'web' && { color: 'white' }
-                  ]}>
-                    Atualizar Plano ✨
-                  </Text>
-                </Pressable>
-              </GradientView>
-
               {/* Botão de Sair */}
               <Pressable 
                 style={styles.logoutButton}
@@ -522,79 +476,6 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
 
       {/* Footer */}
       <View style={styles.footer}>
-        {isTablet ? (
-          <HoverableView
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: 8,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 12,
-              backgroundColor: 'transparent',
-              ...(Platform.OS === 'web' && {
-                backgroundImage: `radial-gradient(circle at center, #9945E8 30%, #733AAB 100%)`,
-                boxShadow: '0 4px 8px rgba(38, 68, 80, 0.15)',
-                cursor: 'pointer',
-              }),
-            }}
-            onPress={() => {
-              // Lógica para mostrar detalhes do plano
-            }}
-          >
-            <HoverableView
-              hoverScale={1.25}
-              style={{
-                backgroundColor: 'transparent',
-              }}
-            >
-              <Crown size={18} color="#FFD700" strokeWidth={1.5} />
-            </HoverableView>
-          </HoverableView>
-        ) : (
-          <GradientView
-            colors={['#733AAB', '#9945E8']}
-            start={{ x: 0.1, y: 0 }}
-            end={{ x: 0.9, y: 1 }}
-            style={{
-              padding: 14,
-              borderRadius: 12,
-              marginBottom: 12,
-              ...(Platform.OS !== 'web' ? {
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 3 },
-                shadowOpacity: 0.15,
-                shadowRadius: 4,
-                elevation: 5,
-              } : {
-                boxShadow: '0 4px 8px rgba(38, 68, 80, 0.15)',
-              })
-            }}
-          >
-            <View style={styles.planHeader}>
-              <Crown size={18} color="#FFD700" strokeWidth={1.5} />
-              <Text style={styles.planTitle}>Plano Free</Text>
-            </View>
-            <Text style={styles.planDays}>14 dias restantes no seu trial</Text>
-            <HoverableView 
-              style={{
-                ...styles.updateButton,
-              }}
-              hoverScale={1.03}
-              disableHoverBackground={true}
-              onPress={() => {
-                // Lógica para atualizar plano
-              }}
-            >
-              <View style={styles.updateButtonContent}>
-                <Text style={styles.updateButtonText}>
-                  Atualizar Plano ✨
-                </Text>
-              </View>
-            </HoverableView>
-          </GradientView>
-        )}
-
         {/* Botão de Sair */}
         <HoverableView 
           style={getConditionalStyle(styles.logoutButton, styles.logoutButtonCompact)}
@@ -758,72 +639,6 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     gap: 10,
     paddingBottom: 10,
-  },
-  planBox: {
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 12,
-    ...(Platform.OS !== 'web' ? {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 3 },
-      shadowOpacity: 0.15,
-      shadowRadius: 4,
-      elevation: 5,
-    } : {
-      boxShadow: '0 4px 8px rgba(38, 68, 80, 0.15)',
-    }),
-  },
-  planBoxDark: {
-    backgroundColor: 'transparent',
-  },
-  planBoxCompact: {
-    width: 44,
-    height: 44,
-    borderRadius: 8,
-    backgroundColor: colors.primary.main,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-    ...(Platform.OS === 'web' && {
-      cursor: 'pointer',
-    }),
-  },
-  planHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    marginBottom: 8,
-  },
-  planTitle: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: colors.white,
-  },
-  planDays: {
-    fontSize: 12,
-    color: colors.white,
-    opacity: 0.9,
-    marginBottom: 12,
-  },
-  updateButton: {
-    backgroundColor: colors.white,
-    padding: 8,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 2,
-    ...(Platform.OS === 'web' && {
-      cursor: 'pointer',
-    }),
-  },
-  updateButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  updateButtonText: {
-    color: '#AC47FC',
-    fontSize: 13,
-    fontWeight: '500',
   },
   logoutButton: {
     flexDirection: 'row',

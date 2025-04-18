@@ -190,7 +190,7 @@ export function PageContainer({
 
   // Estilos do container interno
   const contentContainerStyle: ViewStyle = {
-    maxWidth: maxContentWidth,
+    maxWidth: isDesktop ? (Dimensions.get('window').width > 1440 ? 1800 : 1200) : isTablet ? 800 : '100%',
     ...(isMobile && { paddingTop: SPACING.md }),
   };
 
