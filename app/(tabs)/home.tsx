@@ -3,6 +3,7 @@ import { View, StyleSheet, Text, Platform } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { Header } from '../../components/AicrusComponents/header';
 import { Sidebar } from '../../components/AicrusComponents/sidebar';
+import { PageContainer } from '../../components/AicrusComponents/page-container';
 import { Portal } from '@gorhom/portal';
 import { useResponsive } from '../../hooks/useResponsive';
 
@@ -18,6 +19,9 @@ export default function Home() {
   // Classe de fundo baseada no tema
   const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
   const textColor = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
+
+  // Largura da sidebar
+  const sidebarWidth = isTablet ? 65 : 250;
 
   // Função para abrir/fechar o sidebar
   const toggleSidebar = () => {
@@ -63,12 +67,9 @@ export default function Home() {
           <Header onToggleDrawer={toggleSidebar} />
         )}
         
-        <View style={{ 
-          flex: 1, 
-          marginTop: showHeader ? 64 : 0 
-        }}>
+        <PageContainer withHeader={showHeader}>
           {renderContent()}
-        </View>
+        </PageContainer>
         
         <Portal>
           <Sidebar 
@@ -84,21 +85,24 @@ export default function Home() {
   // Layout para tablets e desktops com Sidebar fixa
   return (
     <View className={`flex-1 ${bgPrimary}`} style={styles.containerDesktop}>
-      {/* Layout flexbox horizontal */}
-      <View style={styles.horizontalLayout}>
-        {/* Sidebar fixa à esquerda */}
-        <View style={styles.sidebarColumn}>
-          <Sidebar withHeader={showHeader} />
-        </View>
+      {/* Sidebar fixa à esquerda */}
+      <View style={[styles.sidebarColumn, { width: sidebarWidth }]}>
+        <Sidebar withHeader={showHeader} />
+      </View>
+
+      {/* Área de conteúdo */}
+      <View style={[styles.mainArea, { marginLeft: sidebarWidth }]}>
+        {/* Header no topo */}
+        {showHeader && <Header sidebarWidth={sidebarWidth} />}
         
-        {/* Coluna principal à direita */}
-        <View style={styles.mainColumn}>
-          {/* Header no topo */}
-          {showHeader && <Header />}
-          
-          {/* Conteúdo principal abaixo do Header */}
+        {/* PageContainer para gerenciar o layout do conteúdo */}
+        <PageContainer 
+          withHeader={showHeader}
+          withSidebar={false} 
+          // Não precisamos passar sidebarWidth aqui pois já aplicamos marginLeft acima
+        >
           {renderContent()}
-        </View>
+        </PageContainer>
       </View>
     </View>
   );
@@ -110,24 +114,21 @@ const styles = StyleSheet.create({
   },
   containerDesktop: {
     flex: 1,
-  },
-  horizontalLayout: {
-    flex: 1,
     flexDirection: 'row',
-    width: '100%',
+    position: 'relative',
   },
   sidebarColumn: {
-    width: 260,
     height: '100%',
+    position: 'fixed',
+    left: 0,
+    top: 0,
     zIndex: 10,
   },
-  mainColumn: {
+  mainArea: {
     flex: 1,
-    flexDirection: 'column',
-    minWidth: 0,
+    width: '100%',
   },
   contentContainer: {
     flex: 1,
-    padding: 16,
   }
 }); 

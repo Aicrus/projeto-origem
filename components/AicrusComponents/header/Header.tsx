@@ -33,6 +33,19 @@ const Z_INDEX = {
   SIDEBAR: 3500
 };
 
+// Definindo fonts localmente para não depender de um arquivo externo
+const fonts = {
+  regular: {
+    fontWeight: '400' as const
+  },
+  medium: {
+    fontWeight: '500' as const
+  },
+  bold: {
+    fontWeight: '700' as const
+  }
+};
+
 /**
  * @component Header
  * @description Componente de cabeçalho responsivo que se adapta a diferentes tamanhos de tela.
@@ -256,12 +269,20 @@ export function Header({
       top: 0,
       right: 0,
       left: sidebarWidth,
-      marginLeft: sidebarWidth,
       width: `calc(100% - ${sidebarWidth}px)` as any,
       zIndex: Z_INDEX.HEADER,
       height: 64, // altura específica para garantir alinhamento
     };
   };
+
+  // Estilos adicionais para tablets e desktops
+  const desktopStyles: ViewStyle = !isMobile ? {
+    marginLeft: sidebarWidth,
+    width: Platform.OS === 'web' 
+      ? '100%' as any // Força o tipo para evitar erro
+      : Dimensions.get('window').width - sidebarWidth,
+    // Removendo o transform que está deslocando o header para fora da tela
+  } : {};
 
   // Para mobile, renderiza um header simplificado com botão de menu
   if (isMobile) {

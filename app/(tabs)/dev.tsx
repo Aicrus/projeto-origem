@@ -8,7 +8,7 @@ import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
 import { colors } from '../../components/AicrusComponents/constants/theme';
 import { Button } from '../../components/AicrusComponents/button';
-import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette } from 'lucide-react-native';
+import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette, Layout } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
 import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
 import { HoverableView } from '../../components/AicrusComponents/hoverable-view';
@@ -18,9 +18,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
 import { ProfileMenu } from '../../components/AicrusComponents/profile-menu';
 import { router } from 'expo-router';
+import { PageContainer } from '../../components/AicrusComponents/page-container';
 
 // Definir tipos para os componentes disponíveis
-type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | null;
+type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | null;
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
@@ -135,6 +136,7 @@ export default function DevPage() {
     { id: 'hoverableView', name: 'Hoverable View', icon: 'MousePointer' },
     { id: 'gradientView', name: 'Gradient View', icon: 'Palette' },
     { id: 'dropdownMenu', name: 'Dropdown Menu', icon: 'MessageSquare' },
+    { id: 'pageContainer', name: 'Page Container', icon: 'Layout' },
   ];
   
   // Função para renderizar o ícone correto
@@ -164,6 +166,8 @@ export default function DevPage() {
         return <MousePointer strokeWidth={1.5} color={iconColor} />;
       case 'Palette':
         return <Palette strokeWidth={1.5} color={iconColor} />;
+      case 'Layout':
+        return <Layout strokeWidth={1.5} color={iconColor} />;
       default:
         return <Settings strokeWidth={1.5} color={iconColor} />;
     }
@@ -205,6 +209,8 @@ export default function DevPage() {
         return renderGradientViewComponent();
       case 'dropdownMenu':
         return renderDropdownMenuComponent();
+      case 'pageContainer':
+        return renderPageContainerComponent();
       default:
         return null;
     }
@@ -2989,6 +2995,179 @@ return (
     );
   };
 
+  const renderPageContainerComponent = () => {
+    const bgSecondary = isDark ? 'bg-bg-secondary-dark' : 'bg-bg-secondary-light';
+    const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
+    const textSecondary = isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light';
+    const borderColor = isDark ? 'border-divider-dark' : 'border-divider-light';
+
+    return (
+      <View className="p-lg">
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+          Componente PageContainer
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-lg`}>
+          Componente responsável por gerenciar os espaçamentos e layout padrão da aplicação.
+          Oferece diferentes variações para atender diversos casos de uso.
+        </Text>
+
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+
+          {/* Modo Padrão */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Modo Padrão</Text>
+            <PageContainer>
+              <View className={`${bgSecondary} rounded-lg p-lg`}>
+                <Text className={`text-body-md ${textPrimary}`}>Conteúdo do Container</Text>
+              </View>
+            </PageContainer>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Container básico com espaçamentos padronizados e responsivos.
+            </Text>
+          </View>
+
+          {/* Layout Dashboard 4x1 */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 4x1</Text>
+            <PageContainer>
+              <View className="flex-row flex-wrap gap-md mb-md">
+                {[1, 2, 3, 4].map((i) => (
+                  <View key={i} className={`flex-1 min-w-[200px] ${bgSecondary} rounded-lg p-lg`}>
+                    <Text className={`text-body-md ${textPrimary}`}>Container {i}</Text>
+                  </View>
+                ))}
+              </View>
+              <View className={`${bgSecondary} rounded-lg p-lg`}>
+                <Text className={`text-body-md ${textPrimary}`}>Container Principal</Text>
+              </View>
+            </PageContainer>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Layout com 4 containers superiores e 1 container inferior, ideal para dashboards.
+            </Text>
+          </View>
+
+          {/* Layout Dashboard 3x1 */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 3x1</Text>
+            <PageContainer>
+              <View className="flex-row flex-wrap gap-md mb-md">
+                {[1, 2, 3].map((i) => (
+                  <View key={i} className={`flex-1 min-w-[250px] ${bgSecondary} rounded-lg p-lg`}>
+                    <Text className={`text-body-md ${textPrimary}`}>Container {i}</Text>
+                  </View>
+                ))}
+              </View>
+              <View className={`${bgSecondary} rounded-lg p-lg`}>
+                <Text className={`text-body-md ${textPrimary}`}>Container Principal</Text>
+              </View>
+            </PageContainer>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Layout com 3 containers superiores e 1 container inferior.
+            </Text>
+          </View>
+
+          {/* Layout Dashboard 2x1 */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 2x1</Text>
+            <PageContainer>
+              <View className="flex-row flex-wrap gap-md mb-md">
+                {[1, 2].map((i) => (
+                  <View key={i} className={`flex-1 min-w-[300px] ${bgSecondary} rounded-lg p-lg`}>
+                    <Text className={`text-body-md ${textPrimary}`}>Container {i}</Text>
+                  </View>
+                ))}
+              </View>
+              <View className={`${bgSecondary} rounded-lg p-lg`}>
+                <Text className={`text-body-md ${textPrimary}`}>Container Principal</Text>
+              </View>
+            </PageContainer>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Layout com 2 containers superiores e 1 container inferior.
+            </Text>
+          </View>
+        </View>
+
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Características
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          O PageContainer oferece diversas características para uma experiência consistente:
+        </Text>
+
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Responsividade</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Adapta-se automaticamente para desktop, tablet e mobile</Text>
+          </View>
+
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Suporte a Sidebar</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Ajusta o layout quando há uma sidebar presente</Text>
+          </View>
+
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Suporte a Header</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Adiciona margem superior apropriada</Text>
+          </View>
+
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Espaçamento Consistente</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Segue o Design System</Text>
+          </View>
+        </View>
+
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Propriedades
+        </Text>
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>children</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Conteúdo do container</Text>
+          </View>
+
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>withSidebar</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se deve considerar espaço para sidebar (boolean)</Text>
+          </View>
+
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>withHeader</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Se deve considerar espaço para header (boolean)</Text>
+          </View>
+
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>sidebarWidth</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Largura da sidebar em pixels (number)</Text>
+          </View>
+
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>headerHeight</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Altura do header em pixels (number, default: 64)</Text>
+          </View>
+
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>style</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Estilos adicionais para o container (ViewStyle)</Text>
+          </View>
+        </View>
+
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Exemplos de Uso
+        </Text>
+        <View className={`${bgSecondary} rounded-lg p-md`}>
+          <Text className={`text-mono-sm ${textPrimary}`}>
+            {`// Modo Padrão\n<PageContainer>\n  {/* seu conteúdo */}\n</PageContainer>`}
+          </Text>
+          <View className={`my-md border-t ${borderColor}`} />
+          <Text className={`text-mono-sm ${textPrimary}`}>
+            {`// Com Header e Sidebar\n<PageContainer\n  withHeader\n  withSidebar\n  sidebarWidth={250}\n>\n  {/* seu conteúdo */}\n</PageContainer>`}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <>
       <Stack.Screen 
@@ -3027,7 +3206,7 @@ return (
                   {availableComponents.map((component) => (
                     <Pressable
                       key={component.id}
-                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu')}
+                      onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer')}
                       className={`mr-2 px-3 py-1 rounded-md ${
                         activeComponent === component.id
                           ? isDark
@@ -3086,7 +3265,7 @@ return (
                       return (
                         <HoverableView
                           key={component.id}
-                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu')}
+                          onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer')}
                           className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
                             isComponentActive
                               ? isDark

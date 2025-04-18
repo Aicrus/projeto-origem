@@ -22,4 +22,9 @@ export * from './constants/theme';
 
 // Exportando o componente GradientView
 export { GradientView, GRADIENTS } from './gradient';
-export type { GradientViewProps, GradientType } from './gradient'; 
+export type { GradientViewProps, GradientType } from './gradient';
+
+// Exportando componentes
+export * from './header';
+export * from './sidebar';
+export * from './page-container/PageContainer'; 
