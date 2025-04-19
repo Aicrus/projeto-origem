@@ -2053,6 +2053,21 @@ showToast({
             </Text>
           </View>
           
+          {/* Exemplo com elemento desabilitado mas com hover */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Hover em elemento desabilitado</Text>
+            <HoverableView 
+              className="p-md rounded-md border border-divider-light"
+              disabled={true}
+              allowHoverWhenDisabled={true}
+            >
+              <Text className={`${textPrimary}`}>Elemento desabilitado com efeito de hover</Text>
+            </HoverableView>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Este elemento está desabilitado para clique (cursor é uma seta), mas ainda mostra efeito visual de hover.
+            </Text>
+          </View>
+          
           {/* Exemplo com múltiplos efeitos - igual ao básico, mas com escala */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Combinação de efeitos</Text>
@@ -2198,18 +2213,18 @@ showToast({
           </View>
           
           <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverTranslateX/Y</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Deslocamento horizontal/vertical (number, padrão: 0)</Text>
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverTranslateX</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Movimento horizontal em px ao passar o mouse (number, padrão: 0)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverTranslateY</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Movimento vertical em px ao passar o mouse (number, padrão: 0)</Text>
           </View>
           
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverRotate</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Rotação em graus (number, padrão: 0)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>hoverElevation</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Sombra/elevação adicional (number, padrão: 0)</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Rotação em graus ao passar o mouse (number, padrão: 0)</Text>
           </View>
           
           <View className="mb-sm">

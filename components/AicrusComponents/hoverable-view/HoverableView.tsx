@@ -82,10 +82,10 @@ export function HoverableView({
 
   // Funções para gerenciar o estado de hover
   const handleHoverIn = () => {
-    if (!props.disabled || allowHoverWhenDisabled) {
-      setIsHovered(true);
-      if (onHoverStateChange) onHoverStateChange(true);
-    }
+    // Sempre permitir o efeito hover, independente do estado disabled
+    // A propriedade allowHoverWhenDisabled não é mais necessária aqui
+    setIsHovered(true);
+    if (onHoverStateChange) onHoverStateChange(true);
   };
 
   const handleHoverOut = () => {
@@ -100,6 +100,7 @@ export function HoverableView({
       cursor: props.disabled ? 'default' : 'pointer',
       transition: `all ${animationDuration}ms ease`,
       userSelect: 'none',
+      pointerEvents: 'auto',
     } : {}),
     ...(typeof style === 'object' ? style : {}),
   };
@@ -168,6 +169,7 @@ export function HoverableView({
       onHoverIn={handleHoverIn}
       onHoverOut={handleHoverOut}
       style={finalStyle}
+      pointerEvents="auto"
       {...props}
     >
       {children}
