@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { Check } from 'lucide-react-native';
+import { Check, Minus } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { colors } from '../constants/theme';
 
@@ -95,19 +95,13 @@ export const Checkbox = ({
       borderRadius: 4,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: checked === true 
+      backgroundColor: (checked === true || checked === "indeterminate")
         ? (isDark ? colors.primary.dark : colors.primary.main)
         : 'transparent',
-      borderColor: checked === true 
+      borderColor: (checked === true || checked === "indeterminate")
         ? (isDark ? colors.primary.dark : colors.primary.main) 
         : (isDark ? '#95A1AC' : '#57636C'),
       opacity: disabled ? 0.5 : 1,
-    },
-    indeterminate: {
-      width: getSize() * 0.6,
-      height: 2,
-      backgroundColor: '#FFFFFF',
-      borderRadius: 1,
     },
   });
   
@@ -133,7 +127,12 @@ export const Checkbox = ({
   // Renderizar o conteúdo do checkbox
   const renderCheckboxContent = () => {
     if (checked === "indeterminate") {
-      return <View style={styles.indeterminate} />;
+      return (
+        <Minus
+          size={getSize() * 0.7}
+          color="#FFFFFF"
+        />
+      );
     }
     
     if (checked === true) {
