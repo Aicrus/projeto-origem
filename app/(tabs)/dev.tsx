@@ -3477,9 +3477,13 @@ return (
           Componente de tabela de dados que suporta ordenação, filtros, seleção, paginação e efeitos de hover.
         </Text>
 
+        {/* Exemplo Básico - Seleção apenas com Checkbox */}
         <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
           <Text className={`text-subtitle-md font-jakarta-medium ${textPrimary} mb-2`}>
-            Exemplo Básico
+            Exemplo 1: Seleção Apenas por Checkbox (padrão)
+          </Text>
+          <Text className={`text-body-sm ${textSecondary} mb-4`}>
+            Neste exemplo, linhas só podem ser selecionadas usando os checkboxes.
           </Text>
           <DataTable 
             data={exampleData}
@@ -3489,20 +3493,23 @@ return (
             enableFiltering
             enablePagination
             searchPlaceholder="Filtrar emails..."
+            // enableRowClick false é o padrão
           />
         </View>
 
+        {/* Exemplo com seleção ao clicar na linha */}
         <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
           <Text className={`text-subtitle-md font-jakarta-medium ${textPrimary} mb-2`}>
-            Exemplo com Efeito de Hover Aprimorado
+            Exemplo 2: Seleção ao Clicar na Linha
           </Text>
           <Text className={`text-body-sm ${textSecondary} mb-4`}>
-            Observe como as linhas reagem ao passar o mouse, com um efeito de hover simples.
+            Neste exemplo, as linhas podem ser selecionadas clicando em qualquer parte da linha.
           </Text>
           <DataTable 
             data={exampleData}
             columns={columns}
             enableRowSelection
+            enableRowClick
             enableSorting
             enableFiltering
             enablePagination
@@ -3539,21 +3546,27 @@ const columns: ColumnDef<Payment>[] = [
   // ... definições de colunas
 ];
 
-// Uso do componente
+// Exemplo 1: Seleção apenas com checkbox (padrão)
 <DataTable 
   data={data}
   columns={columns}
+  enableRowSelection
   enableSorting
   enableFiltering
   enablePagination
   searchPlaceholder="Filtrar emails..."
-  // Configurações de hover básicas
-  hoverableRowProps={{
-    hoverScale: 1,
-    hoverTranslateY: 0,
-    animationDuration: 150,
-    disableHoverBackground: false
-  }}
+/>
+
+// Exemplo 2: Seleção clicando na linha inteira
+<DataTable 
+  data={data}
+  columns={columns}
+  enableRowSelection
+  enableRowClick={true}
+  enableSorting
+  enableFiltering
+  enablePagination
+  searchPlaceholder="Filtrar emails..."
 />
               `.trim()}
             </Text>
@@ -3605,6 +3618,12 @@ const columns: ColumnDef<Payment>[] = [
               <Text className={`w-1/3 ${textPrimary}`}>enableRowSelection</Text>
               <Text className={`w-1/3 ${textSecondary}`}>boolean</Text>
               <Text className={`w-1/3 ${textSecondary}`}>Habilita seleção de linhas</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>enableRowClick</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>boolean</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Permite selecionar ao clicar na linha inteira</Text>
             </View>
             
             <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">

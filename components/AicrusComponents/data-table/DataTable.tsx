@@ -80,6 +80,8 @@ export interface DataTableProps<TData> {
   enablePagination?: boolean;
   /** Habilitar seleção de linhas */
   enableRowSelection?: boolean;
+  /** Habilitar seleção ao clicar na linha (se false, apenas o checkbox seleciona) */
+  enableRowClick?: boolean;
   /** Campo de texto para pesquisa */
   searchPlaceholder?: string;
   /** Estilo personalizado */
@@ -117,6 +119,7 @@ export function DataTable<TData>({
   enableFiltering = true,
   enablePagination = true,
   enableRowSelection = true,
+  enableRowClick = false,
   searchPlaceholder = "Filtrar emails...",
   style,
   noResultsText = "Sem resultados.",
@@ -854,10 +857,11 @@ export function DataTable<TData>({
                     hoverColor={themeColors.state.hover}
                     activeColor={themeColors.state.selected}
                     onPress={() => {
-                      if (enableRowSelection) {
+                      if (enableRowSelection && enableRowClick) {
                         row.toggleSelected(!row.getIsSelected());
                       }
                     }}
+                    disabled={!enableRowClick || !enableRowSelection}
                   >
                     {row.getVisibleCells().map((cell) => {
                       const columnStyle = getColumnStyle(cell.column.id);
