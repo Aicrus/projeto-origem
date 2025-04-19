@@ -693,14 +693,14 @@ export function DataTable<TData>({
     return content;
   };
   
-  // Adicionar estilos de hover para web
+  // Adicionar estilo de cursor baseado no enableRowClick
   useEffect(() => {
     if (Platform.OS === 'web') {
       const style = document.createElement('style');
       style.textContent = `
-        /* Cursor padrão para linhas da tabela */
+        /* Cursor padrão ou pointer com base na configuração */
         [data-table-row="true"] {
-          cursor: default !important;
+          cursor: ${enableRowClick ? 'pointer' : 'default'} !important;
         }
         
         /* Estilo para hover nos botões da tabela */
@@ -754,7 +754,7 @@ export function DataTable<TData>({
         document.head.removeChild(style);
       };
     }
-  }, [isDark, themeColors]);
+  }, [isDark, themeColors, enableRowClick]);
   
   return (
     <View style={[styles.container, style]} ref={containerRef}>
