@@ -277,18 +277,50 @@ export function DataTable<TData>({
   
   const columnWidths = calculateColumnWidths();
   
-  // Cores do tema
+  // Cores do tema seguindo o padrão do Accordion.tsx e theme.ts
   const getThemeColors = () => {
     return {
-      primary: isDark ? colors.primary.dark : colors.primary.main,
-      primaryLight: isDark ? colors.primary.main : colors.primary.light,
-      border: isDark ? colors.gray['700'] : colors.gray['200'],
-      background: isDark ? colors.gray['900'] : colors.white,
-      backgroundAlt: isDark ? colors.gray['800'] : colors.gray['50'],
-      text: isDark ? colors.gray['100'] : colors.gray['900'],
-      textMuted: isDark ? colors.gray['400'] : colors.gray['500'],
-      selectedRow: isDark ? 'rgba(137, 44, 220, 0.15)' : 'rgba(137, 44, 220, 0.05)',
-      hoverState: isDark ? 'rgba(55, 65, 81, 0.5)' : 'rgba(243, 244, 246, 0.5)',
+      // Cores primárias
+      primary: {
+        main: isDark ? colors.primary.dark : colors.primary.main,
+        light: isDark ? colors.primary.main : colors.primary.light,
+        dark: isDark ? colors.primary.main + '99' : colors.primary.dark,
+        contrastText: '#FFFFFF',
+      },
+      // Cores de feedback
+      error: isDark ? colors.error.dark : colors.error.main,
+      warning: isDark ? colors.warning.dark : colors.warning.main,
+      success: isDark ? colors.success.dark : colors.success.main,
+      info: isDark ? colors.info.dark : colors.info.main,
+      // Cores de background
+      background: {
+        default: isDark ? colors.gray['900'] : colors.white,
+        paper: isDark ? colors.gray['800'] : colors.white,
+        alt: isDark ? colors.gray['800'] : colors.gray['50'],
+        elevated: isDark ? colors.gray['700'] : colors.gray['100'],
+      },
+      // Cores de texto
+      text: {
+        primary: isDark ? colors.gray['100'] : colors.gray['900'],
+        secondary: isDark ? colors.gray['400'] : colors.gray['600'],
+        disabled: isDark ? colors.gray['500'] : colors.gray['400'],
+        hint: isDark ? colors.gray['500'] : colors.gray['400'],
+      },
+      // Cores de borda
+      border: {
+        light: isDark ? colors.gray['700'] : colors.gray['200'],
+        main: isDark ? colors.gray['600'] : colors.gray['300'],
+        dark: isDark ? colors.gray['500'] : colors.gray['400'],
+      },
+      // Estados da interface
+      state: {
+        hover: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+        selected: isDark ? 'rgba(137, 44, 220, 0.25)' : 'rgba(137, 44, 220, 0.08)',
+        disabled: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+        focus: isDark ? `${colors.primary.dark}40` : `${colors.primary.main}40`,
+      },
+      // Cores de divisor
+      divider: isDark ? colors.gray['700'] : colors.gray['200'],
     };
   };
   
@@ -315,7 +347,7 @@ export function DataTable<TData>({
       alignItems: 'center',
       backgroundColor: 'transparent',
       borderWidth: 1,
-      borderColor: themeColors.border,
+      borderColor: themeColors.border.light,
       borderRadius: 6,
       paddingHorizontal: 12,
       paddingVertical: 8,
@@ -326,10 +358,10 @@ export function DataTable<TData>({
       top: dropdownPosition.top,
       left: dropdownPosition.left,
       width: 200,
-      backgroundColor: themeColors.background,
+      backgroundColor: themeColors.background.paper,
       borderRadius: 6,
       borderWidth: 1,
-      borderColor: themeColors.border,
+      borderColor: themeColors.border.light,
       padding: 4,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
@@ -347,19 +379,19 @@ export function DataTable<TData>({
     dropdownLabel: {
       fontSize: 12,
       fontWeight: '500',
-      color: themeColors.textMuted,
+      color: themeColors.text.secondary,
       paddingHorizontal: 8,
       paddingVertical: 4,
     },
     dropdownSeparator: {
       height: 1,
-      backgroundColor: themeColors.border,
+      backgroundColor: themeColors.divider,
       marginVertical: 4,
     },
     tableContainer: {
       width: '100%',
       borderWidth: 1,
-      borderColor: themeColors.border,
+      borderColor: themeColors.border.light,
       borderRadius: 8,
       overflow: 'hidden',
     },
@@ -371,14 +403,14 @@ export function DataTable<TData>({
       minWidth: tableWidth > 0 ? tableWidth : '100%',
     },
     tableHeader: {
-      backgroundColor: themeColors.backgroundAlt,
+      backgroundColor: themeColors.background.alt,
       width: '100%',
     },
     tableHeaderRow: {
       display: 'flex',
       flexDirection: 'row',
       borderBottomWidth: 1,
-      borderColor: themeColors.border,
+      borderColor: themeColors.border.light,
       width: '100%',
     },
     tableHeaderCell: {
@@ -387,18 +419,18 @@ export function DataTable<TData>({
       alignItems: 'center',
     },
     tableBody: {
-      backgroundColor: themeColors.background,
+      backgroundColor: themeColors.background.default,
       width: '100%',
     },
     tableRow: {
       display: 'flex',
       flexDirection: 'row',
       borderBottomWidth: 1,
-      borderColor: themeColors.border,
+      borderColor: themeColors.border.light,
       width: '100%',
     },
     tableRowSelected: {
-      backgroundColor: themeColors.selectedRow,
+      backgroundColor: themeColors.state.selected,
     },
     tableCell: {
       padding: 12,
@@ -455,7 +487,7 @@ export function DataTable<TData>({
     selectionText: {
       flex: 1,
       fontSize: 14,
-      color: themeColors.textMuted,
+      color: themeColors.text.secondary,
     },
     paginationGroup: {
       flexDirection: 'row',
@@ -472,17 +504,17 @@ export function DataTable<TData>({
     headerText: {
       fontSize: 14,
       fontWeight: '500',
-      color: themeColors.text,
+      color: themeColors.text.primary,
     },
     cellText: {
       fontSize: 14,
-      color: themeColors.text,
+      color: themeColors.text.primary,
     },
     noResults: {
       padding: 24,
       textAlign: 'center',
       fontSize: 14,
-      color: themeColors.textMuted,
+      color: themeColors.text.secondary,
       width: '100%',
     },
   });
@@ -540,8 +572,13 @@ export function DataTable<TData>({
       onPress={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       disabled={!column.getCanSort()}
     >
-      <Text style={styles.headerText}>{label}</Text>
-      <ArrowUpDown size={16} color={themeColors.textMuted} />
+      <Text 
+        style={styles.headerText}
+        {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
+      >
+        {label}
+      </Text>
+      <ArrowUpDown size={16} color={themeColors.text.secondary} />
     </TouchableOpacity>
   );
   
@@ -569,7 +606,12 @@ export function DataTable<TData>({
           }
         ]}
       >
-        <Text style={styles.dropdownLabel}>Toggle columns</Text>
+        <Text 
+          style={styles.dropdownLabel}
+          {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
+        >
+          Toggle columns
+        </Text>
         {table
           .getAllColumns()
           .filter((column) => column.getCanHide())
@@ -588,6 +630,7 @@ export function DataTable<TData>({
                   styles.cellText, 
                   { marginLeft: 8, textTransform: 'capitalize' }
                 ]}
+                {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
               >
                 {column.id}
               </Text>
@@ -597,6 +640,24 @@ export function DataTable<TData>({
     );
   };
   
+  // Função para envolver o conteúdo renderizado com atributos de texto
+  const wrapWithTextAttributes = (content: React.ReactNode) => {
+    // Caso especial para textos simples
+    if (typeof content === 'string' || typeof content === 'number') {
+      return (
+        <Text 
+          style={styles.cellText}
+          {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
+        >
+          {content}
+        </Text>
+      );
+    }
+    
+    // Retornar o conteúdo original para componentes complexos
+    return content;
+  };
+  
   // Adicionar estilos de hover para web
   useEffect(() => {
     if (Platform.OS === 'web') {
@@ -604,14 +665,63 @@ export function DataTable<TData>({
       style.textContent = `
         /* Estilo para hover nas linhas da tabela */
         [data-table-row="true"]:hover {
-          background-color: ${themeColors.hoverState};
-          transition: background-color 0.2s ease;
+          background-color: ${themeColors.state.hover};
+          transition: all 0.2s ease;
         }
         
         /* Estilo para hover nos botões da tabela */
         [data-table-button="true"]:hover {
-          background-color: ${themeColors.hoverState};
+          background-color: ${themeColors.state.hover};
           transition: background-color 0.2s ease;
+        }
+        
+        /* Estilo para o cabeçalho da tabela */
+        [data-table-header="true"] {
+          color: ${themeColors.text.primary} !important; 
+        }
+        
+        /* Transição suave para todas as linhas da tabela */
+        [data-table-row="true"] {
+          transition: all 0.2s ease;
+        }
+        
+        /* Efeito de hover mais pronunciado */
+        [data-table-row="true"]:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 1px 3px rgba(0,0,0,${isDark ? '0.3' : '0.12'});
+        }
+        
+        /* Estilo para cabeçalho e células */
+        [data-cell-text="true"] {
+          color: ${themeColors.text.primary} !important;
+        }
+        
+        /* Estilo para células da tabela */
+        [data-table-cell="true"] {
+          color: ${themeColors.text.primary};
+        }
+        
+        /* Estilo para status na tabela */
+        [data-table-cell="true"] span, 
+        [data-table-cell="true"] div,
+        [data-table-cell="true"] p {
+          color: ${themeColors.text.primary};
+        }
+        
+        /* Estilo para linhas selecionadas */
+        [data-selected-row="true"] {
+          background-color: ${themeColors.state.selected} !important;
+          border-color: ${isDark ? 'rgba(137, 44, 220, 0.5)' : 'rgba(137, 44, 220, 0.2)'} !important;
+        }
+        
+        /* Efeito de hover em linhas selecionadas */
+        [data-selected-row="true"]:hover {
+          background-color: ${isDark ? 'rgba(137, 44, 220, 0.3)' : 'rgba(137, 44, 220, 0.1)'} !important;
+        }
+        
+        /* Checkbox personalizado para tema escuro */
+        input[type="checkbox"] {
+          accent-color: ${colors.primary.main};
         }
       `;
       document.head.appendChild(style);
@@ -620,7 +730,7 @@ export function DataTable<TData>({
         document.head.removeChild(style);
       };
     }
-  }, [isDark]);
+  }, [isDark, themeColors]);
   
   return (
     <View style={[styles.container, style]} ref={containerRef}>
@@ -646,8 +756,13 @@ export function DataTable<TData>({
           onPress={handleOpenDropdown}
           {...(Platform.OS === 'web' ? { 'data-table-button': 'true' } : {})}
         >
-          <Text style={styles.headerText}>{columnsButtonText}</Text>
-          <ChevronDown size={16} color={themeColors.text} />
+          <Text 
+            style={styles.headerText}
+            {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
+          >
+            {columnsButtonText}
+          </Text>
+          <ChevronDown size={16} color={themeColors.text.primary} />
         </TouchableOpacity>
         
         {Platform.OS !== 'web' && renderColumnsDropdown()}
@@ -678,12 +793,15 @@ export function DataTable<TData>({
                           columnStyle,
                           alignment
                         ]}
+                        {...(Platform.OS === 'web' ? { 'data-table-header': 'true' } : {})}
                       >
                         {header.isPlaceholder
                           ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
+                          : wrapWithTextAttributes(
+                              flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )
                             )}
                       </View>
                     );
@@ -702,7 +820,10 @@ export function DataTable<TData>({
                       styles.tableRow,
                       row.getIsSelected() && styles.tableRowSelected,
                     ]}
-                    {...(Platform.OS === 'web' ? { 'data-table-row': 'true' } : {})}
+                    {...(Platform.OS === 'web' ? { 
+                      'data-table-row': 'true',
+                      'data-selected-row': row.getIsSelected() ? 'true' : 'false'
+                    } : {})}
                   >
                     {row.getVisibleCells().map((cell) => {
                       const columnStyle = getColumnStyle(cell.column.id);
@@ -716,10 +837,13 @@ export function DataTable<TData>({
                             columnStyle,
                             alignment
                           ]}
+                          {...(Platform.OS === 'web' ? { 'data-table-cell': 'true' } : {})}
                         >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
+                          {wrapWithTextAttributes(
+                            flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )
                           )}
                         </View>
                       );
@@ -728,7 +852,10 @@ export function DataTable<TData>({
                 ))
               ) : (
                 <View style={styles.tableRow}>
-                  <Text style={styles.noResults}>
+                  <Text 
+                    style={styles.noResults}
+                    {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
+                  >
                     {noResultsText}
                   </Text>
                 </View>
@@ -741,7 +868,10 @@ export function DataTable<TData>({
       {/* Paginação e seleção */}
       {enablePagination && (
         <View style={styles.buttonGroup}>
-          <Text style={styles.selectionText}>
+          <Text 
+            style={styles.selectionText}
+            {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
+          >
             {table.getFilteredSelectedRowModel().rows.length} {selectionText}{' '}
             {table.getFilteredRowModel().rows.length} linha(s) selecionada(s).
           </Text>
