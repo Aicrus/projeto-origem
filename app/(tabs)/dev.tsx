@@ -3494,7 +3494,7 @@ return (
             Como usar
           </Text>
           <View className="p-3 bg-gray-100 dark:bg-gray-800 rounded-md">
-            <Text className={`font-mono text-xs ${isDark ? 'text-gray-300' : 'text-gray-800'}`}>
+            <Text className={`font-mono text-xs ${isDark ? 'text-gray-800' : 'text-gray-800'}`}>
               {`
 import { DataTable } from '../../components/AicrusComponents';
 import { ColumnDef } from '@tanstack/react-table';
