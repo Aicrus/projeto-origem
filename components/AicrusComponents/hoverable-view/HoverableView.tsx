@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Pressable, ViewStyle, PressableProps, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Pressable, View, ViewStyle, PressableProps, Platform, StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/ThemeContext';
 import { colors } from '../constants/theme';
 
@@ -67,12 +67,16 @@ export function HoverableView({
   backgroundColor,
   className = '',
   onHoverStateChange,
+  disabled,
   ...props
 }: HoverableViewProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-
+  
+  // Para web, precisamos usar refs e useEffect para manipular diretamente o DOM em casos especiais
+  const viewRef = React.useRef<View>(null);
+  
   // Cores padrão baseadas no tema
   const defaultColors = {
     background: backgroundColor || 'transparent',
@@ -80,30 +84,76 @@ export function HoverableView({
     active: activeColor || (isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'),
   };
 
+  // Manipulação direta do DOM para elementos desabilitados na web
+  useEffect(() => {
+    if (Platform.OS === 'web' && viewRef.current && disabled && allowHoverWhenDisabled) {
+      // @ts-ignore - Acessando o elemento DOM nativo
+      const domNode = viewRef.current._nativeTag || viewRef.current;
+      
+      if (domNode && domNode.style) {
+        // Garantir que o cursor seja default
+        domNode.style.cursor = 'default';
+        
+        // Permitir eventos de hover mas bloquear cliques
+        domNode.style.pointerEvents = 'auto';
+        
+        // Adicionar listener de mouse para elementos desabilitados
+        const mouseEnterHandler = () => {
+          if (disabled && allowHoverWhenDisabled) {
+            setIsHovered(true);
+            if (onHoverStateChange) onHoverStateChange(true);
+          }
+        };
+        
+        const mouseLeaveHandler = () => {
+          if (disabled && allowHoverWhenDisabled) {
+            setIsHovered(false);
+            if (onHoverStateChange) onHoverStateChange(false);
+          }
+        };
+        
+        domNode.addEventListener('mouseenter', mouseEnterHandler);
+        domNode.addEventListener('mouseleave', mouseLeaveHandler);
+        
+        return () => {
+          domNode.removeEventListener('mouseenter', mouseEnterHandler);
+          domNode.removeEventListener('mouseleave', mouseLeaveHandler);
+        };
+      }
+    }
+  }, [disabled, allowHoverWhenDisabled, onHoverStateChange]);
+
   // Funções para gerenciar o estado de hover
   const handleHoverIn = () => {
-    // Sempre permitir o efeito hover, independente do estado disabled
-    // A propriedade allowHoverWhenDisabled não é mais necessária aqui
-    setIsHovered(true);
-    if (onHoverStateChange) onHoverStateChange(true);
+    // Não precisamos verificar disabled aqui porque já controlamos isso via useEffect para web
+    // e a Pressable não dispara eventos para elementos desabilitados nativamente
+    if (!disabled || allowHoverWhenDisabled) {
+      setIsHovered(true);
+      if (onHoverStateChange) onHoverStateChange(true);
+    }
   };
 
   const handleHoverOut = () => {
-    setIsHovered(false);
-    if (onHoverStateChange) onHoverStateChange(false);
+    if (!disabled || allowHoverWhenDisabled) {
+      setIsHovered(false);
+      if (onHoverStateChange) onHoverStateChange(false);
+    }
   };
 
   // Estilo base para todos os estados
   const baseStyle: any = {
     backgroundColor: defaultColors.background,
     ...(Platform.OS === 'web' && !disableAnimation ? {
-      cursor: props.disabled ? 'default' : 'pointer',
       transition: `all ${animationDuration}ms ease`,
       userSelect: 'none',
-      pointerEvents: 'auto',
     } : {}),
     ...(typeof style === 'object' ? style : {}),
   };
+
+  // Adicionar cursor style específico para web
+  if (Platform.OS === 'web') {
+    baseStyle.cursor = disabled ? 'default' : 'pointer';
+  }
 
   // Estilo para hover (transformações)
   const getHoverTransform = () => {
@@ -159,17 +209,37 @@ export function HoverableView({
     finalStyle = { ...finalStyle, ...activeStyle };
   }
   
-  if (isHovered && !isActive) {
+  // Aplicar estilo de hover - importante: se allowHoverWhenDisabled é true, 
+  // sempre aplicamos o estilo hover, independente de disabled
+  if (isHovered && (!disabled || allowHoverWhenDisabled)) {
     finalStyle = { ...finalStyle, ...hoverStyle };
   }
 
+  // Usamos um wrapper View para elementos desabilitados com hover permitido
+  if (disabled && allowHoverWhenDisabled && Platform.OS === 'web') {
+    return (
+      <View 
+        ref={viewRef}
+        className={className}
+        style={{
+          ...finalStyle,
+          cursor: 'default',
+        }}
+      >
+        {children}
+      </View>
+    );
+  }
+
+  // Comportamento normal para outros casos
   return (
     <Pressable
+      ref={viewRef}
       className={className}
       onHoverIn={handleHoverIn}
       onHoverOut={handleHoverOut}
       style={finalStyle}
-      pointerEvents="auto"
+      disabled={disabled}
       {...props}
     >
       {children}
