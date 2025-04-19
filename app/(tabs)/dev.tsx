@@ -1228,7 +1228,54 @@ export default function DevPage() {
             <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>Exemplo de fonte mono</Text>
             <Text className={`text-body-lg font-mono-regular ${textPrimary} mb-sm`}>Space Mono (para código)</Text>
           </View>
-
+          
+          {/* Seção de Breakpoints */}
+          <SectionTitle title="Breakpoints" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Breakpoint Atual</Text>
+            <View className={`p-lg rounded-lg ${bgTertiary} mb-lg flex-row items-center justify-between`}>
+              <View>
+                <Text className={`text-display-sm font-jakarta-bold ${textPrimary}`}>
+                  {currentBreakpoint}
+                </Text>
+                <Text className={`text-body-lg font-jakarta-medium ${textSecondary}`}>
+                  Largura atual: {width}px
+                </Text>
+              </View>
+              
+              <View className={`h-24 w-24 rounded-full ${isDark ? 'bg-primary-dark/20' : 'bg-primary-light/20'} items-center justify-center`}>
+                <Text className={`text-display-md font-jakarta-bold ${isDark ? 'text-primary-dark' : 'text-primary-light'}`}>
+                  {currentBreakpoint.charAt(0)}
+                </Text>
+              </View>
+            </View>
+            
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Intervalos de Breakpoints</Text>
+            <View className={`${bgTertiary} p-md rounded-lg`}>
+              <View className="flex-row items-center mb-sm">
+                <View className={`h-3 w-3 rounded-full ${isDark ? 'bg-primary-dark' : 'bg-primary-light'} mr-xs`} />
+                <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>SMALL_MOBILE: 0 a 320px</Text>
+              </View>
+              <View className="flex-row items-center mb-sm">
+                <View className={`h-3 w-3 rounded-full ${isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} mr-xs`} />
+                <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>MOBILE: 321px a 739px</Text>
+              </View>
+              <View className="flex-row items-center mb-sm">
+                <View className={`h-3 w-3 rounded-full ${isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} mr-xs`} />
+                <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>TABLET: 740px a 1199px</Text>
+              </View>
+              <View className="flex-row items-center mb-sm">
+                <View className={`h-3 w-3 rounded-full ${isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} mr-xs`} />
+                <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>DESKTOP: 1200px a 1599px</Text>
+              </View>
+              <View className="flex-row items-center">
+                <View className={`h-3 w-3 rounded-full ${isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} mr-xs`} />
+                <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>LARGE_DESKTOP: 1600px ou mais</Text>
+              </View>
+            </View>
+          </View>
+          
           {/* Seção de Espaçamentos */}
           <SectionTitle title="Espaçamentos" textColor={textPrimary} />
           
@@ -1405,6 +1452,7 @@ export default function DevPage() {
               <ValueDisplay name="1000" value="1000ms" textColor={textPrimary} />
             </View>
           </View>
+          
         </View>
       </ScrollView>
     );
@@ -3545,9 +3593,6 @@ const columns: ColumnDef<Payment>[] = [
           }}
         />
         
-        {/* Mostrar o indicador de breakpoint apenas na versão web */}
-        {Platform.OS === 'web' && <BreakpointIndicator />}
-        
         <View className="flex-1">
           {isMobile ? (
             // Layout para dispositivos móveis com botões compactos no topo
@@ -3614,7 +3659,12 @@ const columns: ColumnDef<Payment>[] = [
                     Componentes
                   </Text>
                   
-                  <View className="flex-col">
+                  <View className="flex-col overflow-y-auto max-h-[calc(100vh-80px)]" 
+                        style={Platform.OS === 'web' ? { 
+                          // @ts-ignore - Estas propriedades são específicas para web
+                          scrollbarWidth: 'none', 
+                          msOverflowStyle: 'none' 
+                        } : {}}>
                     {availableComponents.map((component) => {
                       // Substituir a importação dinâmica pela nossa função renderIcon
                       const isComponentActive = activeComponent === component.id;
@@ -3672,6 +3722,11 @@ const columns: ColumnDef<Payment>[] = [
                 className="flex-1"
                 contentContainerStyle={{ paddingBottom: 40 }}
                 showsVerticalScrollIndicator={false}
+                style={Platform.OS === 'web' ? { 
+                  // @ts-ignore - Estas propriedades são específicas para web
+                  scrollbarWidth: 'thin', 
+                  scrollbarColor: isDark ? '#3B4252 transparent' : '#E2E8F0 transparent' 
+                } : {}}
               >
                 {renderComponentContent()}
               </ScrollView>
