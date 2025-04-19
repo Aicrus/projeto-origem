@@ -3484,6 +3484,7 @@ return (
           </Text>
           <Text className={`text-body-sm ${textSecondary} mb-4`}>
             Neste exemplo, linhas só podem ser selecionadas usando os checkboxes.
+            O efeito de hover nas linhas continua funcionando visualmente ao passar o mouse.
           </Text>
           <DataTable 
             data={exampleData}
@@ -3494,6 +3495,12 @@ return (
             enablePagination
             searchPlaceholder="Filtrar emails..."
             // enableRowClick false é o padrão
+            hoverableRowProps={{
+              hoverScale: 1, 
+              hoverTranslateY: 0,
+              animationDuration: 150,
+              disableHoverBackground: false
+            }}
           />
         </View>
 

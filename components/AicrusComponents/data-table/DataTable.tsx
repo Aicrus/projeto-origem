@@ -861,7 +861,7 @@ export function DataTable<TData>({
                         row.toggleSelected(!row.getIsSelected());
                       }
                     }}
-                    disabled={!enableRowClick || !enableRowSelection}
+                    disabled={false}
                   >
                     {row.getVisibleCells().map((cell) => {
                       const columnStyle = getColumnStyle(cell.column.id);
