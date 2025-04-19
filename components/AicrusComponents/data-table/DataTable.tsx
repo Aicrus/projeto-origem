@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, RefObject } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,8 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  Table,
+  Column,
 } from '@tanstack/react-table';
 import { Input } from '../input';
 import { Checkbox } from '../checkbox';
@@ -115,10 +117,12 @@ export function DataTable<TData>({
   const [rowSelection, setRowSelection] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [tableWidth, setTableWidth] = useState(0);
   
   // Refs
-  const dropdownTriggerRef = React.useRef<any>(null);
+  const dropdownTriggerRef = React.useRef<View>(null);
   const dropdownRef = React.useRef<View>(null);
+  const containerRef = React.useRef<View>(null);
   
   // Tema atual
   const { currentTheme } = useTheme();
@@ -133,6 +137,34 @@ export function DataTable<TData>({
       setColumnFilters([initialColumnFilter]);
     }
   }, [initialColumnFilter]);
+
+  // Medir a largura do container para ajustar a tabela
+  useEffect(() => {
+    if (Platform.OS === 'web' && containerRef.current) {
+      // TypeScript não conhece o ResizeObserver no ambiente React Native
+      const ResizeObserver = (window as any).ResizeObserver;
+      if (!ResizeObserver) return;
+      
+      const resizeObserver = new ResizeObserver((entries: any[]) => {
+        for (let entry of entries) {
+          if (entry.target === containerRef.current) {
+            setTableWidth(entry.contentRect.width);
+          }
+        }
+      });
+
+      // @ts-ignore - getBoundingClientRect() é específico da web
+      const width = containerRef.current.getBoundingClientRect().width;
+      setTableWidth(width);
+      
+      resizeObserver.observe(containerRef.current);
+      return () => {
+        if (containerRef.current) {
+          resizeObserver.unobserve(containerRef.current);
+        }
+      };
+    }
+  }, []);
   
   // Instância da tabela
   const table = useReactTable({
@@ -173,15 +205,20 @@ export function DataTable<TData>({
   useEffect(() => {
     if (Platform.OS === 'web' && dropdownOpen) {
       const handleClickOutside = (event: MouseEvent) => {
-        if (
-          dropdownRef.current && 
-          dropdownTriggerRef.current && 
-          // @ts-ignore - contains é específico da web
-          !dropdownRef.current.contains(event.target) &&
-          // @ts-ignore - contains é específico da web
-          !dropdownTriggerRef.current.contains(event.target)
-        ) {
-          setDropdownOpen(false);
+        // Verificação de tipos para o ambiente web
+        if (Platform.OS === 'web') {
+          const target = event.target as HTMLElement;
+          const dropdownNode = dropdownRef.current as unknown as HTMLElement;
+          const triggerNode = dropdownTriggerRef.current as unknown as HTMLElement;
+          
+          if (
+            dropdownNode && 
+            triggerNode && 
+            !dropdownNode.contains(target) &&
+            !triggerNode.contains(target)
+          ) {
+            setDropdownOpen(false);
+          }
         }
       };
       
@@ -191,6 +228,71 @@ export function DataTable<TData>({
       };
     }
   }, [dropdownOpen]);
+  
+  // Calcular larguras das colunas baseado no espaço disponível
+  const calculateColumnWidths = () => {
+    if (tableWidth === 0) return {};
+    
+    const visibleColumns = table.getVisibleFlatColumns();
+    const totalColumns = visibleColumns.length;
+    
+    // Definir larguras específicas para colunas especiais
+    const specialColumnWidths: Record<string, number> = {
+      select: 50,
+      actions: 70,
+      amount: 120,
+    };
+    
+    // Calcular quantas colunas especiais existem
+    const specialColumns = visibleColumns.filter((col: Column<TData, unknown>) => 
+      Object.keys(specialColumnWidths).includes(col.id)
+    );
+    
+    // Calcular o espaço ocupado pelas colunas especiais
+    const specialColumnsWidth = specialColumns.reduce(
+      (total: number, col: Column<TData, unknown>) => total + (specialColumnWidths[col.id] || 0), 
+      0
+    );
+    
+    // Calcular o espaço restante para as colunas normais
+    const regularColumns = totalColumns - specialColumns.length;
+    const availableWidth = tableWidth - specialColumnsWidth;
+    const regularColumnWidth = Math.max(
+      regularColumns > 0 ? Math.floor(availableWidth / regularColumns) : 200,
+      150 // Largura mínima
+    );
+    
+    // Criar objeto com todas as larguras
+    const result: Record<string, number> = {};
+    visibleColumns.forEach((column: Column<TData, unknown>) => {
+      if (Object.keys(specialColumnWidths).includes(column.id)) {
+        result[column.id] = specialColumnWidths[column.id];
+      } else {
+        result[column.id] = regularColumnWidth;
+      }
+    });
+    
+    return result;
+  };
+  
+  const columnWidths = calculateColumnWidths();
+  
+  // Cores do tema
+  const getThemeColors = () => {
+    return {
+      primary: isDark ? colors.primary.dark : colors.primary.main,
+      primaryLight: isDark ? colors.primary.main : colors.primary.light,
+      border: isDark ? colors.gray['700'] : colors.gray['200'],
+      background: isDark ? colors.gray['900'] : colors.white,
+      backgroundAlt: isDark ? colors.gray['800'] : colors.gray['50'],
+      text: isDark ? colors.gray['100'] : colors.gray['900'],
+      textMuted: isDark ? colors.gray['400'] : colors.gray['500'],
+      selectedRow: isDark ? 'rgba(137, 44, 220, 0.15)' : 'rgba(137, 44, 220, 0.05)',
+      hoverState: isDark ? 'rgba(55, 65, 81, 0.5)' : 'rgba(243, 244, 246, 0.5)',
+    };
+  };
+  
+  const themeColors = getThemeColors();
   
   // Estilos da tabela
   const getStyles = () => StyleSheet.create({
@@ -213,7 +315,7 @@ export function DataTable<TData>({
       alignItems: 'center',
       backgroundColor: 'transparent',
       borderWidth: 1,
-      borderColor: isDark ? '#374151' : '#D1D5DB',
+      borderColor: themeColors.border,
       borderRadius: 6,
       paddingHorizontal: 12,
       paddingVertical: 8,
@@ -224,10 +326,10 @@ export function DataTable<TData>({
       top: dropdownPosition.top,
       left: dropdownPosition.left,
       width: 200,
-      backgroundColor: isDark ? '#1F2937' : '#FFFFFF',
+      backgroundColor: themeColors.background,
       borderRadius: 6,
       borderWidth: 1,
-      borderColor: isDark ? '#374151' : '#E5E7EB',
+      borderColor: themeColors.border,
       padding: 4,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
@@ -245,49 +347,103 @@ export function DataTable<TData>({
     dropdownLabel: {
       fontSize: 12,
       fontWeight: '500',
-      color: isDark ? '#9CA3AF' : '#6B7280',
+      color: themeColors.textMuted,
       paddingHorizontal: 8,
       paddingVertical: 4,
     },
     dropdownSeparator: {
       height: 1,
-      backgroundColor: isDark ? '#374151' : '#E5E7EB',
+      backgroundColor: themeColors.border,
       marginVertical: 4,
     },
-    table: {
+    tableContainer: {
       width: '100%',
       borderWidth: 1,
-      borderColor: isDark ? '#374151' : '#E5E7EB',
+      borderColor: themeColors.border,
       borderRadius: 8,
       overflow: 'hidden',
     },
+    scrollContainer: {
+      minWidth: '100%',
+    },
+    fullWidthTable: {
+      width: '100%',
+      minWidth: tableWidth > 0 ? tableWidth : '100%',
+    },
     tableHeader: {
-      backgroundColor: isDark ? '#1F2937' : '#F9FAFB',
+      backgroundColor: themeColors.backgroundAlt,
+      width: '100%',
     },
     tableHeaderRow: {
+      display: 'flex',
       flexDirection: 'row',
       borderBottomWidth: 1,
-      borderColor: isDark ? '#374151' : '#E5E7EB',
+      borderColor: themeColors.border,
+      width: '100%',
     },
     tableHeaderCell: {
       padding: 12,
       justifyContent: 'center',
-      alignItems: isMobile ? 'flex-start' : 'center',
+      alignItems: 'center',
     },
     tableBody: {
-      backgroundColor: isDark ? '#111827' : '#FFFFFF',
+      backgroundColor: themeColors.background,
+      width: '100%',
     },
     tableRow: {
+      display: 'flex',
       flexDirection: 'row',
       borderBottomWidth: 1,
-      borderColor: isDark ? '#374151' : '#E5E7EB',
+      borderColor: themeColors.border,
+      width: '100%',
     },
     tableRowSelected: {
-      backgroundColor: isDark ? 'rgba(137, 44, 220, 0.1)' : 'rgba(137, 44, 220, 0.05)',
+      backgroundColor: themeColors.selectedRow,
     },
     tableCell: {
       padding: 12,
       justifyContent: 'center',
+    },
+    // Colunas com tamanhos específicos
+    columnFixed: {
+      flexShrink: 0,
+    },
+    columnSelect: {
+      width: 50,
+      flexShrink: 0,
+      flexGrow: 0,
+    },
+    columnActions: {
+      width: 70,
+      flexShrink: 0,
+      flexGrow: 0,
+    },
+    columnMoney: {
+      width: 120,
+      flexShrink: 0,
+      flexGrow: 0,
+    },
+    columnEmail: {
+      minWidth: 220,
+      flex: 2,
+    },
+    columnStatus: {
+      minWidth: 120,
+      flex: 1,
+    },
+    columnFlex: {
+      flex: 1,
+      minWidth: isMobile ? 150 : 180,
+    },
+    // Alinhamentos
+    tableCellStart: {
+      alignItems: 'flex-start',
+    },
+    tableCellCenter: {
+      alignItems: 'center',
+    },
+    tableCellEnd: {
+      alignItems: 'flex-end',
     },
     buttonGroup: {
       flexDirection: 'row',
@@ -299,7 +455,7 @@ export function DataTable<TData>({
     selectionText: {
       flex: 1,
       fontSize: 14,
-      color: isDark ? '#9CA3AF' : '#6B7280',
+      color: themeColors.textMuted,
     },
     paginationGroup: {
       flexDirection: 'row',
@@ -316,21 +472,66 @@ export function DataTable<TData>({
     headerText: {
       fontSize: 14,
       fontWeight: '500',
-      color: isDark ? '#E5E7EB' : '#374151',
+      color: themeColors.text,
     },
     cellText: {
       fontSize: 14,
-      color: isDark ? '#E5E7EB' : '#1F2937',
+      color: themeColors.text,
     },
     noResults: {
       padding: 24,
       textAlign: 'center',
       fontSize: 14,
-      color: isDark ? '#9CA3AF' : '#6B7280',
+      color: themeColors.textMuted,
+      width: '100%',
     },
   });
   
   const styles = getStyles();
+  
+  // Função para determinar o alinhamento de uma coluna
+  const getColumnAlignment = (columnId: string) => {
+    // Alinhamento padrão para cada tipo de coluna
+    if (columnId === 'select') return styles.tableCellCenter;
+    if (columnId === 'status') return styles.tableCellCenter;
+    if (columnId === 'actions') return styles.tableCellCenter;
+    if (columnId === 'amount' || columnId === 'valor') return styles.tableCellEnd;
+    
+    // Alinhamento padrão para outras colunas
+    return styles.tableCellStart;
+  };
+  
+  // Função para determinar qual estilo de coluna usar
+  const getColumnStyle = (columnId: string) => {
+    if (columnId === 'select') return styles.columnSelect;
+    if (columnId === 'actions') return styles.columnActions;
+    if (columnId === 'amount' || columnId === 'valor') return styles.columnMoney;
+    if (columnId === 'email') return styles.columnEmail;
+    if (columnId === 'status') return styles.columnStatus;
+    
+    return styles.columnFlex;
+  };
+  
+  // Função para verificar se o scroll é necessário
+  const isScrollNeeded = (): boolean => {
+    // Se estamos em um dispositivo móvel, sempre permitir scroll horizontal
+    if (isMobile) return true;
+    
+    // Calcular a largura total necessária para todas as colunas
+    const totalRequiredWidth = table.getVisibleFlatColumns().reduce((total, column) => {
+      if (column.id === 'select') return total + 50;
+      if (column.id === 'actions') return total + 70;
+      if (column.id === 'amount' || column.id === 'valor') return total + 120;
+      if (column.id === 'email') return total + 220;
+      if (column.id === 'status') return total + 120;
+      
+      // Colunas regulares
+      return total + 180;
+    }, 0);
+    
+    // Se a largura necessária for maior que a largura disponível, scroll é necessário
+    return totalRequiredWidth > tableWidth;
+  };
   
   // Renderizar botão de ordenação
   const renderSortButton = (column: any, label: string) => (
@@ -340,7 +541,7 @@ export function DataTable<TData>({
       disabled={!column.getCanSort()}
     >
       <Text style={styles.headerText}>{label}</Text>
-      <ArrowUpDown size={16} color={isDark ? '#9CA3AF' : '#6B7280'} />
+      <ArrowUpDown size={16} color={themeColors.textMuted} />
     </TouchableOpacity>
   );
   
@@ -403,13 +604,13 @@ export function DataTable<TData>({
       style.textContent = `
         /* Estilo para hover nas linhas da tabela */
         [data-table-row="true"]:hover {
-          background-color: ${isDark ? 'rgba(55, 65, 81, 0.5)' : 'rgba(243, 244, 246, 0.5)'};
+          background-color: ${themeColors.hoverState};
           transition: background-color 0.2s ease;
         }
         
         /* Estilo para hover nos botões da tabela */
         [data-table-button="true"]:hover {
-          background-color: ${isDark ? 'rgba(55, 65, 81, 0.5)' : 'rgba(243, 244, 246, 0.5)'};
+          background-color: ${themeColors.hoverState};
           transition: background-color 0.2s ease;
         }
       `;
@@ -422,7 +623,7 @@ export function DataTable<TData>({
   }, [isDark]);
   
   return (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, style]} ref={containerRef}>
       {/* Filtros e controles */}
       <View style={styles.filterContainer}>
         {enableFiltering && (
@@ -446,111 +647,96 @@ export function DataTable<TData>({
           {...(Platform.OS === 'web' ? { 'data-table-button': 'true' } : {})}
         >
           <Text style={styles.headerText}>{columnsButtonText}</Text>
-          <ChevronDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+          <ChevronDown size={16} color={themeColors.text} />
         </TouchableOpacity>
         
         {Platform.OS !== 'web' && renderColumnsDropdown()}
       </View>
       
       {/* Tabela */}
-      <ScrollView horizontal style={styles.table}>
-        <View>
-          {/* Cabeçalho da tabela */}
-          <View style={styles.tableHeader}>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <View key={headerGroup.id} style={styles.tableHeaderRow}>
-                {headerGroup.headers.map((header) => {
-                  const width = header.id === 'select' 
-                    ? 50 
-                    : header.id === 'actions' 
-                      ? 70 
-                      : header.id === 'amount' 
-                        ? 120 
-                        : isMobile 
-                          ? 150 
-                          : 200;
-                          
-                  return (
-                    <View 
-                      key={header.id} 
-                      style={[
-                        styles.tableHeaderCell,
-                        { width },
-                        header.id === 'amount' && { alignItems: 'flex-end' }
-                      ]}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </View>
-                  );
-                })}
-              </View>
-            ))}
-          </View>
-          
-          {/* Corpo da tabela */}
-          <View style={styles.tableBody}>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <View
-                  key={row.id}
-                  style={[
-                    styles.tableRow,
-                    row.getIsSelected() && styles.tableRowSelected,
-                  ]}
-                  {...(Platform.OS === 'web' ? { 'data-table-row': 'true' } : {})}
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    const width = cell.column.id === 'select' 
-                      ? 50 
-                      : cell.column.id === 'actions' 
-                        ? 70 
-                        : cell.column.id === 'amount' 
-                          ? 120 
-                          : isMobile 
-                            ? 150 
-                            : 200;
+      <View style={styles.tableContainer}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={true}
+          scrollEnabled={isScrollNeeded()}
+          contentContainerStyle={styles.scrollContainer}
+        >
+          <View style={styles.fullWidthTable}>
+            {/* Cabeçalho da tabela */}
+            <View style={styles.tableHeader}>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <View key={headerGroup.id} style={styles.tableHeaderRow}>
+                  {headerGroup.headers.map((header) => {
+                    const columnStyle = getColumnStyle(header.id);
+                    const alignment = getColumnAlignment(header.id);
                             
                     return (
                       <View 
-                        key={cell.id} 
+                        key={header.id} 
                         style={[
-                          styles.tableCell,
-                          { width },
-                          cell.column.id === 'amount' && { alignItems: 'flex-end' }
+                          styles.tableHeaderCell,
+                          columnStyle,
+                          alignment
                         ]}
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                       </View>
                     );
                   })}
                 </View>
-              ))
-            ) : (
-              <View style={styles.tableRow}>
-                <Text
-                  style={[
-                    styles.noResults,
-                    { width: table.getAllColumns().reduce(
-                      (acc, column) => acc + (column.getSize() || 200),
-                      0
-                    )}
-                  ]}
-                >
-                  {noResultsText}
-                </Text>
-              </View>
-            )}
+              ))}
+            </View>
+            
+            {/* Corpo da tabela */}
+            <View style={styles.tableBody}>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <View
+                    key={row.id}
+                    style={[
+                      styles.tableRow,
+                      row.getIsSelected() && styles.tableRowSelected,
+                    ]}
+                    {...(Platform.OS === 'web' ? { 'data-table-row': 'true' } : {})}
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      const columnStyle = getColumnStyle(cell.column.id);
+                      const alignment = getColumnAlignment(cell.column.id);
+                              
+                      return (
+                        <View 
+                          key={cell.id} 
+                          style={[
+                            styles.tableCell,
+                            columnStyle,
+                            alignment
+                          ]}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </View>
+                      );
+                    })}
+                  </View>
+                ))
+              ) : (
+                <View style={styles.tableRow}>
+                  <Text style={styles.noResults}>
+                    {noResultsText}
+                  </Text>
+                </View>
+              )}
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
       
       {/* Paginação e seleção */}
       {enablePagination && (

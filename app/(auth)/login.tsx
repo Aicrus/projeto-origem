@@ -153,7 +153,7 @@ export default function Login() {
                 fullWidth
                 leftIcon={<Mail size={18} color="#FFFFFF" />}
               >
-                Entrar com Email
+                Login
               </Button>
 
               {/* Separador "ou" */}
