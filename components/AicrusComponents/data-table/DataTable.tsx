@@ -862,6 +862,7 @@ export function DataTable<TData>({
                       }
                     }}
                     disabled={!enableRowClick}
+                    allowHoverWhenDisabled={true}
                   >
                     {row.getVisibleCells().map((cell) => {
                       const columnStyle = getColumnStyle(cell.column.id);

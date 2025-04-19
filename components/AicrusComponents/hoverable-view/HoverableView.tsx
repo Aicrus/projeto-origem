@@ -21,6 +21,7 @@ export interface HoverableViewProps extends PressableProps {
   disableHoverBackground?: boolean;
   disableAnimation?: boolean;
   animationDuration?: number;
+  allowHoverWhenDisabled?: boolean;
 
   // Cores
   hoverColor?: string;
@@ -40,6 +41,11 @@ export interface HoverableViewProps extends PressableProps {
  * 
  * É possível combinar múltiplos efeitos (ex: escala + movimento + opacidade) 
  * para criar interações ricas e personalizadas.
+ * 
+ * Características especiais:
+ * - Pode ter efeitos visuais de hover mesmo quando desabilitado (allowHoverWhenDisabled)
+ * - Suporta múltiplos efeitos de transformação combinados
+ * - Adapta-se automaticamente a temas claros e escuros
  */
 export function HoverableView({
   children,
@@ -55,6 +61,7 @@ export function HoverableView({
   disableHoverBackground = false,
   disableAnimation = false,
   animationDuration = 200,
+  allowHoverWhenDisabled = false,
   hoverColor,
   activeColor,
   backgroundColor,
@@ -75,8 +82,10 @@ export function HoverableView({
 
   // Funções para gerenciar o estado de hover
   const handleHoverIn = () => {
-    setIsHovered(true);
-    if (onHoverStateChange) onHoverStateChange(true);
+    if (!props.disabled || allowHoverWhenDisabled) {
+      setIsHovered(true);
+      if (onHoverStateChange) onHoverStateChange(true);
+    }
   };
 
   const handleHoverOut = () => {
