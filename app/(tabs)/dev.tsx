@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Stack } from 'expo-router';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Switch, Image, Platform, useWindowDimensions, Pressable, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Switch, Image, Platform, useWindowDimensions, Pressable, Dimensions, TextStyle, ViewStyle } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { Input } from '../../components/AicrusComponents/input';
@@ -22,6 +22,9 @@ import { PageContainer } from '../../components/AicrusComponents/page-container'
 import { DataTable } from '../../components/AicrusComponents/data-table';
 import { Checkbox } from '../../components/AicrusComponents/checkbox';
 import { ColumnDef } from '@tanstack/react-table';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Link, useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
 // Definir tipos para os componentes disponíveis
 type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | null;
@@ -3435,7 +3438,7 @@ return (
       },
       {
         accessorKey: "amount",
-        header: () => <Text className={`text-right ${textPrimary}`}>Valor</Text>,
+        header: () => <View className="items-end w-full"><Text className={`${textPrimary}`}>Valor</Text></View>,
         cell: ({ row }) => {
           const amount = parseFloat(row.getValue("amount"));
 
@@ -3471,7 +3474,7 @@ return (
           Data Table
         </Text>
         <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          Componente de tabela de dados que suporta ordenação, filtros, seleção e paginação.
+          Componente de tabela de dados que suporta ordenação, filtros, seleção, paginação e efeitos de hover.
         </Text>
 
         <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
@@ -3486,6 +3489,30 @@ return (
             enableFiltering
             enablePagination
             searchPlaceholder="Filtrar emails..."
+          />
+        </View>
+
+        <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
+          <Text className={`text-subtitle-md font-jakarta-medium ${textPrimary} mb-2`}>
+            Exemplo com Efeito de Hover Aprimorado
+          </Text>
+          <Text className={`text-body-sm ${textSecondary} mb-4`}>
+            Observe como as linhas reagem ao passar o mouse, com um efeito de hover simples.
+          </Text>
+          <DataTable 
+            data={exampleData}
+            columns={columns}
+            enableRowSelection
+            enableSorting
+            enableFiltering
+            enablePagination
+            searchPlaceholder="Filtrar emails..."
+            hoverableRowProps={{
+              hoverScale: 1,
+              hoverTranslateY: 0,
+              animationDuration: 150,
+              disableHoverBackground: false
+            }}
           />
         </View>
 
@@ -3520,6 +3547,13 @@ const columns: ColumnDef<Payment>[] = [
   enableFiltering
   enablePagination
   searchPlaceholder="Filtrar emails..."
+  // Configurações de hover básicas
+  hoverableRowProps={{
+    hoverScale: 1,
+    hoverTranslateY: 0,
+    animationDuration: 150,
+    disableHoverBackground: false
+  }}
 />
               `.trim()}
             </Text>
@@ -3546,7 +3580,7 @@ const columns: ColumnDef<Payment>[] = [
             <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
               <Text className={`w-1/3 ${textPrimary}`}>columns</Text>
               <Text className={`w-1/3 ${textSecondary}`}>ColumnDef[]</Text>
-              <Text className={`w-1/3 ${textSecondary}`}>Definição das colunas</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Definições das colunas</Text>
             </View>
             
             <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
@@ -3558,13 +3592,60 @@ const columns: ColumnDef<Payment>[] = [
             <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
               <Text className={`w-1/3 ${textPrimary}`}>enableFiltering</Text>
               <Text className={`w-1/3 ${textSecondary}`}>boolean</Text>
-              <Text className={`w-1/3 ${textSecondary}`}>Habilita filtragem</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Habilita filtros</Text>
             </View>
             
             <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
               <Text className={`w-1/3 ${textPrimary}`}>enablePagination</Text>
               <Text className={`w-1/3 ${textSecondary}`}>boolean</Text>
               <Text className={`w-1/3 ${textSecondary}`}>Habilita paginação</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>enableRowSelection</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>boolean</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Habilita seleção de linhas</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>hoverableRowProps</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>object</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Configurações de efeito hover</Text>
+            </View>
+          </View>
+          
+          <Text className={`text-subtitle-sm font-jakarta-medium ${textPrimary} mt-4 mb-2`}>
+            Opções de hoverableRowProps
+          </Text>
+          <View className="mb-4">
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 font-medium ${textPrimary}`}>Prop</Text>
+              <Text className={`w-1/3 font-medium ${textPrimary}`}>Tipo</Text>
+              <Text className={`w-1/3 font-medium ${textPrimary}`}>Descrição</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>hoverScale</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>number</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Escala ao passar o mouse (ex: 1.01)</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>hoverTranslateY</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>number</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Deslocamento vertical (ex: -2 para elevar)</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>animationDuration</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>number</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Duração da animação em ms (ex: 200)</Text>
+            </View>
+            
+            <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">
+              <Text className={`w-1/3 ${textPrimary}`}>disableHoverBackground</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>boolean</Text>
+              <Text className={`w-1/3 ${textSecondary}`}>Desabilita mudança de cor de fundo</Text>
             </View>
           </View>
         </View>

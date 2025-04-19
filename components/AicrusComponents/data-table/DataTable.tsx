@@ -28,6 +28,7 @@ import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { colors } from '../constants/theme';
+import { HoverableView } from '../hoverable-view/HoverableView';
 
 /**
  * @component DataTable
@@ -39,6 +40,7 @@ import { colors } from '../constants/theme';
  * - Controle de visibilidade de colunas
  * - Tema claro/escuro automático
  * - Responsividade
+ * - Efeito de hover nas linhas usando HoverableView
  * 
  * Exemplos de uso:
  * 
@@ -92,6 +94,19 @@ export interface DataTableProps<TData> {
   nextButtonText?: string;
   /** Texto para botão de colunas */
   columnsButtonText?: string;
+  /** Configurações para o efeito de hover nas linhas */
+  hoverableRowProps?: {
+    /** Escala ao passar o mouse (default: 1) */
+    hoverScale?: number;
+    /** Deslocamento Y ao passar o mouse (default: 0) */
+    hoverTranslateY?: number;
+    /** Duração da animação em ms (default: 150) */
+    animationDuration?: number;
+    /** Opacidade ao passar o mouse (default: undefined) */
+    hoverOpacity?: number;
+    /** Se deve aplicar fundo ao passar o mouse (default: false) */
+    disableHoverBackground?: boolean;
+  };
 }
 
 export function DataTable<TData>({
@@ -109,6 +124,12 @@ export function DataTable<TData>({
   previousButtonText = "Anterior",
   nextButtonText = "Próximo",
   columnsButtonText = "Colunas",
+  hoverableRowProps = {
+    hoverScale: 1,
+    hoverTranslateY: 0,
+    animationDuration: 150,
+    disableHoverBackground: false,
+  },
 }: DataTableProps<TData>) {
   // Estados para a tabela
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -521,6 +542,17 @@ export function DataTable<TData>({
   
   const styles = getStyles();
   
+  const getHeaderAlignment = (columnId: string) => {
+    // Alinhamento padrão para cada tipo de coluna no cabeçalho
+    if (columnId === 'select') return styles.tableCellCenter;
+    if (columnId === 'status') return styles.tableCellCenter;
+    if (columnId === 'actions') return styles.tableCellCenter;
+    if (columnId === 'amount' || columnId === 'valor') return styles.tableCellEnd;
+    
+    // Alinhamento padrão para outras colunas
+    return styles.tableCellStart;
+  };
+
   // Função para determinar o alinhamento de uma coluna
   const getColumnAlignment = (columnId: string) => {
     // Alinhamento padrão para cada tipo de coluna
@@ -565,7 +597,7 @@ export function DataTable<TData>({
     return totalRequiredWidth > tableWidth;
   };
   
-  // Renderizar botão de ordenação
+  // Função para renderizar botão de ordenação
   const renderSortButton = (column: any, label: string) => (
     <TouchableOpacity
       style={styles.sortButton}
@@ -573,7 +605,7 @@ export function DataTable<TData>({
       disabled={!column.getCanSort()}
     >
       <Text 
-        style={styles.headerText}
+        style={[styles.headerText, column.id === 'amount' && styles.tableCellEnd]}
         {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
       >
         {label}
@@ -663,10 +695,9 @@ export function DataTable<TData>({
     if (Platform.OS === 'web') {
       const style = document.createElement('style');
       style.textContent = `
-        /* Estilo para hover nas linhas da tabela */
-        [data-table-row="true"]:hover {
-          background-color: ${themeColors.state.hover};
-          transition: all 0.2s ease;
+        /* Cursor padrão para linhas da tabela */
+        [data-table-row="true"] {
+          cursor: default !important;
         }
         
         /* Estilo para hover nos botões da tabela */
@@ -683,12 +714,6 @@ export function DataTable<TData>({
         /* Transição suave para todas as linhas da tabela */
         [data-table-row="true"] {
           transition: all 0.2s ease;
-        }
-        
-        /* Efeito de hover mais pronunciado */
-        [data-table-row="true"]:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 1px 3px rgba(0,0,0,${isDark ? '0.3' : '0.12'});
         }
         
         /* Estilo para cabeçalho e células */
@@ -714,14 +739,10 @@ export function DataTable<TData>({
           border-color: ${isDark ? 'rgba(137, 44, 220, 0.5)' : 'rgba(137, 44, 220, 0.2)'} !important;
         }
         
-        /* Efeito de hover em linhas selecionadas */
-        [data-selected-row="true"]:hover {
-          background-color: ${isDark ? 'rgba(137, 44, 220, 0.3)' : 'rgba(137, 44, 220, 0.1)'} !important;
-        }
-        
         /* Checkbox personalizado para tema escuro */
         input[type="checkbox"] {
           accent-color: ${colors.primary.main};
+          cursor: pointer !important;
         }
       `;
       document.head.appendChild(style);
@@ -783,7 +804,7 @@ export function DataTable<TData>({
                 <View key={headerGroup.id} style={styles.tableHeaderRow}>
                   {headerGroup.headers.map((header) => {
                     const columnStyle = getColumnStyle(header.id);
-                    const alignment = getColumnAlignment(header.id);
+                    const alignment = getHeaderAlignment(header.id);
                             
                     return (
                       <View 
@@ -814,16 +835,29 @@ export function DataTable<TData>({
             <View style={styles.tableBody}>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <View
+                  <HoverableView
                     key={row.id}
-                    style={[
-                      styles.tableRow,
-                      row.getIsSelected() && styles.tableRowSelected,
-                    ]}
+                    style={{
+                      ...StyleSheet.flatten([
+                        styles.tableRow,
+                        row.getIsSelected() && styles.tableRowSelected,
+                      ]),
+                    }}
                     {...(Platform.OS === 'web' ? { 
                       'data-table-row': 'true',
                       'data-selected-row': row.getIsSelected() ? 'true' : 'false'
                     } : {})}
+                    hoverScale={hoverableRowProps.hoverScale}
+                    hoverTranslateY={hoverableRowProps.hoverTranslateY}
+                    animationDuration={hoverableRowProps.animationDuration}
+                    disableHoverBackground={hoverableRowProps.disableHoverBackground || row.getIsSelected()}
+                    hoverColor={themeColors.state.hover}
+                    activeColor={themeColors.state.selected}
+                    onPress={() => {
+                      if (enableRowSelection) {
+                        row.toggleSelected(!row.getIsSelected());
+                      }
+                    }}
                   >
                     {row.getVisibleCells().map((cell) => {
                       const columnStyle = getColumnStyle(cell.column.id);
@@ -848,7 +882,7 @@ export function DataTable<TData>({
                         </View>
                       );
                     })}
-                  </View>
+                  </HoverableView>
                 ))
               ) : (
                 <View style={styles.tableRow}>
