@@ -27,6 +27,7 @@ import { colors } from '../constants/theme';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { GradientView } from '../gradient/GradientView';
+import { useAuth } from '../../../contexts/auth';
 
 // Constante para z-index
 const Z_INDEX = {
@@ -70,6 +71,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
   const router = useRouter();
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
+  const { signOut } = useAuth();
   
   // Animation values
   const drawerProgress = useSharedValue(0);
@@ -186,6 +188,17 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
   const [isUpdateButtonHovered, setIsUpdateButtonHovered] = useState(false);
   // Para a versão mobile do botão
   const [isMobileUpdateButtonHovered, setIsMobileUpdateButtonHovered] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      if (isMobile && onClose) {
+        onClose();
+      }
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
 
   // Se for mobile, renderiza como um drawer modal
   if (isMobile) {
@@ -326,10 +339,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
               {/* Botão de Sair */}
               <Pressable 
                 style={styles.logoutButton}
-                onPress={() => {
-                  if (onClose) onClose();
-                  // Aqui pode ser implementada a lógica de logout
-                }}
+                onPress={handleLogout}
               >
                 <View style={styles.logoutContent}>
                   <LogOut 
@@ -480,9 +490,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
         <HoverableView 
           style={getConditionalStyle(styles.logoutButton, styles.logoutButtonCompact)}
           hoverColor={isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'}
-          onPress={() => {
-            // Aqui pode ser implementada a lógica de logout
-          }}
+          onPress={handleLogout}
         >
           <View style={getConditionalStyle(styles.logoutContent, styles.logoutContentCompact)}>
             <LogOut 
