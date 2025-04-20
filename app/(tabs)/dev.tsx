@@ -120,6 +120,9 @@ const SupabaseDataTable = () => {
           <Text className={`${textPrimary}`}>{row.getValue("id")}</Text>
         </View>
       ),
+      meta: {
+        headerText: 'ID'
+      }
     },
     {
       accessorKey: "created_at",
@@ -129,7 +132,7 @@ const SupabaseDataTable = () => {
             className="flex-row items-center gap-1"
             onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            <Text className={textPrimary}>Criado</Text>
+            <Text className={textPrimary}>Criado em</Text>
             <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
           </TouchableOpacity>
         );
@@ -145,6 +148,9 @@ const SupabaseDataTable = () => {
           </View>
         );
       },
+      meta: {
+        headerText: 'Criado em'
+      }
     },
     {
       accessorKey: "nome",
@@ -164,6 +170,9 @@ const SupabaseDataTable = () => {
           <Text className={`${textPrimary}`}>{row.getValue("nome")}</Text>
         </View>
       ),
+      meta: {
+        headerText: 'Nome'
+      }
     },
     {
       accessorKey: "email",
@@ -183,6 +192,9 @@ const SupabaseDataTable = () => {
           <Text className={`lowercase ${textPrimary}`}>{row.getValue("email")}</Text>
         </View>
       ),
+      meta: {
+        headerText: 'Email'
+      }
     },
     {
       id: "actions",

@@ -502,6 +502,31 @@ export function DataTable<TData>({
               .map((column) => {
                 const isHovered = hoveredColumns[column.id] || false;
                 
+                // Extrair nome de exibição do cabeçalho para mostrar no dropdown
+                let displayName = column.id;
+                
+                // Método para extrair texto do cabeçalho
+                const headerDef = column.columnDef.header;
+                
+                // Se for uma string direta, usar essa string
+                if (typeof headerDef === 'string') {
+                  displayName = headerDef;
+                }
+                // Se for um nó React renderizado, tentar extrair seu texto
+                else if (typeof headerDef === 'function') {
+                  // Não podemos acessar o texto diretamente, então verificamos se temos uma meta informação
+                  if (column.columnDef.meta && 
+                      typeof column.columnDef.meta === 'object' && 
+                      column.columnDef.meta !== null) {
+                    
+                    // Verificar se há um 'headerText' definido na meta
+                    const meta = column.columnDef.meta as any;
+                    if (meta.headerText) {
+                      displayName = meta.headerText;
+                    }
+                  }
+                }
+                
                 return (
                   <div
                     key={column.id}
@@ -523,7 +548,7 @@ export function DataTable<TData>({
                       style={{ cursor: 'pointer' }}
                     />
                     <span style={dropdownStyle.itemText as React.CSSProperties}>
-                      {column.id}
+                      {displayName}
                     </span>
                   </div>
                 );
@@ -572,33 +597,60 @@ export function DataTable<TData>({
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
-              .map((column) => (
-                <TouchableOpacity
-                  key={column.id}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    padding: 8,
-                    borderRadius: 4,
-                  }}
-                  onPress={() => column.toggleVisibility(!column.getIsVisible())}
-                >
-                  <Checkbox
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  />
-                  <Text 
+              .map((column) => {
+                // Extrair nome de exibição do cabeçalho para mostrar no dropdown
+                let displayName = column.id;
+                
+                // Método para extrair texto do cabeçalho
+                const headerDef = column.columnDef.header;
+                
+                // Se for uma string direta, usar essa string
+                if (typeof headerDef === 'string') {
+                  displayName = headerDef;
+                }
+                // Se for um nó React renderizado, tentar extrair seu texto
+                else if (typeof headerDef === 'function') {
+                  // Não podemos acessar o texto diretamente, então verificamos se temos uma meta informação
+                  if (column.columnDef.meta && 
+                      typeof column.columnDef.meta === 'object' && 
+                      column.columnDef.meta !== null) {
+                    
+                    // Verificar se há um 'headerText' definido na meta
+                    const meta = column.columnDef.meta as any;
+                    if (meta.headerText) {
+                      displayName = meta.headerText;
+                    }
+                  }
+                }
+                
+                return (
+                  <TouchableOpacity
+                    key={column.id}
                     style={{
-                      marginLeft: 8,
-                      fontSize: 14,
-                      color: isDark ? colors.gray['100'] : colors.gray['900'],
-                      textTransform: 'capitalize',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      padding: 8,
+                      borderRadius: 4,
                     }}
+                    onPress={() => column.toggleVisibility(!column.getIsVisible())}
                   >
-                    {column.id}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                    <Checkbox
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                    />
+                    <Text 
+                      style={{
+                        marginLeft: 8,
+                        fontSize: 14,
+                        color: isDark ? colors.gray['100'] : colors.gray['900'],
+                        textTransform: 'capitalize',
+                      }}
+                    >
+                      {displayName}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             
             <TouchableOpacity
               style={{
