@@ -4536,19 +4536,48 @@ const SheetExampleContent: React.FC = () => {
       
       <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
         <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Dispositivos Nativos (iOS/Android)</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>
+            - top/bottom: altura de 450 (numérico){'\n'}
+            - left/right: largura de 280 (numérico){'\n'}
+            - Valores podem ser alterados no arquivo Sheet.tsx em components/AicrusComponents/sheet/
+          </Text>
+        </View>
+
+        <View className="mb-sm">
           <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Desktop (Web)</Text>
           <Text className={`text-body-sm ${textSecondary}`}>
-            - top/bottom: altura de 350px, largura de 100%{'\n'}
-            - left/right: largura de 350px, altura de 100%
+            - top/bottom: altura de 300px, largura de 100%{'\n'}
+            - left/right: largura de 300px, altura de 100%{'\n'}
+            - Valores podem ser alterados no arquivo Sheet.tsx em components/AicrusComponents/sheet/
           </Text>
         </View>
         
         <View className="mb-sm">
-          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Mobile/Tablet (Web e Nativo)</Text>
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Mobile/Tablet (Web)</Text>
           <Text className={`text-body-sm ${textSecondary}`}>
             - top/bottom: altura de 450px, largura de 100%{'\n'}
-            - left/right: largura de 250px, altura de 100%{'\n'}
-            - Adiciona 40px de padding no topo para evitar colisão com notch/island
+            - left/right: largura de 280px, altura de 100%{'\n'}
+            - Valores podem ser alterados no arquivo Sheet.tsx em components/AicrusComponents/sheet/
+          </Text>
+        </View>
+
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Área de Segurança</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>
+            - A propriedade useSafeArea (padrão: true) adiciona automaticamente padding em dispositivos com notch/island{'\n'}
+            - Para dispositivos nativos: adiciona 40px de padding no topo para o Sheet nas posições 'top', 'left' e 'right'{'\n'}
+            - Para ajustar esse padding, você pode modificar a função getSafeAreaPadding() no arquivo Sheet.tsx
+          </Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Personalizando tamanhos</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>
+            - Você pode sobrescrever os tamanhos padrão usando as props height e width{'\n'}
+            - Para ambientes web, use valores com 'px' (ex: height="500px"){'\n'}
+            - Para ambientes nativos, use valores numéricos (ex: height={500}){'\n'}
+            - Na web, você também pode usar porcentagens (ex: width="50%")
           </Text>
         </View>
       </View>
@@ -4574,11 +4603,19 @@ const [isOpen, setIsOpen] = useState(false);
   onClose={() => setIsOpen(false)}
   position="bottom"
   // Valores são definidos automaticamente com base no dispositivo:
-  // - Desktop: height=350px (top/bottom), width=350px (left/right)
-  // - Mobile/Tablet: height=450px (top/bottom), width=250px (left/right)
+  // - Dispositivos Nativos (iOS/Android):
+  //   - top/bottom: altura de 450 (numérico)
+  //   - left/right: largura de 280 (numérico)
+  // - Web Desktop:
+  //   - top/bottom: altura de 300px
+  //   - left/right: largura de 300px
+  // - Web Mobile/Tablet:
+  //   - top/bottom: altura de 450px
+  //   - left/right: largura de 280px
+  //
   // Você pode sobrescrever esses valores:
-  // height="500px"
-  // width="300px"
+  // Para web: height="500px" ou width="50%"
+  // Para nativo: height={500} ou width={300}
   borderRadius={16}
   closeOnOverlayClick={true}
   showCloseButton={true}

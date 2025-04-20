@@ -213,12 +213,14 @@ const Sheet: React.FC<SheetProps> = ({
       return {};
     }
 
+    // Você pode personalizar os valores abaixo para ajustar o padding de segurança
+    // para dispositivos com notch/island em cada posição do Sheet
     switch (finalPosition) {
       case 'top':
-        return { paddingTop: 40 };
+        return { paddingTop: 40 }; // Aumente ou diminua este valor conforme necessário
       case 'left':
       case 'right':
-        return { paddingTop: 40 };
+        return { paddingTop: 40 }; // Aumente ou diminua este valor conforme necessário
       default:
         return {};
     }
