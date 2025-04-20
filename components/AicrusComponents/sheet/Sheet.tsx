@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated, Dimensions, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated, Dimensions, Platform, SafeAreaView } from 'react-native';
 import { useColorScheme } from '../../../components/hooks/useColorScheme';
 import { colors } from '../constants/theme';
 
@@ -17,6 +17,7 @@ export interface SheetProps {
   closeOnOverlayClick?: boolean;
   showCloseButton?: boolean;
   animationDuration?: number;
+  useSafeArea?: boolean;
   testID?: string;
 }
 
@@ -26,12 +27,13 @@ const Sheet: React.FC<SheetProps> = ({
   position = 'bottom',
   children,
   overlayOpacity = 0.5,
-  height = '350px',
-  width = '350px',
+  height,
+  width,
   borderRadius = 16,
   closeOnOverlayClick = true,
   showCloseButton = false,
   animationDuration = 300,
+  useSafeArea = true,
   testID,
 }) => {
   const theme = useColorScheme();
@@ -48,6 +50,30 @@ const Sheet: React.FC<SheetProps> = ({
 
     return () => subscription.remove();
   }, []);
+
+  // Verifica se estamos em um dispositivo móvel ou tablet baseado na largura da tela
+  const isMobileOrTablet = Platform.OS !== 'web' || dimensions.width < 768;
+
+  // Define valores padrão com base no tipo de dispositivo
+  const getDefaultSize = () => {
+    if (isMobileOrTablet) {
+      // Valores para mobile/tablet
+      return {
+        top: '450px',
+        bottom: '450px',
+        left: '250px',
+        right: '250px'
+      };
+    } else {
+      // Valores para desktop
+      return {
+        top: '350px',
+        bottom: '350px',
+        left: '350px',
+        right: '350px'
+      };
+    }
+  };
 
   // Usar sempre a posição original, sem forçar 'bottom' em dispositivos móveis
   const finalPosition = position;
@@ -108,11 +134,12 @@ const Sheet: React.FC<SheetProps> = ({
   const getContainerStyle = () => {
     const isVertical = finalPosition === 'top' || finalPosition === 'bottom';
     const isHorizontal = finalPosition === 'left' || finalPosition === 'right';
+    const defaultSizes = getDefaultSize();
 
-    // Valores padrão baseados na posição
+    // Valores padrão baseados na posição e tipo de dispositivo
     const containerStyle: any = {
-      width: isVertical ? '100%' : typeof width === 'number' ? width : width,
-      height: isHorizontal ? '100%' : typeof height === 'number' ? height : height,
+      width: isVertical ? '100%' : (width || defaultSizes[finalPosition]),
+      height: isHorizontal ? '100%' : (height || defaultSizes[finalPosition]),
     };
 
     // Ajustes de borda baseados na posição
@@ -162,8 +189,64 @@ const Sheet: React.FC<SheetProps> = ({
     }),
   };
 
+  // Define o padding de segurança para dispositivos com notch/island
+  const getSafeAreaPadding = () => {
+    if (!useSafeArea || !isMobileOrTablet) {
+      return {};
+    }
+
+    switch (finalPosition) {
+      case 'top':
+        return { paddingTop: 40 };
+      case 'left':
+      case 'right':
+        return { paddingTop: 40 };
+      default:
+        return {};
+    }
+  };
+
   // Se não estiver visível nem aberto, não renderize nada
   if (!visible && !isOpen) return null;
+
+  // Renderiza o conteúdo com SafeAreaView se useSafeArea estiver ativado
+  const renderContent = () => {
+    const safeAreaPadding = getSafeAreaPadding();
+    
+    if (useSafeArea && Platform.OS !== 'web') {
+      return (
+        <SafeAreaView style={{ flex: 1 }}>
+          <View style={{ flex: 1, ...safeAreaPadding }}>
+            {showCloseButton && (
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={onClose}
+                testID={`${testID}-close-button`}
+              >
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            )}
+            {children}
+          </View>
+        </SafeAreaView>
+      );
+    }
+    
+    return (
+      <View style={{ flex: 1, ...safeAreaPadding }}>
+        {showCloseButton && (
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={onClose}
+            testID={`${testID}-close-button`}
+          >
+            <Text style={styles.closeButtonText}>✕</Text>
+          </TouchableOpacity>
+        )}
+        {children}
+      </View>
+    );
+  };
 
   return (
     <Modal
@@ -199,16 +282,7 @@ const Sheet: React.FC<SheetProps> = ({
           ]}
           testID={`${testID}-content`}
         >
-          {showCloseButton && (
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={onClose}
-              testID={`${testID}-close-button`}
-            >
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
-          )}
-          {children}
+          {renderContent()}
         </Animated.View>
       </View>
     </Modal>

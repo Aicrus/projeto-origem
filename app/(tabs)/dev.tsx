@@ -4406,13 +4406,12 @@ const SheetExampleContent: React.FC = () => {
         isOpen={sheetVisible}
         onClose={() => setSheetVisible(false)}
         position={currentSheet}
-        height={currentSheet === 'top' || currentSheet === 'bottom' ? '350px' : '100%'}
-        width={currentSheet === 'left' || currentSheet === 'right' ? '350px' : '100%'}
         borderRadius={16}
         closeOnOverlayClick={true}
         showCloseButton={true}
         overlayOpacity={0.5}
         animationDuration={300}
+        useSafeArea={true}
         testID="example-sheet"
       >
         <View className="p-lg">
@@ -4519,6 +4518,39 @@ const SheetExampleContent: React.FC = () => {
           <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>animationDuration</Text>
           <Text className={`text-body-sm ${textSecondary}`}>Duração da animação em ms (number)</Text>
         </View>
+
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>useSafeArea</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>
+            Adiciona área de segurança para dispositivos com notch/island (boolean, padrão: true)
+          </Text>
+        </View>
+      </View>
+      
+      <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+        Tamanhos padrão por dispositivo
+      </Text>
+      <Text className={`text-body-md ${textSecondary} mb-md`}>
+        O Sheet se adapta automaticamente ao tipo de dispositivo:
+      </Text>
+      
+      <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Desktop (Web)</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>
+            - top/bottom: altura de 350px, largura de 100%{'\n'}
+            - left/right: largura de 350px, altura de 100%
+          </Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Mobile/Tablet (Web e Nativo)</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>
+            - top/bottom: altura de 450px, largura de 100%{'\n'}
+            - left/right: largura de 250px, altura de 100%{'\n'}
+            - Adiciona 40px de padding no topo para evitar colisão com notch/island
+          </Text>
+        </View>
       </View>
       
       <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
@@ -4541,12 +4573,16 @@ const [isOpen, setIsOpen] = useState(false);
   isOpen={isOpen}
   onClose={() => setIsOpen(false)}
   position="bottom"
-  // Valores padrão: height="350px" para top/bottom, width="350px" para left/right
-  // Você pode especificar qualquer valor ou porcentagem
-  height="350px"
-  width="100%"
+  // Valores são definidos automaticamente com base no dispositivo:
+  // - Desktop: height=350px (top/bottom), width=350px (left/right)
+  // - Mobile/Tablet: height=450px (top/bottom), width=250px (left/right)
+  // Você pode sobrescrever esses valores:
+  // height="500px"
+  // width="300px"
   borderRadius={16}
   closeOnOverlayClick={true}
+  showCloseButton={true}
+  useSafeArea={true} // Adiciona área de segurança para dispositivos com notch/island
 >
   <View style={{ padding: 20 }}>
     <Text>Conteúdo do Sheet</Text>
