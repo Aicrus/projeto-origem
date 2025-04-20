@@ -479,7 +479,7 @@ export default function DevPage() {
     // Quando reabilitar, aguardar um tempo substancial para evitar conflitos de scroll
     setTimeout(() => {
       setScrollEnabled(true);
-    }, 800); // Aumentado para 800ms para garantir que o scroll não seja ativado acidentalmente
+    }, 1500); // Aumentado para 1.5 segundos para garantir que o scroll não seja ativado acidentalmente
   }, []);
   
   // Função para renderizar o conteúdo do componente selecionado

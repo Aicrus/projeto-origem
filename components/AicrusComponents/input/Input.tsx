@@ -687,8 +687,9 @@ export const Input = ({
           min-height: ${minHeight}px;
           max-height: ${maxHeight}px;
           overflow-y: auto;
-          padding-bottom: 4px; /* Espaço para a alça de redimensionamento */
+          padding-bottom: 6px; /* Espaço para a alça de redimensionamento */
           text-align-vertical: top !important;
+          position: relative; /* Para posicionamento do pseudo-elemento */
         }
         
         /* Alça de redimensionamento personalizada */
@@ -702,23 +703,29 @@ export const Input = ({
           background-color: transparent;
         }
         
-        .resize-handle::after {
+        /* Indicador de redimensionamento visível no canto */
+        textarea.resizable::after {
           content: '';
           position: absolute;
           bottom: 3px;
           right: 3px;
-          width: 6px;
-          height: 6px;
-          border-right: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'};
-          border-bottom: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'};
+          width: 8px;
+          height: 8px;
+          border-right: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.25)'};
+          border-bottom: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.25)'};
+          pointer-events: none;
+          z-index: 100;
         }
         
-        /* Ajusta a alça de redimensionamento nativa do navegador para o canto */
+        /* Esconde o redimensionador nativo para usar nosso indicador personalizado */
         textarea::-webkit-resizer {
-          position: absolute;
-          right: 0;
-          bottom: 0;
+          opacity: 1; /* Manter funcional mas invisível */
           background-color: transparent;
+        }
+        
+        /* Mantenha o foco na borda mas não no redimensionador */
+        textarea:focus {
+          outline-offset: -2px !important;
         }
         
         /* Força alinhamento do texto no topo para multilinhas */
@@ -730,6 +737,12 @@ export const Input = ({
         /* Remove qualquer padding que possa estar afetando o posicionamento */
         .native-number-input {
           padding-right: 0 !important;
+        }
+        
+        /* Ajusta o container para incluir o indicador visualmente */
+        [data-input-container][data-multiline="true"] {
+          position: relative;
+          overflow: visible;
         }
       `;
       document.head.appendChild(style);
