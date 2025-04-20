@@ -30,6 +30,7 @@ import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { colors } from '../constants/theme';
 import { HoverableView } from '../hoverable-view/HoverableView';
+import { createPortal } from 'react-dom';
 
 /**
  * @component DataTable
@@ -143,6 +144,13 @@ export function DataTable<TData>({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownRect, setDropdownRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [tableWidth, setTableWidth] = useState(0);
+  const [dropdownPosition, setDropdownPosition] = useState<{
+    top?: number;
+    right?: number;
+    left?: number;
+    width: number;
+    openDown: boolean;
+  }>({ width: 200, openDown: true });
   
   // Refs
   const dropdownTriggerRef = useRef<View>(null);
@@ -213,17 +221,36 @@ export function DataTable<TData>({
     getFilteredRowModel: enableFiltering ? getFilteredRowModel() : undefined,
   });
   
-  // Abrir dropdown de colunas - ABORDAGEM MELHORADA
+  // Abrir dropdown de colunas - ABORDAGEM SIMILAR AO SELECT
   const handleOpenDropdown = () => {
     if (Platform.OS === 'web' as any && dropdownTriggerRef.current) {
       // @ts-ignore - getBoundingClientRect() é específico da web
       const rect = dropdownTriggerRef.current.getBoundingClientRect();
-      setDropdownRect({
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height
-      });
+      
+      // Determinar se há espaço suficiente abaixo do botão
+      const viewportHeight = window.innerHeight;
+      const dropdownHeight = 250; // Altura estimada do dropdown
+      const spaceBelow = viewportHeight - rect.bottom;
+      
+      // Escolher a direção: para baixo se houver espaço, para cima caso contrário
+      const openDown = spaceBelow >= dropdownHeight || rect.top < dropdownHeight;
+      
+      // Definir posição com base na direção escolhida
+      if (openDown) {
+        setDropdownPosition({
+          top: rect.bottom + 5 + window.scrollY, // 5px de espaçamento
+          right: window.innerWidth - rect.right - window.scrollX,
+          width: 200,
+          openDown: true
+        });
+      } else {
+        setDropdownPosition({
+          top: rect.top - dropdownHeight - 5 + window.scrollY, // 5px de espaçamento
+          right: window.innerWidth - rect.right - window.scrollX,
+          width: 200,
+          openDown: false
+        });
+      }
     }
     setDropdownOpen(true);
   };
@@ -264,20 +291,40 @@ export function DataTable<TData>({
     }
   }, [dropdownOpen]);
 
-  // Atualizar posição do dropdown ao redimensionar a janela
+  // Atualizar posição do dropdown quando a janela for redimensionada
   useEffect(() => {
     if (Platform.OS === 'web' as any && dropdownOpen && dropdownTriggerRef.current) {
       const handleResize = () => {
+        // Recalcular posição do dropdown
         // @ts-ignore - getBoundingClientRect() é específico da web
         const rect = dropdownTriggerRef.current.getBoundingClientRect();
-        setDropdownRect({
-          top: rect.top,
-          left: rect.left,
-          width: rect.width,
-          height: rect.height
-        });
+        
+        // Determinar a direção novamente
+        const viewportHeight = window.innerHeight;
+        const dropdownHeight = 250;
+        const spaceBelow = viewportHeight - rect.bottom;
+        
+        // Abrir para baixo se houver espaço, ou para cima caso contrário
+        const openDown = spaceBelow >= dropdownHeight || rect.top < dropdownHeight;
+        
+        if (openDown) {
+          setDropdownPosition({
+            top: rect.bottom + 5 + window.scrollY,
+            right: window.innerWidth - rect.right - window.scrollX,
+            width: 200,
+            openDown: true
+          });
+        } else {
+          setDropdownPosition({
+            top: rect.top - dropdownHeight - 5 + window.scrollY,
+            right: window.innerWidth - rect.right - window.scrollX,
+            width: 200,
+            openDown: false
+          });
+        }
       };
       
+      // Adicionar listeners para resize e scroll
       window.addEventListener('resize', handleResize);
       window.addEventListener('scroll', handleResize);
       
@@ -288,194 +335,271 @@ export function DataTable<TData>({
     }
   }, [dropdownOpen]);
 
-  // Renderizar o dropdown de seleção de colunas
+  // Adicionar estilos CSS para melhorar a aparência e comportamento do dropdown
+  useEffect(() => {
+    if (Platform.OS === 'web' as any) {
+      const style = document.createElement('style');
+      style.textContent = `
+        /* Garantir que elementos com position:fixed não sejam cortados */
+        *, *::before, *::after {
+          transform-style: preserve-3d;
+        }
+        
+        /* Garantir que elementos com position:fixed tenham um z-index alto */
+        body > [data-dropdown-content="true"] {
+          z-index: 2000 !important;
+        }
+        
+        /* Esconder o scrollbar mas permitir scroll */
+        *::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        
+        *::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        *::-webkit-scrollbar-thumb {
+          background-color: ${isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)'};
+          border-radius: 3px;
+        }
+
+        /* Melhorar aparência dos checkboxes */
+        [data-dropdown-content="true"] input[type="checkbox"] {
+          margin-right: 8px;
+          accent-color: ${isDark ? colors.primary.dark : colors.primary.main};
+        }
+
+        /* Adicionar efeitos de hover para o botão do dropdown */
+        [data-table-button="true"]:hover {
+          border-color: ${isDark ? colors.primary.dark : colors.primary.main};
+          transition: border-color 0.2s ease;
+        }
+      `;
+      document.head.appendChild(style);
+      
+      return () => {
+        document.head.removeChild(style);
+      };
+    }
+  }, [isDark]);
+  
+  // Limpar qualquer recurso ao desmontar o componente
+  useEffect(() => {
+    return () => {
+      if (Platform.OS === 'web' as any) {
+        // Remover qualquer elemento de portal que possa ter ficado
+        const dropdownElements = document.querySelectorAll('[data-dropdown-content="true"]');
+        dropdownElements.forEach(el => {
+          if (el.parentNode) {
+            el.parentNode.removeChild(el);
+          }
+        });
+      }
+    };
+  }, []);
+
+  // Renderizar o dropdown de seleção de colunas com Portal
   const renderColumnsDropdown = () => {
     if (!dropdownOpen) return null;
     
-    if (Platform.OS === 'web' as any) {
-      if (!dropdownRect) return null;
-      
-      // Calcular a posição ideal para o dropdown
-      const calculateDropdownPosition = () => {
-        if (!dropdownRect) return {};
-        
-        const viewportHeight = window.innerHeight;
-        const dropdownHeight = 200; // Altura estimada do dropdown
-        
-        // Posição padrão: abaixo do botão
-        let top = dropdownRect.top + dropdownRect.height + window.scrollY;
-        // Alinhado à direita com o botão
-        let right = window.innerWidth - (dropdownRect.left + dropdownRect.width) - window.scrollX;
-        
-        // Verificar se há espaço suficiente abaixo
-        const spaceBelow = viewportHeight - (dropdownRect.top + dropdownRect.height);
-        
-        // Se não houver espaço suficiente abaixo, posicionar acima
-        if (spaceBelow < dropdownHeight && dropdownRect.top > dropdownHeight) {
-          top = dropdownRect.top - dropdownHeight + window.scrollY;
-        }
-        
-        return {
-          top: `${top}px`,
-          right: `${right}px`,
-        };
-      };
-      
-      const dropdownStyle = calculateDropdownPosition();
-      
-      // Usar DOM para criar o portal na web
-      if (typeof document !== 'undefined') {
-        // Criar um elemento div para o portal se ainda não existir
-        let portalElement = document.getElementById('dropdown-portal');
-        if (!portalElement) {
-          portalElement = document.createElement('div');
-          portalElement.id = 'dropdown-portal';
-          document.body.appendChild(portalElement);
-        }
-        
-        // Injetar o dropdown como um elemento absoluto no DOM
-        portalElement.innerHTML = '';
-        const dropdownElement = document.createElement('div');
-        portalElement.appendChild(dropdownElement);
-        
-        // Aplicar estilos diretamente
-        Object.assign(dropdownElement.style, {
+    // Componente interno do dropdown que será renderizado no portal
+    const ColumnsDropdownContent = () => {
+      const dropdownStyle = StyleSheet.create({
+        overlay: {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 1999,
+          backgroundColor: 'transparent',
+        },
+        container: {
           position: 'absolute',
-          top: dropdownStyle.top,
-          right: dropdownStyle.right,
-          width: '200px',
-          backgroundColor: themeColors.background.paper,
-          borderRadius: '6px',
-          borderWidth: '1px',
+          top: dropdownPosition.top,
+          right: dropdownPosition.right,
+          left: dropdownPosition.left,
+          width: dropdownPosition.width,
+          maxHeight: 250,
+          backgroundColor: isDark ? colors.gray['800'] : colors.white,
+          borderRadius: 6,
+          borderWidth: 1,
           borderStyle: 'solid',
-          borderColor: themeColors.border.light,
-          padding: '4px',
+          borderColor: isDark ? colors.gray['700'] : colors.gray['200'],
+          padding: 4,
           boxShadow: isDark ? '0 2px 4px rgba(0,0,0,0.25)' : '0 2px 4px rgba(0,0,0,0.1)',
-          zIndex: '2000',
-        });
-        
-        // Parar propagação de eventos para evitar que cliques dentro do dropdown fechem o overlay
-        dropdownElement.addEventListener('click', (e) => {
-          e.stopPropagation();
-        });
-        
-        // Identificador único para o dropdown
-        dropdownElement.setAttribute('data-dropdown-id', 'columns-dropdown');
-        
-        // Renderizar conteúdo dentro do portal
-        const titleElement = document.createElement('div');
-        titleElement.style.fontSize = '12px';
-        titleElement.style.fontWeight = '500';
-        titleElement.style.color = themeColors.text.secondary;
-        titleElement.style.padding = '8px';
-        titleElement.textContent = 'Toggle columns';
-        dropdownElement.appendChild(titleElement);
-        
-        // Render column toggles
-        table
-          .getAllColumns()
-          .filter((column) => column.getCanHide())
-          .forEach((column) => {
-            const itemElement = document.createElement('div');
-            itemElement.style.display = 'flex';
-            itemElement.style.alignItems = 'center';
-            itemElement.style.padding = '8px';
-            itemElement.style.borderRadius = '4px';
-            itemElement.style.cursor = 'pointer';
-            
-            // Simular hover
-            itemElement.addEventListener('mouseenter', () => {
-              itemElement.style.backgroundColor = themeColors.state.hover;
-            });
-            itemElement.addEventListener('mouseleave', () => {
-              itemElement.style.backgroundColor = 'transparent';
-            });
-            
-            // Toggle visibility on click
-            itemElement.addEventListener('click', (e) => {
-              e.stopPropagation();
-              column.toggleVisibility(!column.getIsVisible());
-            });
-            
-            // Checkbox
-            const checkboxContainer = document.createElement('div');
-            checkboxContainer.style.marginRight = '8px';
-            
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.checked = column.getIsVisible();
-            checkbox.addEventListener('change', (e) => {
-              e.stopPropagation();
-              const target = e.target as HTMLInputElement;
-              column.toggleVisibility(target.checked);
-            });
-            
-            checkboxContainer.appendChild(checkbox);
-            itemElement.appendChild(checkboxContainer);
-            
-            // Label
-            const labelElement = document.createElement('span');
-            labelElement.style.fontSize = '14px';
-            labelElement.style.color = themeColors.text.primary;
-            labelElement.style.textTransform = 'capitalize';
-            labelElement.textContent = column.id;
-            itemElement.appendChild(labelElement);
-            
-            dropdownElement.appendChild(itemElement);
-          });
-      }
-      
-      // Como estamos usando DOM direto, retornamos null aqui para o React
-      return null;
-    } else {
-      // Versão para dispositivos móveis usando componentes React Native
+          zIndex: 2000,
+          overflowY: 'auto',
+        },
+        header: {
+          fontSize: 12,
+          fontWeight: '500',
+          color: isDark ? colors.gray['400'] : colors.gray['600'],
+          padding: 8,
+          borderBottomWidth: 1,
+          borderBottomColor: isDark ? colors.gray['700'] : colors.gray['200'],
+          marginBottom: 4,
+        },
+        item: {
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 8,
+          borderRadius: 4,
+          cursor: 'pointer',
+        },
+        itemHover: {
+          backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+        },
+        itemText: {
+          fontSize: 14,
+          marginLeft: 8,
+          textTransform: 'capitalize',
+          color: isDark ? colors.gray['100'] : colors.gray['900'],
+        }
+      });
+
       return (
-        <View 
-          ref={dropdownRef}
-          style={[
-            styles.dropdownContent, 
-            { 
-              position: 'relative', 
-              top: 0, 
-              right: 0, 
-              alignSelf: 'flex-end',
-              marginTop: 8 
-            }
-          ]}
-        >
-          <Text 
-            style={styles.dropdownLabel}
-            {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
+        <>
+          {/* Overlay transparente para capturar eventos e prevenir scroll */}
+          <div 
+            style={dropdownStyle.overlay as React.CSSProperties}
+            onClick={handleCloseDropdown}
+          />
+          <div 
+            ref={dropdownRef as any}
+            style={dropdownStyle.container as React.CSSProperties}
+            onClick={(e) => e.stopPropagation()}
+            data-dropdown-content="true"
           >
-            Toggle columns
-          </Text>
-          {table
-            .getAllColumns()
-            .filter((column) => column.getCanHide())
-            .map((column) => (
-              <TouchableOpacity
-                key={column.id}
-                style={styles.dropdownItem}
-                onPress={() => column.toggleVisibility(!column.getIsVisible())}
-              >
-                <Checkbox
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                />
-                <Text 
-                  style={[
-                    styles.cellText, 
-                    { marginLeft: 8, textTransform: 'capitalize' }
-                  ]}
-                  {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
-                >
-                  {column.id}
-                </Text>
-              </TouchableOpacity>
-            ))}
-        </View>
+            <div style={dropdownStyle.header as React.CSSProperties}>
+              Toggle columns
+            </div>
+            
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                const [isHovered, setIsHovered] = useState(false);
+                
+                return (
+                  <div
+                    key={column.id}
+                    style={{
+                      ...dropdownStyle.item as React.CSSProperties,
+                      ...(isHovered ? dropdownStyle.itemHover as React.CSSProperties : {})
+                    }}
+                    onClick={() => column.toggleVisibility(!column.getIsVisible())}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={column.getIsVisible()}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        column.toggleVisibility(e.target.checked);
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    />
+                    <span style={dropdownStyle.itemText as React.CSSProperties}>
+                      {column.id}
+                    </span>
+                  </div>
+                );
+              })}
+          </div>
+        </>
+      );
+    };
+
+    // Usando createPortal para renderizar diretamente no body
+    if (Platform.OS === 'web' as any && typeof document !== 'undefined') {
+      return createPortal(
+        <ColumnsDropdownContent />,
+        document.body
       );
     }
+    
+    // Versão para dispositivos móveis usando Modal
+    return (
+      <Modal
+        visible={dropdownOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleCloseDropdown}
+      >
+        {/* Implementação mobile aqui */}
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View 
+            style={{ 
+              width: '80%', 
+              backgroundColor: isDark ? colors.gray['800'] : colors.white,
+              borderRadius: 6,
+              padding: 16,
+            }}
+          >
+            <Text 
+              style={{
+                fontSize: 12,
+                fontWeight: '500',
+                color: isDark ? colors.gray['400'] : colors.gray['600'],
+                marginBottom: 8,
+              }}
+            >
+              Toggle columns
+            </Text>
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => (
+                <TouchableOpacity
+                  key={column.id}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: 8,
+                    borderRadius: 4,
+                  }}
+                  onPress={() => column.toggleVisibility(!column.getIsVisible())}
+                >
+                  <Checkbox
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  />
+                  <Text 
+                    style={{
+                      marginLeft: 8,
+                      fontSize: 14,
+                      color: isDark ? colors.gray['100'] : colors.gray['900'],
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {column.id}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            
+            <TouchableOpacity
+              style={{
+                marginTop: 16,
+                padding: 8,
+                backgroundColor: isDark ? colors.gray['700'] : colors.gray['200'],
+                borderRadius: 4,
+                alignItems: 'center',
+              }}
+              onPress={handleCloseDropdown}
+            >
+              <Text style={{ color: isDark ? colors.gray['100'] : colors.gray['900'] }}>
+                Fechar
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
   };
   
   // Calcular larguras das colunas baseado no espaço disponível
@@ -960,7 +1084,10 @@ export function DataTable<TData>({
         
         <TouchableOpacity
           ref={dropdownTriggerRef}
-          style={styles.dropdownTrigger}
+          style={[
+            styles.dropdownTrigger,
+            Platform.OS === 'web' as any ? { cursor: 'pointer' } : {}
+          ]}
           onPress={handleOpenDropdown}
           {...(Platform.OS === 'web' as any ? { 'data-table-button': 'true' } : {})}
         >
@@ -973,7 +1100,8 @@ export function DataTable<TData>({
           <ChevronDown size={16} color={themeColors.text.primary} />
         </TouchableOpacity>
         
-        {Platform.OS !== 'web' as any && renderColumnsDropdown()}
+        {/* Renderizar o dropdown com portal */}
+        {renderColumnsDropdown()}
       </View>
       
       {/* Tabela */}
@@ -1119,9 +1247,6 @@ export function DataTable<TData>({
           </View>
         </View>
       )}
-      
-      {/* Portal para dropdown na web, já é gerenciado pela função renderColumnsDropdown */}
-      {Platform.OS === 'web' as any && renderColumnsDropdown()}
     </View>
   );
 } 
