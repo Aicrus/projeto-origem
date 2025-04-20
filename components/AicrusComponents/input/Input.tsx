@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, TextInput, Text, TouchableOpacity, Platform, Keyboard } from 'react-native';
+import { StyleSheet, View, TextInput, Text, TouchableOpacity, Platform, Keyboard, PanResponder, GestureResponderEvent, PanResponderGestureState } from 'react-native';
 import { Eye, EyeOff, Search, X, Calendar, Plus, Minus, Clock, ChevronUp, ChevronDown } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
@@ -128,6 +128,14 @@ export interface InputProps {
   showNumberControls?: boolean;
   /** Função chamada quando o botão de relógio é pressionado (apenas para type="time") */
   onTimePress?: () => void;
+  /** Se o input deve ser redimensionável (funciona em todas as plataformas quando multiline=true) */
+  resizable?: boolean;
+  /** Altura mínima para inputs redimensionáveis */
+  minHeight?: number;
+  /** Altura máxima para inputs redimensionáveis */
+  maxHeight?: number;
+  /** Função para desativar o scroll do container pai (necessário para redimensionamento no nativo) */
+  setScrollEnabled?: (enabled: boolean) => void;
 }
 
 export const Input = ({
@@ -163,6 +171,10 @@ export const Input = ({
   max,
   step = 1,
   showNumberControls = false,
+  resizable = false,
+  minHeight = 38,
+  maxHeight = 200,
+  setScrollEnabled,
 }: InputProps) => {
   // Estado para controlar visibilidade da senha
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -188,6 +200,103 @@ export const Input = ({
   
   // Verificar se estamos na plataforma web
   const isWeb = Platform.OS === 'web';
+  
+  // Estado para controlar altura do input no nativo quando redimensionável
+  const [nativeInputHeight, setNativeInputHeight] = useState(multiline ? minHeight : 38);
+  
+  // Ref para armazenar a posição inicial do toque para redimensionamento
+  const touchStartY = useRef(0);
+  
+  // Função para desabilitar o scroll do componente pai durante o redimensionamento
+  const disableParentScroll = () => {
+    if (setScrollEnabled && !isWeb) {
+      setScrollEnabled(false);
+    }
+  };
+
+  // Função para reabilitar o scroll do componente pai após o redimensionamento
+  const enableParentScroll = () => {
+    if (setScrollEnabled && !isWeb) {
+      setScrollEnabled(true);
+    }
+  };
+  
+  // Configurar PanResponder para manipular gestos de redimensionamento no nativo
+  const panResponder = useRef(
+    PanResponder.create({
+      // Capturar qualquer toque que comece na área da alça de redimensionamento
+      onStartShouldSetPanResponder: () => true,
+      // Capturar movimentos mesmo que outro componente já tenha capturado
+      onStartShouldSetPanResponderCapture: () => true,
+      // Também capturar movimentos novos que começaram em outro lugar
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        // Somente responder a movimentos verticais significativos
+        return Math.abs(gestureState.dy) > 2;
+      },
+      // Capturar todos os movimentos durante o redimensionamento com alta prioridade
+      onMoveShouldSetPanResponderCapture: (_, gestureState) => {
+        // Somente para movimentos verticais significativos
+        return Math.abs(gestureState.dy) > 2;
+      },
+      onPanResponderGrant: (evt: GestureResponderEvent) => {
+        // Armazena posição inicial do toque
+        touchStartY.current = evt.nativeEvent.pageY;
+        
+        // Impede o scroll nativo da página
+        if (Platform.OS === 'web') {
+          document.body.style.overflow = 'hidden';
+        } else {
+          // Desativa o scroll de forma enfática
+          disableParentScroll();
+          Keyboard.dismiss(); // Garantir que o teclado esteja fechado para foco total no redimensionamento
+        }
+      },
+      onPanResponderMove: (evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+        if (!resizable || !multiline) return;
+        
+        // Previne o evento de scroll padrão
+        evt.preventDefault?.();
+        
+        // Previne que o evento se propague para outros manipuladores
+        evt.stopPropagation?.();
+        
+        // Calcula a nova altura com base no movimento do dedo
+        const newHeight = nativeInputHeight + gestureState.dy;
+        
+        // Aplica limites mínimo e máximo
+        if (newHeight >= minHeight && newHeight <= maxHeight) {
+          setNativeInputHeight(newHeight);
+        }
+        
+        // Retorna true para indicar que o evento foi consumido
+        return true;
+      },
+      onPanResponderRelease: () => {
+        // Reseta a posição inicial
+        touchStartY.current = 0;
+        
+        // Restaura o scroll nativo da página
+        if (Platform.OS === 'web') {
+          document.body.style.overflow = '';
+        } else {
+          // Atrasa ligeiramente a reativação do scroll para evitar conflitos
+          setTimeout(() => {
+            enableParentScroll();
+          }, 100);
+        }
+      },
+      onPanResponderTerminate: () => {
+        // Restaura o scroll nativo da página caso o gesto seja interrompido
+        if (Platform.OS === 'web') {
+          document.body.style.overflow = '';
+        } else {
+          enableParentScroll();
+        }
+      },
+      // Não ceder o responder a outros componentes
+      onPanResponderTerminationRequest: () => false
+    })
+  ).current;
   
   // Estilo do container do input
   const containerStyle = StyleSheet.create({
@@ -216,6 +325,7 @@ export const Input = ({
       paddingVertical: 8,
       height: multiline ? undefined : 38,
       textAlignVertical: multiline ? 'top' : 'center',
+      ...(Platform.OS === 'ios' && multiline ? { paddingTop: 8 } : {}), // Ajuste específico para iOS
     },
     // Estilo específico para o ícone de pesquisa (mais à esquerda)
     searchIcon: {
@@ -461,7 +571,12 @@ export const Input = ({
   // Função para lidar com mudanças no tamanho do conteúdo (para multiline)
   const handleContentSizeChange = (event: any) => {
     if (multiline) {
-      setInputHeight(event.nativeEvent.contentSize.height);
+      if (isWeb) {
+        setInputHeight(event.nativeEvent.contentSize.height);
+      } else if (!resizable) {
+        // No nativo, só ajusta automaticamente se não for redimensionável
+        setInputHeight(event.nativeEvent.contentSize.height);
+      }
     }
   };
   
@@ -565,6 +680,57 @@ export const Input = ({
           z-index: 1;
           border-radius: 6px;
         }
+        
+        /* Estilos para input redimensionável */
+        textarea.resizable {
+          resize: vertical;
+          min-height: ${minHeight}px;
+          max-height: ${maxHeight}px;
+          overflow-y: auto;
+          padding-bottom: 4px; /* Espaço para a alça de redimensionamento */
+          text-align-vertical: top !important;
+        }
+        
+        /* Alça de redimensionamento personalizada */
+        .resize-handle {
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          width: 10px;
+          height: 10px;
+          cursor: ns-resize;
+          background-color: transparent;
+        }
+        
+        .resize-handle::after {
+          content: '';
+          position: absolute;
+          bottom: 3px;
+          right: 3px;
+          width: 6px;
+          height: 6px;
+          border-right: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'};
+          border-bottom: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'};
+        }
+        
+        /* Ajusta a alça de redimensionamento nativa do navegador para o canto */
+        textarea::-webkit-resizer {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          background-color: transparent;
+        }
+        
+        /* Força alinhamento do texto no topo para multilinhas */
+        textarea, [multiline="true"] {
+          vertical-align: top !important;
+          text-align-vertical: top !important;
+        }
+        
+        /* Remove qualquer padding que possa estar afetando o posicionamento */
+        .native-number-input {
+          padding-right: 0 !important;
+        }
       `;
       document.head.appendChild(style);
       
@@ -628,7 +794,48 @@ export const Input = ({
         document.removeEventListener('wheel', handleWheel, { capture: true });
       };
     }
-  }, [isDark]);
+  }, [isDark, minHeight, maxHeight]);
+
+  // Efeito para garantir que o texto comece no topo em inputs multilinhas
+  useEffect(() => {
+    if (multiline && inputRef.current) {
+      // Forçar o alinhamento vertical no topo no iOS/Android
+      if (Platform.OS !== 'web') {
+        const node = inputRef.current;
+        if (node) {
+          // Forçar re-render para garantir que o textAlignVertical seja aplicado
+          setTimeout(() => {
+            const currentSelection = node.props?.selection;
+            node.setNativeProps({
+              style: { textAlignVertical: 'top' },
+              selection: currentSelection
+            });
+          }, 50);
+        }
+      }
+    }
+  }, [multiline]);
+  
+  // Função para garantir que o texto comece no topo em inputs multilinhas
+  const initInputLayout = () => {
+    if (multiline && inputRef.current && Platform.OS !== 'web') {
+      // Garante que o texto comece no topo
+      inputRef.current.setNativeProps({
+        style: { textAlignVertical: 'top' }
+      });
+    }
+  };
+  
+  // Executar inicialização após a montagem
+  useEffect(() => {
+    // Chamar a função de inicialização
+    if (multiline && inputRef.current && Platform.OS !== 'web') {
+      // Garante que o texto comece no topo
+      inputRef.current.setNativeProps({
+        style: { textAlignVertical: 'top' }
+      });
+    }
+  }, [multiline]);
 
   return (
     <View style={[containerStyle.container, style]}>
@@ -640,13 +847,27 @@ export const Input = ({
         style={[
           containerStyle.inputContainer, 
           disabled ? { opacity: 0.5 } : {},
-          type === 'number' && showNumberControls && !isWeb ? { paddingRight: 32 } : {}
+          type === 'number' && showNumberControls && !isWeb ? { paddingRight: 32 } : {},
+          multiline && { minHeight: minHeight },
+          // Aplicar altura personalizada para inputs redimensionáveis no nativo
+          !isWeb && multiline && resizable ? { height: nativeInputHeight } : {},
+          // Garante alinhamento adequado quando multiline
+          multiline ? { alignItems: 'flex-start' } : {}
         ]}
         {...(isWeb ? {
           'data-input-container': 'true',
           'data-disabled': disabled ? 'true' : 'false',
+          'data-multiline': multiline ? 'true' : 'false',
           ...(type === 'number' ? { 'data-number-input-container': 'true' } : {})
         } : {})}
+        onLayout={() => {
+          if (multiline && inputRef.current && Platform.OS !== 'web') {
+            // Garante que o texto comece no topo após o layout
+            inputRef.current.setNativeProps({
+              style: { textAlignVertical: 'top' }
+            });
+          }
+        }}
       >
         {/* Ícone de pesquisa para type="search" */}
         {type === 'search' && (
@@ -701,7 +922,15 @@ export const Input = ({
             style={[
               containerStyle.inputStyle, 
               inputStyle,
-              { height: multiline ? inputHeight : undefined }
+              { height: multiline ? inputHeight : undefined },
+              // Adiciona estilos para redimensionamento se necessário
+              isWeb && multiline && resizable ? {
+                minHeight: minHeight,
+                maxHeight: maxHeight,
+                height: 'auto'
+              } : {},
+              // Garante que o texto comece no topo em inputs multilinhas
+              multiline ? { textAlignVertical: 'top' } : {}
             ]}
             value={value}
             onChangeText={handleChangeText}
@@ -731,6 +960,12 @@ export const Input = ({
               type: 'text', // Mantemos como text para usar nossa máscara customizada
               inputMode: 'numeric'
             } : {})}
+            // Para web, adiciona suporte à redimensionamento
+            {...(isWeb && multiline && resizable ? {
+              className: 'resizable'
+            } : {})}
+            // Garante que o texto comece no topo - IMPORTANTE: esta propriedade precisa ser definida por último
+            textAlignVertical={multiline ? 'top' : 'center'}
           />
         )}
         
@@ -838,6 +1073,56 @@ export const Input = ({
                 color={isDark ? '#95A1AC' : '#57636C'} 
               />
             </TouchableOpacity>
+          </View>
+        )}
+        
+        {/* Alça de redimensionamento para textarea (no React Native) */}
+        {!isWeb && multiline && resizable && (
+          <View 
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              width: 32, 
+              height: 32,
+              justifyContent: 'flex-end',
+              alignItems: 'flex-end',
+              paddingRight: 4,
+              paddingBottom: 4,
+              zIndex: 100,
+            }}
+            {...panResponder.panHandlers}
+            hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }}
+          >
+            {/* Três linhas diagonais semelhantes ao indicador de redimensionamento da web */}
+            <View style={{
+              width: 10,
+              height: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              overflow: 'hidden',
+            }}>
+              <View style={{
+                width: 10,
+                height: 1,
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                marginBottom: 2,
+                transform: [{ rotate: '-45deg' }, { translateX: 1 }],
+              }} />
+              <View style={{
+                width: 7,
+                height: 1,
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                marginBottom: 2,
+                transform: [{ rotate: '-45deg' }],
+              }} />
+              <View style={{
+                width: 4,
+                height: 1,
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                transform: [{ rotate: '-45deg' }, { translateX: -1 }],
+              }} />
+            </View>
           </View>
         )}
       </View>

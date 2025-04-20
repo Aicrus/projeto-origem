@@ -30,6 +30,7 @@ import { Sheet } from 'components/AicrusComponents';
 import type { SheetPosition } from 'components/AicrusComponents/sheet/Sheet';
 import { DateInput } from '../../components/AicrusComponents/input/DateInput';
 import { TimeInput } from '../../components/AicrusComponents/input/TimeInput';
+import { Keyboard } from 'react-native';
 
 // Definir tipos para os componentes disponíveis
 type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | 'sheet' | null;
@@ -313,6 +314,7 @@ export default function DevPage() {
   const [inputData, setInputData] = useState('');
   const [inputHora, setInputHora] = useState('');
   const [inputNumerico, setInputNumerico] = useState('0');
+  const [inputRedimensionavel, setInputRedimensionavel] = useState('');
   
   // Estados separados para cada exemplo de Select
   const [selectBasico, setSelectBasico] = useState('');
@@ -457,6 +459,29 @@ export default function DevPage() {
     }
   };
   
+  // Estado para controlar o scroll da página
+  const [scrollEnabled, setScrollEnabled] = useState(true);
+  
+  // Função para impedir o scroll com debounce
+  const handleScrollEnabled = useCallback((enabled: boolean) => {
+    // Se estiver desabilitando o scroll, fazer imediatamente
+    if (!enabled) {
+      setScrollEnabled(false);
+      
+      // No Android e iOS, usar código mais agressivo para bloquear o scroll
+      if (Platform.OS !== 'web') {
+        // Forçar o foco no elemento redimensionável para evitar scroll
+        Keyboard.dismiss();
+      }
+      return;
+    }
+    
+    // Quando reabilitar, aguardar um tempo substancial para evitar conflitos de scroll
+    setTimeout(() => {
+      setScrollEnabled(true);
+    }, 800); // Aumentado para 800ms para garantir que o scroll não seja ativado acidentalmente
+  }, []);
+  
   // Função para renderizar o conteúdo do componente selecionado
   const renderComponentContent = () => {
     if (!activeComponent) {
@@ -507,7 +532,12 @@ export default function DevPage() {
   // Função para renderizar o componente Input e seus exemplos
   const renderInputComponent = () => {
     return (
-      <View className="p-lg">
+      <ScrollView 
+        className="p-lg" 
+        scrollEnabled={scrollEnabled}
+        contentContainerStyle={{ paddingBottom: 60 }} // Adiciona espaço extra ao final
+        showsVerticalScrollIndicator={true}
+      >
         <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
           Componente Input
         </Text>
@@ -658,6 +688,28 @@ export default function DevPage() {
                 : ' Em dispositivos móveis, implementa controles personalizados.'}
             </Text>
           </View>
+          
+          {/* Input redimensionável */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input redimensionável</Text>
+            <Input
+              value={inputRedimensionavel}
+              onChangeText={setInputRedimensionavel}
+              placeholder="Digite um texto longo aqui... Este input permite redimensionamento vertical no navegador."
+              label="Texto redimensionável"
+              multiline={true}
+              numberOfLines={3}
+              resizable={true}
+              minHeight={80}
+              maxHeight={300}
+              setScrollEnabled={handleScrollEnabled}
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Input multilinhas que pode ser redimensionado verticalmente pelo usuário.
+              Em qualquer plataforma, o usuário pode arrastar a alça inferior para ajustar a altura do campo.
+              {Platform.OS !== 'web' && ' Toque e arraste o indicador no canto inferior direito para redimensionar.'}
+            </Text>
+          </View>
         </View>
         
         <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
@@ -752,11 +804,26 @@ export default function DevPage() {
             <Text className={`text-body-sm ${textSecondary}`}>Mostra botões de incremento/decremento (type="number")</Text>
           </View>
           
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>resizable</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Permite redimensionar o campo verticalmente (apenas para multiline=true)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>minHeight</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Altura mínima para inputs redimensionáveis</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>maxHeight</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Altura máxima para inputs redimensionáveis</Text>
+          </View>
+          
           <Text className={`text-body-sm ${textSecondary} mt-md`}>
             E muitas outras propriedades para personalização completa...
           </Text>
         </View>
-      </View>
+      </ScrollView>
     );
   };
   
@@ -4506,8 +4573,7 @@ const SheetExampleContent: React.FC = () => {
         showCloseButton={true}
         overlayOpacity={0.5}
         animationDuration={300}
-        useSafeArea={true}
-        testID="example-sheet"
+        useSafeArea={true} // Adiciona área de segurança para dispositivos com notch/island
       >
         <View className="p-lg">
           <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-md`}>
@@ -4737,7 +4803,7 @@ const [isOpen, setIsOpen] = useState(false);
   borderRadius={16}
   closeOnOverlayClick={true}
   showCloseButton={true}
-  useSafeArea={true} // Adiciona área de segurança para dispositivos com notch/island
+  useSafeArea={true // Adiciona área de segurança para dispositivos com notch/island
 >
   <View style={{ padding: 20 }}>
     <Text>Conteúdo do Sheet</Text>
