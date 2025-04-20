@@ -25,9 +25,219 @@ import { ColumnDef } from '@tanstack/react-table';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { supabase } from '@/lib/supabase';
 
 // Definir tipos para os componentes disponíveis
 type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | null;
+
+// Tipo para os usuários do Supabase
+type UserAicrusAcademy = {
+  id: string;
+  created_at: string;
+  nome: string;
+  email: string;
+  idCustomerAsaas?: string;
+};
+
+// Componente separado para a tabela Supabase
+const SupabaseDataTable = () => {
+  const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
+  const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
+  
+  const [supabaseUsers, setSupabaseUsers] = useState<UserAicrusAcademy[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Função para buscar usuários do Supabase
+  const fetchSupabaseUsers = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { data, error: supabaseError } = await supabase
+        .from('usersAicrusAcademy')
+        .select('id, created_at, nome, email, idCustomerAsaas')
+        .order('created_at', { ascending: false });
+
+      if (supabaseError) {
+        throw supabaseError;
+      }
+
+      setSupabaseUsers(data || []);
+    } catch (err: any) {
+      console.error('Erro ao buscar usuários:', err);
+      setError(err.message || 'Erro ao buscar dados do Supabase');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Carregar dados ao montar o componente
+  useEffect(() => {
+    fetchSupabaseUsers();
+  }, []);
+
+  // Definição das colunas para o Supabase
+  const supabaseColumns: ColumnDef<UserAicrusAcademy>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          accessibilityLabel="Selecionar todos"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          accessibilityLabel="Selecionar linha"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "id",
+      header: ({ column }) => {
+        return (
+          <TouchableOpacity
+            className="flex-row items-center gap-1"
+            onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            <Text className={textPrimary}>ID</Text>
+            <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+          </TouchableOpacity>
+        );
+      },
+      cell: ({ row }) => (
+        <View>
+          <Text className={`${textPrimary}`}>{row.getValue("id")}</Text>
+        </View>
+      ),
+    },
+    {
+      accessorKey: "created_at",
+      header: ({ column }) => {
+        return (
+          <TouchableOpacity
+            className="flex-row items-center gap-1"
+            onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            <Text className={textPrimary}>Criado</Text>
+            <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+          </TouchableOpacity>
+        );
+      },
+      cell: ({ row }) => {
+        // Formatar a data para exibição
+        const date = new Date(row.getValue("created_at"));
+        const formatted = date.toLocaleString('pt-BR');
+        
+        return (
+          <View>
+            <Text className={`${textPrimary}`}>{formatted}</Text>
+          </View>
+        );
+      },
+    },
+    {
+      accessorKey: "nome",
+      header: ({ column }) => {
+        return (
+          <TouchableOpacity
+            className="flex-row items-center gap-1"
+            onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            <Text className={textPrimary}>Nome</Text>
+            <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+          </TouchableOpacity>
+        );
+      },
+      cell: ({ row }) => (
+        <View>
+          <Text className={`${textPrimary}`}>{row.getValue("nome")}</Text>
+        </View>
+      ),
+    },
+    {
+      accessorKey: "email",
+      header: ({ column }) => {
+        return (
+          <TouchableOpacity
+            className="flex-row items-center gap-1"
+            onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            <Text className={textPrimary}>Email</Text>
+            <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+          </TouchableOpacity>
+        );
+      },
+      cell: ({ row }) => (
+        <View>
+          <Text className={`lowercase ${textPrimary}`}>{row.getValue("email")}</Text>
+        </View>
+      ),
+    },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: () => (
+        <View className="items-center justify-center">
+          <TouchableOpacity className="p-1">
+            <MoreHorizontal size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+          </TouchableOpacity>
+        </View>
+      ),
+    },
+  ];
+
+  // Renderizar a tabela com base nos estados
+  if (isLoading) {
+    return (
+      <View className="p-4 items-center">
+        <Text className={textPrimary}>Carregando dados do Supabase...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="p-4 items-center">
+        <Text className="text-red-500">{error}</Text>
+        <TouchableOpacity 
+          className="mt-2 p-2 bg-blue-500 rounded-md" 
+          onPress={fetchSupabaseUsers}
+        >
+          <Text className="text-white">Tentar novamente</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <DataTable 
+      data={supabaseUsers}
+      columns={supabaseColumns}
+      enableRowSelection
+      enableSorting
+      enableFiltering
+      enablePagination
+      searchPlaceholder="Filtrar por nome ou email..."
+      hoverableRowProps={{
+        hoverScale: 1,
+        hoverTranslateY: 0,
+        animationDuration: 150,
+        disableHoverBackground: false
+      }}
+    />
+  );
+};
 
 export default function DevPage() {
   const { currentTheme } = useTheme();
@@ -3545,59 +3755,21 @@ return (
           />
         </View>
 
+        {/* Exemplo com dados do Supabase */}
         <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
           <Text className={`text-subtitle-md font-jakarta-medium ${textPrimary} mb-2`}>
-            Como usar
+            Exemplo 3: Dados Dinâmicos do Supabase
           </Text>
-          <View className="p-3 bg-gray-100 dark:bg-gray-800 rounded-md">
-            <Text className={`font-mono text-xs ${isDark ? 'text-gray-800' : 'text-gray-800'}`}>
-              {`
-import { DataTable } from '../../components/AicrusComponents';
-import { ColumnDef } from '@tanstack/react-table';
-
-// Definir tipo dos dados
-type Payment = {
-  id: string;
-  amount: number;
-  status: string;
-  email: string;
-};
-
-// Definir colunas
-const columns: ColumnDef<Payment>[] = [
-  // ... definições de colunas
-];
-
-// Exemplo 1: Seleção apenas com checkbox (padrão)
-<DataTable 
-  data={data}
-  columns={columns}
-  enableRowSelection
-  enableSorting
-  enableFiltering
-  enablePagination
-  searchPlaceholder="Filtrar emails..."
-/>
-
-// Exemplo 2: Seleção clicando na linha inteira
-<DataTable 
-  data={data}
-  columns={columns}
-  enableRowSelection
-  enableRowClick={true}
-  enableSorting
-  enableFiltering
-  enablePagination
-  searchPlaceholder="Filtrar emails..."
-/>
-              `.trim()}
-            </Text>
-          </View>
+          <Text className={`text-body-sm ${textSecondary} mb-4`}>
+            Este exemplo demonstra a tabela conectada à tabela 'usersAicrusAcademy' do Supabase com colunas personalizadas.
+          </Text>
+          
+          <SupabaseDataTable />
         </View>
 
         <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
           <Text className={`text-subtitle-md font-jakarta-medium ${textPrimary} mb-2`}>
-            Props
+            Propriedades do Componente
           </Text>
           <View className="mb-4">
             <View className="flex-row py-2 border-b border-gray-200 dark:border-gray-700">

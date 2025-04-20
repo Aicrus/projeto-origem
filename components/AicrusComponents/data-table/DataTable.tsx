@@ -406,6 +406,17 @@ export function DataTable<TData>({
     
     // Componente interno do dropdown que será renderizado no portal
     const ColumnsDropdownContent = () => {
+      // Estado de hover para todas as colunas em um único objeto
+      const [hoveredColumns, setHoveredColumns] = useState<Record<string, boolean>>({});
+      
+      const handleMouseEnter = (columnId: string) => {
+        setHoveredColumns(prev => ({ ...prev, [columnId]: true }));
+      };
+      
+      const handleMouseLeave = (columnId: string) => {
+        setHoveredColumns(prev => ({ ...prev, [columnId]: false }));
+      };
+      
       const dropdownStyle = StyleSheet.create({
         overlay: {
           position: 'fixed',
@@ -489,7 +500,7 @@ export function DataTable<TData>({
               .getAllColumns()
               .filter((column) => column.getCanHide())
               .map((column) => {
-                const [isHovered, setIsHovered] = useState(false);
+                const isHovered = hoveredColumns[column.id] || false;
                 
                 return (
                   <div
@@ -499,8 +510,8 @@ export function DataTable<TData>({
                       ...(isHovered ? dropdownStyle.itemHover as React.CSSProperties : {})
                     }}
                     onClick={() => column.toggleVisibility(!column.getIsVisible())}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
+                    onMouseEnter={() => handleMouseEnter(column.id)}
+                    onMouseLeave={() => handleMouseLeave(column.id)}
                   >
                     <input
                       type="checkbox"
