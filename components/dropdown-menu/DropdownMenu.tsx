@@ -151,6 +151,9 @@ const WebDropdownMenu = ({
   // Ref para armazenar a posição de scroll
   const scrollPositionRef = useRef(0);
   
+  // Ref para o campo de pesquisa
+  const searchInputRef = useRef<TextInput>(null);
+  
   // Estado para controlar a pesquisa
   const [searchValue, setSearchValue] = useState('');
   
@@ -207,8 +210,17 @@ const WebDropdownMenu = ({
           });
         }
       }
+      
+      // Focar no campo de pesquisa com delay para garantir que o menu já esteja aberto
+      if (searchable && autoFocus) {
+        setTimeout(() => {
+          if (searchInputRef.current) {
+            searchInputRef.current.focus();
+          }
+        }, 50);
+      }
     }
-  }, [isOpen, maxHeight, position]);
+  }, [isOpen, maxHeight, position, searchable, autoFocus]);
   
   // Função para normalizar texto (remover acentos)
   const normalizeText = (text: string): string => {
@@ -269,9 +281,8 @@ const WebDropdownMenu = ({
     setSearchValue('');
     
     // Focus no input de pesquisa após limpar
-    const searchInput = document.querySelector('[data-search-input="true"]') as HTMLInputElement;
-    if (searchInput) {
-      searchInput.focus();
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
     }
   };
   
@@ -371,6 +382,7 @@ const WebDropdownMenu = ({
               style={dropdownStyle.searchIcon}
             />
             <TextInput
+              ref={searchInputRef}
               style={dropdownStyle.searchInput}
               value={searchValue}
               onChangeText={handleSearchChange}
@@ -385,6 +397,10 @@ const WebDropdownMenu = ({
                   input.style.outline = 'none';
                   input.style.boxShadow = 'none';
                 }
+              }}
+              // Impedir que o evento de clique feche o menu
+              onClick={(e: React.MouseEvent<HTMLInputElement>) => {
+                e.stopPropagation();
               }}
             />
             {searchValue.length > 0 && (
@@ -471,6 +487,9 @@ const MobileDropdownMenu = ({
   // Estado para controlar a pesquisa
   const [searchValue, setSearchValue] = useState('');
   
+  // Ref para o campo de pesquisa
+  const searchInputRef = useRef<TextInput>(null);
+  
   // Usar valores de animação do componente pai
   const fadeAnim = animatedValues?.fadeAnim || useRef(new Animated.Value(isOpen ? 1 : 0)).current;
   const slideAnim = animatedValues?.slideAnim || useRef(new Animated.Value(isOpen ? 0 : 20)).current;
@@ -499,8 +518,15 @@ const MobileDropdownMenu = ({
   useEffect(() => {
     if (!isOpen) {
       setSearchValue('');
+    } else if (searchable && autoFocus) {
+      // Foca no campo de busca quando abrir
+      setTimeout(() => {
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      }, 100);
     }
-  }, [isOpen]);
+  }, [isOpen, searchable, autoFocus]);
   
   // Lidar com alteração na pesquisa
   const handleSearchChange = (text: string) => {
@@ -515,6 +541,11 @@ const MobileDropdownMenu = ({
   // Limpar campo de pesquisa
   const handleClearSearch = () => {
     setSearchValue('');
+    
+    // Focus no input após limpar
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
   };
   
   // Lidar com seleção de item
@@ -632,6 +663,7 @@ const MobileDropdownMenu = ({
                   style={dropdownStyle.searchIcon}
                 />
                 <TextInput
+                  ref={searchInputRef}
                   style={[
                     dropdownStyle.searchInput,
                     Platform.OS === 'web' && {
@@ -689,6 +721,27 @@ const MobileDropdownMenu = ({
       </Animated.View>
     </Modal>
   );
+};
+
+/**
+ * Hook para gerenciar um menu dropdown facilmente
+ * @param triggerRef Referência para o elemento que ativa o menu
+ * @returns Utilidades para controlar o menu (isOpen, open, close, toggle)
+ */
+export const useDropdownMenu = (triggerRef: React.RefObject<any>) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const open = () => setIsOpen(true);
+  const close = () => setIsOpen(false);
+  const toggle = () => setIsOpen(prev => !prev);
+  
+  return {
+    isOpen,
+    open,
+    close,
+    toggle,
+    triggerRef
+  };
 };
 
 export const DropdownMenu = ({

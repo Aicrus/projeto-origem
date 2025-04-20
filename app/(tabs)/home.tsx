@@ -8,7 +8,7 @@ import { Portal } from '@gorhom/portal';
 import { useResponsive } from '../../hooks/useResponsive';
 import { Building2, Users, ClipboardList, AlertTriangle, MoreVertical, Edit, Trash2, Share, Eye, Copy, FileText } from 'lucide-react-native';
 import { BREAKPOINTS } from '../../constants/responsive';
-import { DropdownMenu } from '../../components/dropdown-menu';
+import { DropdownMenu, useDropdownMenu } from '../../components/dropdown-menu';
 
 export default function Home() {
   const { currentTheme } = useTheme();
@@ -17,9 +17,9 @@ export default function Home() {
   const { isMobile, isTablet, isDesktop } = useResponsive();
   const { width } = useWindowDimensions();
   
-  // Estado e ref para o menu dropdown
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // Usar o hook para gerenciar o menu
   const menuButtonRef = useRef(null);
+  const { isOpen: isMenuOpen, open: openMenu, close: closeMenu } = useDropdownMenu(menuButtonRef);
   
   const showHeader = true;
   const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
@@ -38,7 +38,7 @@ export default function Home() {
       icon: <Eye size={16} color={isDark ? '#D1D5DB' : '#57636C'} />,
       onPress: () => {
         console.log('Visualizar detalhes');
-        setIsMenuOpen(false);
+        closeMenu();
       }
     },
     { 
@@ -47,7 +47,7 @@ export default function Home() {
       icon: <Edit size={16} color={isDark ? '#D1D5DB' : '#57636C'} />,
       onPress: () => {
         console.log('Editar');
-        setIsMenuOpen(false);
+        closeMenu();
       }
     },
     { 
@@ -56,7 +56,7 @@ export default function Home() {
       icon: <Copy size={16} color={isDark ? '#D1D5DB' : '#57636C'} />,
       onPress: () => {
         console.log('Duplicar');
-        setIsMenuOpen(false);
+        closeMenu();
       }
     },
     { 
@@ -65,7 +65,7 @@ export default function Home() {
       icon: <Share size={16} color={isDark ? '#D1D5DB' : '#57636C'} />,
       onPress: () => {
         console.log('Compartilhar');
-        setIsMenuOpen(false);
+        closeMenu();
       }
     },
     { 
@@ -74,7 +74,7 @@ export default function Home() {
       icon: <FileText size={16} color={isDark ? '#D1D5DB' : '#57636C'} />,
       onPress: () => {
         console.log('Exportar relatório');
-        setIsMenuOpen(false);
+        closeMenu();
       }
     },
     { 
@@ -83,22 +83,10 @@ export default function Home() {
       icon: <Trash2 size={16} color="#EF4444" />,
       onPress: () => {
         console.log('Excluir');
-        setIsMenuOpen(false);
+        closeMenu();
       }
     },
   ];
-  
-  // Handler para abrir o menu com debounce básico para evitar duplos cliques
-  const handleOpenMenu = () => {
-    if (!isMenuOpen) {
-      setIsMenuOpen(true);
-    }
-  };
-  
-  // Handler para fechar o menu
-  const handleCloseMenu = () => {
-    setIsMenuOpen(false);
-  };
 
   interface StatCardProps {
     title: string;
@@ -208,7 +196,7 @@ export default function Home() {
         <View style={styles.menuButtonContainer}>
           <TouchableOpacity
             ref={menuButtonRef}
-            onPress={handleOpenMenu}
+            onPress={openMenu}
             style={[
               styles.menuButton,
               { backgroundColor: isDark ? '#1F2937' : '#F3F4F6' }
@@ -227,7 +215,7 @@ export default function Home() {
           <DropdownMenu
             options={menuOptions}
             isOpen={isMenuOpen}
-            onClose={handleCloseMenu}
+            onClose={closeMenu}
             triggerRef={menuButtonRef}
             searchable={true}
             maxHeight={300}
