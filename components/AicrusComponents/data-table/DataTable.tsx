@@ -25,12 +25,13 @@ import {
 import { Input } from '../input';
 import { Checkbox } from '../checkbox';
 import { Button } from '../button';
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react-native';
+import { ArrowUpDown, ChevronDown, MoreHorizontal, AlertCircle } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { colors } from '../constants/theme';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { createPortal } from 'react-dom';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * @component DataTable
@@ -43,6 +44,7 @@ import { createPortal } from 'react-dom';
  * - Tema claro/escuro automático
  * - Responsividade
  * - Efeito de hover nas linhas usando HoverableView
+ * - Integração com Supabase (opcional)
  * 
  * Exemplos de uso:
  * 
@@ -61,14 +63,49 @@ import { createPortal } from 'react-dom';
  *   enableFiltering
  *   enablePagination
  * />
+ * 
+ * // Tabela com integração Supabase
+ * <DataTable 
+ *   columns={colunasArray}
+ *   supabaseConfig={{
+ *     client: supabaseClient,
+ *     table: 'users',
+ *     select: 'id, nome, email, created_at',
+ *     orderBy: {column: 'created_at', ascending: false}
+ *   }}
+ * />
  * ```
  */
 
+export interface SupabaseConfig {
+  /** Cliente Supabase inicializado */
+  client: SupabaseClient;
+  /** Nome da tabela no Supabase */
+  table: string;
+  /** Colunas a serem selecionadas (formato SQL: '*' ou 'id, nome, email') */
+  select?: string;
+  /** Ordenação dos resultados */
+  orderBy?: {
+    column: string;
+    ascending?: boolean;
+  };
+  /** Número máximo de registros a serem retornados */
+  limit?: number;
+  /** Filtros a serem aplicados (seguindo a sintaxe do Supabase) */
+  filters?: Array<{
+    column: string;
+    operator: 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'like' | 'ilike';
+    value: any;
+  }>;
+}
+
 export interface DataTableProps<TData> {
   /** Dados a serem exibidos na tabela */
-  data: TData[];
+  data?: TData[];
   /** Definição das colunas da tabela */
   columns: ColumnDef<TData, any>[];
+  /** Configuração para integração com Supabase */
+  supabaseConfig?: SupabaseConfig;
   /** Filtro de coluna inicial */
   initialColumnFilter?: {
     id: string;
@@ -111,11 +148,16 @@ export interface DataTableProps<TData> {
     /** Se deve aplicar fundo ao passar o mouse (default: false) */
     disableHoverBackground?: boolean;
   };
+  /** Callback chamado após dados do Supabase serem carregados */
+  onDataLoaded?: (data: TData[]) => void;
+  /** Callback chamado quando ocorre um erro ao carregar dados do Supabase */
+  onError?: (error: any) => void;
 }
 
 export function DataTable<TData>({
-  data,
+  data = [],
   columns,
+  supabaseConfig,
   initialColumnFilter,
   enableSorting = true,
   enableFiltering = true,
@@ -135,6 +177,8 @@ export function DataTable<TData>({
     animationDuration: 150,
     disableHoverBackground: false,
   },
+  onDataLoaded,
+  onError,
 }: DataTableProps<TData>) {
   // Estados para a tabela
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -148,9 +192,15 @@ export function DataTable<TData>({
     top?: number;
     right?: number;
     left?: number;
+    bottom?: number;
     width: number;
     openDown: boolean;
   }>({ width: 200, openDown: true });
+  
+  // Estados para Supabase
+  const [tableData, setTableData] = useState<TData[]>(data);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   // Refs
   const dropdownTriggerRef = useRef<View>(null);
@@ -199,9 +249,78 @@ export function DataTable<TData>({
     }
   }, []);
   
+  // Efeito para carregar dados do Supabase quando supabaseConfig for fornecido
+  useEffect(() => {
+    if (supabaseConfig) {
+      fetchSupabaseData();
+    } else {
+      setTableData(data);
+    }
+  }, [supabaseConfig, data]);
+
+  // Função para buscar dados do Supabase
+  const fetchSupabaseData = async () => {
+    if (!supabaseConfig) return;
+    
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const { client, table, select = '*', orderBy, limit, filters } = supabaseConfig;
+      
+      // Iniciar a consulta
+      let query = client.from(table).select(select);
+      
+      // Aplicar filtros se existirem
+      if (filters && filters.length > 0) {
+        filters.forEach(filter => {
+          query = query.filter(filter.column, filter.operator, filter.value);
+        });
+      }
+      
+      // Aplicar ordenação
+      if (orderBy) {
+        query = query.order(orderBy.column, { ascending: orderBy.ascending ?? false });
+      }
+      
+      // Aplicar limite de registros
+      if (limit) {
+        query = query.limit(limit);
+      }
+      
+      // Executar a consulta
+      const { data: supabaseData, error: supabaseError } = await query;
+      
+      if (supabaseError) {
+        throw supabaseError;
+      }
+      
+      // Atualizar dados da tabela
+      const typedData = supabaseData as unknown as TData[];
+      setTableData(typedData);
+      
+      // Chamar callback com os dados
+      if (onDataLoaded) {
+        onDataLoaded(typedData);
+      }
+      
+    } catch (err: any) {
+      console.error('Erro ao buscar dados do Supabase:', err);
+      const errorMessage = err.message || 'Erro ao buscar dados do Supabase';
+      setError(errorMessage);
+      
+      // Chamar callback de erro
+      if (onError) {
+        onError(err);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   // Instância da tabela
   const table = useReactTable({
-    data,
+    data: tableData,
     columns,
     state: {
       sorting,
@@ -245,12 +364,70 @@ export function DataTable<TData>({
         });
       } else {
         setDropdownPosition({
-          top: rect.top + window.scrollY, // Guardar a posição top para cálculo do bottom
+          bottom: window.innerHeight - rect.top + 5 + window.scrollY,
           right: window.innerWidth - rect.right - window.scrollX,
           width: 200,
           openDown: false
         });
       }
+
+      console.log('Web dropdown position:', { 
+        openDown, 
+        rect, 
+        viewportHeight, 
+        spaceBelow 
+      });
+    } else if (Platform.OS !== 'web' && dropdownTriggerRef.current) {
+      // Para dispositivos móveis, calcular a posição similar à abordagem do Select
+      dropdownTriggerRef.current.measure((x, y, width, height, pageX, pageY) => {
+        // Calcular espaço disponível
+        const { height: windowHeight, width: windowWidth } = require('react-native').Dimensions.get('window');
+        const dropdownHeight = 250;
+        const spaceBelow = windowHeight - (pageY + height);
+        
+        // Determinar se abre para baixo ou para cima
+        const openDown = spaceBelow >= dropdownHeight || pageY < dropdownHeight;
+        
+        // Calculando uma largura mínima maior para o dropdown no mobile
+        // que seja suficiente para textos mais longos
+        const dropdownWidth = Math.max(width || 160, 200);
+        
+        // Garantir que o dropdown não ultrapasse a tela
+        const maxAllowedWidth = windowWidth - 20; // 10px de cada lado
+        const finalWidth = Math.min(dropdownWidth, maxAllowedWidth);
+        
+        // Ajustar posição horizontal para evitar que o dropdown saia da tela
+        let leftPosition = pageX;
+        if (leftPosition + finalWidth > windowWidth - 10) {
+          leftPosition = windowWidth - finalWidth - 10;
+        }
+        
+        console.log('Mobile dropdown measure:', { 
+          x, y, width, height, pageX, pageY, 
+          windowHeight, 
+          spaceBelow, 
+          openDown,
+          dropdownWidth,
+          finalWidth,
+          leftPosition
+        });
+        
+        if (openDown) {
+          setDropdownPosition({
+            top: pageY + height + 5,
+            left: leftPosition,
+            width: finalWidth,
+            openDown: true
+          });
+        } else {
+          setDropdownPosition({
+            bottom: windowHeight - pageY + 5,
+            left: leftPosition,
+            width: finalWidth,
+            openDown: false
+          });
+        }
+      });
     }
     setDropdownOpen(true);
   };
@@ -316,7 +493,7 @@ export function DataTable<TData>({
           });
         } else {
           setDropdownPosition({
-            top: rect.top + window.scrollY, // Guardar a posição top para cálculo do bottom
+            bottom: window.innerHeight - rect.top + 5 + window.scrollY,
             right: window.innerWidth - rect.right - window.scrollX,
             width: 200,
             openDown: false
@@ -404,6 +581,8 @@ export function DataTable<TData>({
   const renderColumnsDropdown = () => {
     if (!dropdownOpen) return null;
     
+    console.log('Rendering dropdown with position:', dropdownPosition);
+    
     // Componente interno do dropdown que será renderizado no portal
     const ColumnsDropdownContent = () => {
       // Estado de hover para todas as colunas em um único objeto
@@ -445,7 +624,7 @@ export function DataTable<TData>({
           overflowY: 'auto',
         },
         header: {
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: '500',
           color: isDark ? colors.gray['400'] : colors.gray['600'],
           padding: 8,
@@ -476,7 +655,7 @@ export function DataTable<TData>({
       const containerStyle = {...dropdownStyle.container as React.CSSProperties};
       if (!dropdownPosition.openDown) {
         containerStyle.top = undefined;
-        containerStyle.bottom = `${window.innerHeight - (dropdownPosition.top || 0) + 5}px`;
+        containerStyle.bottom = `${dropdownPosition.bottom}px`;
       }
 
       return (
@@ -493,7 +672,7 @@ export function DataTable<TData>({
             data-dropdown-content="true"
           >
             <div style={dropdownStyle.header as React.CSSProperties}>
-              Toggle columns
+              Alternar colunas
             </div>
             
             {table
@@ -505,7 +684,7 @@ export function DataTable<TData>({
                 // Extrair nome de exibição do cabeçalho para mostrar no dropdown
                 let displayName = column.id;
                 
-                // Método para extrair texto do cabeçalhoOk, então me responde uma coisa. Então, agora vai pegar quando a pessoa, ali o menu, né? O menu vai ser igual ao que está no cabeçalho, correto? Sempre vai ser assim? Já está configurado dessa forma? 
+                // Método para extrair texto do cabeçalho
                 const headerDef = column.columnDef.header;
                 
                 // Se for uma string direta, usar essa string
@@ -558,7 +737,7 @@ export function DataTable<TData>({
       );
     };
 
-    // Usando createPortal para renderizar diretamente no body
+    // Usando createPortal para renderizar diretamente no body (versão web)
     if (Platform.OS === 'web' as any && typeof document !== 'undefined') {
       return createPortal(
         <ColumnsDropdownContent />,
@@ -566,108 +745,115 @@ export function DataTable<TData>({
       );
     }
     
-    // Versão para dispositivos móveis usando Modal
+    // Versão para dispositivos móveis usando Modal com posicionamento similar ao web
     return (
       <Modal
         visible={dropdownOpen}
         transparent={true}
         animationType="fade"
         onRequestClose={handleCloseDropdown}
+        statusBarTranslucent={true}
       >
-        {/* Implementação mobile aqui */}
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableOpacity 
+          style={{
+            flex: 1,
+            backgroundColor: 'transparent',
+          }}
+          activeOpacity={1}
+          onPress={handleCloseDropdown}
+        >
           <View 
-            style={{ 
-              width: '80%', 
+            style={{
+              position: 'absolute',
+              top: dropdownPosition.openDown ? dropdownPosition.top : undefined,
+              left: dropdownPosition.left,
+              bottom: !dropdownPosition.openDown ? dropdownPosition.bottom : undefined,
+              width: dropdownPosition.width || 230, // Ajustado para uma largura menos exagerada
+              maxHeight: 250,
               backgroundColor: isDark ? colors.gray['800'] : colors.white,
               borderRadius: 6,
-              padding: 16,
+              borderWidth: 1,
+              borderColor: isDark ? colors.gray['700'] : colors.gray['200'],
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: isDark ? 0.25 : 0.1,
+              shadowRadius: 3,
+              elevation: 5,
             }}
           >
             <Text 
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: '500',
                 color: isDark ? colors.gray['400'] : colors.gray['600'],
-                marginBottom: 8,
+                padding: 8,
+                borderBottomWidth: 1,
+                borderBottomColor: isDark ? colors.gray['700'] : colors.gray['200'],
               }}
             >
-              Toggle columns
+              Alternar colunas
             </Text>
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                // Extrair nome de exibição do cabeçalho para mostrar no dropdown
-                let displayName = column.id;
-                
-                // Método para extrair texto do cabeçalho
-                const headerDef = column.columnDef.header;
-                
-                // Se for uma string direta, usar essa string
-                if (typeof headerDef === 'string') {
-                  displayName = headerDef;
-                }
-                // Se for um nó React renderizado, tentar extrair seu texto
-                else if (typeof headerDef === 'function') {
-                  // Não podemos acessar o texto diretamente, então verificamos se temos uma meta informação
-                  if (column.columnDef.meta && 
-                      typeof column.columnDef.meta === 'object' && 
-                      column.columnDef.meta !== null) {
-                    
-                    // Verificar se há um 'headerText' definido na meta
-                    const meta = column.columnDef.meta as any;
-                    if (meta.headerText) {
-                      displayName = meta.headerText;
+            
+            <ScrollView style={{ maxHeight: 200 }}>
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  let displayName = column.id;
+                  
+                  // Extrair nome de exibição do cabeçalho
+                  const headerDef = column.columnDef.header;
+                  
+                  if (typeof headerDef === 'string') {
+                    displayName = headerDef;
+                  } else if (typeof headerDef === 'function') {
+                    if (column.columnDef.meta && 
+                        typeof column.columnDef.meta === 'object' && 
+                        column.columnDef.meta !== null) {
+                      
+                      const meta = column.columnDef.meta as any;
+                      if (meta.headerText) {
+                        displayName = meta.headerText;
+                      }
                     }
                   }
-                }
-                
-                return (
-                  <TouchableOpacity
-                    key={column.id}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      padding: 8,
-                      borderRadius: 4,
-                    }}
-                    onPress={() => column.toggleVisibility(!column.getIsVisible())}
-                  >
-                    <Checkbox
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                    />
-                    <Text 
+                  
+                  return (
+                    <TouchableOpacity
+                      key={column.id}
                       style={{
-                        marginLeft: 8,
-                        fontSize: 14,
-                        color: isDark ? colors.gray['100'] : colors.gray['900'],
-                        textTransform: 'capitalize',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        padding: 8,
+                        marginVertical: 0.5,
+                        borderRadius: 4,
                       }}
+                      onPress={() => column.toggleVisibility(!column.getIsVisible())}
                     >
-                      {displayName}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            
-            <TouchableOpacity
-              style={{
-                marginTop: 16,
-                padding: 8,
-                backgroundColor: isDark ? colors.gray['700'] : colors.gray['200'],
-                borderRadius: 4,
-                alignItems: 'center',
-              }}
-              onPress={handleCloseDropdown}
-            >
-              <Text style={{ color: isDark ? colors.gray['100'] : colors.gray['900'] }}>
-                Fechar
-              </Text>
-            </TouchableOpacity>
+                      <Checkbox
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                      />
+                      <Text 
+                        style={{
+                          marginLeft: 8,
+                          fontSize: 14,
+                          color: isDark ? colors.gray['100'] : colors.gray['900'],
+                          textTransform: 'capitalize',
+                          flex: 1,
+                          flexShrink: 1,
+                        }}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {displayName}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+            </ScrollView>
           </View>
-        </View>
+        </TouchableOpacity>
       </Modal>
     );
   };
@@ -1134,6 +1320,221 @@ export function DataTable<TData>({
     };
   }, []);
   
+  // Renderizar estado de carregamento para Supabase
+  const renderLoadingState = () => {
+    if (!isLoading) return null;
+    
+    return (
+      <View className="p-6 items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <View className="w-8 h-8 border-2 border-primary-dark dark:border-primary-light border-t-transparent dark:border-t-transparent rounded-full animate-spin mb-2" />
+        <Text className={`text-center ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+          Carregando dados do Supabase...
+        </Text>
+      </View>
+    );
+  };
+
+  // Renderizar estado de erro para Supabase
+  const renderErrorState = () => {
+    if (!error) return null;
+    
+    // Determinar o tipo de erro para exibir mensagem apropriada
+    let errorMessage = error;
+    let errorTitle = "Erro ao carregar dados";
+    
+    if (error.includes("table") && error.includes("not found")) {
+      errorTitle = "Tabela não encontrada";
+      errorMessage = `A tabela '${supabaseConfig?.table}' não foi encontrada no seu projeto Supabase. Verifique se ela existe ou se o nome está correto.`;
+    } else if (error.includes("authentication") || error.includes("auth")) {
+      errorTitle = "Erro de autenticação";
+      errorMessage = "Não foi possível autenticar com o Supabase. Verifique se as credenciais estão corretas.";
+    } else if (error.includes("network") || error.includes("connection")) {
+      errorTitle = "Erro de conexão";
+      errorMessage = "Não foi possível conectar ao servidor Supabase. Verifique sua conexão com a internet.";
+    }
+    
+    return (
+      <View className="p-6 items-center bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <View className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900 items-center justify-center mb-3">
+          <AlertCircle size={24} color={isDark ? '#FCA5A5' : '#DC2626'} />
+        </View>
+        <Text className={`text-lg font-bold text-center mb-2 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+          {errorTitle}
+        </Text>
+        <Text className={`text-center ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+          {errorMessage}
+        </Text>
+        <TouchableOpacity
+          className="mt-4 bg-primary-dark dark:bg-primary-light px-4 py-2 rounded-md"
+          onPress={fetchSupabaseData}
+        >
+          <Text className="text-white dark:text-gray-900 font-medium">Tentar novamente</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+  
+  // Renderizar tabela principal
+  const renderTableContent = () => {
+    // Se estivermos usando Supabase e estiver carregando, mostrar estado de carregamento
+    if (supabaseConfig && isLoading) {
+      return renderLoadingState();
+    }
+    
+    // Se estivermos usando Supabase e houver um erro, mostrar estado de erro
+    if (supabaseConfig && error) {
+      return renderErrorState();
+    }
+  
+    // Renderizar tabela normal
+    return (
+      <>
+        <View style={styles.tableContainer}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={true}
+            scrollEnabled={isScrollNeeded()}
+            contentContainerStyle={styles.scrollContainer}
+          >
+            <View style={styles.fullWidthTable}>
+              {/* Cabeçalho da tabela */}
+              <View style={styles.tableHeader}>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <View key={headerGroup.id} style={styles.tableHeaderRow}>
+                    {headerGroup.headers.map((header) => {
+                      const columnStyle = getColumnStyle(header.id);
+                      const alignment = getHeaderAlignment(header.id);
+                              
+                      return (
+                        <View 
+                          key={header.id} 
+                          style={[
+                            styles.tableHeaderCell,
+                            columnStyle,
+                            alignment
+                          ]}
+                          {...(Platform.OS === 'web' as any ? { 'data-table-header': 'true' } : {})}
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : wrapWithTextAttributes(
+                                flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )
+                              )}
+                        </View>
+                      );
+                    })}
+                  </View>
+                ))}
+              </View>
+              
+              {/* Corpo da tabela */}
+              <View style={styles.tableBody}>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <HoverableView
+                      key={row.id}
+                      style={{
+                        ...StyleSheet.flatten([
+                          styles.tableRow,
+                          row.getIsSelected() && styles.tableRowSelected,
+                        ]),
+                      }}
+                      {...(Platform.OS === 'web' as any ? { 
+                        'data-table-row': 'true',
+                        'data-selected-row': row.getIsSelected() ? 'true' : 'false'
+                      } : {})}
+                      hoverScale={hoverableRowProps.hoverScale}
+                      hoverTranslateY={hoverableRowProps.hoverTranslateY}
+                      animationDuration={hoverableRowProps.animationDuration}
+                      disableHoverBackground={hoverableRowProps.disableHoverBackground || row.getIsSelected()}
+                      hoverColor={themeColors.state.hover}
+                      activeColor={themeColors.state.selected}
+                      onPress={() => {
+                        if (enableRowSelection && enableRowClick) {
+                          row.toggleSelected(!row.getIsSelected());
+                        }
+                      }}
+                      disabled={!enableRowClick}
+                      allowHoverWhenDisabled={true}
+                    >
+                      {row.getVisibleCells().map((cell) => {
+                        const columnStyle = getColumnStyle(cell.column.id);
+                        const alignment = getColumnAlignment(cell.column.id);
+                                
+                        return (
+                          <View 
+                            key={cell.id} 
+                            style={[
+                              styles.tableCell,
+                              columnStyle,
+                              alignment
+                            ]}
+                            {...(Platform.OS === 'web' as any ? { 'data-table-cell': 'true' } : {})}
+                          >
+                            {wrapWithTextAttributes(
+                              flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )
+                            )}
+                          </View>
+                        );
+                      })}
+                    </HoverableView>
+                  ))
+                ) : (
+                  <View style={styles.tableRow}>
+                    <Text 
+                      style={styles.noResults}
+                      {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
+                    >
+                      {noResultsText}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+        
+        {/* Paginação e seleção */}
+        {enablePagination && (
+          <View style={styles.buttonGroup}>
+            <Text 
+              style={styles.selectionText}
+              {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
+            >
+              {table.getFilteredSelectedRowModel().rows.length} {selectionText}{' '}
+              {table.getFilteredRowModel().rows.length} linha(s) selecionada(s).
+            </Text>
+            
+            <View style={styles.paginationGroup}>
+              <Button
+                variant="outline"
+                size="sm"
+                onPress={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                {previousButtonText}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onPress={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                {nextButtonText}
+              </Button>
+            </View>
+          </View>
+        )}
+      </>
+    );
+  };
+  
   return (
     <View style={[styles.container, style]} ref={containerRef}>
       {/* Filtros e controles */}
@@ -1174,149 +1575,8 @@ export function DataTable<TData>({
         {renderColumnsDropdown()}
       </View>
       
-      {/* Tabela */}
-      <View style={styles.tableContainer}>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={true}
-          scrollEnabled={isScrollNeeded()}
-          contentContainerStyle={styles.scrollContainer}
-        >
-          <View style={styles.fullWidthTable}>
-            {/* Cabeçalho da tabela */}
-            <View style={styles.tableHeader}>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <View key={headerGroup.id} style={styles.tableHeaderRow}>
-                  {headerGroup.headers.map((header) => {
-                    const columnStyle = getColumnStyle(header.id);
-                    const alignment = getHeaderAlignment(header.id);
-                            
-                    return (
-                      <View 
-                        key={header.id} 
-                        style={[
-                          styles.tableHeaderCell,
-                          columnStyle,
-                          alignment
-                        ]}
-                        {...(Platform.OS === 'web' as any ? { 'data-table-header': 'true' } : {})}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : wrapWithTextAttributes(
-                              flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )
-                            )}
-                      </View>
-                    );
-                  })}
-                </View>
-              ))}
-            </View>
-            
-            {/* Corpo da tabela */}
-            <View style={styles.tableBody}>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <HoverableView
-                    key={row.id}
-                    style={{
-                      ...StyleSheet.flatten([
-                        styles.tableRow,
-                        row.getIsSelected() && styles.tableRowSelected,
-                      ]),
-                    }}
-                    {...(Platform.OS === 'web' as any ? { 
-                      'data-table-row': 'true',
-                      'data-selected-row': row.getIsSelected() ? 'true' : 'false'
-                    } : {})}
-                    hoverScale={hoverableRowProps.hoverScale}
-                    hoverTranslateY={hoverableRowProps.hoverTranslateY}
-                    animationDuration={hoverableRowProps.animationDuration}
-                    disableHoverBackground={hoverableRowProps.disableHoverBackground || row.getIsSelected()}
-                    hoverColor={themeColors.state.hover}
-                    activeColor={themeColors.state.selected}
-                    onPress={() => {
-                      if (enableRowSelection && enableRowClick) {
-                        row.toggleSelected(!row.getIsSelected());
-                      }
-                    }}
-                    disabled={!enableRowClick}
-                    allowHoverWhenDisabled={true}
-                  >
-                    {row.getVisibleCells().map((cell) => {
-                      const columnStyle = getColumnStyle(cell.column.id);
-                      const alignment = getColumnAlignment(cell.column.id);
-                              
-                      return (
-                        <View 
-                          key={cell.id} 
-                          style={[
-                            styles.tableCell,
-                            columnStyle,
-                            alignment
-                          ]}
-                          {...(Platform.OS === 'web' as any ? { 'data-table-cell': 'true' } : {})}
-                        >
-                          {wrapWithTextAttributes(
-                            flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )
-                          )}
-                        </View>
-                      );
-                    })}
-                  </HoverableView>
-                ))
-              ) : (
-                <View style={styles.tableRow}>
-                  <Text 
-                    style={styles.noResults}
-                    {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
-                  >
-                    {noResultsText}
-                  </Text>
-                </View>
-              )}
-            </View>
-          </View>
-        </ScrollView>
-      </View>
-      
-      {/* Paginação e seleção */}
-      {enablePagination && (
-        <View style={styles.buttonGroup}>
-          <Text 
-            style={styles.selectionText}
-            {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
-          >
-            {table.getFilteredSelectedRowModel().rows.length} {selectionText}{' '}
-            {table.getFilteredRowModel().rows.length} linha(s) selecionada(s).
-          </Text>
-          
-          <View style={styles.paginationGroup}>
-            <Button
-              variant="outline"
-              size="sm"
-              onPress={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              {previousButtonText}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onPress={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              {nextButtonText}
-            </Button>
-          </View>
-        </View>
-      )}
+      {/* Tabela ou estados de carregamento/erro */}
+      {renderTableContent()}
     </View>
   );
 } 
