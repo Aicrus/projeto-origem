@@ -4329,66 +4329,74 @@ const SheetExampleContent: React.FC = () => {
         <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
         
         <View className="flex-row flex-wrap gap-sm justify-center mb-lg">
-          {/* Layout inspirado na terceira imagem com botões em grid 2x2 */}
-          <View className="flex flex-row flex-wrap justify-center" style={{ maxWidth: 300, gap: 10 }}>
-            <View style={{ width: 140, margin: 5 }}>
-              <Pressable
+          {/* Grid 2x2 para os botões de direção */}
+          <View className="flex flex-row flex-wrap justify-center" style={{ width: 310 }}>
+            <View style={{ width: 150, margin: 2 }}>
+              <HoverableView
                 onPress={() => {
                   setCurrentSheet('top');
                   setSheetVisible(true);
                 }}
-                className="bg-primary-light dark:bg-primary-dark py-2 rounded-md"
+                className="bg-white dark:bg-white py-4 rounded-lg border border-gray-200"
                 style={{ width: '100%' }}
+                hoverScale={1.02}
+                hoverElevation={2}
               >
-                <Text className="text-white font-jakarta-medium text-center">
+                <Text className="text-black font-jakarta-medium text-center text-lg">
                   top
                 </Text>
-              </Pressable>
+              </HoverableView>
             </View>
             
-            <View style={{ width: 140, margin: 5 }}>
-              <Pressable
+            <View style={{ width: 150, margin: 2 }}>
+              <HoverableView
                 onPress={() => {
                   setCurrentSheet('right');
                   setSheetVisible(true);
                 }}
-                className="bg-primary-light dark:bg-primary-dark py-2 rounded-md"
+                className="bg-white dark:bg-white py-4 rounded-lg border border-gray-200"
                 style={{ width: '100%' }}
+                hoverScale={1.02}
+                hoverElevation={2}
               >
-                <Text className="text-white font-jakarta-medium text-center">
+                <Text className="text-black font-jakarta-medium text-center text-lg">
                   right
                 </Text>
-              </Pressable>
+              </HoverableView>
             </View>
             
-            <View style={{ width: 140, margin: 5 }}>
-              <Pressable
+            <View style={{ width: 150, margin: 2 }}>
+              <HoverableView
                 onPress={() => {
                   setCurrentSheet('bottom');
                   setSheetVisible(true);
                 }}
-                className="bg-primary-light dark:bg-primary-dark py-2 rounded-md"
+                className="bg-white dark:bg-white py-4 rounded-lg border border-gray-200"
                 style={{ width: '100%' }}
+                hoverScale={1.02}
+                hoverElevation={2}
               >
-                <Text className="text-white font-jakarta-medium text-center">
+                <Text className="text-black font-jakarta-medium text-center text-lg">
                   bottom
                 </Text>
-              </Pressable>
+              </HoverableView>
             </View>
             
-            <View style={{ width: 140, margin: 5 }}>
-              <Pressable
+            <View style={{ width: 150, margin: 2 }}>
+              <HoverableView
                 onPress={() => {
                   setCurrentSheet('left');
                   setSheetVisible(true);
                 }}
-                className="bg-primary-light dark:bg-primary-dark py-2 rounded-md"
+                className="bg-white dark:bg-white py-4 rounded-lg border border-gray-200"
                 style={{ width: '100%' }}
+                hoverScale={1.02}
+                hoverElevation={2}
               >
-                <Text className="text-white font-jakarta-medium text-center">
+                <Text className="text-black font-jakarta-medium text-center text-lg">
                   left
                 </Text>
-              </Pressable>
+              </HoverableView>
             </View>
           </View>
         </View>
