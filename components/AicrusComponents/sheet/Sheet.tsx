@@ -56,21 +56,29 @@ const Sheet: React.FC<SheetProps> = ({
 
   // Define valores padrão com base no tipo de dispositivo
   const getDefaultSize = () => {
-    if (isMobileOrTablet) {
-      // Valores para mobile/tablet
+    if (Platform.OS !== 'web') {
+      // Valores para dispositivos nativos (iOS/Android)
+      return {
+        top: 450,
+        bottom: 450,
+        left: 280,
+        right: 280
+      };
+    } else if (isMobileOrTablet) {
+      // Valores para web mobile/tablet
       return {
         top: '450px',
         bottom: '450px',
-        left: '250px',
-        right: '250px'
+        left: '280px',
+        right: '280px'
       };
     } else {
-      // Valores para desktop
+      // Valores para web desktop
       return {
-        top: '350px',
-        bottom: '350px',
-        left: '350px',
-        right: '350px'
+        top: '300px',
+        bottom: '300px',
+        left: '300px',
+        right: '300px'
       };
     }
   };
@@ -141,6 +149,16 @@ const Sheet: React.FC<SheetProps> = ({
       width: isVertical ? '100%' : (width || defaultSizes[finalPosition]),
       height: isHorizontal ? '100%' : (height || defaultSizes[finalPosition]),
     };
+
+    // Convertemos strings com 'px' para números em ambientes nativos
+    if (Platform.OS !== 'web') {
+      if (typeof containerStyle.width === 'string' && containerStyle.width.endsWith('px')) {
+        containerStyle.width = parseFloat(containerStyle.width);
+      }
+      if (typeof containerStyle.height === 'string' && containerStyle.height.endsWith('px')) {
+        containerStyle.height = parseFloat(containerStyle.height);
+      }
+    }
 
     // Ajustes de borda baseados na posição
     switch (finalPosition) {
