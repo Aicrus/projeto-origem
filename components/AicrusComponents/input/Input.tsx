@@ -568,8 +568,64 @@ export const Input = ({
       `;
       document.head.appendChild(style);
       
+      // Adicionando prevenção de scroll quando o cursor estiver sobre o input numérico
+      const handleWheel = (e: WheelEvent) => {
+        // Verifica se o alvo do evento é um input do tipo number ou está dentro de um container de input number
+        const target = e.target as HTMLElement;
+        const isNumberInput = target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'number';
+        const isInNumberInputContainer = target.closest('[data-number-input-container]') !== null;
+        
+        if (isNumberInput || isInNumberInputContainer) {
+          // Previne o scroll da página
+          e.preventDefault();
+          
+          // Encontra o input numérico
+          let inputElement: HTMLInputElement | null = null;
+          if (isNumberInput) {
+            inputElement = target as HTMLInputElement;
+          } else if (isInNumberInputContainer) {
+            inputElement = target.closest('[data-number-input-container]')?.querySelector('input[type="number"]') || null;
+          }
+          
+          if (inputElement) {
+            // Obtém os valores atuais
+            const currentValue = parseFloat(inputElement.value) || 0;
+            const step = parseFloat(inputElement.step) || 1;
+            const min = inputElement.min !== '' ? parseFloat(inputElement.min) : undefined;
+            const max = inputElement.max !== '' ? parseFloat(inputElement.max) : undefined;
+            
+            // Determina a direção do scroll (negativo = para cima = aumentar valor)
+            let newValue = currentValue;
+            if (e.deltaY < 0) {
+              // Scroll para cima, aumenta o valor
+              newValue = currentValue + step;
+              if (max !== undefined && newValue > max) newValue = max;
+            } else {
+              // Scroll para baixo, diminui o valor
+              newValue = currentValue - step;
+              if (min !== undefined && newValue < min) newValue = min;
+            }
+            
+            // Atualiza o valor do input
+            inputElement.value = newValue.toString();
+            
+            // Dispara um evento de change para que React e outros frameworks detectem a mudança
+            const event = new Event('change', { bubbles: true });
+            inputElement.dispatchEvent(event);
+            
+            // Se tiver um evento de input, também dispara
+            const inputEvent = new Event('input', { bubbles: true });
+            inputElement.dispatchEvent(inputEvent);
+          }
+        }
+      };
+      
+      // Adiciona o listener em modo de captura para garantir que ele é executado antes do comportamento padrão
+      document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+      
       return () => {
         document.head.removeChild(style);
+        document.removeEventListener('wheel', handleWheel, { capture: true });
       };
     }
   }, [isDark]);
