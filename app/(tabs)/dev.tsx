@@ -367,32 +367,6 @@ export default function DevPage() {
     }
   }, [isNative, toastPosition]);
   
-  // Carregar dados do Supabase quando o componente Select for selecionado
-  useEffect(() => {
-    if (activeComponent === 'select') {
-      fetchUsersForSelect();
-    }
-  }, [activeComponent]);
-  
-  // Função para buscar usuários do Supabase para o Select
-  const fetchUsersForSelect = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('usersAicrusAcademy')
-        .select('id, nome, email, created_at, idCustomerAsaas')
-        .order('nome', { ascending: true });
-        
-      if (error) {
-        console.error('Erro ao buscar usuários para Select:', error);
-        return;
-      }
-      
-      setSupabaseUsersForSelect(data || []);
-    } catch (err) {
-      console.error('Erro ao buscar dados do Supabase para Select:', err);
-    }
-  };
-  
   // Validar email
   const isValidEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -760,29 +734,24 @@ export default function DevPage() {
           
           {/* Select com dados do Supabase (nome) */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Select com Supabase (Nome)</Text>
-            {supabaseNomeOptions.length > 0 ? (
-              <Select
-                options={supabaseNomeOptions}
-                value={selectSupabaseNome}
-                setValue={setSelectSupabaseNome}
-                placeholder="Selecione um nome"
-                label="Nome do usuário"
-                searchable={true}
-                superBaseTable={true}
-              />
-            ) : (
-              <View className={`p-md bg-bg-tertiary-light dark:bg-bg-tertiary-dark rounded-md`}>
-                <Text className={`text-body-md ${textSecondary}`}>
-                  Carregando dados do Supabase...
-                </Text>
-              </View>
-            )}
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Select com Supabase (integração direta)</Text>
+            <Select
+              value={selectSupabaseNome}
+              setValue={setSelectSupabaseNome}
+              placeholder="Selecione um nome"
+              label="Nome do usuário"
+              searchable={true}
+              supabaseTable="usersAicrusAcademy"
+              supabaseColumn="nome"
+              supabaseOrderBy="nome"
+              supabaseAscending={true}
+            />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Este exemplo demonstra o Select já configurado para usar dados do Supabase,
-              especificamente os nomes da tabela 'usersAicrusAcademy'. Para implementar em seu projeto,
-              basta carregar os dados com a função fetchUsersForSelect e convertê-los para o formato
-              de opções com value/label. O campo de busca permite localizar rapidamente um nome específico.
+              Este exemplo demonstra a nova integração direta com o Supabase. Basta passar as propriedades:
+              <Text className="font-bold"> supabaseTable</Text> (nome da tabela) e 
+              <Text className="font-bold"> supabaseColumn</Text> (nome da coluna a ser usada).
+              Opcionalmente, você pode especificar <Text className="font-bold">supabaseOrderBy</Text> e
+              <Text className="font-bold"> supabaseAscending</Text> para controlar a ordenação dos dados.
             </Text>
           </View>
         </View>
@@ -862,6 +831,28 @@ export default function DevPage() {
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>searchable</Text>
             <Text className={`text-body-sm ${textSecondary}`}>Adiciona campo de busca nas opções</Text>
+          </View>
+          
+          <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mt-lg mb-sm`}>Integração com Supabase</Text>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>supabaseTable</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Nome da tabela no Supabase (obrigatório para uso com Supabase)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>supabaseColumn</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Nome da coluna que será usada como valor/label (obrigatório para uso com Supabase)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>supabaseOrderBy</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Coluna para ordenação (opcional, usa supabaseColumn se não especificado)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>supabaseAscending</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Define se a ordenação é ascendente (opcional, padrão: true)</Text>
           </View>
           
           <Text className={`text-body-sm ${textSecondary} mt-md`}>

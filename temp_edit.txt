@@ -1,0 +1,7 @@
+  // Estados separados para cada exemplo de Select
+  const [selectBasico, setSelectBasico] = useState('');
+  const [selectBusca, setSelectBusca] = useState('');
+  const [multiSelect, setMultiSelect] = useState<string[]>([]);
+  const [selectSupabaseNome, setSelectSupabaseNome] = useState('');
+  
+  // Notificações - estados 
