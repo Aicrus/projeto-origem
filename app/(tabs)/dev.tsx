@@ -4322,71 +4322,82 @@ const SheetExampleContent: React.FC = () => {
       </Text>
       <Text className={`text-body-md ${textSecondary} mb-lg`}>
         O Sheet é um componente que permite exibir conteúdo em uma janela modal deslizando de qualquer direção.
-        Em dispositivos móveis, o Sheet só aparece da parte inferior da tela, enquanto no desktop pode vir de qualquer direção.
+        Disponível em todos os dispositivos e breakpoints.
       </Text>
       
       <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
         <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
         
-        <View className="flex-row flex-wrap gap-md mb-lg">
-          <Pressable
-            onPress={() => {
-              setCurrentSheet('bottom');
-              setSheetVisible(true);
-            }}
-            className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
-          >
-            <Text className="text-white font-jakarta-medium">
-              De Baixo
-            </Text>
-          </Pressable>
-          
-          <Pressable
-            onPress={() => {
-              setCurrentSheet('top');
-              setSheetVisible(true);
-            }}
-            className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
-          >
-            <Text className="text-white font-jakarta-medium">
-              De Cima
-            </Text>
-          </Pressable>
-          
-          <Pressable
-            onPress={() => {
-              setCurrentSheet('left');
-              setSheetVisible(true);
-            }}
-            className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
-          >
-            <Text className="text-white font-jakarta-medium">
-              Da Esquerda
-            </Text>
-          </Pressable>
-          
-          <Pressable
-            onPress={() => {
-              setCurrentSheet('right');
-              setSheetVisible(true);
-            }}
-            className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
-          >
-            <Text className="text-white font-jakarta-medium">
-              Da Direita
-            </Text>
-          </Pressable>
+        <View className="flex-row flex-wrap gap-sm justify-center mb-lg">
+          {/* Layout inspirado na terceira imagem com botões em grid 2x2 */}
+          <View className="flex flex-row flex-wrap justify-center" style={{ maxWidth: 300, gap: 10 }}>
+            <View style={{ width: 140, margin: 5 }}>
+              <Pressable
+                onPress={() => {
+                  setCurrentSheet('top');
+                  setSheetVisible(true);
+                }}
+                className="bg-primary-light dark:bg-primary-dark py-2 rounded-md"
+                style={{ width: '100%' }}
+              >
+                <Text className="text-white font-jakarta-medium text-center">
+                  top
+                </Text>
+              </Pressable>
+            </View>
+            
+            <View style={{ width: 140, margin: 5 }}>
+              <Pressable
+                onPress={() => {
+                  setCurrentSheet('right');
+                  setSheetVisible(true);
+                }}
+                className="bg-primary-light dark:bg-primary-dark py-2 rounded-md"
+                style={{ width: '100%' }}
+              >
+                <Text className="text-white font-jakarta-medium text-center">
+                  right
+                </Text>
+              </Pressable>
+            </View>
+            
+            <View style={{ width: 140, margin: 5 }}>
+              <Pressable
+                onPress={() => {
+                  setCurrentSheet('bottom');
+                  setSheetVisible(true);
+                }}
+                className="bg-primary-light dark:bg-primary-dark py-2 rounded-md"
+                style={{ width: '100%' }}
+              >
+                <Text className="text-white font-jakarta-medium text-center">
+                  bottom
+                </Text>
+              </Pressable>
+            </View>
+            
+            <View style={{ width: 140, margin: 5 }}>
+              <Pressable
+                onPress={() => {
+                  setCurrentSheet('left');
+                  setSheetVisible(true);
+                }}
+                className="bg-primary-light dark:bg-primary-dark py-2 rounded-md"
+                style={{ width: '100%' }}
+              >
+                <Text className="text-white font-jakarta-medium text-center">
+                  left
+                </Text>
+              </Pressable>
+            </View>
+          </View>
         </View>
         
         <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>
-          {currentBreakpoint === 'sm' || Platform.OS !== 'web' 
-            ? 'No mobile, o Sheet só abre de baixo para cima' 
-            : 'Escolha a direção do Sheet'}
+          Escolha a direção do Sheet
         </Text>
         <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-          {currentBreakpoint === 'sm' || Platform.OS !== 'web'
-            ? 'Por razões de UX, em dispositivos móveis o Sheet só abre de baixo para cima'
-            : 'No desktop, o Sheet pode abrir de qualquer uma das quatro direções'}
+          O Sheet pode abrir de qualquer uma das quatro direções em todos os dispositivos e breakpoints
         </Text>
       </View>
       
@@ -4395,8 +4406,8 @@ const SheetExampleContent: React.FC = () => {
         isOpen={sheetVisible}
         onClose={() => setSheetVisible(false)}
         position={currentSheet}
-        height="50%"
-        width="80%"
+        height={currentSheet === 'top' || currentSheet === 'bottom' ? '350px' : '100%'}
+        width={currentSheet === 'left' || currentSheet === 'right' ? '350px' : '100%'}
         borderRadius={16}
         closeOnOverlayClick={true}
         showCloseButton={true}
@@ -4476,12 +4487,12 @@ const SheetExampleContent: React.FC = () => {
         
         <View className="mb-sm">
           <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>height</Text>
-          <Text className={`text-body-sm ${textSecondary}`}>Altura do Sheet (number ou string)</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Altura do Sheet (padrão: 350px para top/bottom)</Text>
         </View>
         
         <View className="mb-sm">
           <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>width</Text>
-          <Text className={`text-body-sm ${textSecondary}`}>Largura do Sheet (number ou string)</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Largura do Sheet (padrão: 350px para left/right)</Text>
         </View>
         
         <View className="mb-sm">
@@ -4530,7 +4541,10 @@ const [isOpen, setIsOpen] = useState(false);
   isOpen={isOpen}
   onClose={() => setIsOpen(false)}
   position="bottom"
-  height="50%"
+  // Valores padrão: height="350px" para top/bottom, width="350px" para left/right
+  // Você pode especificar qualquer valor ou porcentagem
+  height="350px"
+  width="100%"
   borderRadius={16}
   closeOnOverlayClick={true}
 >

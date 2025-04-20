@@ -26,8 +26,8 @@ const Sheet: React.FC<SheetProps> = ({
   position = 'bottom',
   children,
   overlayOpacity = 0.5,
-  height = '50%',
-  width = '80%',
+  height = '350px',
+  width = '350px',
   borderRadius = 16,
   closeOnOverlayClick = true,
   showCloseButton = false,
@@ -39,6 +39,7 @@ const Sheet: React.FC<SheetProps> = ({
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const [dimensions, setDimensions] = useState({ width: windowWidth, height: windowHeight });
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', ({ window }) => {
@@ -48,14 +49,12 @@ const Sheet: React.FC<SheetProps> = ({
     return () => subscription.remove();
   }, []);
 
-  // Determina se estamos no mobile para restringir posições
-  const isMobile = Platform.OS !== 'web' || dimensions.width < 768;
-
-  // Ajusta a posição se necessário para mobile
-  const finalPosition = isMobile ? 'bottom' : position;
+  // Usar sempre a posição original, sem forçar 'bottom' em dispositivos móveis
+  const finalPosition = position;
 
   useEffect(() => {
     if (isOpen) {
+      setVisible(true);
       Animated.timing(animation, {
         toValue: 1,
         duration: animationDuration,
@@ -66,7 +65,10 @@ const Sheet: React.FC<SheetProps> = ({
         toValue: 0,
         duration: animationDuration,
         useNativeDriver: true,
-      }).start();
+      }).start(() => {
+        // Só esconde o modal depois que a animação de fechamento terminar
+        setVisible(false);
+      });
     }
   }, [isOpen, animation, animationDuration]);
 
@@ -160,12 +162,13 @@ const Sheet: React.FC<SheetProps> = ({
     }),
   };
 
-  if (!isOpen) return null;
+  // Se não estiver visível nem aberto, não renderize nada
+  if (!visible && !isOpen) return null;
 
   return (
     <Modal
       transparent
-      visible={isOpen}
+      visible={visible}
       onRequestClose={onClose}
       animationType="none"
       testID={testID}
