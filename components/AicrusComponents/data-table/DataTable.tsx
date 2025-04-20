@@ -245,7 +245,7 @@ export function DataTable<TData>({
         });
       } else {
         setDropdownPosition({
-          top: rect.top - dropdownHeight - 5 + window.scrollY, // 5px de espaçamento
+          top: rect.top + window.scrollY, // Guardar a posição top para cálculo do bottom
           right: window.innerWidth - rect.right - window.scrollX,
           width: 200,
           openDown: false
@@ -316,7 +316,7 @@ export function DataTable<TData>({
           });
         } else {
           setDropdownPosition({
-            top: rect.top - dropdownHeight - 5 + window.scrollY,
+            top: rect.top + window.scrollY, // Guardar a posição top para cálculo do bottom
             right: window.innerWidth - rect.right - window.scrollX,
             width: 200,
             openDown: false
@@ -418,7 +418,7 @@ export function DataTable<TData>({
         },
         container: {
           position: 'absolute',
-          top: dropdownPosition.top,
+          top: dropdownPosition.openDown ? dropdownPosition.top : undefined,
           right: dropdownPosition.right,
           left: dropdownPosition.left,
           width: dropdownPosition.width,
@@ -461,6 +461,13 @@ export function DataTable<TData>({
         }
       });
 
+      // Calculando o estilo adicional para quando o dropdown abre para cima
+      const containerStyle = {...dropdownStyle.container as React.CSSProperties};
+      if (!dropdownPosition.openDown) {
+        containerStyle.top = undefined;
+        containerStyle.bottom = `${window.innerHeight - (dropdownPosition.top || 0) + 5}px`;
+      }
+
       return (
         <>
           {/* Overlay transparente para capturar eventos e prevenir scroll */}
@@ -470,7 +477,7 @@ export function DataTable<TData>({
           />
           <div 
             ref={dropdownRef as any}
-            style={dropdownStyle.container as React.CSSProperties}
+            style={containerStyle}
             onClick={(e) => e.stopPropagation()}
             data-dropdown-content="true"
           >
