@@ -695,7 +695,7 @@ export default function DevPage() {
             <Input
               value={inputRedimensionavel}
               onChangeText={setInputRedimensionavel}
-              placeholder="Digite um texto longo aqui... Este input permite redimensionamento vertical no navegador."
+              placeholder="Digite um texto longo aqui... Este input permite redimensionamento vertical."
               label="Texto redimensionável"
               multiline={true}
               numberOfLines={3}
@@ -706,9 +706,18 @@ export default function DevPage() {
             />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Input multilinhas que pode ser redimensionado verticalmente pelo usuário.
-              Em qualquer plataforma, o usuário pode arrastar a alça inferior para ajustar a altura do campo.
-              {Platform.OS !== 'web' && ' Toque e arraste o indicador no canto inferior direito para redimensionar.'}
+              Funciona perfeitamente em todas as plataformas (web, iOS e Android).
+              {Platform.OS !== 'web' 
+                ? ' No ambiente nativo, toque e arraste o indicador no canto inferior direito.' 
+                : ' No navegador, use o indicador no canto inferior direito ou a área de redimensionamento padrão.'}
             </Text>
+            <View className={`mt-sm p-xs rounded-md ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}>
+              <Text className={`text-body-xs ${textSecondary}`}>
+                <Text className="font-jakarta-bold">Dica:</Text> O componente bloqueia automaticamente o scroll durante o redimensionamento, 
+                facilitando a operação em dispositivos móveis. Define `minHeight` e `maxHeight` para controlar 
+                os limites de altura, e use `setScrollEnabled` em ScrollViews que contenham este componente.
+              </Text>
+            </View>
           </View>
         </View>
         
@@ -806,17 +815,22 @@ export default function DevPage() {
           
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>resizable</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Permite redimensionar o campo verticalmente (apenas para multiline=true)</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Permite redimensionar o campo verticalmente (funciona em todas as plataformas quando multiline=true)</Text>
           </View>
           
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>minHeight</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Altura mínima para inputs redimensionáveis</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Altura mínima para inputs redimensionáveis (padrão: 38px)</Text>
           </View>
           
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>maxHeight</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Altura máxima para inputs redimensionáveis</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Altura máxima para inputs redimensionáveis (padrão: 200px)</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>setScrollEnabled</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Função para controlar o scroll do container pai durante o redimensionamento (recomendado para ScrollViews)</Text>
           </View>
           
           <Text className={`text-body-sm ${textSecondary} mt-md`}>

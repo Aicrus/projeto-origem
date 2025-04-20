@@ -687,39 +687,34 @@ export const Input = ({
           min-height: ${minHeight}px;
           max-height: ${maxHeight}px;
           overflow-y: auto;
-          padding-bottom: 6px; /* Espaço para a alça de redimensionamento */
+          padding-bottom: 10px; /* Aumentado para dar mais espaço para o indicador */
           text-align-vertical: top !important;
           position: relative; /* Para posicionamento do pseudo-elemento */
         }
         
-        /* Alça de redimensionamento personalizada */
-        .resize-handle {
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          width: 10px;
-          height: 10px;
-          cursor: ns-resize;
-          background-color: transparent;
+        /* Estilização do container para inputs redimensionáveis */
+        [data-input-container][data-multiline="true"] {
+          position: relative;
+          overflow: visible;
         }
         
-        /* Indicador de redimensionamento visível no canto */
-        textarea.resizable::after {
+        /* Indicador visual personalizado no canto inferior direito */
+        [data-input-container][data-multiline="true"]::after {
           content: '';
           position: absolute;
-          bottom: 3px;
-          right: 3px;
-          width: 8px;
-          height: 8px;
-          border-right: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.25)'};
-          border-bottom: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.25)'};
+          bottom: 4px;
+          right: 4px;
+          width: 10px;
+          height: 10px;
+          border-right: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.3)'};
+          border-bottom: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.3)'};
           pointer-events: none;
-          z-index: 100;
+          z-index: 10;
         }
         
-        /* Esconde o redimensionador nativo para usar nosso indicador personalizado */
+        /* Ajuste do redimensionador nativo */
         textarea::-webkit-resizer {
-          opacity: 1; /* Manter funcional mas invisível */
+          opacity: 1; /* Manter funcional */
           background-color: transparent;
         }
         
@@ -737,12 +732,6 @@ export const Input = ({
         /* Remove qualquer padding que possa estar afetando o posicionamento */
         .native-number-input {
           padding-right: 0 !important;
-        }
-        
-        /* Ajusta o container para incluir o indicador visualmente */
-        [data-input-container][data-multiline="true"] {
-          position: relative;
-          overflow: visible;
         }
       `;
       document.head.appendChild(style);
