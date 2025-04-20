@@ -6,9 +6,8 @@ import { Sidebar } from '../../components/AicrusComponents/sidebar';
 import { PageContainer } from '../../components/AicrusComponents/page-container';
 import { Portal } from '@gorhom/portal';
 import { useResponsive } from '../../hooks/useResponsive';
-import { Building2, Users, ClipboardList, AlertTriangle, MoreVertical, Edit, Trash2, Share, Eye, Copy, FileText } from 'lucide-react-native';
+import { Building2, Users, ClipboardList, AlertTriangle } from 'lucide-react-native';
 import { BREAKPOINTS } from '../../constants/responsive';
-import { DropdownMenu, useDropdownMenu } from '../../components/dropdown-menu';
 
 export default function Home() {
   const { currentTheme } = useTheme();
@@ -16,10 +15,6 @@ export default function Home() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isMobile, isTablet, isDesktop } = useResponsive();
   const { width } = useWindowDimensions();
-  
-  // Usar o hook para gerenciar o menu
-  const menuButtonRef = useRef(null);
-  const { isOpen: isMenuOpen, open: openMenu, close: closeMenu } = useDropdownMenu(menuButtonRef);
   
   const showHeader = true;
   const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
@@ -30,64 +25,6 @@ export default function Home() {
     setIsSidebarOpen(!isSidebarOpen);
   };
   
-  // Opções do menu
-  const menuOptions = [
-    { 
-      value: 'view', 
-      label: 'Visualizar detalhes', 
-      icon: <Eye size={16} color={isDark ? '#D1D5DB' : '#57636C'} />,
-      onPress: () => {
-        console.log('Visualizar detalhes');
-        closeMenu();
-      }
-    },
-    { 
-      value: 'edit', 
-      label: 'Editar', 
-      icon: <Edit size={16} color={isDark ? '#D1D5DB' : '#57636C'} />,
-      onPress: () => {
-        console.log('Editar');
-        closeMenu();
-      }
-    },
-    { 
-      value: 'duplicate', 
-      label: 'Duplicar', 
-      icon: <Copy size={16} color={isDark ? '#D1D5DB' : '#57636C'} />,
-      onPress: () => {
-        console.log('Duplicar');
-        closeMenu();
-      }
-    },
-    { 
-      value: 'share', 
-      label: 'Compartilhar', 
-      icon: <Share size={16} color={isDark ? '#D1D5DB' : '#57636C'} />,
-      onPress: () => {
-        console.log('Compartilhar');
-        closeMenu();
-      }
-    },
-    { 
-      value: 'export', 
-      label: 'Exportar relatório', 
-      icon: <FileText size={16} color={isDark ? '#D1D5DB' : '#57636C'} />,
-      onPress: () => {
-        console.log('Exportar relatório');
-        closeMenu();
-      }
-    },
-    { 
-      value: 'delete', 
-      label: 'Excluir', 
-      icon: <Trash2 size={16} color="#EF4444" />,
-      onPress: () => {
-        console.log('Excluir');
-        closeMenu();
-      }
-    },
-  ];
-
   interface StatCardProps {
     title: string;
     value: number;
@@ -192,36 +129,6 @@ export default function Home() {
     
     return (
       <View style={styles.contentContainer}>
-        {/* Botão do menu e dropdown */}
-        <View style={styles.menuButtonContainer}>
-          <TouchableOpacity
-            ref={menuButtonRef}
-            onPress={openMenu}
-            style={[
-              styles.menuButton,
-              { backgroundColor: isDark ? '#1F2937' : '#F3F4F6' }
-            ]}
-            activeOpacity={0.7}
-          >
-            <Text style={{ 
-              color: isDark ? '#D1D5DB' : '#4B5563',
-              marginRight: 8
-            }}>
-              Ações
-            </Text>
-            <MoreVertical size={18} color={isDark ? '#D1D5DB' : '#4B5563'} />
-          </TouchableOpacity>
-          
-          <DropdownMenu
-            options={menuOptions}
-            isOpen={isMenuOpen}
-            onClose={closeMenu}
-            triggerRef={menuButtonRef}
-            searchable={true}
-            maxHeight={300}
-          />
-        </View>
-        
         {/* Cards superiores - agora vazios */}
         <View className={`gap-5 mb-5 grid ${topCardsLayout}`} style={styles.topSection}>
           {stats.map((stat) => (
@@ -337,17 +244,6 @@ const styles = StyleSheet.create({
     minHeight: '100%',
     display: 'flex',
     flexDirection: 'column',
-  },
-  menuButtonContainer: {
-    marginBottom: 16,
-  },
-  menuButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
   },
   topSection: {
     flexShrink: 0,
