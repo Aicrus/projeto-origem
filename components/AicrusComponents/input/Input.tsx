@@ -491,7 +491,7 @@ export const Input = ({
           >
             <Calendar 
               size={16} 
-              color={isDark ? colors.primary.dark : colors.primary.main} 
+              color={isDark ? '#95A1AC' : '#57636C'} 
             />
           </TouchableOpacity>
         )}

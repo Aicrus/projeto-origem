@@ -451,7 +451,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   const ClockIcon = () => (
     <Clock 
       size={16} 
-      color={isDark ? colors.primary.dark : colors.primary.main} 
+      color={isDark ? '#95A1AC' : '#57636C'} 
     />
   );
 
