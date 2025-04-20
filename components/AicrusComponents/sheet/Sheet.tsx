@@ -75,8 +75,8 @@ const Sheet: React.FC<SheetProps> = ({
     } else {
       // Valores para web desktop
       return {
-        top: '300px',
-        bottom: '300px',
+        top: '380px',
+        bottom: '380px',
         left: '300px',
         right: '300px'
       };
