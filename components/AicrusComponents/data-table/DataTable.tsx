@@ -1,4 +1,4 @@
-import React, { useState, useEffect, RefObject, useRef } from 'react';
+import React, { useState, useEffect, RefObject, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -33,6 +33,13 @@ import { HoverableView } from '../hoverable-view/HoverableView';
 import { createPortal } from 'react-dom';
 import { SupabaseClient } from '@supabase/supabase-js';
 
+// Declaração para adicionar supabase ao objeto window
+declare global {
+  interface Window {
+    supabase?: SupabaseClient;
+  }
+}
+
 /**
  * @component DataTable
  * @description Componente de tabela de dados altamente personalizável que suporta:
@@ -45,17 +52,17 @@ import { SupabaseClient } from '@supabase/supabase-js';
  * - Responsividade
  * - Efeito de hover nas linhas usando HoverableView
  * - Integração com Supabase (opcional)
+ * - Dados de exemplo automáticos quando não há dados fornecidos
  * 
  * Exemplos de uso:
  * 
  * ```tsx
- * // Tabela básica
+ * // Tabela básica - vai usar dados de exemplo embutidos automaticamente
  * <DataTable 
- *   data={dadosArray} 
  *   columns={colunasArray}
  * />
  * 
- * // Tabela com paginação, ordenação e filtros
+ * // Tabela com dados personalizados
  * <DataTable 
  *   data={dadosArray} 
  *   columns={colunasArray}
@@ -64,7 +71,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
  *   enablePagination
  * />
  * 
- * // Tabela com integração Supabase
+ * // Tabela com integração Supabase (carrega dados automaticamente)
  * <DataTable 
  *   columns={colunasArray}
  *   supabaseConfig={{
@@ -74,24 +81,182 @@ import { SupabaseClient } from '@supabase/supabase-js';
  *     orderBy: {column: 'created_at', ascending: false}
  *   }}
  * />
+ * 
+ * // Tabela com seleção de linha ao clicar
+ * <DataTable 
+ *   columns={colunasArray}
+ *   enableRowSelection
+ *   enableRowClick
+ * />
  * ```
  */
 
+// Tipo para os dados de exemplo padrões da tabela
+interface DefaultPaymentData {
+  id: string;
+  amount: number;
+  status: "pending" | "processing" | "success" | "failed";
+  email: string;
+}
+
+// Dados de exemplo estáticos para serem usados quando não há dados fornecidos
+const defaultExampleData: DefaultPaymentData[] = [
+  {
+    id: "m5gr84i9",
+    amount: 316,
+    status: "success",
+    email: "ken99@example.com",
+  },
+  {
+    id: "3u1reuv4",
+    amount: 242,
+    status: "success",
+    email: "Abe45@example.com",
+  },
+  {
+    id: "derv1ws0",
+    amount: 837,
+    status: "processing",
+    email: "Monserrat44@example.com",
+  },
+  {
+    id: "5kma53ae",
+    amount: 874,
+    status: "success",
+    email: "Silas22@example.com",
+  },
+  {
+    id: "bhqecj4p",
+    amount: 721,
+    status: "failed",
+    email: "carmella@example.com",
+  },
+];
+
+// Configuração padrão para o Supabase usando a tabela usersAicrusAcademy
+const defaultSupabaseConfig: SupabaseConfig = {
+  table: 'usersAicrusAcademy',
+  select: 'id, created_at, nome, email, idCustomerAsaas',
+  orderBy: { column: 'created_at', ascending: false }
+};
+
+// Colunas padrão para os dados de exemplo
+const createDefaultColumns = (isDark: boolean): ColumnDef<DefaultPaymentData>[] => [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        accessibilityLabel="Selecionar todos"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        accessibilityLabel="Selecionar linha"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => (
+      <View>
+        <Text style={{ color: isDark ? colors.gray['100'] : colors.gray['900'] }} className="capitalize">
+          {row.getValue("status")}
+        </Text>
+      </View>
+    ),
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+    cell: ({ row }) => (
+      <View>
+        <Text style={{ color: isDark ? colors.gray['100'] : colors.gray['900'] }} className="lowercase">
+          {row.getValue("email")}
+        </Text>
+      </View>
+    ),
+  },
+  {
+    accessorKey: "amount",
+    header: () => <Text style={{ textAlign: 'right', width: '100%', color: isDark ? colors.gray['100'] : colors.gray['900'] }}>Valor</Text>,
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("amount"));
+      const formatted = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(amount);
+
+      return (
+        <Text style={{ textAlign: 'right', width: '100%', color: isDark ? colors.gray['100'] : colors.gray['900'] }}>
+          {formatted}
+        </Text>
+      );
+    },
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: () => (
+      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <TouchableOpacity style={{ padding: 4 }}>
+          <MoreHorizontal size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+        </TouchableOpacity>
+      </View>
+    ),
+  },
+];
+
 export interface SupabaseConfig {
-  /** Cliente Supabase inicializado */
-  client: SupabaseClient;
-  /** Nome da tabela no Supabase */
-  table: string;
-  /** Colunas a serem selecionadas (formato SQL: '*' ou 'id, nome, email') */
+  /** 
+   * Cliente Supabase inicializado 
+   * Exemplo: import { supabase } from '@/lib/supabase'
+   */
+  client?: SupabaseClient;
+  
+  /** 
+   * Nome da tabela no Supabase 
+   * Exemplo: 'users', 'products', etc.
+   * Padrão: 'usersAicrusAcademy'
+   */
+  table?: string;
+  
+  /** 
+   * Colunas a serem selecionadas
+   * Formato SQL: '*' para todas as colunas ou 'id, nome, email' para colunas específicas 
+   * Se não informado, será usado 'id, created_at, nome, email, idCustomerAsaas'
+   */
   select?: string;
-  /** Ordenação dos resultados */
+  
+  /** 
+   * Ordenação dos resultados 
+   * Exemplo: { column: 'created_at', ascending: false } ordena por data de criação decrescente
+   * Padrão: { column: 'created_at', ascending: false }
+   */
   orderBy?: {
     column: string;
     ascending?: boolean;
   };
-  /** Número máximo de registros a serem retornados */
+  
+  /** 
+   * Número máximo de registros a serem retornados 
+   * Se não informado, retorna todos os registros
+   */
   limit?: number;
-  /** Filtros a serem aplicados (seguindo a sintaxe do Supabase) */
+  
+  /** 
+   * Filtros a serem aplicados (seguindo a sintaxe do Supabase)
+   * Exemplo: [{ column: 'status', operator: 'eq', value: 'active' }]
+   */
   filters?: Array<{
     column: string;
     operator: 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'like' | 'ilike';
@@ -201,6 +366,7 @@ export function DataTable<TData>({
   const [tableData, setTableData] = useState<TData[]>(data);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [generatedColumns, setColumns] = useState<ColumnDef<TData, any>[]>([]);
   
   // Refs
   const dropdownTriggerRef = useRef<View>(null);
@@ -213,6 +379,97 @@ export function DataTable<TData>({
   
   // Responsividade
   const { isMobile } = useResponsive();
+  
+  // Estado para determinar se estamos usando dados padrão
+  const [usingDefaultData, setUsingDefaultData] = useState(false);
+  
+  // Função para buscar dados do Supabase
+  const fetchSupabaseData = async () => {
+    if (supabaseConfig?.client || window.supabase) {
+      const client = supabaseConfig?.client || window.supabase;
+      const table = supabaseConfig?.table || 'usersAicrusAcademy';
+      
+      if (client && table) {
+        try {
+          setIsLoading(true);
+          setError(null);
+          
+          let query = client
+            .from(table)
+            .select(supabaseConfig?.select || '*');
+          
+          // Aplicar ordenação se configurada
+          if (supabaseConfig?.orderBy) {
+            query = query.order(supabaseConfig.orderBy.column, { 
+              ascending: supabaseConfig.orderBy.ascending ?? false 
+            });
+          } else {
+            query = query.order('id');
+          }
+          
+          // Aplicar filtros se configurados
+          if (supabaseConfig?.filters && supabaseConfig.filters.length > 0) {
+            supabaseConfig.filters.forEach(filter => {
+              query = query.filter(filter.column, filter.operator, filter.value);
+            });
+          }
+          
+          // Aplicar limite se configurado
+          if (supabaseConfig?.limit) {
+            query = query.limit(supabaseConfig.limit);
+          }
+          
+          const { data: fetchedData, error: fetchError } = await query;
+          
+          setIsLoading(false);
+          
+          if (fetchError) {
+            console.error('Erro ao buscar dados:', fetchError);
+            setError(fetchError.message);
+            if (onError) onError(fetchError);
+          } else if (fetchedData) {
+            setTableData(fetchedData as unknown as TData[]);
+            
+            if (onDataLoaded) onDataLoaded(fetchedData as unknown as TData[]);
+            
+            // Gerar colunas automaticamente se não forem fornecidas
+            if (!columns && fetchedData.length > 0) {
+              const firstRow = fetchedData[0];
+              const generatedColumns = Object.keys(firstRow).map((key) => ({
+                header: key.charAt(0).toUpperCase() + key.slice(1),
+                accessorKey: key,
+              }));
+              setColumns(generatedColumns);
+            }
+          }
+        } catch (err) {
+          setIsLoading(false);
+          const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido ao buscar dados';
+          console.error('Erro ao buscar dados do Supabase:', err);
+          setError(errorMessage);
+          if (onError) onError(err);
+        }
+      }
+    }
+  };
+  
+  // Se não há dados fornecidos e não tem configuração de Supabase, usar dados de exemplo
+  useEffect(() => {
+    // Se temos dados fornecidos, usar esses dados
+    if (data.length > 0) {
+      setTableData(data);
+      setUsingDefaultData(false);
+    } 
+    // Se temos configuração de Supabase, vamos carregar os dados de lá (feito em outro useEffect)
+    else if (supabaseConfig) {
+      setUsingDefaultData(false);
+    } 
+    // Sem dados nem Supabase, usar dados de exemplo
+    else {
+      setTableData(defaultExampleData as unknown as TData[]);
+      setUsingDefaultData(true);
+    }
+  }, [data, supabaseConfig]);
   
   // Configurar filtro inicial se fornecido
   useEffect(() => {
@@ -251,77 +508,215 @@ export function DataTable<TData>({
   
   // Efeito para carregar dados do Supabase quando supabaseConfig for fornecido
   useEffect(() => {
-    if (supabaseConfig) {
+    // Obtenha dados do Supabase, se estiver configurado
+    if (supabaseConfig?.client || window.supabase) {
       fetchSupabaseData();
     } else {
-      setTableData(data);
+      // Se temos dados explicitamente fornecidos, usar esses dados
+      if (data.length > 0) {
+        setTableData(data);
+        setUsingDefaultData(false);
+      }
+      // Caso contrário, usar dados de exemplo
+      else {
+        setTableData(defaultExampleData as unknown as TData[]);
+        setUsingDefaultData(true);
+      }
     }
-  }, [supabaseConfig, data]);
+  }, [supabaseConfig, data, columns, onDataLoaded, onError]);
 
-  // Função para buscar dados do Supabase
-  const fetchSupabaseData = async () => {
-    if (!supabaseConfig) return;
+  // Auto-gerar colunas baseado nos dados do Supabase se não fornecermos explicitamente
+  const generateColumnsFromData = (): ColumnDef<TData, any>[] => {
+    if (!tableData || tableData.length === 0) return [];
     
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const { client, table, select = '*', orderBy, limit, filters } = supabaseConfig;
-      
-      // Iniciar a consulta
-      let query = client.from(table).select(select);
-      
-      // Aplicar filtros se existirem
-      if (filters && filters.length > 0) {
-        filters.forEach(filter => {
-          query = query.filter(filter.column, filter.operator, filter.value);
-        });
+    // Vamos pegar as chaves do primeiro item para criar colunas
+    const firstItem = tableData[0];
+    if (!firstItem) return [];
+    
+    const keys = Object.keys(firstItem);
+    
+    // Geramos as colunas começando com a coluna de seleção
+    const generatedColumns: ColumnDef<TData, any>[] = [
+      {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            accessibilityLabel="Selecionar todos"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            accessibilityLabel="Selecionar linha"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
       }
+    ];
+    
+    // Para cada chave do objeto, criar uma coluna apropriada
+    keys.forEach(key => {
+      // Ignorar a coluna de seleção que já adicionamos
+      if (key === 'select') return;
       
-      // Aplicar ordenação
-      if (orderBy) {
-        query = query.order(orderBy.column, { ascending: orderBy.ascending ?? false });
-      }
+      // Determinar o tipo de dado da coluna para formatação adequada
+      const value = (firstItem as any)[key];
+      const valueType = typeof value;
       
-      // Aplicar limite de registros
-      if (limit) {
-        query = query.limit(limit);
-      }
+      // Configurar a coluna com base no tipo de dado
+      const column: ColumnDef<TData, any> = {
+        accessorKey: key,
+        header: () => {
+          // Formatar o nome do cabeçalho para ser mais amigável
+          const headerText = key
+            .replace(/_/g, ' ')  // substituir underscore por espaço
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+            
+          return (
+            <Text style={{ 
+              color: isDark ? colors.gray['100'] : colors.gray['900'],
+              textAlign: ['amount', 'valor', 'price', 'preco', 'total'].includes(key.toLowerCase()) ? 'right' : 'left',
+              width: '100%'
+            }}>
+              {headerText}
+            </Text>
+          );
+        },
+        cell: ({ row }) => {
+          const rawValue = row.getValue(key);
+          
+          // Formatação baseada no tipo de valor
+          if (key.toLowerCase().includes('date') || key.toLowerCase().includes('data') || key === 'created_at') {
+            // Formatar datas
+            let formattedDate = '';
+            try {
+              const rawDate = rawValue as string | number | Date;
+              const date = new Date(rawDate);
+              formattedDate = new Intl.DateTimeFormat('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }).format(date);
+            } catch (error) {
+              formattedDate = String(rawValue);
+            }
+            
+            return (
+              <Text style={{ 
+                color: isDark ? colors.gray['100'] : colors.gray['900'],
+                textAlign: 'left',
+                width: '100%'
+              }}>
+                {formattedDate}
+              </Text>
+            );
+          } 
+          else if (['amount', 'valor', 'price', 'preco', 'total'].includes(key.toLowerCase())) {
+            // Formatar valores monetários
+            let formattedValue = '';
+            try {
+              const numericValue = parseFloat(String(rawValue));
+              formattedValue = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+              }).format(numericValue);
+            } catch (error) {
+              formattedValue = String(rawValue);
+            }
+            
+            return (
+              <Text style={{ 
+                color: isDark ? colors.gray['100'] : colors.gray['900'],
+                textAlign: 'right',
+                width: '100%'
+              }}>
+                {formattedValue}
+              </Text>
+            );
+          }
+          else if (key === 'status') {
+            // Status com capitalização
+            return (
+              <Text style={{ 
+                color: isDark ? colors.gray['100'] : colors.gray['900'],
+                textTransform: 'capitalize'
+              }}>
+                {String(rawValue)}
+              </Text>
+            );
+          }
+          else if (key === 'email') {
+            // Email em lowercase
+            return (
+              <Text style={{ 
+                color: isDark ? colors.gray['100'] : colors.gray['900'],
+                textTransform: 'lowercase'
+              }}>
+                {String(rawValue)}
+              </Text>
+            );
+          }
+          else {
+            // Formato padrão para outros tipos
+            return (
+              <Text style={{ color: isDark ? colors.gray['100'] : colors.gray['900'] }}>
+                {String(rawValue)}
+              </Text>
+            );
+          }
+        }
+      };
       
-      // Executar a consulta
-      const { data: supabaseData, error: supabaseError } = await query;
-      
-      if (supabaseError) {
-        throw supabaseError;
-      }
-      
-      // Atualizar dados da tabela
-      const typedData = supabaseData as unknown as TData[];
-      setTableData(typedData);
-      
-      // Chamar callback com os dados
-      if (onDataLoaded) {
-        onDataLoaded(typedData);
-      }
-      
-    } catch (err: any) {
-      console.error('Erro ao buscar dados do Supabase:', err);
-      const errorMessage = err.message || 'Erro ao buscar dados do Supabase';
-      setError(errorMessage);
-      
-      // Chamar callback de erro
-      if (onError) {
-        onError(err);
-      }
-    } finally {
-      setIsLoading(false);
-    }
+      generatedColumns.push(column);
+    });
+    
+    // Adicionar coluna de ações no final
+    generatedColumns.push({
+      id: "actions",
+      enableHiding: false,
+      cell: () => (
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+          <TouchableOpacity style={{ padding: 4 }}>
+            <MoreHorizontal size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+    
+    return generatedColumns;
   };
+  
+  // Determinar quais colunas usar: fornecidas, geradas, ou padrão
+  const effectiveColumns = useMemo(() => {
+    // Se colunas foram explicitamente fornecidas, usá-las
+    if (columns && columns.length > 0) {
+      return columns;
+    }
+    
+    // Se temos dados do Supabase ou dados customizados e não estamos usando dados padrão
+    if (tableData.length > 0 && !usingDefaultData) {
+      return generateColumnsFromData();
+    }
+    
+    // Caso contrário, usar colunas padrão para dados de exemplo
+    return createDefaultColumns(isDark) as unknown as ColumnDef<TData, any>[];
+  }, [columns, tableData, usingDefaultData, isDark]);
   
   // Instância da tabela
   const table = useReactTable({
     data: tableData,
-    columns,
+    columns: effectiveColumns,
     state: {
       sorting,
       columnFilters,

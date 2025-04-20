@@ -3809,6 +3809,7 @@ return (
             Este exemplo demonstra a tabela conectada à tabela 'usersAicrusAcademy' do Supabase com colunas personalizadas.
             Observe que você pode personalizar os nomes exibidos no cabeçalho (e no dropdown de colunas) usando as propriedades:
           </Text>
+
           <View className="mb-4 border border-gray-200 dark:border-gray-700 p-3 rounded-md">
             <Text className={`text-mono-sm ${textPrimary}`}>
               {`// Configuração nas colunas:`}
