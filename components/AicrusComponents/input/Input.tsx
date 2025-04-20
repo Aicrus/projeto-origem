@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Platform } from 'react-native';
-import { Eye, EyeOff, Search, X } from 'lucide-react-native';
+import { Eye, EyeOff, Search, X, Calendar } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { colors } from '../constants/theme';
@@ -8,7 +8,7 @@ import { colors } from '../constants/theme';
 /**
  * @component Input
  * @description Componente de entrada de texto altamente personalizável que suporta:
- * - Vários formatos: texto simples, senha, pesquisa, número, email
+ * - Vários formatos: texto simples, senha, pesquisa, número, email, data
  * - Máscaras: CPF, CNPJ, telefone, data, CEP, moeda
  * - Tema claro/escuro automático
  * - Responsividade
@@ -50,6 +50,16 @@ import { colors } from '../constants/theme';
  *   type="search" 
  *   onClear={() => setBusca('')} 
  * />
+ * 
+ * // Input de data
+ * <Input 
+ *   value={data} 
+ *   onChangeText={setData} 
+ *   type="date" 
+ *   mask="date" 
+ *   placeholder="dd/mm/aaaa" 
+ *   label="Data" 
+ * />
  * ```
  */
 
@@ -67,7 +77,7 @@ export interface InputProps {
   /** Se o input está desabilitado */
   disabled?: boolean;
   /** Tipo de input - determina o comportamento e ícones */
-  type?: 'text' | 'password' | 'search' | 'number' | 'email';
+  type?: 'text' | 'password' | 'search' | 'number' | 'email' | 'date';
   /** Máscara aplicada ao texto digitado */
   mask?: 'cpf' | 'cnpj' | 'phone' | 'date' | 'cep' | 'currency' | 'none';
   /** Número máximo de caracteres permitidos */
@@ -94,6 +104,8 @@ export interface InputProps {
   numberOfLines?: number;
   /** Função chamada quando o botão de limpar é pressionado */
   onClear?: () => void;
+  /** Função chamada quando o ícone de calendário é pressionado (apenas para type="date") */
+  onCalendarPress?: () => void;
   /** ID para testes automatizados */
   testID?: string;
   /** Estilo personalizado para o container do input */
@@ -125,6 +137,7 @@ export const Input = ({
   multiline = false,
   numberOfLines = 1,
   onClear,
+  onCalendarPress,
   testID,
   style,
   inputStyle,
@@ -187,7 +200,7 @@ export const Input = ({
       case 'date':
         // Remove caracteres não numéricos
         text = text.replace(/\D/g, '');
-        // Aplica máscara de data: 00/00/0000
+        // Aplica máscara de data: dd/mm/aaaa
         text = text.replace(/(\d{2})(\d)/, '$1/$2');
         text = text.replace(/(\d{2})(\d)/, '$1/$2');
         return text.substring(0, 10);
@@ -217,7 +230,10 @@ export const Input = ({
   
   // Função para lidar com mudança de texto
   const handleChangeText = (text: string) => {
-    if (mask !== 'none') {
+    // Se for tipo data, define automaticamente a máscara de data
+    const activeMask = type === 'date' && mask === 'none' ? 'date' : mask;
+    
+    if (activeMask !== 'none') {
       // Aplica máscara se necessário
       text = applyMask(text);
     }
@@ -250,12 +266,22 @@ export const Input = ({
     inputRef.current?.focus();
   };
   
+  // Função para abrir o seletor de data (se disponível)
+  const handleCalendarPress = () => {
+    if (onCalendarPress) {
+      onCalendarPress();
+    } else if (Platform.OS === 'web') {
+      // No ambiente web, podemos acionar o input de data nativo se estiver usando type="date"
+      inputRef.current?.focus();
+    }
+  };
+  
   // Determinar tipo seguro de teclado
   const getKeyboardType = () => {
     if (keyboardType !== 'default') return keyboardType;
     
     // Definir tipo de teclado com base no mask ou type
-    if (mask === 'cpf' || mask === 'cnpj' || mask === 'phone' || mask === 'date' || mask === 'cep' || mask === 'currency') {
+    if (mask === 'cpf' || mask === 'cnpj' || mask === 'phone' || mask === 'date' || mask === 'cep' || mask === 'currency' || type === 'date') {
       return 'numeric';
     }
     
@@ -397,7 +423,7 @@ export const Input = ({
           autoCapitalize={autoCapitalize}
           autoCorrect={autoCorrect}
           // @ts-ignore - Para compatibilidade web
-          autoComplete={autoComplete}
+          autoComplete={autoComplete || (type === 'date' ? 'bday' : undefined)}
           returnKeyType={returnKeyType}
           onSubmitEditing={onSubmitEditing}
           onFocus={handleFocus}
@@ -409,6 +435,11 @@ export const Input = ({
           // Cor de seleção mais sutil
           selectionColor={isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}
           autoFocus={autoFocus}
+          // Para web, adiciona suporte nativo ao input de data HTML5
+          {...(Platform.OS === 'web' && type === 'date' ? { 
+            type: 'text', // Mantemos como text para usar nossa máscara customizada
+            inputMode: 'numeric'
+          } : {})}
         />
         
         {/* Botão para limpar input quando houver valor e não for disabled */}
@@ -421,6 +452,21 @@ export const Input = ({
             <X 
               size={16} 
               color={isDark ? '#95A1AC' : '#57636C'} 
+            />
+          </TouchableOpacity>
+        )}
+        
+        {/* Ícone de calendário para input tipo data */}
+        {type === 'date' && (
+          <TouchableOpacity 
+            onPress={handleCalendarPress}
+            style={containerStyle.iconContainer}
+            {...(Platform.OS === 'web' ? { 'data-input-icon': 'true' } : {})}
+            disabled={disabled}
+          >
+            <Calendar 
+              size={16} 
+              color={isDark ? colors.primary.dark : colors.primary.main} 
             />
           </TouchableOpacity>
         )}

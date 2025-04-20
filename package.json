@@ -31,6 +31,7 @@
     "expo-blur": "~14.0.3",
     "expo-checkbox": "4.0.1",
     "expo-constants": "~17.0.5",
+    "expo-datepicker": "1.0.23",
     "expo-font": "~13.0.3",
     "expo-haptics": "~14.0.1",
     "expo-linear-gradient": "~14.0.2",
@@ -60,7 +61,8 @@
     "react-native-webview": "13.12.5",
     "sharp": "0.33.5",
     "tailwindcss": "3.3.3",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@react-native-community/datetimepicker": "8.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

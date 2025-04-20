@@ -28,6 +28,7 @@ import { StatusBar } from 'expo-status-bar';
 import { supabase } from '@/lib/supabase';
 import { Sheet } from 'components/AicrusComponents';
 import type { SheetPosition } from 'components/AicrusComponents/sheet/Sheet';
+import { DateInput } from '../../components/AicrusComponents/input/DateInput';
 
 // Definir tipos para os componentes disponíveis
 type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | 'sheet' | null;
@@ -308,6 +309,7 @@ export default function DevPage() {
   const [inputErro, setInputErro] = useState('');
   const [inputBusca, setInputBusca] = useState('');
   const [inputMascara, setInputMascara] = useState('');
+  const [inputData, setInputData] = useState('');
   
   // Estados separados para cada exemplo de Select
   const [selectBasico, setSelectBasico] = useState('');
@@ -589,6 +591,26 @@ export default function DevPage() {
             />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Formata automaticamente entradas numéricas no padrão de CPF: 000.000.000-00.
+            </Text>
+          </View>
+          
+          {/* Input de data */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input de data</Text>
+            <DateInput
+              value={inputData}
+              onChangeText={setInputData}
+              placeholder="dd/mm/aaaa"
+              label="Data"
+              minDate={new Date(1900, 0, 1)}
+              maxDate={new Date(2100, 11, 31)}
+              initialDate={new Date()}
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Input de data com máscara dd/mm/aaaa e seletor de data para todas as plataformas.
+              {Platform.OS === 'web' 
+                ? ' Na web, usa o calendário nativo HTML5 estilizado com as cores do tema.' 
+                : ' No iOS e Android, abre um seletor de data com controles para confirmação.'}
             </Text>
           </View>
         </View>
