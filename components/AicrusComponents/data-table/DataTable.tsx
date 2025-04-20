@@ -1,4 +1,4 @@
-import React, { useState, useEffect, RefObject } from 'react';
+import React, { useState, useEffect, RefObject, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  Modal,
 } from 'react-native';
 import {
   ColumnDef,
@@ -140,13 +141,13 @@ export function DataTable<TData>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [dropdownRect, setDropdownRect] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
   const [tableWidth, setTableWidth] = useState(0);
   
   // Refs
-  const dropdownTriggerRef = React.useRef<View>(null);
-  const dropdownRef = React.useRef<View>(null);
-  const containerRef = React.useRef<View>(null);
+  const dropdownTriggerRef = useRef<View>(null);
+  const dropdownRef = useRef<View>(null);
+  const containerRef = useRef<View>(null);
   
   // Tema atual
   const { currentTheme } = useTheme();
@@ -164,7 +165,7 @@ export function DataTable<TData>({
 
   // Medir a largura do container para ajustar a tabela
   useEffect(() => {
-    if (Platform.OS === 'web' && containerRef.current) {
+    if (Platform.OS === 'web' as any && containerRef.current) {
       // TypeScript não conhece o ResizeObserver no ambiente React Native
       const ResizeObserver = (window as any).ResizeObserver;
       if (!ResizeObserver) return;
@@ -212,46 +213,270 @@ export function DataTable<TData>({
     getFilteredRowModel: enableFiltering ? getFilteredRowModel() : undefined,
   });
   
-  // Abrir dropdown de colunas
+  // Abrir dropdown de colunas - ABORDAGEM MELHORADA
   const handleOpenDropdown = () => {
-    if (Platform.OS === 'web' && dropdownTriggerRef.current) {
+    if (Platform.OS === 'web' as any && dropdownTriggerRef.current) {
       // @ts-ignore - getBoundingClientRect() é específico da web
       const rect = dropdownTriggerRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + window.scrollY,
-        left: rect.right - 200 + window.scrollX,
+      setDropdownRect({
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height
       });
     }
     setDropdownOpen(true);
   };
   
-  // Fechar dropdown quando clicar fora
+  // Fechar o dropdown
+  const handleCloseDropdown = () => {
+    setDropdownOpen(false);
+  };
+  
+  // Fechar dropdown quando clicar fora - VERSÃO CORRIGIDA
   useEffect(() => {
-    if (Platform.OS === 'web' && dropdownOpen) {
-      const handleClickOutside = (event: MouseEvent) => {
-        // Verificação de tipos para o ambiente web
-        if (Platform.OS === 'web') {
-          const target = event.target as HTMLElement;
-          const dropdownNode = dropdownRef.current as unknown as HTMLElement;
-          const triggerNode = dropdownTriggerRef.current as unknown as HTMLElement;
-          
-          if (
-            dropdownNode && 
-            triggerNode && 
-            !dropdownNode.contains(target) &&
-            !triggerNode.contains(target)
-          ) {
-            setDropdownOpen(false);
-          }
-        }
-      };
+    if (Platform.OS === 'web' as any && dropdownOpen) {
+      // Criar um overlay de tela inteira para capturar qualquer clique fora do dropdown
+      const overlay = document.createElement('div');
+      overlay.id = 'dropdown-overlay';
+      Object.assign(overlay.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        right: '0',
+        bottom: '0',
+        zIndex: '1999', // Um pouco menos que o dropdown (2000)
+      });
       
-      document.addEventListener('mousedown', handleClickOutside);
+      // Quando clicar no overlay, fechar o dropdown
+      overlay.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleCloseDropdown();
+      });
+      
+      document.body.appendChild(overlay);
+      
       return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
+        // Remover o overlay quando o efeito for limpo
+        document.body.removeChild(overlay);
       };
     }
   }, [dropdownOpen]);
+
+  // Atualizar posição do dropdown ao redimensionar a janela
+  useEffect(() => {
+    if (Platform.OS === 'web' as any && dropdownOpen && dropdownTriggerRef.current) {
+      const handleResize = () => {
+        // @ts-ignore - getBoundingClientRect() é específico da web
+        const rect = dropdownTriggerRef.current.getBoundingClientRect();
+        setDropdownRect({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height
+        });
+      };
+      
+      window.addEventListener('resize', handleResize);
+      window.addEventListener('scroll', handleResize);
+      
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        window.removeEventListener('scroll', handleResize);
+      };
+    }
+  }, [dropdownOpen]);
+
+  // Renderizar o dropdown de seleção de colunas
+  const renderColumnsDropdown = () => {
+    if (!dropdownOpen) return null;
+    
+    if (Platform.OS === 'web' as any) {
+      if (!dropdownRect) return null;
+      
+      // Calcular a posição ideal para o dropdown
+      const calculateDropdownPosition = () => {
+        if (!dropdownRect) return {};
+        
+        const viewportHeight = window.innerHeight;
+        const dropdownHeight = 200; // Altura estimada do dropdown
+        
+        // Posição padrão: abaixo do botão
+        let top = dropdownRect.top + dropdownRect.height + window.scrollY;
+        // Alinhado à direita com o botão
+        let right = window.innerWidth - (dropdownRect.left + dropdownRect.width) - window.scrollX;
+        
+        // Verificar se há espaço suficiente abaixo
+        const spaceBelow = viewportHeight - (dropdownRect.top + dropdownRect.height);
+        
+        // Se não houver espaço suficiente abaixo, posicionar acima
+        if (spaceBelow < dropdownHeight && dropdownRect.top > dropdownHeight) {
+          top = dropdownRect.top - dropdownHeight + window.scrollY;
+        }
+        
+        return {
+          top: `${top}px`,
+          right: `${right}px`,
+        };
+      };
+      
+      const dropdownStyle = calculateDropdownPosition();
+      
+      // Usar DOM para criar o portal na web
+      if (typeof document !== 'undefined') {
+        // Criar um elemento div para o portal se ainda não existir
+        let portalElement = document.getElementById('dropdown-portal');
+        if (!portalElement) {
+          portalElement = document.createElement('div');
+          portalElement.id = 'dropdown-portal';
+          document.body.appendChild(portalElement);
+        }
+        
+        // Injetar o dropdown como um elemento absoluto no DOM
+        portalElement.innerHTML = '';
+        const dropdownElement = document.createElement('div');
+        portalElement.appendChild(dropdownElement);
+        
+        // Aplicar estilos diretamente
+        Object.assign(dropdownElement.style, {
+          position: 'absolute',
+          top: dropdownStyle.top,
+          right: dropdownStyle.right,
+          width: '200px',
+          backgroundColor: themeColors.background.paper,
+          borderRadius: '6px',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          borderColor: themeColors.border.light,
+          padding: '4px',
+          boxShadow: isDark ? '0 2px 4px rgba(0,0,0,0.25)' : '0 2px 4px rgba(0,0,0,0.1)',
+          zIndex: '2000',
+        });
+        
+        // Parar propagação de eventos para evitar que cliques dentro do dropdown fechem o overlay
+        dropdownElement.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+        
+        // Identificador único para o dropdown
+        dropdownElement.setAttribute('data-dropdown-id', 'columns-dropdown');
+        
+        // Renderizar conteúdo dentro do portal
+        const titleElement = document.createElement('div');
+        titleElement.style.fontSize = '12px';
+        titleElement.style.fontWeight = '500';
+        titleElement.style.color = themeColors.text.secondary;
+        titleElement.style.padding = '8px';
+        titleElement.textContent = 'Toggle columns';
+        dropdownElement.appendChild(titleElement);
+        
+        // Render column toggles
+        table
+          .getAllColumns()
+          .filter((column) => column.getCanHide())
+          .forEach((column) => {
+            const itemElement = document.createElement('div');
+            itemElement.style.display = 'flex';
+            itemElement.style.alignItems = 'center';
+            itemElement.style.padding = '8px';
+            itemElement.style.borderRadius = '4px';
+            itemElement.style.cursor = 'pointer';
+            
+            // Simular hover
+            itemElement.addEventListener('mouseenter', () => {
+              itemElement.style.backgroundColor = themeColors.state.hover;
+            });
+            itemElement.addEventListener('mouseleave', () => {
+              itemElement.style.backgroundColor = 'transparent';
+            });
+            
+            // Toggle visibility on click
+            itemElement.addEventListener('click', (e) => {
+              e.stopPropagation();
+              column.toggleVisibility(!column.getIsVisible());
+            });
+            
+            // Checkbox
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.style.marginRight = '8px';
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = column.getIsVisible();
+            checkbox.addEventListener('change', (e) => {
+              e.stopPropagation();
+              const target = e.target as HTMLInputElement;
+              column.toggleVisibility(target.checked);
+            });
+            
+            checkboxContainer.appendChild(checkbox);
+            itemElement.appendChild(checkboxContainer);
+            
+            // Label
+            const labelElement = document.createElement('span');
+            labelElement.style.fontSize = '14px';
+            labelElement.style.color = themeColors.text.primary;
+            labelElement.style.textTransform = 'capitalize';
+            labelElement.textContent = column.id;
+            itemElement.appendChild(labelElement);
+            
+            dropdownElement.appendChild(itemElement);
+          });
+      }
+      
+      // Como estamos usando DOM direto, retornamos null aqui para o React
+      return null;
+    } else {
+      // Versão para dispositivos móveis usando componentes React Native
+      return (
+        <View 
+          ref={dropdownRef}
+          style={[
+            styles.dropdownContent, 
+            { 
+              position: 'relative', 
+              top: 0, 
+              right: 0, 
+              alignSelf: 'flex-end',
+              marginTop: 8 
+            }
+          ]}
+        >
+          <Text 
+            style={styles.dropdownLabel}
+            {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
+          >
+            Toggle columns
+          </Text>
+          {table
+            .getAllColumns()
+            .filter((column) => column.getCanHide())
+            .map((column) => (
+              <TouchableOpacity
+                key={column.id}
+                style={styles.dropdownItem}
+                onPress={() => column.toggleVisibility(!column.getIsVisible())}
+              >
+                <Checkbox
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                />
+                <Text 
+                  style={[
+                    styles.cellText, 
+                    { marginLeft: 8, textTransform: 'capitalize' }
+                  ]}
+                  {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
+                >
+                  {column.id}
+                </Text>
+              </TouchableOpacity>
+            ))}
+        </View>
+      );
+    }
+  };
   
   // Calcular larguras das colunas baseado no espaço disponível
   const calculateColumnWidths = () => {
@@ -379,8 +604,6 @@ export function DataTable<TData>({
     },
     dropdownContent: {
       position: 'absolute',
-      top: dropdownPosition.top,
-      left: dropdownPosition.left,
       width: 200,
       backgroundColor: themeColors.background.paper,
       borderRadius: 6,
@@ -623,58 +846,6 @@ export function DataTable<TData>({
     return null;
   };
   
-  // Renderizar o dropdown de seleção de colunas
-  const renderColumnsDropdown = () => {
-    if (!dropdownOpen) return null;
-    
-    return (
-      <View 
-        ref={dropdownRef}
-        style={[
-          styles.dropdownContent, 
-          Platform.OS !== 'web' && { 
-            position: 'relative', 
-            top: 0, 
-            left: 0, 
-            alignSelf: 'flex-end',
-            marginTop: 8 
-          }
-        ]}
-      >
-        <Text 
-          style={styles.dropdownLabel}
-          {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
-        >
-          Toggle columns
-        </Text>
-        {table
-          .getAllColumns()
-          .filter((column) => column.getCanHide())
-          .map((column) => (
-            <TouchableOpacity
-              key={column.id}
-              style={styles.dropdownItem}
-              onPress={() => column.toggleVisibility(!column.getIsVisible())}
-            >
-              <Checkbox
-                checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
-              />
-              <Text 
-                style={[
-                  styles.cellText, 
-                  { marginLeft: 8, textTransform: 'capitalize' }
-                ]}
-                {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
-              >
-                {column.id}
-              </Text>
-            </TouchableOpacity>
-          ))}
-      </View>
-    );
-  };
-  
   // Função para envolver o conteúdo renderizado com atributos de texto
   const wrapWithTextAttributes = (content: React.ReactNode) => {
     // Caso especial para textos simples
@@ -756,6 +927,19 @@ export function DataTable<TData>({
     }
   }, [isDark, themeColors, enableRowClick]);
   
+  // Adicionamos um efeito de limpeza ao desmontar o componente
+  useEffect(() => {
+    return () => {
+      // Limpar dropdown portal ao desmontar
+      if (Platform.OS === 'web' as any) {
+        const portalElement = document.getElementById('dropdown-portal');
+        if (portalElement) {
+          portalElement.innerHTML = '';
+        }
+      }
+    };
+  }, []);
+  
   return (
     <View style={[styles.container, style]} ref={containerRef}>
       {/* Filtros e controles */}
@@ -778,18 +962,18 @@ export function DataTable<TData>({
           ref={dropdownTriggerRef}
           style={styles.dropdownTrigger}
           onPress={handleOpenDropdown}
-          {...(Platform.OS === 'web' ? { 'data-table-button': 'true' } : {})}
+          {...(Platform.OS === 'web' as any ? { 'data-table-button': 'true' } : {})}
         >
           <Text 
             style={styles.headerText}
-            {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
+            {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
           >
             {columnsButtonText}
           </Text>
           <ChevronDown size={16} color={themeColors.text.primary} />
         </TouchableOpacity>
         
-        {Platform.OS !== 'web' && renderColumnsDropdown()}
+        {Platform.OS !== 'web' as any && renderColumnsDropdown()}
       </View>
       
       {/* Tabela */}
@@ -817,7 +1001,7 @@ export function DataTable<TData>({
                           columnStyle,
                           alignment
                         ]}
-                        {...(Platform.OS === 'web' ? { 'data-table-header': 'true' } : {})}
+                        {...(Platform.OS === 'web' as any ? { 'data-table-header': 'true' } : {})}
                       >
                         {header.isPlaceholder
                           ? null
@@ -846,7 +1030,7 @@ export function DataTable<TData>({
                         row.getIsSelected() && styles.tableRowSelected,
                       ]),
                     }}
-                    {...(Platform.OS === 'web' ? { 
+                    {...(Platform.OS === 'web' as any ? { 
                       'data-table-row': 'true',
                       'data-selected-row': row.getIsSelected() ? 'true' : 'false'
                     } : {})}
@@ -876,7 +1060,7 @@ export function DataTable<TData>({
                             columnStyle,
                             alignment
                           ]}
-                          {...(Platform.OS === 'web' ? { 'data-table-cell': 'true' } : {})}
+                          {...(Platform.OS === 'web' as any ? { 'data-table-cell': 'true' } : {})}
                         >
                           {wrapWithTextAttributes(
                             flexRender(
@@ -893,7 +1077,7 @@ export function DataTable<TData>({
                 <View style={styles.tableRow}>
                   <Text 
                     style={styles.noResults}
-                    {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
+                    {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
                   >
                     {noResultsText}
                   </Text>
@@ -909,7 +1093,7 @@ export function DataTable<TData>({
         <View style={styles.buttonGroup}>
           <Text 
             style={styles.selectionText}
-            {...(Platform.OS === 'web' ? { 'data-cell-text': 'true' } : {})}
+            {...(Platform.OS === 'web' as any ? { 'data-cell-text': 'true' } : {})}
           >
             {table.getFilteredSelectedRowModel().rows.length} {selectionText}{' '}
             {table.getFilteredRowModel().rows.length} linha(s) selecionada(s).
@@ -936,8 +1120,8 @@ export function DataTable<TData>({
         </View>
       )}
       
-      {/* Dropdown para web */}
-      {Platform.OS === 'web' && renderColumnsDropdown()}
+      {/* Portal para dropdown na web, já é gerenciado pela função renderColumnsDropdown */}
+      {Platform.OS === 'web' as any && renderColumnsDropdown()}
     </View>
   );
 } 
