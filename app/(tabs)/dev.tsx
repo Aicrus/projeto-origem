@@ -44,6 +44,7 @@ const SupabaseDataTable = () => {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
+  const textSecondary = isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light';
   
   const [supabaseUsers, setSupabaseUsers] = useState<UserAicrusAcademy[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -212,22 +213,54 @@ const SupabaseDataTable = () => {
   // Renderizar a tabela com base nos estados
   if (isLoading) {
     return (
-      <View className="p-4 items-center">
-        <Text className={textPrimary}>Carregando dados do Supabase...</Text>
+      <View className="p-6 items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <View className="w-8 h-8 border-2 border-primary-dark dark:border-primary-light border-t-transparent dark:border-t-transparent rounded-full animate-spin mb-2" />
+        <Text className={`${textPrimary} text-center`}>Carregando dados do Supabase...</Text>
       </View>
     );
   }
 
   if (error) {
+    // Determinar o tipo de erro para exibir mensagem apropriada
+    let errorMessage = error;
+    let errorTitle = "Erro ao carregar dados";
+    
+    if (error.includes("table") && error.includes("not found")) {
+      errorTitle = "Tabela não encontrada";
+      errorMessage = "A tabela 'usersAicrusAcademy' não foi encontrada no seu projeto Supabase. Verifique se ela existe ou se o nome está correto.";
+    } else if (error.includes("authentication") || error.includes("auth")) {
+      errorTitle = "Erro de autenticação";
+      errorMessage = "Não foi possível autenticar com o Supabase. Verifique se as credenciais estão corretas.";
+    } else if (error.includes("network") || error.includes("connection")) {
+      errorTitle = "Erro de conexão";
+      errorMessage = "Não foi possível conectar ao servidor Supabase. Verifique sua conexão com a internet.";
+    }
+    
     return (
-      <View className="p-4 items-center">
-        <Text className="text-red-500">{error}</Text>
+      <View className="p-6 items-center bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <View className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900 items-center justify-center mb-3">
+          <AlertCircle size={24} color={isDark ? '#FCA5A5' : '#DC2626'} />
+        </View>
+        <Text className="text-headline-sm font-jakarta-bold text-red-500 dark:text-red-400 mb-2">{errorTitle}</Text>
+        <Text className={`${textSecondary} text-center mb-4 max-w-md`}>{errorMessage}</Text>
         <TouchableOpacity 
-          className="mt-2 p-2 bg-blue-500 rounded-md" 
+          className="px-4 py-2 bg-primary-light dark:bg-primary-dark rounded-md flex-row items-center" 
           onPress={fetchSupabaseUsers}
         >
-          <Text className="text-white">Tentar novamente</Text>
+          <Text className="text-white font-jakarta-medium">Tentar novamente</Text>
         </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Se não houver dados, mostrar mensagem
+  if (supabaseUsers.length === 0) {
+    return (
+      <View className="p-6 items-center bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-2`}>Nenhum dado encontrado</Text>
+        <Text className={`${textSecondary} text-center mb-4`}>
+          A tabela 'usersAicrusAcademy' existe, mas não possui registros.
+        </Text>
       </View>
     );
   }
@@ -3774,7 +3807,16 @@ return (
           </Text>
           <Text className={`text-body-sm ${textSecondary} mb-4`}>
             Este exemplo demonstra a tabela conectada à tabela 'usersAicrusAcademy' do Supabase com colunas personalizadas.
+            Observe que você pode personalizar os nomes exibidos no cabeçalho (e no dropdown de colunas) usando as propriedades:
           </Text>
+          <View className="mb-4 border border-gray-200 dark:border-gray-700 p-3 rounded-md">
+            <Text className={`text-mono-sm ${textPrimary}`}>
+              {`// Configuração nas colunas:`}
+            </Text>
+            <Text className={`text-mono-sm ${textPrimary} mt-1`}>
+              {`{\n  accessorKey: "created_at", // Nome original do campo no Supabase\n  header: () => <Text>Criado em</Text>, // Texto personalizado no cabeçalho\n  meta: {\n    headerText: 'Criado em' // Texto usado no dropdown de colunas\n  }\n}`}
+            </Text>
+          </View>
           
           <SupabaseDataTable />
         </View>

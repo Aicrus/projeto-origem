@@ -505,7 +505,7 @@ export function DataTable<TData>({
                 // Extrair nome de exibição do cabeçalho para mostrar no dropdown
                 let displayName = column.id;
                 
-                // Método para extrair texto do cabeçalho
+                // Método para extrair texto do cabeçalhoOk, então me responde uma coisa. Então, agora vai pegar quando a pessoa, ali o menu, né? O menu vai ser igual ao que está no cabeçalho, correto? Sempre vai ser assim? Já está configurado dessa forma? 
                 const headerDef = column.columnDef.header;
                 
                 // Se for uma string direta, usar essa string
