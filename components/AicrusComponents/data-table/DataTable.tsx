@@ -366,7 +366,7 @@ export function DataTable<TData>({
   const [tableData, setTableData] = useState<TData[]>(data);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [generatedColumns, setColumns] = useState<ColumnDef<TData, any>[]>([]);
+  const [generatedColumns, setGeneratedColumns] = useState<ColumnDef<TData, any>[]>([]);
   
   // Refs
   const dropdownTriggerRef = useRef<View>(null);
@@ -401,7 +401,7 @@ export function DataTable<TData>({
           // Aplicar ordenação se configurada
           if (supabaseConfig?.orderBy) {
             query = query.order(supabaseConfig.orderBy.column, { 
-              ascending: supabaseConfig.orderBy.ascending ?? false 
+              ascending: supabaseConfig.orderBy.ascending !== undefined ? supabaseConfig.orderBy.ascending : false 
             });
           } else {
             query = query.order('id');
@@ -434,12 +434,8 @@ export function DataTable<TData>({
             
             // Gerar colunas automaticamente se não forem fornecidas
             if (!columns && fetchedData.length > 0) {
-              const firstRow = fetchedData[0];
-              const generatedColumns = Object.keys(firstRow).map((key) => ({
-                header: key.charAt(0).toUpperCase() + key.slice(1),
-                accessorKey: key,
-              }));
-              setColumns(generatedColumns);
+              const generatedCols = generateColumnsFromData();
+              setGeneratedColumns(generatedCols);
             }
           }
         } catch (err) {
