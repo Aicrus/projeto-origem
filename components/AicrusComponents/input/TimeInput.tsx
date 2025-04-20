@@ -4,7 +4,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input, InputProps } from './Input';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { colors } from '../constants/theme';
-import { Clock } from 'lucide-react-native';
 
 /**
  * @component TimeInput
@@ -25,7 +24,7 @@ import { Clock } from 'lucide-react-native';
  * ```
  */
 
-export interface TimeInputProps extends Omit<InputProps, 'type' | 'mask' | 'onCalendarPress'> {
+export interface TimeInputProps extends Omit<InputProps, 'type' | 'mask' | 'onCalendarPress' | 'onTimePress'> {
   /** Valor inicial para o seletor de hora (quando aberto pela primeira vez) */
   initialTime?: Date;
   /** Se deve mostrar o seletor de 24 horas (vs. AM/PM) */
@@ -447,14 +446,6 @@ export const TimeInput: React.FC<TimeInputProps> = ({
     }
   }, [isDark]);
 
-  // Componente para renderizar o ícone do relógio
-  const ClockIcon = () => (
-    <Clock 
-      size={16} 
-      color={isDark ? '#95A1AC' : '#57636C'} 
-    />
-  );
-
   return (
     <View {...(Platform.OS === 'web' ? { 'data-time-input-container': 'true' } : {})}>
       <Input
@@ -464,9 +455,8 @@ export const TimeInput: React.FC<TimeInputProps> = ({
         label={label}
         disabled={disabled}
         keyboardType="numeric"
-        // Passamos função personalizada para o ícone de relógio
-        rightIcon={ClockIcon}
-        onRightIconPress={openTimePicker}
+        type="time"
+        onTimePress={openTimePicker}
         {...otherProps}
       />
       

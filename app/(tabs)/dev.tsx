@@ -312,6 +312,7 @@ export default function DevPage() {
   const [inputMascara, setInputMascara] = useState('');
   const [inputData, setInputData] = useState('');
   const [inputHora, setInputHora] = useState('');
+  const [inputNumerico, setInputNumerico] = useState('0');
   
   // Estados separados para cada exemplo de Select
   const [selectBasico, setSelectBasico] = useState('');
@@ -635,6 +636,28 @@ export default function DevPage() {
                 : ' No iOS e Android, abre um seletor de hora nativo com controles de confirmação.'}
             </Text>
           </View>
+          
+          {/* Input numérico com controles */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input numérico com controles</Text>
+            <Input
+              value={inputNumerico}
+              onChangeText={setInputNumerico}
+              type="number"
+              label="Quantidade"
+              placeholder="0"
+              keyboardType="numeric"
+              min={0}
+              step={1}
+              showNumberControls={true}
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Input numérico com botões de incremento e decremento. Sem limite máximo definido.
+              {Platform.OS === 'web' 
+                ? ' No navegador, utiliza input tipo number nativo do HTML5.' 
+                : ' Em dispositivos móveis, implementa controles personalizados.'}
+            </Text>
+          </View>
         </View>
         
         <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
@@ -701,12 +724,32 @@ export default function DevPage() {
           
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>type</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Tipo de input: 'text', 'password', 'search', 'number', 'email'</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Tipo de input: 'text', 'password', 'search', 'number', 'email', 'date', 'time'</Text>
           </View>
           
           <View className="mb-sm">
             <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>mask</Text>
             <Text className={`text-body-sm ${textSecondary}`}>Máscara: 'cpf', 'cnpj', 'phone', 'date', 'cep', 'currency', 'none'</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>min</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Valor mínimo para input numérico (type="number")</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>max</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Valor máximo para input numérico (type="number")</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>step</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Incremento/decremento para input numérico (type="number")</Text>
+          </View>
+          
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>showNumberControls</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>Mostra botões de incremento/decremento (type="number")</Text>
           </View>
           
           <Text className={`text-body-sm ${textSecondary} mt-md`}>
