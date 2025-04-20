@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { StyleSheet, Platform, TouchableOpacity, Text, View, Modal, Pressable, ScrollView, TextInput } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { ChevronUp, ChevronDown, Check, Search, X } from 'lucide-react-native';
@@ -6,6 +6,7 @@ import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { colors } from '../constants/theme';
 import { createPortal } from 'react-dom';
+import { supabase } from '../../../lib/supabase';
 
 /**
  * @component Select
@@ -33,7 +34,7 @@ export interface DropdownOption {
 }
 
 interface BaseDropdownProps {
-  options: DropdownOption[];
+  options?: DropdownOption[];
   placeholder?: string;
   zIndex?: number;
   zIndexInverse?: number;
@@ -50,6 +51,14 @@ interface BaseDropdownProps {
   autoFocus?: boolean;
   /** Indica se o select está dentro de uma tabela Supabase */
   superBaseTable?: boolean;
+  /** Nome da tabela no Supabase para buscar os dados */
+  supabaseTable?: string;
+  /** Nome da coluna que será usada como valor no Supabase */
+  supabaseColumn?: string;
+  /** Nome da coluna para ordenação no Supabase */
+  supabaseOrderBy?: string;
+  /** Define se a ordenação é ascendente */
+  supabaseAscending?: boolean;
 }
 
 interface SingleSelectProps extends BaseDropdownProps {
@@ -822,7 +831,7 @@ const MobileSelectModal = ({
 };
 
 export const Select = ({
-  options,
+  options = [],
   value,
   setValue,
   placeholder = 'Selecione uma opção',
@@ -840,12 +849,21 @@ export const Select = ({
   onClose,
   autoFocus = Platform.OS === 'web',
   superBaseTable = false,
+  supabaseTable,
+  supabaseColumn,
+  supabaseOrderBy,
+  supabaseAscending = true,
 }: SelectProps) => {
   // Estado para controlar abertura do dropdown
   const [open, setOpen] = useState(false);
   
   // Ref para o componente principal
   const selectRef = useRef<any>(null);
+  
+  // Estados para dados do Supabase
+  const [supabaseOptions, setSupabaseOptions] = useState<DropdownOption[]>([]);
+  const [isLoadingSupabase, setIsLoadingSupabase] = useState(false);
+  const [supabaseError, setSupabaseError] = useState<string | null>(null);
   
   // Posicionamento para o dropdown web
   const [position, setPosition] = useState<{
@@ -859,6 +877,63 @@ export const Select = ({
   // Tema atual
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
+  
+  // Verificar se estamos usando Supabase
+  const isUsingSupabase = !!supabaseTable && !!supabaseColumn;
+  
+  // Função para buscar dados do Supabase
+  const fetchSupabaseOptions = async () => {
+    if (!isUsingSupabase) return;
+    
+    try {
+      setIsLoadingSupabase(true);
+      setSupabaseError(null);
+      
+      const { data, error } = await supabase
+        .from(supabaseTable)
+        .select(`${supabaseColumn}`)
+        .order(supabaseOrderBy || supabaseColumn, { ascending: supabaseAscending });
+        
+      if (error) {
+        throw error;
+      }
+      
+      if (data && data.length > 0) {
+        // Transformar dados em formato de opções para o Select
+        const newOptions = data.map(item => {
+          const value = item[supabaseColumn as keyof typeof item];
+          return {
+            value: String(value || ''),
+            label: String(value || '')
+          };
+        });
+        
+        setSupabaseOptions(newOptions);
+      } else {
+        setSupabaseOptions([]);
+      }
+    } catch (err: any) {
+      console.error('Erro ao buscar dados do Supabase:', err);
+      setSupabaseError(err.message || 'Erro ao buscar dados');
+    } finally {
+      setIsLoadingSupabase(false);
+    }
+  };
+  
+  // Carregar dados do Supabase quando o componente montar
+  useEffect(() => {
+    if (isUsingSupabase) {
+      fetchSupabaseOptions();
+    }
+  }, [supabaseTable, supabaseColumn, supabaseOrderBy, supabaseAscending]);
+  
+  // Opções efetivas (do Supabase ou passadas diretamente)
+  const effectiveOptions = useMemo(() => {
+    return isUsingSupabase ? supabaseOptions : options;
+  }, [isUsingSupabase, supabaseOptions, options]);
+  
+  // Estado de carregamento efetivo
+  const isLoading = loading || (isUsingSupabase && isLoadingSupabase);
   
   // Otimizar recálculo de posição para evitar tremedeira
   useEffect(() => {
@@ -1162,7 +1237,8 @@ export const Select = ({
       if (selectedValues.length === 0) return placeholder;
       return `${selectedValues.length} ${selectedValues.length === 1 ? 'item selecionado' : 'itens selecionados'}`;
     } else {
-      const selectedOption = options.find(opt => opt.value === value);
+      if (!effectiveOptions) return placeholder;
+      const selectedOption = effectiveOptions.find(opt => opt.value === value);
       return selectedOption ? selectedOption.label : placeholder;
     }
   };
@@ -1186,8 +1262,44 @@ export const Select = ({
       color: value && (multiple ? (value as string[]).length > 0 : true)
         ? (isDark ? '#FFFFFF' : '#14181B')
         : (isDark ? '#95A1AC' : '#8B97A2')
+    },
+    loadingContainer: {
+      flexDirection: 'row',
+      alignItems: 'center'
+    },
+    loadingIndicator: {
+      width: 16,
+      height: 16,
+      borderRadius: 8,
+      borderWidth: 2,
+      borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+      borderTopColor: isDark ? colors.primary.dark : colors.primary.main,
+      marginRight: 8
+    },
+    errorText: {
+      fontSize: 12,
+      color: isDark ? '#F87171' : '#DC2626',
+      marginTop: 4
     }
   });
+
+  // Verificar se a opção selecionada está visível e rolar para ela quando abrir o dropdown
+  const flatListRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (open && effectiveOptions?.length > 0) {
+      const selectedOptionIndex = effectiveOptions.findIndex(
+        (option) => option.value === value
+      );
+      if (selectedOptionIndex !== -1 && flatListRef.current) {
+        flatListRef.current.scrollToIndex({
+          index: selectedOptionIndex,
+          animated: true,
+          viewPosition: 0.5,
+        });
+      }
+    }
+  }, [open, effectiveOptions, value]);
 
   // Função para fechar o dropdown
   const handleClose = () => {
@@ -1217,29 +1329,53 @@ export const Select = ({
         onPress={handleToggleDropdown}
         style={[
           selectButtonStyle.container,
-          disabled ? { opacity: 0.5 } : {}
+          disabled || isLoading ? { opacity: 0.5 } : {}
         ]}
-        disabled={disabled || loading}
+        disabled={disabled || isLoading}
       >
-        <Text 
-          style={selectButtonStyle.text}
-          numberOfLines={1}
-        >
-          {getDisplayText()}
-        </Text>
-        
-        {open ? (
-          <ChevronUp size={16} color={isDark ? '#95A1AC' : '#57636C'} />
+        {isLoading ? (
+          <View style={selectButtonStyle.loadingContainer}>
+            <View style={[
+              selectButtonStyle.loadingIndicator,
+              Platform.OS === 'web' && { 
+                // @ts-ignore - Animação específica para web
+                animation: 'spin 1s linear infinite' 
+              }
+            ]} />
+            <Text style={selectButtonStyle.text}>
+              Carregando...
+            </Text>
+          </View>
         ) : (
-          <ChevronDown size={16} color={isDark ? '#95A1AC' : '#57636C'} />
+          <Text 
+            style={selectButtonStyle.text}
+            numberOfLines={1}
+          >
+            {getDisplayText()}
+          </Text>
+        )}
+        
+        {isLoading ? null : (
+          open ? (
+            <ChevronUp size={16} color={isDark ? '#95A1AC' : '#57636C'} />
+          ) : (
+            <ChevronDown size={16} color={isDark ? '#95A1AC' : '#57636C'} />
+          )
         )}
       </TouchableOpacity>
+      
+      {/* Exibir mensagem de erro se houver */}
+      {supabaseError && (
+        <Text style={selectButtonStyle.errorText}>
+          Erro: {supabaseError}
+        </Text>
+      )}
       
       {/* Dropdown no mobile - usa Modal */}
       {Platform.OS !== 'web' && (
         <MobileSelectModal
           visible={open}
-          options={options}
+          options={effectiveOptions}
           value={value}
           onSelect={handleSelectValue}
           onClose={handleClose}
@@ -1258,10 +1394,10 @@ export const Select = ({
       {Platform.OS === 'web' && (
         <WebDropdownOptions
           visible={open}
-          options={options}
+          options={effectiveOptions}
           value={value}
           onSelect={handleSelectValue}
-          onClose={() => setOpen(false)}
+          onClose={handleClose}
           multiple={multiple}
           isDark={isDark}
           position={position}

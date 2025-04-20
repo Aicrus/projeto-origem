@@ -311,6 +311,18 @@ export default function DevPage() {
   const [selectBasico, setSelectBasico] = useState('');
   const [selectBusca, setSelectBusca] = useState('');
   const [multiSelect, setMultiSelect] = useState<string[]>([]);
+  const [selectSupabaseNome, setSelectSupabaseNome] = useState('');
+  
+  // Estado para armazenar usuários do Supabase para Select
+  const [supabaseUsersForSelect, setSupabaseUsersForSelect] = useState<UserAicrusAcademy[]>([]);
+  
+  // Converter usuários do Supabase para o formato de opções do Select (usando o campo nome)
+  const supabaseNomeOptions = useMemo(() => {
+    return supabaseUsersForSelect.map(user => ({
+      value: user.nome,
+      label: user.nome
+    }));
+  }, [supabaseUsersForSelect]);
   
   // Notificações - estados
   const [notificationsVisible, setNotificationsVisible] = useState(false);
@@ -354,6 +366,32 @@ export default function DevPage() {
       }
     }
   }, [isNative, toastPosition]);
+  
+  // Carregar dados do Supabase quando o componente Select for selecionado
+  useEffect(() => {
+    if (activeComponent === 'select') {
+      fetchUsersForSelect();
+    }
+  }, [activeComponent]);
+  
+  // Função para buscar usuários do Supabase para o Select
+  const fetchUsersForSelect = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('usersAicrusAcademy')
+        .select('id, nome, email, created_at, idCustomerAsaas')
+        .order('nome', { ascending: true });
+        
+      if (error) {
+        console.error('Erro ao buscar usuários para Select:', error);
+        return;
+      }
+      
+      setSupabaseUsersForSelect(data || []);
+    } catch (err) {
+      console.error('Erro ao buscar dados do Supabase para Select:', err);
+    }
+  };
   
   // Validar email
   const isValidEmail = (email: string) => {
@@ -717,6 +755,34 @@ export default function DevPage() {
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Permite selecionar múltiplos itens com contagem e gerenciamento automático.
               Também inclui campo de pesquisa para facilitar a seleção em listas grandes.
+            </Text>
+          </View>
+          
+          {/* Select com dados do Supabase (nome) */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Select com Supabase (Nome)</Text>
+            {supabaseNomeOptions.length > 0 ? (
+              <Select
+                options={supabaseNomeOptions}
+                value={selectSupabaseNome}
+                setValue={setSelectSupabaseNome}
+                placeholder="Selecione um nome"
+                label="Nome do usuário"
+                searchable={true}
+                superBaseTable={true}
+              />
+            ) : (
+              <View className={`p-md bg-bg-tertiary-light dark:bg-bg-tertiary-dark rounded-md`}>
+                <Text className={`text-body-md ${textSecondary}`}>
+                  Carregando dados do Supabase...
+                </Text>
+              </View>
+            )}
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Este exemplo demonstra o Select já configurado para usar dados do Supabase,
+              especificamente os nomes da tabela 'usersAicrusAcademy'. Para implementar em seu projeto,
+              basta carregar os dados com a função fetchUsersForSelect e convertê-los para o formato
+              de opções com value/label. O campo de busca permite localizar rapidamente um nome específico.
             </Text>
           </View>
         </View>
