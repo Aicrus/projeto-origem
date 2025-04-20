@@ -217,10 +217,10 @@ const Sheet: React.FC<SheetProps> = ({
     // para dispositivos com notch/island em cada posição do Sheet
     switch (finalPosition) {
       case 'top':
-        return { paddingTop: 40 }; // Aumente ou diminua este valor conforme necessário
+        return { paddingTop: 10 }; // Aumente ou diminua este valor conforme necessário
       case 'left':
       case 'right':
-        return { paddingTop: 40 }; // Aumente ou diminua este valor conforme necessário
+        return { paddingTop: 10 }; // Aumente ou diminua este valor conforme necessário
       default:
         return {};
     }

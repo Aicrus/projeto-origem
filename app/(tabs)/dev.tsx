@@ -4415,20 +4415,43 @@ const SheetExampleContent: React.FC = () => {
         testID="example-sheet"
       >
         <View className="p-lg">
-          <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-lg`}>
-            Conteúdo do Sheet
+          <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-md`}>
+            Editar perfil
           </Text>
           <Text className={`text-body-md ${textSecondary} mb-lg`}>
-            Este é um exemplo de conteúdo dentro do Sheet. Você pode colocar qualquer componente React Native aqui.
+            Faça alterações no seu perfil aqui. Clique salvar quando terminar.
           </Text>
-          <Pressable
-            onPress={() => setSheetVisible(false)}
-            className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md self-start"
-          >
-            <Text className="text-white font-jakarta-medium">
-              Fechar Sheet
-            </Text>
-          </Pressable>
+          
+          <View className="mb-md">
+            <View className="mb-md">
+              <Input
+                label="Nome"
+                value="Paulo Morales"
+                onChangeText={(text) => {}}
+                placeholder="Digite seu nome"
+                testID="input-nome"
+              />
+            </View>
+            
+            <View className="mb-lg">
+              <Input
+                label="Username"
+                value="@paulomorales"
+                onChangeText={(text) => {}}
+                placeholder="Digite seu username"
+                testID="input-username"
+              />
+            </View>
+            
+            <Button
+              variant="primary"
+              onPress={() => setSheetVisible(false)}
+              fullWidth
+              testID="button-salvar"
+            >
+              Salvar alterações
+            </Button>
+          </View>
         </View>
       </Sheet>
       
@@ -4566,7 +4589,7 @@ const SheetExampleContent: React.FC = () => {
           <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Área de Segurança</Text>
           <Text className={`text-body-sm ${textSecondary}`}>
             - A propriedade useSafeArea (padrão: true) adiciona automaticamente padding em dispositivos com notch/island{'\n'}
-            - Para dispositivos nativos: adiciona 40px de padding no topo para o Sheet nas posições 'top', 'left' e 'right'{'\n'}
+            - Para dispositivos nativos: adiciona 10px de padding no topo para o Sheet nas posições 'top', 'left' e 'right'{'\n'}
             - Para ajustar esse padding, você pode modificar a função getSafeAreaPadding() no arquivo Sheet.tsx
           </Text>
         </View>
