@@ -26,9 +26,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '@/lib/supabase';
+import { Sheet } from 'components/AicrusComponents';
+import type { SheetPosition } from 'components/AicrusComponents/sheet/Sheet';
 
 // Definir tipos para os componentes disponíveis
-type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | null;
+type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | 'sheet' | null;
 
 // Tipo para os usuários do Supabase
 type UserAicrusAcademy = {
@@ -411,6 +413,7 @@ export default function DevPage() {
     { id: 'dropdownMenu', name: 'Dropdown Menu', icon: 'MessageSquare' },
     { id: 'pageContainer', name: 'Page Container', icon: 'Layout' },
     { id: 'dataTable', name: 'Data Table', icon: 'Settings' },
+    { id: 'sheet', name: 'Sheet', icon: 'Move' },
   ];
   
   // Função para renderizar o ícone correto
@@ -442,6 +445,8 @@ export default function DevPage() {
         return <Palette strokeWidth={1.5} color={iconColor} />;
       case 'Layout':
         return <Layout strokeWidth={1.5} color={iconColor} />;
+      case 'Move':
+        return <Move strokeWidth={1.5} color={iconColor} />;
       default:
         return <Settings strokeWidth={1.5} color={iconColor} />;
     }
@@ -487,6 +492,8 @@ export default function DevPage() {
         return renderPageContainerComponent();
       case 'dataTable':
         return renderDataTableComponent();
+      case 'sheet':
+        return renderSheetComponent();
       default:
         return null;
     }
@@ -3978,6 +3985,13 @@ return (
     );
   };
 
+  const renderSheetComponent = () => {
+    // Ao invés de declarar hooks diretamente aqui, retornamos um componente que declara os hooks
+    return (
+      <SheetExampleContent />
+    );
+  };
+
   return (
     <>
       <Stack.Screen 
@@ -4285,3 +4299,265 @@ const CopyButton = ({ text }: { text: string }) => {
     </Pressable>
   );
 }
+
+// Componente para o conteúdo de exemplo do Sheet
+const SheetExampleContent: React.FC = () => {
+  const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
+  const { currentBreakpoint } = useResponsive();
+  const [sheetVisible, setSheetVisible] = useState(false);
+  const [currentSheet, setCurrentSheet] = useState<SheetPosition>('bottom');
+
+  // Cores do tema atual
+  const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
+  const bgSecondary = isDark ? 'bg-bg-secondary-dark' : 'bg-bg-secondary-light';
+  const bgTertiary = isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light';
+  const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
+  const textSecondary = isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light';
+  
+  return (
+    <View className="p-lg">
+      <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+        Componente Sheet
+      </Text>
+      <Text className={`text-body-md ${textSecondary} mb-lg`}>
+        O Sheet é um componente que permite exibir conteúdo em uma janela modal deslizando de qualquer direção.
+        Em dispositivos móveis, o Sheet só aparece da parte inferior da tela, enquanto no desktop pode vir de qualquer direção.
+      </Text>
+      
+      <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+        
+        <View className="flex-row flex-wrap gap-md mb-lg">
+          <Pressable
+            onPress={() => {
+              setCurrentSheet('bottom');
+              setSheetVisible(true);
+            }}
+            className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
+          >
+            <Text className="text-white font-jakarta-medium">
+              De Baixo
+            </Text>
+          </Pressable>
+          
+          <Pressable
+            onPress={() => {
+              setCurrentSheet('top');
+              setSheetVisible(true);
+            }}
+            className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
+          >
+            <Text className="text-white font-jakarta-medium">
+              De Cima
+            </Text>
+          </Pressable>
+          
+          <Pressable
+            onPress={() => {
+              setCurrentSheet('left');
+              setSheetVisible(true);
+            }}
+            className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
+          >
+            <Text className="text-white font-jakarta-medium">
+              Da Esquerda
+            </Text>
+          </Pressable>
+          
+          <Pressable
+            onPress={() => {
+              setCurrentSheet('right');
+              setSheetVisible(true);
+            }}
+            className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
+          >
+            <Text className="text-white font-jakarta-medium">
+              Da Direita
+            </Text>
+          </Pressable>
+        </View>
+        
+        <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+          {currentBreakpoint === 'sm' || Platform.OS !== 'web' 
+            ? 'No mobile, o Sheet só abre de baixo para cima' 
+            : 'Escolha a direção do Sheet'}
+        </Text>
+        <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+          {currentBreakpoint === 'sm' || Platform.OS !== 'web'
+            ? 'Por razões de UX, em dispositivos móveis o Sheet só abre de baixo para cima'
+            : 'No desktop, o Sheet pode abrir de qualquer uma das quatro direções'}
+        </Text>
+      </View>
+      
+      {/* Sheet Component */}
+      <Sheet
+        isOpen={sheetVisible}
+        onClose={() => setSheetVisible(false)}
+        position={currentSheet}
+        height="50%"
+        width="80%"
+        borderRadius={16}
+        closeOnOverlayClick={true}
+        showCloseButton={true}
+        overlayOpacity={0.5}
+        animationDuration={300}
+        testID="example-sheet"
+      >
+        <View className="p-lg">
+          <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-lg`}>
+            Conteúdo do Sheet
+          </Text>
+          <Text className={`text-body-md ${textSecondary} mb-lg`}>
+            Este é um exemplo de conteúdo dentro do Sheet. Você pode colocar qualquer componente React Native aqui.
+          </Text>
+          <Pressable
+            onPress={() => setSheetVisible(false)}
+            className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md self-start"
+          >
+            <Text className="text-white font-jakarta-medium">
+              Fechar Sheet
+            </Text>
+          </Pressable>
+        </View>
+      </Sheet>
+      
+      <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+        Características
+      </Text>
+      <Text className={`text-body-md ${textSecondary} mb-md`}>
+        O Sheet oferece diversas características para uma experiência de usuário fluida:
+      </Text>
+      
+      <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Responsivo</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Adapta-se automaticamente ao tamanho da tela</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Animação Suave</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Transições fluidas para uma melhor experiência do usuário</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Overlay Personalizável</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Controle da opacidade do overlay de fundo</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Múltiplas Direções</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Em desktop, o Sheet pode abrir de qualquer direção (top, right, bottom, left)</Text>
+        </View>
+      </View>
+      
+      <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+        Propriedades
+      </Text>
+      <Text className={`text-body-md ${textSecondary} mb-lg`}>
+        O componente Sheet possui as seguintes propriedades:
+      </Text>
+      
+      <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>isOpen</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Se o Sheet está visível (boolean)</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>onClose</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Função chamada quando o Sheet é fechado (callback)</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>position</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Posição do Sheet ('top', 'right', 'bottom', 'left')</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>height</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Altura do Sheet (number ou string)</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>width</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Largura do Sheet (number ou string)</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>borderRadius</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Raio da borda do Sheet (number)</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>closeOnOverlayClick</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Se o Sheet deve fechar ao clicar no overlay (boolean)</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>showCloseButton</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Se deve mostrar o botão de fechar (boolean)</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>overlayOpacity</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Opacidade do overlay (number)</Text>
+        </View>
+        
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>animationDuration</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Duração da animação em ms (number)</Text>
+        </View>
+      </View>
+      
+      <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+        Uso
+      </Text>
+      <Text className={`text-body-md ${textSecondary} mb-md`}>
+        Exemplo de implementação do Sheet:
+      </Text>
+      
+      <View className={`bg-bg-tertiary-${isDark ? 'dark' : 'light'} rounded-lg p-md mb-lg`}>
+        <Text className={`text-mono-md font-mono-regular ${textPrimary}`}>
+{`// Importar o componente
+import { Sheet } from 'components/AicrusComponents';
+
+// Estado para controlar a visibilidade
+const [isOpen, setIsOpen] = useState(false);
+
+// Renderização
+<Sheet
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
+  position="bottom"
+  height="50%"
+  borderRadius={16}
+  closeOnOverlayClick={true}
+>
+  <View style={{ padding: 20 }}>
+    <Text>Conteúdo do Sheet</Text>
+    <Button
+      title="Fechar"
+      onPress={() => setIsOpen(false)}
+    />
+  </View>
+</Sheet>
+
+// Botão para abrir o Sheet
+<Button
+  title="Abrir Sheet"
+  onPress={() => setIsOpen(true)}
+/>`}
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+// Função que chama o componente sem declarar hooks diretamente
+const renderSheetComponent = () => {
+  // Ao invés de declarar hooks diretamente aqui, retornamos um componente que declara os hooks
+  return (
+    <SheetExampleContent />
+  );
+};

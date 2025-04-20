@@ -18,6 +18,7 @@ export * from './notifications-menu';
 export * from './profile-menu';
 export * from './checkbox';
 export * from './data-table';
+export * from './sheet';
 
 // Exportações de constantes
 export * from './constants/theme';
