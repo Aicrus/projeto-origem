@@ -4,57 +4,58 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input, InputProps } from './Input';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { colors } from '../constants/theme';
+import { Clock } from 'lucide-react-native';
 
 /**
- * @component DateInput
- * @description Componente de entrada de data com suporte a:
- * - Máscara de data no formato dd/mm/aaaa
- * - Seletor de data nativo no iOS e Android
- * - Calendário HTML5 nativo para web estilizado
+ * @component TimeInput
+ * @description Componente de entrada de hora com suporte a:
+ * - Máscara de hora no formato HH:MM
+ * - Seletor de hora nativo no iOS e Android
+ * - Seletor de hora HTML5 nativo para web estilizado
  * - Tema claro/escuro 
  * 
  * Exemplo:
  * ```tsx
- * <DateInput
- *   value={data}
- *   onChangeText={setData}
- *   label="Data de nascimento"
- *   placeholder="dd/mm/aaaa"
+ * <TimeInput
+ *   value={hora}
+ *   onChangeText={setHora}
+ *   label="Horário"
+ *   placeholder="HH:MM"
  * />
  * ```
  */
 
-export interface DateInputProps extends Omit<InputProps, 'type' | 'mask' | 'onCalendarPress'> {
-  /** Data mínima permitida */
-  minDate?: Date;
-  /** Data máxima permitida */
-  maxDate?: Date;
-  /** Valor inicial para o seletor de data (quando aberto pela primeira vez) */
-  initialDate?: Date;
+export interface TimeInputProps extends Omit<InputProps, 'type' | 'mask' | 'onCalendarPress'> {
+  /** Valor inicial para o seletor de hora (quando aberto pela primeira vez) */
+  initialTime?: Date;
+  /** Se deve mostrar o seletor de 24 horas (vs. AM/PM) */
+  is24Hour?: boolean;
+  /** Intervalo em minutos para o seletor de minutos (iOS) */
+  minuteInterval?: 1 | 5 | 10 | 15 | 20 | 30;
 }
 
-export const DateInput: React.FC<DateInputProps> = ({
+export const TimeInput: React.FC<TimeInputProps> = ({
   value,
   onChangeText,
-  minDate,
-  maxDate,
-  initialDate = new Date(),
-  placeholder = 'dd/mm/aaaa',
+  initialTime = new Date(),
+  placeholder = 'HH:MM',
   label,
   disabled = false,
+  is24Hour = true,
+  minuteInterval = 1,
   ...otherProps
 }) => {
   // Tema atual
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   
-  // Estado para controlar visibilidade do seletor de data
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  // Estado para controlar visibilidade do seletor de hora
+  const [showTimePicker, setShowTimePicker] = useState(false);
   
-  // Estado para armazenar a data selecionada temporariamente (antes de confirmar)
-  const [tempDate, setTempDate] = useState<Date | null>(null);
+  // Estado para armazenar a hora selecionada temporariamente (antes de confirmar)
+  const [tempTime, setTempTime] = useState<Date | null>(null);
   
-  // Referência ao input nativo de data para web
+  // Referência ao input nativo de hora para web
   const nativeTimeInputRef = useRef<HTMLInputElement>(null);
   
   // Animação para o overlay
@@ -63,7 +64,7 @@ export const DateInput: React.FC<DateInputProps> = ({
   
   // Animação de entrada e saída do modal
   useEffect(() => {
-    if (showDatePicker) {
+    if (showTimePicker) {
       // Animação de entrada
       Animated.parallel([
         Animated.timing(fadeAnim, {
@@ -82,12 +83,12 @@ export const DateInput: React.FC<DateInputProps> = ({
       fadeAnim.setValue(0);
       slideAnim.setValue(150);
     }
-  }, [showDatePicker, fadeAnim, slideAnim]);
+  }, [showTimePicker, fadeAnim, slideAnim]);
   
-  // Observar mensagens do calendário HTML5 para interceptar "Limpar"
+  // Observar mensagens do seletor HTML5 para interceptar "Limpar"
   useEffect(() => {
     if (Platform.OS === 'web') {
-      // Função para ouvir mensagens do calendário HTML5
+      // Função para ouvir mensagens do seletor HTML5
       const handleClearButton = (event: MessageEvent) => {
         // Tentar detectar padrões conhecidos de eventos para o botão "Limpar"
         if (
@@ -137,14 +138,14 @@ export const DateInput: React.FC<DateInputProps> = ({
     }
   }, [onChangeText]);
   
-  // Função para abrir o seletor de data
-  const openDatePicker = () => {
+  // Função para abrir o seletor de hora
+  const openTimePicker = () => {
     if (!disabled) {
-      // Inicializa a data temporária com a data atual do input ou a data inicial
-      setTempDate(value ? stringToDate(value) : initialDate);
+      // Inicializa a hora temporária com a hora atual do input ou a hora inicial
+      setTempTime(value ? stringToTime(value) : initialTime);
       
       if (Platform.OS === 'web') {
-        // Para web, precisamos acionar o clique no input nativo de data
+        // Para web, precisamos acionar o clique no input nativo de hora
         setTimeout(() => {
           if (nativeTimeInputRef.current) {
             nativeTimeInputRef.current.showPicker();
@@ -153,108 +154,115 @@ export const DateInput: React.FC<DateInputProps> = ({
         }, 100);
       } else {
         // Para mobile, abrimos o modal customizado
-        setShowDatePicker(true);
+        setShowTimePicker(true);
       }
     }
   };
   
-  // Função para converter string no formato dd/mm/aaaa para objeto Date
-  const stringToDate = (dateString: string): Date => {
-    if (!dateString || dateString.length !== 10) return initialDate;
+  // Função para converter string no formato HH:MM para objeto Date
+  const stringToTime = (timeString: string): Date => {
+    if (!timeString || timeString.length !== 5) return initialTime;
     
-    const parts = dateString.split('/');
-    if (parts.length !== 3) return initialDate;
+    const parts = timeString.split(':');
+    if (parts.length !== 2) return initialTime;
     
-    const day = parseInt(parts[0], 10);
-    const month = parseInt(parts[1], 10) - 1; // Mês em JS começa em 0
-    const year = parseInt(parts[2], 10);
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
     
-    // Criar data usando UTC para evitar problemas de fuso horário
-    const date = new Date(Date.UTC(year, month, day));
+    if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+      return initialTime;
+    }
     
-    // Verificar se a data é válida
-    if (isNaN(date.getTime())) return initialDate;
+    const date = new Date();
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
     
     return date;
   };
   
-  // Função para converter Data para string no formato dd/mm/aaaa
-  const dateToString = (date: Date): string => {
-    // Usamos UTC para evitar problemas de fuso horário
-    const day = date.getUTCDate().toString().padStart(2, '0');
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0'); // Mês em JS começa em 0
-    const year = date.getUTCFullYear();
+  // Função para converter Date para string no formato HH:MM
+  const timeToString = (date: Date): string => {
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
     
-    return `${day}/${month}/${year}`;
+    return `${hours}:${minutes}`;
   };
   
-  // Função para formatar data no formato ISO (usado pelo input date HTML5)
-  const dateToISO = (date: Date): string => {
-    // Usamos UTC para ter consistência entre a exibição e o valor interno
-    const year = date.getUTCFullYear();
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-    const day = date.getUTCDate().toString().padStart(2, '0');
+  // Função para aplicar máscara de hora (HH:MM)
+  const applyTimeMask = (text: string): string => {
+    // Remove caracteres não numéricos
+    text = text.replace(/\D/g, '');
     
-    return `${year}-${month}-${day}`;
+    // Formata para HH:MM
+    if (text.length <= 2) {
+      // Apenas horas
+      return text;
+    } else {
+      // Horas e minutos
+      const hours = text.substring(0, 2);
+      const minutes = text.substring(2, 4);
+      return `${hours}:${minutes}`;
+    }
   };
   
-  // Função para converter formato ISO para o formato dd/mm/aaaa
-  const isoToFormattedDate = (isoDate: string): string => {
-    // Criar data a partir do formato ISO
-    const date = new Date(isoDate + 'T00:00:00Z'); // Adicionamos T00:00:00Z para forçar UTC
-    return dateToString(date);
+  // Função para lidar com mudança de texto
+  const handleTimeChange = (text: string) => {
+    const maskedText = applyTimeMask(text);
+    onChangeText(maskedText);
   };
   
-  // Função para lidar com a mudança de data no seletor nativo (iOS/Android)
-  const handleDateChange = (event: any, selectedDate?: Date) => {
+  // Função para lidar com a mudança de hora no seletor nativo (iOS/Android)
+  const handleTimePickerChange = (event: any, selectedTime?: Date) => {
     // Não fecha mais o picker automaticamente
     
-    // Se o usuário cancelou ou não selecionou nenhuma data
-    if (!selectedDate) {
+    // Se o usuário cancelou ou não selecionou nenhuma hora
+    if (!selectedTime) {
       return;
     }
     
-    // Atualiza a data temporária
-    setTempDate(selectedDate);
+    // Atualiza apenas a hora temporária, não confirma ainda
+    setTempTime(selectedTime);
   };
   
-  // Função para lidar com a confirmação da data
+  // Função para lidar com a confirmação da hora
   const handleConfirm = () => {
-    // Se temos uma data temporária selecionada, aplica-a
-    if (tempDate) {
-      onChangeText(dateToString(tempDate));
+    // Se temos uma hora temporária selecionada, aplica-a
+    if (tempTime) {
+      onChangeText(timeToString(tempTime));
     }
     
     // Fecha o picker
-    setShowDatePicker(false);
+    setShowTimePicker(false);
   };
   
   // Função para lidar com o cancelamento
   const handleCancel = () => {
-    // Descarta a data temporária
-    setTempDate(null);
+    // Descarta a hora temporária
+    setTempTime(null);
     
     // Fecha o picker
-    setShowDatePicker(false);
-  };
-  
-  // Função para lidar com mudança no input nativo de data HTML5 (web)
-  const handleWebNativeDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isoDate = e.target.value; // Formato YYYY-MM-DD
-    
-    // Se o input está vazio, limpa o valor
-    if (!isoDate) {
-      onChangeText('');
-      return;
-    }
-    
-    // Senão, formata a data
-    onChangeText(isoToFormattedDate(isoDate));
+    setShowTimePicker(false);
   };
   
   // Fechar ao clicar no overlay
   const handleOverlayPress = () => {
-    setShowDatePicker(false);
+    setShowTimePicker(false);
+  };
+  
+  // Função para lidar com mudança no input nativo de hora HTML5 (web)
+  const handleWebNativeTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const timeValue = e.target.value; // Formato HH:MM
+    
+    // Se o input está vazio, limpa o valor
+    if (!timeValue) {
+      onChangeText('');
+      return;
+    }
+    
+    // Formata a hora se necessário
+    onChangeText(timeValue);
   };
   
   // Pegar a largura da tela para centralizar o seletor
@@ -336,31 +344,31 @@ export const DateInput: React.FC<DateInputProps> = ({
     },
   });
   
-  // Inject CSS para estilizar o calendário HTML5 nativo
+  // Inject CSS para estilizar o seletor de hora HTML5 nativo
   useEffect(() => {
     if (Platform.OS === 'web') {
       const style = document.createElement('style');
       const primaryColor = isDark ? colors.primary.dark : colors.primary.main;
       
       style.textContent = `
-        /* Estilização do calendário nativo HTML5 */
-        input[type="date"]::-webkit-calendar-picker-indicator {
+        /* Estilização do seletor de hora HTML5 nativo */
+        input[type="time"]::-webkit-calendar-picker-indicator {
           cursor: pointer;
           filter: ${isDark ? 'invert(1)' : 'none'};
           opacity: 0.6;
         }
         
-        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        input[type="time"]::-webkit-calendar-picker-indicator:hover {
           opacity: 1;
         }
         
         /* Cor principal para o calendário e elementos selecionados */
-        input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+        input[type="time"]::-webkit-datetime-edit-fields-wrapper {
           color: ${isDark ? '#FFFFFF' : '#14181B'};
         }
         
-        /* Reposicionar o calendário para não sobrepor o campo */
-        [data-date-input-container] {
+        /* Reposicionar o seletor para não sobrepor o campo */
+        [data-time-input-container] {
           position: relative;
         }
         
@@ -372,12 +380,12 @@ export const DateInput: React.FC<DateInputProps> = ({
         }
         
         /* Firefox */
-        input[type="date"] {
+        input[type="time"] {
           position: relative;
         }
         
-        /* Estilizações para o calendário nativo */
-        ::-webkit-calendar-picker {
+        /* Estilizações para o seletor nativo */
+        ::-webkit-time-picker {
           background-color: ${isDark ? '#1A1F24' : '#FFFFFF'};
         }
         
@@ -386,57 +394,45 @@ export const DateInput: React.FC<DateInputProps> = ({
         }
         
         /* Para navegadores baseados em Chromium */
+        ::-webkit-time-picker-indicator,
         ::-webkit-calendar-picker-indicator {
           filter: ${isDark ? 'invert(1)' : 'none'};
         }
         
-        /* Hack para aplicar cores no calendário */
+        /* Hack para aplicar cores no seletor */
         :root {
           accent-color: ${primaryColor} !important;
           --calendar-selected-bg: ${primaryColor} !important;
           --calendar-selected-color: white !important;
           --calendar-active-color: ${primaryColor} !important;
           --calendar-header-color: ${primaryColor} !important;
-          --calendar-today-color: ${primaryColor} !important;
-          --calendar-today-bg: ${primaryColor}20 !important;
-          
-          /* Cores específicas para Chrome e Firefox */
-          --webkit-calendar-selected-bg: ${primaryColor} !important;
-          --moz-calendar-selected-bg: ${primaryColor} !important;
-          
-          /* Tenta forçar a cor personalizada no botão "Hoje" */
-          --today-button-color: ${primaryColor} !important;
-          --reset-button-color: ${primaryColor} !important;
-          --clear-button-color: ${primaryColor} !important;
+          --time-picker-selected-bg: ${primaryColor} !important;
+          --time-picker-selected-color: white !important;
+          --time-picker-active-color: ${primaryColor} !important;
         }
         
-        /* Adiciona suporte a cores personalizadas no calendário */
+        /* Adiciona suporte a cores personalizadas no seletor */
         @supports (accent-color: ${primaryColor}) {
-          input[type="date"] {
+          input[type="time"] {
             accent-color: ${primaryColor};
           }
         }
         
         /* Hack para Chrome/Blink */
         @supports (-webkit-appearance: none) {
-          .calendar-color-override {
+          .time-color-override {
             color: ${primaryColor} !important;
           }
         }
         
         /* Estilos para temas escuros */
         ${isDark ? `
+          ::-webkit-time-picker-indicator,
           ::-webkit-calendar-picker-indicator {
             filter: invert(1) !important;
           }
           
-          /* Tenta forçar o tema escuro no calendário */
           [role="dialog"], [role="application"] {
-            background-color: #1A1F24 !important;
-            color: #FFFFFF !important;
-          }
-          
-          [role="grid"], [role="row"], [role="gridcell"] {
             background-color: #1A1F24 !important;
             color: #FFFFFF !important;
           }
@@ -451,45 +447,52 @@ export const DateInput: React.FC<DateInputProps> = ({
     }
   }, [isDark]);
 
+  // Componente para renderizar o ícone do relógio
+  const ClockIcon = () => (
+    <Clock 
+      size={16} 
+      color={isDark ? colors.primary.dark : colors.primary.main} 
+    />
+  );
+
   return (
-    <View {...(Platform.OS === 'web' ? { 'data-date-input-container': 'true' } : {})}>
+    <View {...(Platform.OS === 'web' ? { 'data-time-input-container': 'true' } : {})}>
       <Input
         value={value}
-        onChangeText={onChangeText}
+        onChangeText={handleTimeChange}
         placeholder={placeholder}
         label={label}
         disabled={disabled}
-        type="date"
-        mask="date"
-        onCalendarPress={openDatePicker}
+        keyboardType="numeric"
+        // Passamos função personalizada para o ícone de relógio
+        rightIcon={ClockIcon}
+        onRightIconPress={openTimePicker}
         {...otherProps}
       />
       
-      {/* Input nativo de data para web */}
+      {/* Input nativo de hora para web */}
       {Platform.OS === 'web' && (
         <input
           ref={nativeTimeInputRef}
-          type="date"
+          type="time"
           style={styles.webNativeTimeInput}
-          onChange={handleWebNativeDateChange}
+          onChange={handleWebNativeTimeChange}
           onInput={(e) => {
             // Verificar se foi limpo
             if (!(e.target as HTMLInputElement).value && value) {
               onChangeText('');
             }
           }}
-          min={minDate ? dateToISO(minDate) : undefined}
-          max={maxDate ? dateToISO(maxDate) : undefined}
-          value={value ? dateToISO(stringToDate(value)) : ''}
+          value={value || ''}
           disabled={disabled}
         />
       )}
       
-      {/* Modal de data para iOS e Android com design melhorado */}
+      {/* Modal de hora para iOS e Android com design melhorado */}
       {(Platform.OS === 'ios' || Platform.OS === 'android') && (
         <Modal
           transparent
-          visible={showDatePicker}
+          visible={showTimePicker}
           animationType="fade"
           onRequestClose={handleCancel}
         >
@@ -516,16 +519,16 @@ export const DateInput: React.FC<DateInputProps> = ({
                 }
               ]}
             >
-              <Text style={styles.pickerTitle}>Selecione uma data</Text>
+              <Text style={styles.pickerTitle}>Selecione uma hora</Text>
               
               <View style={styles.pickerContainer}>
                 <DateTimePicker
-                  value={tempDate || initialDate}
-                  mode="date"
+                  value={tempTime || initialTime}
+                  mode="time"
                   display="spinner"
-                  onChange={handleDateChange}
-                  minimumDate={minDate}
-                  maximumDate={maxDate}
+                  onChange={handleTimePickerChange}
+                  is24Hour={is24Hour}
+                  minuteInterval={minuteInterval}
                   locale="pt-BR"
                   textColor={isDark ? '#FFFFFF' : '#000000'}
                   themeVariant={isDark ? 'dark' : 'light'}

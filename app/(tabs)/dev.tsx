@@ -29,6 +29,7 @@ import { supabase } from '@/lib/supabase';
 import { Sheet } from 'components/AicrusComponents';
 import type { SheetPosition } from 'components/AicrusComponents/sheet/Sheet';
 import { DateInput } from '../../components/AicrusComponents/input/DateInput';
+import { TimeInput } from '../../components/AicrusComponents/input/TimeInput';
 
 // Definir tipos para os componentes disponíveis
 type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | 'sheet' | null;
@@ -310,6 +311,7 @@ export default function DevPage() {
   const [inputBusca, setInputBusca] = useState('');
   const [inputMascara, setInputMascara] = useState('');
   const [inputData, setInputData] = useState('');
+  const [inputHora, setInputHora] = useState('');
   
   // Estados separados para cada exemplo de Select
   const [selectBasico, setSelectBasico] = useState('');
@@ -611,6 +613,26 @@ export default function DevPage() {
               {Platform.OS === 'web' 
                 ? ' Na web, usa o calendário nativo HTML5 estilizado com as cores do tema.' 
                 : ' No iOS e Android, abre um seletor de data com controles para confirmação.'}
+            </Text>
+          </View>
+          
+          {/* Input de hora */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input de hora</Text>
+            <TimeInput
+              value={inputHora}
+              onChangeText={setInputHora}
+              placeholder="HH:MM"
+              label="Hora"
+              is24Hour={true}
+              minuteInterval={1}
+              initialTime={new Date()}
+            />
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Input de hora com máscara HH:MM e seletor de hora para todas as plataformas.
+              {Platform.OS === 'web' 
+                ? ' Na web, usa o seletor de hora nativo HTML5 com tema personalizado.' 
+                : ' No iOS e Android, abre um seletor de hora nativo com controles de confirmação.'}
             </Text>
           </View>
         </View>

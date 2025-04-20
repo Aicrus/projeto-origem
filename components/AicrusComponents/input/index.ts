@@ -76,4 +76,6 @@
 export { Input } from './Input';
 export type { InputProps } from './Input';
 export { DateInput } from './DateInput';
-export type { DateInputProps } from './DateInput'; 
+export type { DateInputProps } from './DateInput';
+export { TimeInput } from './TimeInput';
+export type { TimeInputProps } from './TimeInput'; 

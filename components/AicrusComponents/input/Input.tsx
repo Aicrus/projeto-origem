@@ -106,6 +106,10 @@ export interface InputProps {
   onClear?: () => void;
   /** Função chamada quando o ícone de calendário é pressionado (apenas para type="date") */
   onCalendarPress?: () => void;
+  /** Componente de ícone personalizado para exibir à direita do input */
+  rightIcon?: React.ComponentType;
+  /** Função chamada quando o ícone à direita é pressionado */
+  onRightIconPress?: () => void;
   /** ID para testes automatizados */
   testID?: string;
   /** Estilo personalizado para o container do input */
@@ -138,6 +142,8 @@ export const Input = ({
   numberOfLines = 1,
   onClear,
   onCalendarPress,
+  rightIcon,
+  onRightIconPress,
   testID,
   style,
   inputStyle,
@@ -264,6 +270,13 @@ export const Input = ({
     onClear && onClear();
     // Focar no input após limpar
     inputRef.current?.focus();
+  };
+  
+  // Função para lidar com clique no ícone direito personalizado
+  const handleRightIconPress = () => {
+    if (onRightIconPress) {
+      onRightIconPress();
+    }
   };
   
   // Função para abrir o seletor de data (se disponível)
@@ -441,6 +454,18 @@ export const Input = ({
             inputMode: 'numeric'
           } : {})}
         />
+        
+        {/* Ícone personalizado à direita */}
+        {rightIcon && (
+          <TouchableOpacity 
+            onPress={handleRightIconPress}
+            style={containerStyle.iconContainer}
+            {...(Platform.OS === 'web' ? { 'data-input-icon': 'true' } : {})}
+            disabled={disabled}
+          >
+            {React.createElement(rightIcon)}
+          </TouchableOpacity>
+        )}
         
         {/* Botão para limpar input quando houver valor e não for disabled */}
         {value.length > 0 && !disabled && onClear && (
