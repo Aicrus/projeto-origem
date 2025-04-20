@@ -585,7 +585,7 @@ export const Input = ({
     if (isWeb) {
       const style = document.createElement('style');
       style.textContent = `
-        /* Estilo para o input */
+        /* Estilos para o input */
         [data-input-container="true"]:hover:not([data-disabled="true"]) {
           border-color: ${isDark ? colors.primary.dark : colors.primary.main};
           transition: all 0.2s ease;
@@ -687,51 +687,33 @@ export const Input = ({
           min-height: ${minHeight}px;
           max-height: ${maxHeight}px;
           overflow-y: auto;
-          padding-bottom: 10px; /* Aumentado para dar mais espaço para o indicador */
+          padding-bottom: 16px; /* Espaço para o indicador de redimensionamento */
           text-align-vertical: top !important;
-          position: relative; /* Para posicionamento do pseudo-elemento */
         }
         
-        /* Estilização do container para inputs redimensionáveis */
+        /* Container para inputs redimensionáveis */
         [data-input-container][data-multiline="true"] {
           position: relative;
           overflow: visible;
         }
         
-        /* Indicador visual personalizado no canto inferior direito */
-        [data-input-container][data-multiline="true"]::after {
-          content: '';
+        /* Ícone de redimensionamento visível (semelhante ao nativo) */
+        [data-resize-handle] {
           position: absolute;
           bottom: 4px;
           right: 4px;
-          width: 10px;
-          height: 10px;
-          border-right: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.3)'};
-          border-bottom: 2px solid ${isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.3)'};
-          pointer-events: none;
+          width: 16px;
+          height: 16px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
           z-index: 10;
+          pointer-events: none;
         }
         
-        /* Ajuste do redimensionador nativo */
+        /* Não esconda o redimensionador nativo, apenas estilize o nosso ícone por cima */
         textarea::-webkit-resizer {
-          opacity: 1; /* Manter funcional */
           background-color: transparent;
-        }
-        
-        /* Mantenha o foco na borda mas não no redimensionador */
-        textarea:focus {
-          outline-offset: -2px !important;
-        }
-        
-        /* Força alinhamento do texto no topo para multilinhas */
-        textarea, [multiline="true"] {
-          vertical-align: top !important;
-          text-align-vertical: top !important;
-        }
-        
-        /* Remove qualquer padding que possa estar afetando o posicionamento */
-        .native-number-input {
-          padding-right: 0 !important;
         }
       `;
       document.head.appendChild(style);
@@ -851,9 +833,7 @@ export const Input = ({
           disabled ? { opacity: 0.5 } : {},
           type === 'number' && showNumberControls && !isWeb ? { paddingRight: 32 } : {},
           multiline && { minHeight: minHeight },
-          // Aplicar altura personalizada para inputs redimensionáveis no nativo
           !isWeb && multiline && resizable ? { height: nativeInputHeight } : {},
-          // Garante alinhamento adequado quando multiline
           multiline ? { alignItems: 'flex-start' } : {}
         ]}
         {...(isWeb ? {
@@ -864,7 +844,6 @@ export const Input = ({
         } : {})}
         onLayout={() => {
           if (multiline && inputRef.current && Platform.OS !== 'web') {
-            // Garante que o texto comece no topo após o layout
             inputRef.current.setNativeProps({
               style: { textAlignVertical: 'top' }
             });
@@ -1078,6 +1057,53 @@ export const Input = ({
           </View>
         )}
         
+        {/* Indicador de redimensionamento para web (similar ao nativo) */}
+        {isWeb && multiline && resizable && (
+          <View 
+            style={{
+              position: 'absolute',
+              bottom: 4,
+              right: 4,
+              width: 14,
+              height: 14,
+              zIndex: 5,
+              pointerEvents: 'none',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            {...(isWeb ? { 'data-resize-handle': 'true' } : {})}
+          >
+            {/* Usando o mesmo indicador visual do nativo */}
+            <View style={{
+              width: 10,
+              height: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+              <View style={{
+                width: 10,
+                height: 1,
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                marginBottom: 2,
+                transform: [{ rotate: '-45deg' }, { translateX: 1 }],
+              }} />
+              <View style={{
+                width: 7,
+                height: 1,
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                marginBottom: 2,
+                transform: [{ rotate: '-45deg' }],
+              }} />
+              <View style={{
+                width: 4,
+                height: 1,
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                transform: [{ rotate: '-45deg' }, { translateX: -1 }],
+              }} />
+            </View>
+          </View>
+        )}
+        
         {/* Alça de redimensionamento para textarea (no React Native) */}
         {!isWeb && multiline && resizable && (
           <View 
@@ -1096,7 +1122,7 @@ export const Input = ({
             {...panResponder.panHandlers}
             hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }}
           >
-            {/* Três linhas diagonais semelhantes ao indicador de redimensionamento da web */}
+            {/* Três linhas diagonais como indicador de redimensionamento */}
             <View style={{
               width: 10,
               height: 10,
