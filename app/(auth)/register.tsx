@@ -80,16 +80,6 @@ export default function Register() {
       }
 
       await signUp({ email, password: senha, name: nome });
-      showToast({
-        type: 'success',
-        message: 'Cadastro realizado!',
-        description: 'Sua conta foi criada com sucesso. Verifique seu email para confirmação.',
-      });
-      
-      // Navega para a tela de login após um pequeno delay para o usuário ver a mensagem de sucesso
-      setTimeout(() => {
-        router.replace('/login');
-      }, 1500);
     } catch (error: any) {
       // Tratamento de erros conforme implementação existente
       console.error('Erro detalhado no cadastro:', error);

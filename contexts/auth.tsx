@@ -192,13 +192,30 @@ export function AuthProvider({
 
       // Sucesso - mensagem clara sobre confirmação de email
       if (data?.user) {
-        showToast({
-          type: 'success',
-          message: 'Cadastro realizado!',
-          description: 'Verifique seu email para confirmar a conta antes de fazer login.',
-        });
-        
-        setTimeout(() => router.replace('/(auth)/login'), 2000);
+        // Verifica se o usuário já foi autenticado automaticamente
+        // (isso acontece quando o Supabase está configurado para não exigir confirmação de e-mail)
+        if (data.session) {
+          // Autenticação automática - o usuário já está logado
+          setSession(data.session);
+          showToast({
+            type: 'success',
+            message: 'Cadastro realizado!',
+            description: 'Sua conta foi criada com sucesso! Bem-vindo(a) a plataforma.',
+          });
+          
+          // Não precisa navegar para login, pois já está autenticado
+          // O useEffect que monitora a sessão fará a navegação automaticamente
+        } else {
+          // Confirmação de e-mail é necessária
+          showToast({
+            type: 'success',
+            message: 'Cadastro realizado!',
+            description: 'Verifique seu email para confirmar a conta antes de fazer login.',
+          });
+          
+          // Navega para tela de login após o toast
+          setTimeout(() => router.replace('/(auth)/login'), 2000);
+        }
       } else {
         // Caso improvável, mas tratamos por segurança
         showToast({
@@ -294,7 +311,7 @@ export function AuthProvider({
         showToast({
           type: 'success',
           message: 'Login realizado!',
-          description: 'Bem‑vindo de volta!',
+          description: 'Bem‑vindo à plataforma!',
         });
       } else {
         showToast({
