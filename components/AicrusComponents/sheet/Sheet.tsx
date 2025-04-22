@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated, Dimensions, Platform, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated, Dimensions, Platform, SafeAreaView, KeyboardAvoidingView } from 'react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { colors } from '../constants/theme';
 
@@ -71,6 +71,10 @@ const Sheet: React.FC<SheetProps> = ({
   // Usando o hook useTheme do contexto de tema da aplicação
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
+  
+  // Valores de padding para diferentes plataformas
+  const webPadding = 20;
+  const nativePadding = 10;
   
   const animation = useRef(new Animated.Value(0)).current;
   const windowWidth = Dimensions.get('window').width;
@@ -251,10 +255,18 @@ const Sheet: React.FC<SheetProps> = ({
     // Aplicar padding tanto para dispositivos nativos quanto para web
     switch (finalPosition) {
       case 'top':
-        return { paddingTop: Platform.OS === 'web' ? 20 : 10 };
+        return { paddingTop: Platform.OS === 'web' ? webPadding : nativePadding };
+      case 'bottom':
+        // Para a posição bottom, vamos garantir que o padding seja suficiente
+        // Em dispositivos iOS com notch na parte inferior, isso é especialmente importante
+        return { 
+          paddingBottom: Platform.OS === 'web' 
+            ? webPadding * 2 // Dobrar o padding para web
+            : (isIOS ? nativePadding * 4 : nativePadding * 2) // Padding muito maior para iOS
+        };
       case 'left':
       case 'right':
-        return { paddingTop: Platform.OS === 'web' ? 20 : 10 };
+        return { paddingTop: Platform.OS === 'web' ? webPadding : nativePadding };
       default:
         return {};
     }
@@ -273,6 +285,9 @@ const Sheet: React.FC<SheetProps> = ({
 
   const themeColors = getThemeColors();
 
+  // Verificar se estamos no iOS
+  const isIOS = Platform.OS === 'ios';
+
   // Se não estiver visível nem aberto, não renderize nada
   if (!visible && !isOpen) return null;
 
@@ -280,14 +295,17 @@ const Sheet: React.FC<SheetProps> = ({
   const renderContent = () => {
     const safeAreaPadding = getSafeAreaPadding();
     
+    // Para a posição 'bottom', aplicar o padding diretamente na View
+    const contentStyle = [
+      { flex: 1 },
+      safeAreaPadding,
+      contentContainerStyle
+    ];
+    
+    // Limpamos os ajustes extras de padding pois já estão na função getSafeAreaPadding
+    
     const contentWrapper = (
-      <View 
-        style={[
-          { flex: 1 }, 
-          safeAreaPadding,
-          contentContainerStyle
-        ]}
-      >
+      <View style={contentStyle}>
         {showCloseButton && (
           <TouchableOpacity
             style={[
@@ -304,7 +322,39 @@ const Sheet: React.FC<SheetProps> = ({
       </View>
     );
     
+    // Em plataformas nativas, usar SafeAreaView
     if (useSafeArea && Platform.OS !== 'web') {
+      // No iOS, usamos o SafeAreaView para todas as posições
+      if (isIOS) {
+        // Para bottom no iOS, garantimos paddingBottom mesmo com o SafeAreaView
+        if (finalPosition === 'bottom') {
+          return (
+            <KeyboardAvoidingView 
+              style={{ flex: 1 }} 
+              behavior={isIOS ? "padding" : undefined}
+              keyboardVerticalOffset={10}
+            >
+              <SafeAreaView style={{ flex: 1 }}>
+                <View style={[contentStyle, { paddingBottom: nativePadding * 5 }]}>
+                  {showCloseButton && (
+                    <TouchableOpacity
+                      style={[
+                        styles.closeButton,
+                        { backgroundColor: themeColors.closeButtonBackground }
+                      ]}
+                      onPress={onClose}
+                      testID={`${testID}-close-button`}
+                    >
+                      <Text style={[styles.closeButtonText, { color: themeColors.closeButtonText }]}>✕</Text>
+                    </TouchableOpacity>
+                  )}
+                  {children}
+                </View>
+              </SafeAreaView>
+            </KeyboardAvoidingView>
+          );
+        }
+      }
       return <SafeAreaView style={{ flex: 1 }}>{contentWrapper}</SafeAreaView>;
     }
     
