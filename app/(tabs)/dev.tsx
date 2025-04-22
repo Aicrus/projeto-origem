@@ -31,6 +31,7 @@ import type { SheetPosition } from 'components/AicrusComponents/sheet/Sheet';
 import { DateInput } from '../../components/AicrusComponents/input/DateInput';
 import { TimeInput } from '../../components/AicrusComponents/input/TimeInput';
 import { Keyboard } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
 // Definir tipos para os componentes disponíveis
 type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | 'sheet' | null;
@@ -116,14 +117,14 @@ const SupabaseDataTable = () => {
             className="flex-row items-center gap-1"
             onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            <Text className={textPrimary}>ID</Text>
+            <Text className={`${textPrimary} font-jakarta-medium`}>ID</Text>
             <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
           </TouchableOpacity>
         );
       },
       cell: ({ row }) => (
         <View>
-          <Text className={`${textPrimary}`}>{row.getValue("id")}</Text>
+          <Text className={`${textPrimary} font-jakarta-regular`}>{row.getValue("id")}</Text>
         </View>
       ),
       meta: {
@@ -138,7 +139,7 @@ const SupabaseDataTable = () => {
             className="flex-row items-center gap-1"
             onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            <Text className={textPrimary}>Criado em</Text>
+            <Text className={`${textPrimary} font-jakarta-medium`}>Criado em</Text>
             <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
           </TouchableOpacity>
         );
@@ -150,7 +151,7 @@ const SupabaseDataTable = () => {
         
         return (
           <View>
-            <Text className={`${textPrimary}`}>{formatted}</Text>
+            <Text className={`${textPrimary} font-jakarta-regular`}>{formatted}</Text>
           </View>
         );
       },
@@ -166,14 +167,14 @@ const SupabaseDataTable = () => {
             className="flex-row items-center gap-1"
             onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            <Text className={textPrimary}>Nome</Text>
+            <Text className={`${textPrimary} font-jakarta-medium`}>Nome</Text>
             <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
           </TouchableOpacity>
         );
       },
       cell: ({ row }) => (
         <View>
-          <Text className={`${textPrimary}`}>{row.getValue("nome")}</Text>
+          <Text className={`${textPrimary} font-jakarta-regular`}>{row.getValue("nome")}</Text>
         </View>
       ),
       meta: {
@@ -188,14 +189,14 @@ const SupabaseDataTable = () => {
             className="flex-row items-center gap-1"
             onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            <Text className={textPrimary}>Email</Text>
+            <Text className={`${textPrimary} font-jakarta-medium`}>Email</Text>
             <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
           </TouchableOpacity>
         );
       },
       cell: ({ row }) => (
         <View>
-          <Text className={`lowercase ${textPrimary}`}>{row.getValue("email")}</Text>
+          <Text className={`lowercase ${textPrimary} font-jakarta-regular`}>{row.getValue("email")}</Text>
         </View>
       ),
       meta: {
@@ -220,7 +221,7 @@ const SupabaseDataTable = () => {
     return (
       <View className="p-6 items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg">
         <View className="w-8 h-8 border-2 border-primary-dark dark:border-primary-light border-t-transparent dark:border-t-transparent rounded-full animate-spin mb-2" />
-        <Text className={`${textPrimary} text-center`}>Carregando dados do Supabase...</Text>
+        <Text className={`${textPrimary} text-center font-jakarta-regular`}>Carregando dados do Supabase...</Text>
       </View>
     );
   }
@@ -923,10 +924,10 @@ export default function DevPage() {
             />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Este exemplo demonstra a nova integração direta com o Supabase. Basta passar as propriedades:
-              <Text className="font-bold"> supabaseTable</Text> (nome da tabela) e 
-              <Text className="font-bold"> supabaseColumn</Text> (nome da coluna a ser usada).
-              Opcionalmente, você pode especificar <Text className="font-bold">supabaseOrderBy</Text> e
-              <Text className="font-bold"> supabaseAscending</Text> para controlar a ordenação dos dados.
+              <Text className="font-jakarta-bold"> supabaseTable</Text> (nome da tabela) e 
+              <Text className="font-jakarta-bold"> supabaseColumn</Text> (nome da coluna a ser usada).
+              Opcionalmente, você pode especificar <Text className="font-jakarta-bold">supabaseOrderBy</Text> e
+              <Text className="font-jakarta-bold"> supabaseAscending</Text> para controlar a ordenação dos dados.
             </Text>
           </View>
         </View>

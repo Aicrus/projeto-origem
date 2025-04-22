@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { Pressable, View, Platform, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Sun, Moon, Monitor } from 'lucide-react-native';
 import Animated, {
   useAnimatedStyle,
   withSpring,
@@ -15,9 +15,9 @@ import { colors } from '../constants/theme';
  * Ícones para cada modo de tema
  */
 const THEME_ICONS = {
-  system: 'desktop-outline',
-  light: 'sunny-outline',
-  dark: 'moon-outline',
+  system: Monitor,
+  light: Sun,
+  dark: Moon,
 } as const;
 
 /**
@@ -356,12 +356,19 @@ export function ThemeSelector({
             }}
             onPress={handleSinglePress}
           >
-            <Ionicons
-              name={themeMode === 'light' ? THEME_ICONS.light : THEME_ICONS.dark}
-              size={singleIconSize}
-              color={isDark ? colors.primary.dark : colors.primary.main}
-              style={themeMode === 'light' ? { marginLeft: -1 } : undefined}
-            />
+            {themeMode === 'light' ? (
+              <Sun
+                size={singleIconSize}
+                color={isDark ? colors.primary.dark : colors.primary.main}
+                strokeWidth={1.5}
+              />
+            ) : (
+              <Moon
+                size={singleIconSize}
+                color={isDark ? colors.primary.dark : colors.primary.main}
+                strokeWidth={1.5}
+              />
+            )}
           </Pressable>
         </View>
       );
@@ -392,15 +399,25 @@ export function ThemeSelector({
           }}
           onPress={handleSinglePress}
         >
-          <Ionicons
-            name={themeMode === 'light' ? THEME_ICONS.light : THEME_ICONS.dark}
-            size={singleIconSize}
-            color={transparentSingle 
-              ? (isDark ? colors.primary.dark : colors.primary.main) 
-              : '#FFFFFF'
-            }
-            style={themeMode === 'light' ? { marginLeft: -1 } : undefined}
-          />
+          {themeMode === 'light' ? (
+            <Sun
+              size={singleIconSize}
+              color={transparentSingle 
+                ? (isDark ? colors.primary.dark : colors.primary.main) 
+                : '#FFFFFF'
+              }
+              strokeWidth={1.5}
+            />
+          ) : (
+            <Moon
+              size={singleIconSize}
+              color={transparentSingle 
+                ? (isDark ? colors.primary.dark : colors.primary.main) 
+                : '#FFFFFF'
+              }
+              strokeWidth={1.5}
+            />
+          )}
         </Pressable>
       </View>
     );
@@ -449,10 +466,10 @@ export function ThemeSelector({
               onPress={() => setThemeMode('light')}
             >
               <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Ionicons
-                  name={THEME_ICONS.light}
+                <Sun
                   size={iconSize}
                   color={themeMode === 'light' ? '#FFFFFF' : isDark ? '#FFFFFF' : colors.gray[600]}
+                  strokeWidth={1.5}
                 />
               </View>
             </Pressable>
@@ -467,10 +484,10 @@ export function ThemeSelector({
               onPress={() => setThemeMode('dark')}
             >
               <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Ionicons
-                  name={THEME_ICONS.dark}
+                <Moon
                   size={iconSize}
                   color={themeMode === 'dark' ? '#FFFFFF' : isDark ? '#FFFFFF' : colors.gray[600]}
+                  strokeWidth={1.5}
                 />
               </View>
             </Pressable>
@@ -504,6 +521,7 @@ export function ThemeSelector({
         
         {availableModes.map((mode, index) => {
           const isActive = mode === themeMode;
+          const IconComponent = THEME_ICONS[mode];
           
           return (
             <Pressable
@@ -529,10 +547,10 @@ export function ThemeSelector({
                 paddingBottom: variant === 'labeled' && showLabels ? 0 : Math.floor(buttonWidth * 0.02),
               }}
               onPress={() => handlePress(mode)}>
-              <Ionicons
-                name={THEME_ICONS[mode]}
+              <IconComponent
                 size={iconSize}
                 color={getIconColor(mode)}
+                strokeWidth={1.5}
                 style={variant === 'labeled' && showLabels ? { marginBottom: 4 } : null}
               />
               
