@@ -101,7 +101,7 @@ export function AuthProvider({
     try {
       setIsLoading(true);
       
-      // Validação dos campos
+      // Validações básicas
       if (!email || !password || !name) {
         showToast({
           type: 'warning',
@@ -111,7 +111,6 @@ export function AuthProvider({
         return;
       }
 
-      // Validação do nome
       if (name.trim().length < 3) {
         showToast({
           type: 'warning',
@@ -121,7 +120,6 @@ export function AuthProvider({
         return;
       }
 
-      // Validação do email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         showToast({
@@ -140,48 +138,10 @@ export function AuthProvider({
         });
         return;
       }
-      
+
       const emailLowerCase = email.toLowerCase().trim();
 
-      // Método 1: Verificação através da tentativa de login fictício
-      // (Mantido como fallback e para compatibilidade)
-      const { error: checkError } = await supabase.auth.signInWithPassword({
-        email: emailLowerCase,
-        password: 'dummy-password-for-check',
-      });
-
-      // Método 2: Verificação direta com a API admin (mais confiável)
-      // Tenta criar um usuário com signUp mas sem auto-confirmar
-      const { data: checkData, error: signUpCheckError } = await supabase.auth.signUp({
-        email: emailLowerCase,
-        password: Math.random().toString(36).substring(2, 15), // Senha aleatória para o teste
-        options: {
-          emailRedirectTo: Platform.OS === 'web' ? window.location.origin : undefined
-        }
-      });
-
-      // Se o erro for null e identities estiver vazio OU o erro indicar que o email já existe
-      const emailExists = (
-        (!signUpCheckError && checkData?.user?.identities?.length === 0) || 
-        signUpCheckError?.message?.includes('email already exists') ||
-        signUpCheckError?.message?.includes('already registered') ||
-        (!checkError || !checkError.message.includes('Invalid login credentials'))
-      );
-
-      if (emailExists) {
-        showToast({
-          type: 'info',
-          message: 'Email já cadastrado',
-          description: 'Uma conta com este email já existe. Por favor, faça login.',
-        });
-        
-        setTimeout(() => {
-          router.replace('/(auth)/login');
-        }, 1500);
-        return;
-      }
-
-      // Cria o usuário (nova tentativa com os dados corretos)
+      // Tenta criar o usuário diretamente
       const { data, error } = await supabase.auth.signUp({
         email: emailLowerCase,
         password,
@@ -190,63 +150,65 @@ export function AuthProvider({
             name,
             display_name: name,
           },
-          emailRedirectTo: Platform.OS === 'web' ? window.location.origin : undefined
-        }
+          emailRedirectTo: Platform.OS === 'web' ? window.location.origin : undefined,
+        },
       });
 
+      // Trata erros específicos
       if (error) {
         console.error('Erro no cadastro:', error);
-
-        if (error.message?.toLowerCase().includes('password')) {
+        
+        // Email já existe
+        if (error.message?.includes('already registered') || 
+            error.message?.includes('already exists') ||
+            error.code === 'user_already_exists') {
+          showToast({
+            type: 'info',
+            message: 'Email já cadastrado',
+            description: 'Este email já está registrado. Por favor, faça login ou recupere sua senha.',
+          });
+          setTimeout(() => router.replace('/(auth)/login'), 1500);
+          return;
+        }
+        
+        // Senha fraca
+        if (error.message?.includes('password') || error.code === 'weak_password') {
           showToast({
             type: 'error',
-            message: 'Senha inválida',
+            message: 'Senha fraca',
             description: 'A senha deve ter pelo menos 6 caracteres.',
           });
           return;
         }
 
-        if (error.message?.toLowerCase().includes('email')) {
-          showToast({
-            type: 'error',
-            message: 'Email inválido',
-            description: 'Por favor, insira um email válido.',
-          });
-          return;
-        }
-
+        // Qualquer outro erro
         showToast({
           type: 'error',
           message: 'Erro no cadastro',
-          description: 'Ocorreu um erro inesperado. Por favor, tente novamente.',
+          description: 'Não foi possível criar sua conta. Tente novamente.',
         });
         return;
       }
 
-      // Verifica se o email precisa de confirmação
-      if (data?.user?.identities?.length === 0) {
+      // Sucesso - mensagem clara sobre confirmação de email
+      if (data?.user) {
         showToast({
-          type: 'info',
-          message: 'Email já cadastrado',
-          description: 'Uma conta com este email já existe. Por favor, faça login.',
+          type: 'success',
+          message: 'Cadastro realizado!',
+          description: 'Verifique seu email para confirmar a conta antes de fazer login.',
         });
         
-        setTimeout(() => {
-          router.replace('/(auth)/login');
-        }, 1500);
-        return;
+        setTimeout(() => router.replace('/(auth)/login'), 2000);
+      } else {
+        // Caso improvável, mas tratamos por segurança
+        showToast({
+          type: 'warning',
+          message: 'Cadastro incompleto',
+          description: 'Sua conta foi criada, mas houve um problema. Tente fazer login ou entre em contato com suporte.',
+        });
+        
+        setTimeout(() => router.replace('/(auth)/login'), 2000);
       }
-
-      // Sucesso no cadastro
-      showToast({
-        type: 'success',
-        message: 'Cadastro realizado!',
-        description: 'Use suas credenciais para fazer login.',
-      });
-
-      setTimeout(() => {
-        router.replace('/(auth)/login');
-      }, 1500);
     } catch (error) {
       console.error('Erro no cadastro:', error);
       showToast({
@@ -262,8 +224,7 @@ export function AuthProvider({
   const signIn = async ({ email, password }: { email: string; password: string }) => {
     try {
       setIsLoading(true);
-      
-      // Validação dos campos
+
       if (!email || !password) {
         showToast({
           type: 'warning',
@@ -273,7 +234,6 @@ export function AuthProvider({
         return;
       }
 
-      // Validação do email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         showToast({
@@ -289,55 +249,62 @@ export function AuthProvider({
         password,
       });
 
-      // Se houver erro na autenticação
       if (error) {
-        if (error.message.includes('Invalid login credentials') ||
-            error.message.includes('Invalid email or password')) {
-          showToast({
-            type: 'error',
-            message: 'Credenciais inválidas',
-            description: 'Email ou senha incorretos.',
-          });
-        } else if (error.message.includes('Email not confirmed')) {
+        console.error('Erro detalhado no login:', error);
+        
+        // Verifica tanto o código quanto a mensagem para maior segurança
+        const errorMessage = error.message?.toLowerCase() || '';
+        
+        // Email não confirmado
+        if (error.code === 'email_not_confirmed' || 
+            errorMessage.includes('email not confirmed') || 
+            errorMessage.includes('not confirmed')) {
           showToast({
             type: 'warning',
             message: 'Email não confirmado',
-            description: 'Por favor, confirme seu email antes de fazer login.',
+            description: 'Você precisa confirmar seu email antes de fazer login. Verifique sua caixa de entrada.',
           });
-        } else {
+          return;
+        }
+        
+        // Credenciais inválidas 
+        if (error.code === 'invalid_login_credentials' || 
+            error.code === 'invalid_credentials' ||
+            errorMessage.includes('invalid login') || 
+            errorMessage.includes('invalid credentials')) {
           showToast({
             type: 'error',
-            message: 'Erro ao fazer login',
-            description: 'Ocorreu um erro inesperado. Tente novamente.',
+            message: 'Credenciais inválidas',
+            description: 'Email ou senha incorretos. Verifique seus dados.',
           });
+          return;
         }
+        
+        // Qualquer outro erro
+        showToast({
+          type: 'error',
+          message: 'Erro ao fazer login',
+          description: 'Ocorreu um erro ao tentar entrar. Tente novamente.',
+        });
         return;
       }
 
-      // Se não houver erro e temos uma sessão válida
       if (data?.session) {
-        // Atualiza a sessão imediatamente
         setSession(data.session);
-        
-        // Mostra mensagem de sucesso
         showToast({
           type: 'success',
           message: 'Login realizado!',
-          description: 'Bem-vindo de volta!',
+          description: 'Bem‑vindo de volta!',
         });
-        
-        // A navegação será feita automaticamente pelo useEffect que monitora a sessão
-        // Não precisamos chamar router.replace aqui
       } else {
-        // Caso improvável onde não há erro mas também não há sessão
         showToast({
           type: 'error',
           message: 'Erro ao fazer login',
           description: 'Não foi possível iniciar sua sessão. Tente novamente.',
         });
       }
-    } catch (error: any) {
-      console.error('Erro no login:', error);
+    } catch (err) {
+      console.error('Erro no login:', err);
       showToast({
         type: 'error',
         message: 'Erro ao fazer login',
@@ -424,34 +391,33 @@ export function AuthProvider({
 
   const checkEmailExists = async (email: string): Promise<boolean> => {
     try {
-      // Método 1: Tentativa de login fictício
-      const { error: checkError } = await supabase.auth.signInWithPassword({
+      // Tentar login com senha errada
+      const { error } = await supabase.auth.signInWithPassword({
         email: email.toLowerCase().trim(),
-        password: 'dummy-password-for-check',
+        password: 'senha-incorreta-para-verificacao',
       });
-
-      // Método 2: Tentativa de criar usuário temporário
-      const { data, error: signUpCheckError } = await supabase.auth.signUp({
-        email: email.toLowerCase().trim(),
-        password: Math.random().toString(36).substring(2, 15), // Senha aleatória
-        options: {
-          emailRedirectTo: Platform.OS === 'web' ? window.location.origin : undefined
+      
+      // Analisa a mensagem de erro específica
+      if (error && error.message) {
+        // Se o erro indicar credenciais inválidas, significa que o email existe
+        // mas a senha está errada (o que esperamos)
+        if (error.message.includes('Invalid login credentials') || 
+            error.message.includes('Email not confirmed')) {
+          return true;
         }
-      });
-
-      // 1. A tentativa de login não retornou erro específico de credenciais inválidas OU
-      // 2. O signup não deu erro mas identities está vazio OU
-      // 3. Mensagem de erro indica que email já existe
-      const userExists = (
-        (!checkError || !checkError.message?.includes('Invalid login credentials')) ||
-        (!signUpCheckError && data?.user?.identities?.length === 0) || 
-        !!signUpCheckError?.message?.includes('email already exists') ||
-        !!signUpCheckError?.message?.includes('already registered')
-      );
-
-      return Boolean(userExists);
+        
+        // Se o erro indicar que o usuário não existe, temos certeza que não existe
+        if (error.message.includes('user not found') || 
+            error.message.includes('User not found')) {
+          return false;
+        }
+      }
+      
+      // Não conseguimos determinar com certeza - retornar falso para permitir tentativa de cadastro
+      return false;
     } catch (error) {
       console.error('Erro ao verificar existência do email:', error);
+      // Em caso de erro, é mais seguro retornar falso
       return false;
     }
   };

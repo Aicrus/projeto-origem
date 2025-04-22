@@ -61,21 +61,6 @@ export default function Register() {
         return;
       }
 
-      // Verificação explícita se o email já existe
-      const emailExists = await checkEmailExists(email);
-      if (emailExists) {
-        showToast({
-          type: 'info',
-          message: 'Email já cadastrado',
-          description: 'Uma conta com este email já existe. Você será redirecionado para a tela de login.',
-        });
-        
-        setTimeout(() => {
-          router.replace('/login');
-        }, 2000);
-        return;
-      }
-
       if (senha !== confirmarSenha) {
         showToast({
           type: 'error',
@@ -98,7 +83,7 @@ export default function Register() {
       showToast({
         type: 'success',
         message: 'Cadastro realizado!',
-        description: 'Sua conta foi criada com sucesso. Faça login para continuar.',
+        description: 'Sua conta foi criada com sucesso. Verifique seu email para confirmação.',
       });
       
       // Navega para a tela de login após um pequeno delay para o usuário ver a mensagem de sucesso
