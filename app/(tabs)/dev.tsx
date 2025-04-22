@@ -4512,71 +4512,63 @@ const SheetExampleContent: React.FC = () => {
           {/* Grid 2x2 para os botões de direção */}
           <View className="flex flex-row flex-wrap justify-center" style={{ width: 310 }}>
             <View style={{ width: 150, margin: 2 }}>
-              <HoverableView
+              <Button
                 onPress={() => {
                   setCurrentSheet('top');
                   setSheetVisible(true);
                 }}
-                className="bg-white dark:bg-white py-4 rounded-lg border border-gray-200"
+                variant="outline"
+                size="md"
                 style={{ width: '100%' }}
-                hoverScale={1.02}
-                hoverElevation={2}
+                testID="button-sheet-top"
               >
-                <Text className="text-black font-jakarta-medium text-center text-lg">
-                  top
-                </Text>
-              </HoverableView>
+                top
+              </Button>
             </View>
             
             <View style={{ width: 150, margin: 2 }}>
-              <HoverableView
+              <Button
                 onPress={() => {
                   setCurrentSheet('right');
                   setSheetVisible(true);
                 }}
-                className="bg-white dark:bg-white py-4 rounded-lg border border-gray-200"
+                variant="outline"
+                size="md"
                 style={{ width: '100%' }}
-                hoverScale={1.02}
-                hoverElevation={2}
+                testID="button-sheet-right"
               >
-                <Text className="text-black font-jakarta-medium text-center text-lg">
-                  right
-                </Text>
-              </HoverableView>
+                right
+              </Button>
             </View>
             
             <View style={{ width: 150, margin: 2 }}>
-              <HoverableView
+              <Button
                 onPress={() => {
                   setCurrentSheet('bottom');
                   setSheetVisible(true);
                 }}
-                className="bg-white dark:bg-white py-4 rounded-lg border border-gray-200"
+                variant="outline"
+                size="md"
                 style={{ width: '100%' }}
-                hoverScale={1.02}
-                hoverElevation={2}
+                testID="button-sheet-bottom"
               >
-                <Text className="text-black font-jakarta-medium text-center text-lg">
-                  bottom
-                </Text>
-              </HoverableView>
+                bottom
+              </Button>
             </View>
             
             <View style={{ width: 150, margin: 2 }}>
-              <HoverableView
+              <Button
                 onPress={() => {
                   setCurrentSheet('left');
                   setSheetVisible(true);
                 }}
-                className="bg-white dark:bg-white py-4 rounded-lg border border-gray-200"
+                variant="outline"
+                size="md"
                 style={{ width: '100%' }}
-                hoverScale={1.02}
-                hoverElevation={2}
+                testID="button-sheet-left"
               >
-                <Text className="text-black font-jakarta-medium text-center text-lg">
-                  left
-                </Text>
-              </HoverableView>
+                left
+              </Button>
             </View>
           </View>
         </View>
@@ -4631,7 +4623,7 @@ const SheetExampleContent: React.FC = () => {
             </View>
             
             <Button
-              variant="primary"
+              variant="outline"
               onPress={() => setSheetVisible(false)}
               fullWidth
               testID="button-salvar"
