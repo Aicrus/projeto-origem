@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated, Dimensions, Platform, SafeAreaView } from 'react-native';
-import { useColorScheme } from '../../../components/hooks/useColorScheme';
+import { useTheme } from '../../../hooks/ThemeContext';
 import { colors } from '../constants/theme';
 
 export type SheetPosition = 'top' | 'right' | 'bottom' | 'left';
@@ -19,8 +19,39 @@ export interface SheetProps {
   animationDuration?: number;
   useSafeArea?: boolean;
   testID?: string;
+  contentContainerStyle?: any;
 }
 
+/**
+ * Componente Sheet - Modal deslizante que pode ser aberto de qualquer direção.
+ * 
+ * Características:
+ * - Compatível com temas claro/escuro
+ * - Responsivo para todos os dispositivos e breakpoints
+ * - Suporta abertura de 4 direções: top, right, bottom, left
+ * - Animações suaves de abertura e fechamento
+ * - Safe Area para dispositivos com notch/island
+ * - Overlay personalizável
+ * 
+ * @example
+ * // Exemplo básico de uso:
+ * const [isOpen, setIsOpen] = useState(false);
+ * 
+ * <Button onPress={() => setIsOpen(true)}>
+ *   Abrir Sheet
+ * </Button>
+ * 
+ * <Sheet
+ *   isOpen={isOpen}
+ *   onClose={() => setIsOpen(false)}
+ *   position="bottom"
+ *   showCloseButton={true}
+ * >
+ *   <View style={{ padding: 16 }}>
+ *     <Text>Conteúdo do Sheet</Text>
+ *   </View>
+ * </Sheet>
+ */
 const Sheet: React.FC<SheetProps> = ({
   isOpen,
   onClose,
@@ -35,8 +66,12 @@ const Sheet: React.FC<SheetProps> = ({
   animationDuration = 300,
   useSafeArea = true,
   testID,
+  contentContainerStyle,
 }) => {
-  const theme = useColorScheme();
+  // Usando o hook useTheme do contexto de tema da aplicação
+  const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
+  
   const animation = useRef(new Animated.Value(0)).current;
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
@@ -209,22 +244,34 @@ const Sheet: React.FC<SheetProps> = ({
 
   // Define o padding de segurança para dispositivos com notch/island
   const getSafeAreaPadding = () => {
-    if (!useSafeArea || !isMobileOrTablet) {
+    if (!useSafeArea) {
       return {};
     }
 
-    // Você pode personalizar os valores abaixo para ajustar o padding de segurança
-    // para dispositivos com notch/island em cada posição do Sheet
+    // Aplicar padding tanto para dispositivos nativos quanto para web
     switch (finalPosition) {
       case 'top':
-        return { paddingTop: 10 }; // Aumente ou diminua este valor conforme necessário
+        return { paddingTop: Platform.OS === 'web' ? 20 : 10 };
       case 'left':
       case 'right':
-        return { paddingTop: 10 }; // Aumente ou diminua este valor conforme necessário
+        return { paddingTop: Platform.OS === 'web' ? 20 : 10 };
       default:
         return {};
     }
   };
+
+  // Obtenha as cores baseadas no tema atual
+  const getThemeColors = () => {
+    return {
+      background: isDark ? colors.gray[800] : colors.white,
+      text: isDark ? colors.gray[200] : colors.gray[800],
+      closeButtonBackground: isDark ? colors.gray[700] : colors.gray[200],
+      closeButtonText: isDark ? colors.white : colors.black,
+      contentBackground: isDark ? colors.gray[700] : colors.gray[100], // Cor de fundo para destacar o conteúdo
+    };
+  };
+
+  const themeColors = getThemeColors();
 
   // Se não estiver visível nem aberto, não renderize nada
   if (!visible && !isOpen) return null;
@@ -233,39 +280,35 @@ const Sheet: React.FC<SheetProps> = ({
   const renderContent = () => {
     const safeAreaPadding = getSafeAreaPadding();
     
-    if (useSafeArea && Platform.OS !== 'web') {
-      return (
-        <SafeAreaView style={{ flex: 1 }}>
-          <View style={{ flex: 1, ...safeAreaPadding }}>
-            {showCloseButton && (
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={onClose}
-                testID={`${testID}-close-button`}
-              >
-                <Text style={styles.closeButtonText}>✕</Text>
-              </TouchableOpacity>
-            )}
-            {children}
-          </View>
-        </SafeAreaView>
-      );
-    }
-    
-    return (
-      <View style={{ flex: 1, ...safeAreaPadding }}>
+    const contentWrapper = (
+      <View 
+        style={[
+          { flex: 1 }, 
+          safeAreaPadding,
+          contentContainerStyle
+        ]}
+      >
         {showCloseButton && (
           <TouchableOpacity
-            style={styles.closeButton}
+            style={[
+              styles.closeButton,
+              { backgroundColor: themeColors.closeButtonBackground }
+            ]}
             onPress={onClose}
             testID={`${testID}-close-button`}
           >
-            <Text style={styles.closeButtonText}>✕</Text>
+            <Text style={[styles.closeButtonText, { color: themeColors.closeButtonText }]}>✕</Text>
           </TouchableOpacity>
         )}
         {children}
       </View>
     );
+    
+    if (useSafeArea && Platform.OS !== 'web') {
+      return <SafeAreaView style={{ flex: 1 }}>{contentWrapper}</SafeAreaView>;
+    }
+    
+    return contentWrapper;
   };
 
   return (
@@ -295,9 +338,7 @@ const Sheet: React.FC<SheetProps> = ({
             getContainerStyle(),
             getAnimatedStyle(),
             {
-              backgroundColor: theme.isDark
-                ? colors.gray[800]
-                : colors.white,
+              backgroundColor: themeColors.background,
             },
           ]}
           testID={`${testID}-content`}
@@ -324,7 +365,6 @@ const styles = StyleSheet.create({
   },
   content: {
     position: 'absolute',
-    backgroundColor: colors.white,
     overflow: 'hidden',
   },
   topContainer: {

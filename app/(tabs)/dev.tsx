@@ -4593,44 +4593,29 @@ const SheetExampleContent: React.FC = () => {
         animationDuration={300}
         useSafeArea={true} // Adiciona área de segurança para dispositivos com notch/island
       >
-        <View className="p-lg">
-          <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-md`}>
-            Editar perfil
+        {/* Conteúdo de exemplo para o Sheet */}
+        <View className="p-md">
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+            Sheet {currentSheet}
           </Text>
-          <Text className={`text-body-md ${textSecondary} mb-lg`}>
-            Faça alterações no seu perfil aqui. Clique salvar quando terminar.
+          <Text className={`text-body-md ${textSecondary} mb-md`}>
+            Este componente adapta-se automaticamente ao tema claro/escuro do sistema.
+            O fundo e o botão de fechamento mudam de acordo com o tema.
           </Text>
-          
-          <View className="mb-md">
-            <View className="mb-md">
-              <Input
-                label="Nome"
-                value="Paulo Morales"
-                onChangeText={(text) => {}}
-                placeholder="Digite seu nome"
-                testID="input-nome"
-              />
-            </View>
-            
-            <View className="mb-lg">
-              <Input
-                label="Username"
-                value="@paulomorales"
-                onChangeText={(text) => {}}
-                placeholder="Digite seu username"
-                testID="input-username"
-              />
-            </View>
-            
-            <Button
-              variant="outline"
-              onPress={() => setSheetVisible(false)}
-              fullWidth
-              testID="button-salvar"
-            >
-              Salvar alterações
-            </Button>
+          <View className={`${bgSecondary} rounded-lg p-md mb-md`}>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              O Sheet é um componente versátil que pode ser aberto em qualquer direção.
+              É ideal para mostrar informações contextuais sem interromper o fluxo principal do aplicativo.
+            </Text>
           </View>
+          <Button
+            onPress={() => setSheetVisible(false)}
+            variant="primary"
+            size="md"
+            style={{ width: '100%' }}
+          >
+            Fechar
+          </Button>
         </View>
       </Sheet>
       
@@ -4660,6 +4645,16 @@ const SheetExampleContent: React.FC = () => {
         <View className="mb-sm">
           <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Múltiplas Direções</Text>
           <Text className={`text-body-sm ${textSecondary}`}>Em desktop, o Sheet pode abrir de qualquer direção (top, right, bottom, left)</Text>
+        </View>
+
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tema Adaptativo</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Cores se adaptam automaticamente aos temas claro, escuro ou configuração do sistema</Text>
+        </View>
+
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Safe Area</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>Padding de segurança automático para dispositivos com notch/island (iOS) e também para web</Text>
         </View>
       </View>
       
@@ -4724,7 +4719,14 @@ const SheetExampleContent: React.FC = () => {
         <View className="mb-sm">
           <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>useSafeArea</Text>
           <Text className={`text-body-sm ${textSecondary}`}>
-            Adiciona área de segurança para dispositivos com notch/island (boolean, padrão: true)
+            Adiciona área de segurança para dispositivos com notch/island e web (boolean, padrão: true)
+          </Text>
+        </View>
+
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>contentContainerStyle</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>
+            Estilos adicionais para o container de conteúdo (object)
           </Text>
         </View>
       </View>
@@ -4742,16 +4744,16 @@ const SheetExampleContent: React.FC = () => {
           <Text className={`text-body-sm ${textSecondary}`}>
             - top/bottom: altura de 450 (numérico){'\n'}
             - left/right: largura de 280 (numérico){'\n'}
-            - Valores podem ser alterados no arquivo Sheet.tsx em components/AicrusComponents/sheet/
+            - Área de segurança: padding de 10px para telas com notch/island
           </Text>
         </View>
 
         <View className="mb-sm">
           <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Desktop (Web)</Text>
           <Text className={`text-body-sm ${textSecondary}`}>
-            - top/bottom: altura de 300px, largura de 100%{'\n'}
+            - top/bottom: altura de 380px, largura de 100%{'\n'}
             - left/right: largura de 300px, altura de 100%{'\n'}
-            - Valores podem ser alterados no arquivo Sheet.tsx em components/AicrusComponents/sheet/
+            - Área de segurança: padding de 20px para melhor visualização
           </Text>
         </View>
         
@@ -4760,16 +4762,7 @@ const SheetExampleContent: React.FC = () => {
           <Text className={`text-body-sm ${textSecondary}`}>
             - top/bottom: altura de 450px, largura de 100%{'\n'}
             - left/right: largura de 280px, altura de 100%{'\n'}
-            - Valores podem ser alterados no arquivo Sheet.tsx em components/AicrusComponents/sheet/
-          </Text>
-        </View>
-
-        <View className="mb-sm">
-          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Área de Segurança</Text>
-          <Text className={`text-body-sm ${textSecondary}`}>
-            - A propriedade useSafeArea (padrão: true) adiciona automaticamente padding em dispositivos com notch/island{'\n'}
-            - Para dispositivos nativos: adiciona 10px de padding no topo para o Sheet nas posições 'top', 'left' e 'right'{'\n'}
-            - Para ajustar esse padding, você pode modificar a função getSafeAreaPadding() no arquivo Sheet.tsx
+            - Área de segurança: padding de 20px para melhor visualização
           </Text>
         </View>
         
@@ -4804,31 +4797,25 @@ const [isOpen, setIsOpen] = useState(false);
   isOpen={isOpen}
   onClose={() => setIsOpen(false)}
   position="bottom"
-  // Valores são definidos automaticamente com base no dispositivo:
-  // - Dispositivos Nativos (iOS/Android):
-  //   - top/bottom: altura de 450 (numérico)
-  //   - left/right: largura de 280 (numérico)
-  // - Web Desktop:
-  //   - top/bottom: altura de 300px
-  //   - left/right: largura de 300px
-  // - Web Mobile/Tablet:
-  //   - top/bottom: altura de 450px
-  //   - left/right: largura de 280px
-  //
-  // Você pode sobrescrever esses valores:
-  // Para web: height="500px" ou width="50%"
-  // Para nativo: height={500} ou width={300}
-  borderRadius={16}
-  closeOnOverlayClick={true}
   showCloseButton={true}
-  useSafeArea={true // Adiciona área de segurança para dispositivos com notch/island
+  borderRadius={16}
+  overlayOpacity={0.5}
 >
-  <View style={{ padding: 20 }}>
-    <Text>Conteúdo do Sheet</Text>
-    <Button
-      title="Fechar"
-      onPress={() => setIsOpen(false)}
-    />
+  {/* 
+   * O conteúdo será exibido com as cores corretas 
+   * de acordo com o tema do sistema (claro/escuro)
+   */}
+  <View style={{ padding: 16 }}>
+    <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>
+      Título do Sheet
+    </Text>
+    <Text style={{ marginBottom: 16 }}>
+      Este é um exemplo de conteúdo que você pode incluir no Sheet.
+      O componente já gerencia automaticamente os temas claro/escuro.
+    </Text>
+    <Button onPress={() => setIsOpen(false)}>
+      Fechar Sheet
+    </Button>
   </View>
 </Sheet>
 
@@ -4838,6 +4825,33 @@ const [isOpen, setIsOpen] = useState(false);
   onPress={() => setIsOpen(true)}
 />`}
         </Text>
+      </View>
+
+      <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+        Temas
+      </Text>
+      <Text className={`text-body-md ${textSecondary} mb-md`}>
+        O Sheet adapta-se automaticamente aos temas claro, escuro e configuração do sistema:
+      </Text>
+      
+      <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tema Claro</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>
+            - Background: branco{'\n'}
+            - Botão de fechar: cinza claro com ícone escuro{'\n'}
+            - Funciona automaticamente, sem configuração adicional{'\n'}
+          </Text>
+        </View>
+
+        <View className="mb-sm">
+          <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tema Escuro</Text>
+          <Text className={`text-body-sm ${textSecondary}`}>
+            - Background: cinza escuro{'\n'}
+            - Botão de fechar: cinza médio com ícone claro{'\n'}
+            - Funciona automaticamente, sem configuração adicional{'\n'}
+          </Text>
+        </View>
       </View>
     </View>
   );
