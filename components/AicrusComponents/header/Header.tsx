@@ -313,7 +313,7 @@ export function Header({
                 >
                   <Image
                     source={{ 
-                      uri: 'https://media.licdn.com/dms/image/v2/C4E03AQFy5omIcTocVg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1657212319358?e=2147483647&v=beta&t=UsUia-5GvPBUz9AFC6nzzDe_bEuKB4sOxQxi0YzitVg' 
+                      uri: 'https://cdn.pixabay.com/photo/2018/11/13/22/01/avatar-3814081_640.png' 
                     }}
                     style={styles.avatar}
                   />
@@ -437,7 +437,7 @@ export function Header({
               >
                 <Image
                   source={{ 
-                    uri: 'https://media.licdn.com/dms/image/v2/C4E03AQFy5omIcTocVg/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1657212319358?e=2147483647&v=beta&t=UsUia-5GvPBUz9AFC6nzzDe_bEuKB4sOxQxi0YzitVg' 
+                    uri: 'https://cdn.pixabay.com/photo/2018/11/13/22/01/avatar-3814081_640.png' 
                   }}
                   style={styles.avatar}
                 />
