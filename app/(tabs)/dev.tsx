@@ -1587,36 +1587,36 @@ export default function DevPage() {
           {/* Cores Primárias - Light/Dark theme */}
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Cores Primárias</Text>
           <View className="flex-row flex-wrap gap-md mb-lg">
-            <ColorCard name="Primary" color="bg-primary-light dark:bg-primary-dark" textColor={textPrimary} />
-            <ColorCard name="Primary Hover" color="bg-primary-light-hover dark:bg-primary-dark-hover" textColor={textPrimary} />
-            <ColorCard name="Primary Active" color="bg-primary-light-active dark:bg-primary-dark-active" textColor={textPrimary} />
-            <ColorCard name="Secondary" color="bg-secondary-light dark:bg-secondary-dark" textColor={textPrimary} />
-            <ColorCard name="Secondary Hover" color="bg-secondary-light-hover dark:bg-secondary-dark-hover" textColor={textPrimary} />
-            <ColorCard name="Secondary Active" color="bg-secondary-light-active dark:bg-secondary-dark-active" textColor={textPrimary} />
-            <ColorCard name="Tertiary" color="bg-tertiary-light dark:bg-tertiary-dark" textColor={textPrimary} />
-            <ColorCard name="Tertiary Hover" color="bg-tertiary-light-hover dark:bg-tertiary-dark-hover" textColor={textPrimary} />
-            <ColorCard name="Tertiary Active" color="bg-tertiary-light-active dark:bg-tertiary-dark-active" textColor={textPrimary} />
-            <ColorCard name="Alternate" color="bg-alternate-light dark:bg-alternate-dark" textColor={textPrimary} />
+            <ColorCard name="Primary" color={isDark ? "bg-primary-dark" : "bg-primary-light"} textColor={textPrimary} />
+            <ColorCard name="Primary Hover" color={isDark ? "bg-primary-dark-hover" : "bg-primary-light-hover"} textColor={textPrimary} />
+            <ColorCard name="Primary Active" color={isDark ? "bg-primary-dark-active" : "bg-primary-light-active"} textColor={textPrimary} />
+            <ColorCard name="Secondary" color={isDark ? "bg-secondary-dark" : "bg-secondary-light"} textColor={textPrimary} />
+            <ColorCard name="Secondary Hover" color={isDark ? "bg-secondary-dark-hover" : "bg-secondary-light-hover"} textColor={textPrimary} />
+            <ColorCard name="Secondary Active" color={isDark ? "bg-secondary-dark-active" : "bg-secondary-light-active"} textColor={textPrimary} />
+            <ColorCard name="Tertiary" color={isDark ? "bg-tertiary-dark" : "bg-tertiary-light"} textColor={textPrimary} />
+            <ColorCard name="Tertiary Hover" color={isDark ? "bg-tertiary-dark-hover" : "bg-tertiary-light-hover"} textColor={textPrimary} />
+            <ColorCard name="Tertiary Active" color={isDark ? "bg-tertiary-dark-active" : "bg-tertiary-light-active"} textColor={textPrimary} />
+            <ColorCard name="Alternate" color={isDark ? "bg-alternate-dark" : "bg-alternate-light"} textColor={textPrimary} />
           </View>
           
           {/* Cores de Texto */}
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Texto</Text>
           <View className="flex-row flex-wrap gap-md mb-lg">
-            <ColorCard name="Text Primary" color="bg-text-primary-light dark:bg-text-primary-dark" textColor={textPrimary} />
-            <ColorCard name="Text Secondary" color="bg-text-secondary-light dark:bg-text-secondary-dark" textColor={textPrimary} />
-            <ColorCard name="Text Tertiary" color="bg-text-tertiary-light dark:bg-text-tertiary-dark" textColor={textPrimary} />
+            <ColorCard name="Text Primary" color={isDark ? "bg-text-primary-dark" : "bg-text-primary-light"} textColor={textPrimary} />
+            <ColorCard name="Text Secondary" color={isDark ? "bg-text-secondary-dark" : "bg-text-secondary-light"} textColor={textPrimary} />
+            <ColorCard name="Text Tertiary" color={isDark ? "bg-text-tertiary-dark" : "bg-text-tertiary-light"} textColor={textPrimary} />
           </View>
           
           {/* Cores de Background */}
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Background</Text>
           <View className="flex-row flex-wrap gap-md mb-lg">
-            <ColorCard name="BG Primary" color="bg-bg-primary-light dark:bg-bg-primary-dark" textColor={textPrimary} />
-            <ColorCard name="BG Secondary" color="bg-bg-secondary-light dark:bg-bg-secondary-dark" textColor={textPrimary} />
-            <ColorCard name="BG Tertiary" color="bg-bg-tertiary-light dark:bg-bg-tertiary-dark" textColor={textPrimary} />
-            <ColorCard name="Icon" color="bg-icon-light dark:bg-icon-dark" textColor={textPrimary} />
-            <ColorCard name="Divider" color="bg-divider-light dark:bg-divider-dark" textColor={textPrimary} />
-            <ColorCard name="Hover" color="bg-hover-light dark:bg-hover-dark" textColor={textPrimary} />
-            <ColorCard name="Active" color="bg-active-light dark:bg-active-dark" textColor={textPrimary} />
+            <ColorCard name="BG Primary" color={isDark ? "bg-bg-primary-dark" : "bg-bg-primary-light"} textColor={textPrimary} />
+            <ColorCard name="BG Secondary" color={isDark ? "bg-bg-secondary-dark" : "bg-bg-secondary-light"} textColor={textPrimary} />
+            <ColorCard name="BG Tertiary" color={isDark ? "bg-bg-tertiary-dark" : "bg-bg-tertiary-light"} textColor={textPrimary} />
+            <ColorCard name="Icon" color={isDark ? "bg-icon-dark" : "bg-icon-light"} textColor={textPrimary} />
+            <ColorCard name="Divider" color={isDark ? "bg-divider-dark" : "bg-divider-light"} textColor={textPrimary} />
+            <ColorCard name="Hover" color={isDark ? "bg-hover-dark" : "bg-hover-light"} textColor={textPrimary} />
+            <ColorCard name="Active" color={isDark ? "bg-active-dark" : "bg-active-light"} textColor={textPrimary} />
           </View>
           
           {/* Cores de Feedback */}
@@ -1702,7 +1702,7 @@ export default function DevPage() {
             <Text className={`text-mono-md font-mono-regular ${textPrimary} mb-sm`}>Mono Md (Space Mono)</Text>
             <Text className={`text-mono-sm font-mono-regular ${textPrimary} mb-sm`}>Mono Sm (Space Mono)</Text>
             
-            <View className="border-t border-divider-light dark:border-divider-dark my-md"></View>
+            <View className={`border-t ${isDark ? 'border-divider-dark' : 'border-divider-light'} my-md`}></View>
             
             <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>Pesos disponíveis da fonte</Text>
             
@@ -1714,7 +1714,7 @@ export default function DevPage() {
             <Text className={`text-body-lg font-jakarta-bold ${textPrimary} mb-sm`}>Plus Jakarta Sans Bold (700)</Text>
             <Text className={`text-body-lg font-jakarta-extrabold ${textPrimary} mb-sm`}>Plus Jakarta Sans ExtraBold (800)</Text>
             
-            <View className="border-t border-divider-light dark:border-divider-dark my-md"></View>
+            <View className={`border-t ${isDark ? 'border-divider-dark' : 'border-divider-light'} my-md`}></View>
             
             <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>Exemplo de fonte mono</Text>
             <Text className={`text-body-lg font-mono-regular ${textPrimary} mb-sm`}>Space Mono (para código)</Text>
@@ -1877,8 +1877,8 @@ export default function DevPage() {
               <ShadowExample name="xl" shadow="shadow-xl" textColor={textPrimary} bgColor={bgTertiary} />
               <ShadowExample name="2xl" shadow="shadow-2xl" textColor={textPrimary} bgColor={bgTertiary} />
               <ShadowExample name="inner" shadow="shadow-inner" textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="light-card" shadow="shadow-light-card dark:shadow-dark-card" textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="light-button" shadow="shadow-light-button dark:shadow-dark-button" textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="light-card" shadow={isDark ? "shadow-dark-card" : "shadow-light-card"} textColor={textPrimary} bgColor={bgTertiary} />
+              <ShadowExample name="light-button" shadow={isDark ? "shadow-dark-button" : "shadow-light-button"} textColor={textPrimary} bgColor={bgTertiary} />
               <ShadowExample name="float" shadow="shadow-float" textColor={textPrimary} bgColor={bgTertiary} />
             </View>
           </View>
@@ -4388,34 +4388,43 @@ const ColorCard = ({ name, color, textColor }: ColorCardProps) => (
   </View>
 );
 
-const SpacingExample = ({ size, bgColor, textColor, value }: SpacingExampleProps) => (
-  <View className="items-center mr-md mb-md">
-    <View className={`${bgColor} h-8`} style={{ width: parseInt(size.replace(/[^0-9]/g, '') || '4') * 4 }} />
-    <Text className={`text-label-sm ${textColor} mt-xs`}>{size}</Text>
-    {value && <Text className={`text-body-xs ${textColor} opacity-60`}>{value}</Text>}
-  </View>
-);
-
-const BorderRadiusExample = ({ name, value, bgColor, textColor }: BorderRadiusExampleProps) => (
-  <View className="items-center mr-md mb-md">
-    <View 
-      className={`${bgColor} h-20 w-20 flex items-center justify-center mb-xs`} 
-      style={{ borderRadius: name === "full" ? 9999 : parseInt(value.replace(/[^0-9]/g, '') || '0') }}
-    >
-      <Text className={`text-white text-label-sm`}>{value}</Text>
+const SpacingExample = ({ size, bgColor, textColor, value }: SpacingExampleProps) => {
+  return (
+    <View className="items-center mr-md mb-md">
+      <View className={`${bgColor} h-8`} style={{ width: parseInt(size.replace(/[^0-9]/g, '') || '4') * 4 }} />
+      <Text className={`text-label-sm ${textColor} mt-xs`}>{size}</Text>
+      {value && <Text className={`text-body-xs ${textColor} opacity-60`}>{value}</Text>}
     </View>
-    <Text className={`text-label-sm ${textColor}`}>{name}</Text>
-  </View>
-);
+  );
+};
 
-const ShadowExample = ({ name, shadow, textColor, bgColor }: ShadowExampleProps) => (
-  <View className="items-center mb-md">
-    <View className={`${bgColor} ${shadow} h-20 w-full rounded-md flex items-center justify-center mb-xs`}>
-      <Text className={`text-body-sm ${textColor}`}>shadow-{name}</Text>
+const BorderRadiusExample = ({ name, value, bgColor, textColor }: BorderRadiusExampleProps) => {
+  return (
+    <View className="items-center mr-md mb-md">
+      <View 
+        className={`${bgColor} h-20 w-20 flex items-center justify-center mb-xs`} 
+        style={{ borderRadius: name === "full" ? 9999 : parseInt(value.replace(/[^0-9]/g, '') || '0') }}
+      >
+        <Text className={`text-white text-label-sm`}>{value}</Text>
+      </View>
+      <Text className={`text-label-sm ${textColor}`}>{name}</Text>
     </View>
-    <Text className={`text-label-sm ${textColor}`}>{name}</Text>
-  </View>
-);
+  );
+};
+
+const ShadowExample = ({ name, shadow, textColor, bgColor }: ShadowExampleProps) => {
+  const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
+  
+  return (
+    <View className="items-center mb-md">
+      <View className={`${bgColor} ${shadow} h-20 w-full rounded-md flex items-center justify-center mb-xs`}>
+        <Text className={`text-body-sm ${textColor}`}>shadow-{name}</Text>
+      </View>
+      <Text className={`text-label-sm ${textColor}`}>{name}</Text>
+    </View>
+  );
+};
 
 const OpacityExample = ({ name, value, bgColor, textColor }: OpacityExampleProps) => {
   // Convertemos o nome (string) para um número para poder aplicar diretamente como estilo
@@ -4433,12 +4442,14 @@ const OpacityExample = ({ name, value, bgColor, textColor }: OpacityExampleProps
   );
 };
 
-const ValueDisplay = ({ name, value, textColor }: ValueDisplayProps) => (
-  <View className="items-center mb-md p-xs border border-divider-light dark:border-divider-dark rounded-md">
-    <Text className={`text-body-md font-jakarta-semibold ${textColor}`}>{name}</Text>
-    <Text className={`text-body-sm ${textColor} opacity-70`}>{value}</Text>
-  </View>
-);
+const ValueDisplay = ({ name, value, textColor }: ValueDisplayProps) => {
+  return (
+    <View className="items-center mb-md p-xs border border-divider-light dark:border-divider-dark rounded-md">
+      <Text className={`text-body-md font-jakarta-semibold ${textColor}`}>{name}</Text>
+      <Text className={`text-body-sm ${textColor} opacity-70`}>{value}</Text>
+    </View>
+  );
+};
 
 // Adicionar componente para botão de copiar
 const CopyButton = ({ text }: { text: string }) => {
