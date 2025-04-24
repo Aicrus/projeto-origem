@@ -20,6 +20,7 @@ export interface HoverableViewProps extends PressableProps {
   // Opções de personalização
   disableHoverBackground?: boolean;
   disableAnimation?: boolean;
+  disableHoverWhenActive?: boolean;
   animationDuration?: number;
   allowHoverWhenDisabled?: boolean;
 
@@ -46,6 +47,7 @@ export interface HoverableViewProps extends PressableProps {
  * - Pode ter efeitos visuais de hover mesmo quando desabilitado (allowHoverWhenDisabled)
  * - Suporta múltiplos efeitos de transformação combinados
  * - Adapta-se automaticamente a temas claros e escuros
+ * - Pode desativar efeitos de hover em itens ativos (disableHoverWhenActive)
  */
 export function HoverableView({
   children,
@@ -60,6 +62,7 @@ export function HoverableView({
   hoverOpacity,
   disableHoverBackground = false,
   disableAnimation = false,
+  disableHoverWhenActive = false,
   animationDuration = 200,
   allowHoverWhenDisabled = false,
   hoverColor,
@@ -125,6 +128,11 @@ export function HoverableView({
 
   // Funções para gerenciar o estado de hover
   const handleHoverIn = () => {
+    // Não aplicar hover se o componente estiver ativo e disableHoverWhenActive for true
+    if ((isActive && disableHoverWhenActive)) {
+      return;
+    }
+    
     // Não precisamos verificar disabled aqui porque já controlamos isso via useEffect para web
     // e a Pressable não dispara eventos para elementos desabilitados nativamente
     if (!disabled || allowHoverWhenDisabled) {
@@ -211,7 +219,7 @@ export function HoverableView({
   
   // Aplicar estilo de hover - importante: se allowHoverWhenDisabled é true, 
   // sempre aplicamos o estilo hover, independente de disabled
-  if (isHovered && (!disabled || allowHoverWhenDisabled)) {
+  if (isHovered && (!disabled || allowHoverWhenDisabled) && !(disableHoverWhenActive && isActive)) {
     finalStyle = { ...finalStyle, ...hoverStyle };
   }
 

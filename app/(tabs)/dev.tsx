@@ -2616,6 +2616,7 @@ showToast({
                   isActive={activeItem === item}
                   activeBackgroundColor={activeItem === item ? (isDark ? '#4A6' : colors.primary.main) : undefined}
                   hoverColor={isDark ? 'rgba(74, 102, 102, 0.15)' : 'rgba(137, 44, 220, 0.1)'}
+                  disableHoverWhenActive={true}
                   onPress={() => setActiveItem(item)}
                 >
                   <Text className={activeItem === item ? 'text-white' : textPrimary}>Item {item}</Text>
@@ -2624,6 +2625,7 @@ showToast({
             </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Os itens têm estados ativos quando selecionados. Clique em um item para ativá-lo.
+              O efeito de hover é desativado quando o item está ativo (disableHoverWhenActive=true).
             </Text>
           </View>
           
@@ -2654,6 +2656,41 @@ showToast({
             </HoverableView>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Igual ao Hover básico, mas sem as animações suaves na transição.
+            </Text>
+          </View>
+          
+          {/* Exemplo com e sem disableHoverWhenActive */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Efeito hover em itens ativos</Text>
+            <View className="flex-row flex-wrap">
+              <View className="mr-md mb-md flex-1">
+                <Text className={`text-body-sm ${textSecondary} mb-xs`}>Com disableHoverWhenActive=true:</Text>
+                <HoverableView 
+                  className="p-md rounded-md border border-gray-300 dark:border-gray-700"
+                  isActive={true}
+                  activeBackgroundColor={isDark ? '#4A6' : colors.primary.main}
+                  hoverColor={isDark ? 'rgba(74, 102, 102, 0.15)' : 'rgba(137, 44, 220, 0.1)'}
+                  disableHoverWhenActive={true}
+                >
+                  <Text className="text-white">Item ativo sem efeito hover</Text>
+                </HoverableView>
+              </View>
+              
+              <View className="mr-md mb-md flex-1">
+                <Text className={`text-body-sm ${textSecondary} mb-xs`}>Com disableHoverWhenActive=false:</Text>
+                <HoverableView 
+                  className="p-md rounded-md border border-gray-300 dark:border-gray-700"
+                  isActive={true}
+                  activeBackgroundColor={isDark ? '#4A6' : colors.primary.main}
+                  hoverColor={isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(137, 44, 220, 0.2)'}
+                  disableHoverWhenActive={false}
+                >
+                  <Text className="text-white">Item ativo com efeito hover</Text>
+                </HoverableView>
+              </View>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              A propriedade disableHoverWhenActive controla se o efeito hover deve ser aplicado em itens que já estão em estado ativo.
             </Text>
           </View>
         </View>
