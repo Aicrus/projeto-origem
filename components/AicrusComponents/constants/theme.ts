@@ -2,13 +2,13 @@
 export const colors = {
   primary: {
     main: '#892CDC', // Cor primária principal (mesma do tailwind primary-light)
-    light: '#EEEAFF', // Versão clara da cor primária - deveria ser igual ao tailwind
-    dark: '#4A148C'  // Versão escura da cor primária
+    light: '#EEEAFF', // Versão clara da cor primária
+    dark: '#4A6'  // Versão escura da cor primária (mesma do tailwind primary-dark)
   },
   secondary: {
-    main: '#22D3EE',
+    main: '#22D3EE', // Mesma do tailwind secondary-light
     light: '#E0F7FA',
-    dark: '#2C3E50'
+    dark: '#2C3E'  // Mesma do tailwind secondary-dark
   },
   gray: {
     '50': '#F9FAFB',

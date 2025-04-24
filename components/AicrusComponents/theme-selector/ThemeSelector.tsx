@@ -221,12 +221,12 @@ export function ThemeSelector({
   };
   
   const sliderColors = {
-    default: isDark ? colors.primary.dark : colors.primary.main,
-    pill: isDark ? colors.primary.dark : colors.primary.main,
+    default: isDark ? '#4A6' : '#892CDC',
+    pill: isDark ? '#4A6' : '#892CDC',
     minimal: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-    labeled: isDark ? colors.primary.dark : colors.primary.main,
-    toggle: isDark ? colors.primary.dark : colors.primary.main,
-    single: isDark ? colors.primary.dark : colors.primary.main,
+    labeled: isDark ? '#4A6' : '#892CDC',
+    toggle: isDark ? '#4A6' : '#892CDC',
+    single: isDark ? '#4A6' : '#892CDC',
   };
   
   const activeTextColors = {
