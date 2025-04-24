@@ -1302,9 +1302,9 @@ export function DataTable<TData>({
     return {
       // Cores primárias
       primary: {
-        main: isDark ? colors.primary.dark : colors.primary.main,
-        light: isDark ? colors.primary.main : colors.primary.light,
-        dark: isDark ? colors.primary.main + '99' : colors.primary.dark,
+        main: isDark ? '#4A6' : colors.primary.main,
+        light: isDark ? '#5B80B6' : colors.primary.light,
+        dark: isDark ? '#6C91C7' : colors.primary.dark,
         contrastText: '#FFFFFF',
       },
       // Cores de feedback
@@ -1335,9 +1335,9 @@ export function DataTable<TData>({
       // Estados da interface
       state: {
         hover: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-        selected: isDark ? 'rgba(137, 44, 220, 0.25)' : 'rgba(137, 44, 220, 0.08)',
+        selected: isDark ? 'rgba(74, 102, 102, 0.25)' : 'rgba(137, 44, 220, 0.08)',
         disabled: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
-        focus: isDark ? `${colors.primary.dark}40` : `${colors.primary.main}40`,
+        focus: isDark ? '#4A640' : `${colors.primary.main}40`,
       },
       // Cores de divisor
       divider: isDark ? colors.gray['700'] : colors.gray['200'],

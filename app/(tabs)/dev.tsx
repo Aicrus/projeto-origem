@@ -2614,8 +2614,8 @@ showToast({
                   key={item}
                   className="p-md rounded-md m-xs"
                   isActive={activeItem === item}
-                  activeBackgroundColor={activeItem === item ? colors.primary.main : undefined}
-                  hoverColor={isDark ? 'rgba(137, 44, 220, 0.15)' : 'rgba(137, 44, 220, 0.1)'}
+                  activeBackgroundColor={activeItem === item ? (isDark ? '#4A6' : colors.primary.main) : undefined}
+                  hoverColor={isDark ? 'rgba(74, 102, 102, 0.15)' : 'rgba(137, 44, 220, 0.1)'}
                   onPress={() => setActiveItem(item)}
                 >
                   <Text className={activeItem === item ? 'text-white' : textPrimary}>Item {item}</Text>

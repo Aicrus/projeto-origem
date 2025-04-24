@@ -232,7 +232,7 @@ export function ThemeSelector({
   const activeTextColors = {
     default: '#FFFFFF',
     pill: '#FFFFFF',
-    minimal: isDark ? colors.primary.dark : colors.primary.main,
+    minimal: isDark ? '#4A6' : colors.primary.main,
     labeled: '#FFFFFF',
     toggle: '#FFFFFF',
     single: '#FFFFFF',
@@ -258,13 +258,13 @@ export function ThemeSelector({
     if (mode === themeMode) {
       if (variant === 'minimal') {
         // Para minimal, usar apenas a cor primária
-        return isDark ? colors.primary.dark : colors.primary.main;
+        return isDark ? '#4A6' : colors.primary.main;
       } else if (variant === 'single') {
         // Para single: se for iconOnly, usar cor primária, caso contrário branco
         if (iconOnly) {
-          return isDark ? colors.primary.dark : colors.primary.main;
+          return isDark ? '#4A6' : colors.primary.main;
         } else if (transparentSingle) {
-          return isDark ? colors.primary.dark : colors.primary.main;
+          return isDark ? '#4A6' : colors.primary.main;
         } else {
           return '#FFFFFF';
         }
@@ -384,7 +384,7 @@ export function ThemeSelector({
             borderRadius: singleHeight / 2,
             backgroundColor: transparentSingle 
               ? 'transparent' 
-              : isDark ? colors.primary.dark : colors.primary.main,
+              : isDark ? '#4A6' : colors.primary.main,
             alignItems: 'center',
             justifyContent: 'center',
             ...(transparentSingle && {
@@ -403,7 +403,7 @@ export function ThemeSelector({
             <Sun
               size={singleIconSize}
               color={transparentSingle 
-                ? (isDark ? colors.primary.dark : colors.primary.main) 
+                ? (isDark ? '#4A6' : colors.primary.main) 
                 : '#FFFFFF'
               }
               strokeWidth={1.5}
@@ -412,7 +412,7 @@ export function ThemeSelector({
             <Moon
               size={singleIconSize}
               color={transparentSingle 
-                ? (isDark ? colors.primary.dark : colors.primary.main) 
+                ? (isDark ? '#4A6' : colors.primary.main) 
                 : '#FFFFFF'
               }
               strokeWidth={1.5}
@@ -444,7 +444,7 @@ export function ThemeSelector({
                 width: buttonWidth - 4,
                 height: height - 4,
                 borderRadius: height / 2,
-                backgroundColor: isDark ? colors.primary.dark : colors.primary.main,
+                backgroundColor: isDark ? '#4A6' : colors.primary.main,
                 top: 2,
                 left: 2,
                 zIndex: 0,

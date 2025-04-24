@@ -290,10 +290,10 @@ export function ProfileMenu({
                 style={getThemeOptionStyle(themeMode === 'light')}
                 onPress={() => setThemeMode('light')}
               >
-                <Sun size={16} color={themeMode === 'light' ? themeColors.primary : themeColors.textPrimary} />
+                <Sun size={16} color={themeMode === 'light' ? (isDark ? '#4A6' : colors.primary.main) : themeColors.textPrimary} />
                 <Text style={[
                   styles.themeText,
-                  { color: themeMode === 'light' ? themeColors.primary : themeColors.textPrimary }
+                  { color: themeMode === 'light' ? (isDark ? '#4A6' : colors.primary.main) : themeColors.textPrimary }
                 ]}>Claro</Text>
               </HoverableView>
 
@@ -301,10 +301,10 @@ export function ProfileMenu({
                 style={getThemeOptionStyle(themeMode === 'dark')}
                 onPress={() => setThemeMode('dark')}
               >
-                <Moon size={16} color={themeMode === 'dark' ? themeColors.primary : themeColors.textPrimary} />
+                <Moon size={16} color={themeMode === 'dark' ? (isDark ? '#4A6' : colors.primary.main) : themeColors.textPrimary} />
                 <Text style={[
                   styles.themeText,
-                  { color: themeMode === 'dark' ? themeColors.primary : themeColors.textPrimary }
+                  { color: themeMode === 'dark' ? (isDark ? '#4A6' : colors.primary.main) : themeColors.textPrimary }
                 ]}>Escuro</Text>
               </HoverableView>
 
@@ -312,10 +312,10 @@ export function ProfileMenu({
                 style={getThemeOptionStyle(themeMode === 'system')}
                 onPress={() => setThemeMode('system')}
               >
-                <Monitor size={16} color={themeMode === 'system' ? themeColors.primary : themeColors.textPrimary} />
+                <Monitor size={16} color={themeMode === 'system' ? (isDark ? '#4A6' : colors.primary.main) : themeColors.textPrimary} />
                 <Text style={[
                   styles.themeText,
-                  { color: themeMode === 'system' ? themeColors.primary : themeColors.textPrimary }
+                  { color: themeMode === 'system' ? (isDark ? '#4A6' : colors.primary.main) : themeColors.textPrimary }
                 ]}>Sistema</Text>
               </HoverableView>
             </View>

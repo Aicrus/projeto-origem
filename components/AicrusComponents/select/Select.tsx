@@ -102,7 +102,7 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
       borderBottomWidth: 1,
       borderBottomColor: isDark ? '#262D34' : '#E0E3E7',
       backgroundColor: selected 
-        ? (isDark ? 'rgba(137, 44, 220, 0.08)' : 'rgba(137, 44, 220, 0.05)')
+        ? (isDark ? 'rgba(74, 102, 102, 0.08)' : 'rgba(137, 44, 220, 0.05)')
         : (isHovered && !selected && Platform.OS === 'web' 
             ? (isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)') 
             : 'transparent')
@@ -110,7 +110,7 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
     itemText: {
       fontSize: 14,
       color: selected 
-        ? (isDark ? colors.primary.dark : colors.primary.main)
+        ? (isDark ? '#4A6' : colors.primary.main)
         : (isDark ? '#D1D5DB' : '#57636C'),
       fontWeight: selected ? '500' : 'normal'
     }
@@ -128,7 +128,7 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
         {item.label}
       </Text>
       {selected && (
-        <Check size={16} color={isDark ? colors.primary.dark : colors.primary.main} strokeWidth={2} />
+        <Check size={16} color={isDark ? '#4A6' : colors.primary.main} strokeWidth={2} />
       )}
     </TouchableOpacity>
   );
@@ -1273,7 +1273,7 @@ export const Select = ({
       borderRadius: 8,
       borderWidth: 2,
       borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
-      borderTopColor: isDark ? colors.primary.dark : colors.primary.main,
+      borderTopColor: isDark ? '#4A6' : colors.primary.main,
       marginRight: 8
     },
     errorText: {
