@@ -7,6 +7,7 @@ import { LucideIcon } from 'lucide-react-native';
 import { useAuth } from '../../../contexts/auth';
 import { router } from 'expo-router';
 import { useResponsive } from '../../../hooks/useResponsive';
+import { createPortal } from 'react-dom';
 
 /**
  * @component ProfileMenu
@@ -20,6 +21,7 @@ import { useResponsive } from '../../../hooks/useResponsive';
  * - Compatibilidade com web e mobile
  * - Adaptação automática ao tema (claro/escuro)
  * - Posicionamento dinâmico próximo ao elemento que o invocou
+ * - Portal para renderização no DOM (Web)
  */
 
 interface MenuItemProps {
@@ -51,7 +53,11 @@ const getTailwindConfig = () => {
     console.error('Erro ao carregar tailwind.config.js:', error);
     return {
       'primary-light': '#892CDC',
-      'primary-dark': '#C13636',
+      'primary-dark': '#C87e22',
+      'primary-light-hover': '#3D5C8C',
+      'primary-dark-hover': '#5B80B6',
+      'primary-light-active': '#345078',
+      'primary-dark-active': '#6C91C7',
       'bg-secondary-light': '#FFFFFF',
       'bg-secondary-dark': '#14181B',
       'divider-light': '#E0E3E7',
@@ -80,18 +86,20 @@ export function ProfileMenu({
   // Valores de animação
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateYAnim = useRef(new Animated.Value(10)).current;
-
+  
   // Obtém as cores do tailwind.config.js
   const twColors = getTailwindConfig();
 
-  // Cores para o tema atual
+  // Mapeamento de cores dinâmico
   const themeColors = {
-    primary: isDark ? twColors['primary-dark'] : twColors['primary-light'],
-    secondaryBackground: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
-    divider: isDark ? twColors['divider-dark'] : twColors['divider-light'],
-    textPrimary: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
-    textSecondary: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
-    textTertiary: isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
+    'primary': isDark ? twColors['primary-dark'] : twColors['primary-light'],
+    'primary-hover': isDark ? twColors['primary-dark-hover'] : twColors['primary-light-hover'],
+    'primary-active': isDark ? twColors['primary-dark-active'] : twColors['primary-light-active'],
+    'bg-secondary': isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
+    'divider': isDark ? twColors['divider-dark'] : twColors['divider-light'],
+    'text-primary': isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+    'text-secondary': isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+    'text-tertiary': isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
   };
 
   // Executa animação quando a visibilidade muda
@@ -125,6 +133,80 @@ export function ProfileMenu({
     }
   }, [isVisible]);
 
+  // Bloquear scroll da página quando dropdown está aberto (web)
+  useEffect(() => {
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      const originalStyle = {
+        overflow: document.body.style.overflow,
+        position: document.body.style.position,
+        top: document.body.style.top,
+        width: document.body.style.width,
+        height: document.body.style.height,
+        paddingRight: document.body.style.paddingRight
+      };
+      
+      const scrollY = window.scrollY;
+      
+      if (isVisible) {
+        // Salvar a posição atual de scroll
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+        document.body.style.height = '100%';
+        document.body.style.overflow = 'hidden';
+        
+        // Prevenir o salto causado pelo scrollbar desaparecendo
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        if (scrollbarWidth > 0) {
+          document.body.style.paddingRight = `${scrollbarWidth}px`;
+        }
+        
+        return () => {
+          // Restaurar o estilo original
+          document.body.style.overflow = originalStyle.overflow;
+          document.body.style.position = originalStyle.position;
+          document.body.style.top = originalStyle.top;
+          document.body.style.width = originalStyle.width;
+          document.body.style.height = originalStyle.height;
+          document.body.style.paddingRight = originalStyle.paddingRight;
+          
+          // Restaurar a posição de scroll
+          window.scrollTo(0, scrollY);
+        };
+      }
+    }
+  }, [isVisible]);
+
+  // Adicionar estilos para garantir que elementos com position:fixed não sejam cortados
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      const style = document.createElement('style');
+      style.textContent = `
+        /* Garantir que elementos com position:fixed não sejam cortados */
+        *, *::before, *::after {
+          transform-style: preserve-3d;
+        }
+        
+        /* Garantir que elementos com position:fixed tenham o maior z-index possível */
+        body > [style*="position: fixed"] {
+          z-index: 2147483647 !important;
+          isolation: isolate;
+        }
+        
+        /* Estilos para menu de perfil */
+        [data-profile-menu="true"] {
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+      `;
+      document.head.appendChild(style);
+
+      return () => {
+        document.head.removeChild(style);
+      };
+    }
+  }, []);
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -136,27 +218,26 @@ export function ProfileMenu({
 
   if (!isVisible) return null;
 
-  const MenuItem = ({ icon: Icon, label, onClick, color = themeColors.textPrimary }: MenuItemProps) => (
+  const MenuItem = ({ icon: Icon, label, onClick, color = themeColors['text-primary'] }: MenuItemProps) => (
     <HoverableView
       style={styles.menuItem}
       onPress={onClick}
       hoverScale={1.01}
     >
       <Icon size={18} color={color} strokeWidth={1.5} />
-      <Text style={[styles.menuItemText, { color: themeColors.textPrimary }]}>{label}</Text>
+      <Text style={[styles.menuItemText, { color: themeColors['text-primary'] }]}>{label}</Text>
     </HoverableView>
   );
 
   const getThemeOptionStyle = (isSelected: boolean): ViewStyle => ({
     ...styles.themeOption,
-    ...(isSelected ? { backgroundColor: themeColors.primary + '15' } : {})
+    ...(isSelected ? { backgroundColor: themeColors['primary'] + '15' } : {})
   });
 
   // Determinar a posição com base nas coordenadas fornecidas
   const getPositionStyle = () => {
     if (position && Platform.OS === 'web') {
       // Se temos uma posição definida pelo usuário e estamos na web
-      // Manter o comportamento atual para web
       const windowWidth = Dimensions.get('window').width;
       const menuWidth = isMobile ? Math.min(220, windowWidth * 0.85) : 220;
       
@@ -167,7 +248,7 @@ export function ProfileMenu({
       const windowHeight = window.innerHeight;
       
       // Define valores para posicionamento
-      const spacingDown = 1;
+      const spacingDown = 5;
       
       // Calcula se o menu cabe abaixo da posição
       const menuHeight = 320; // Altura aproximada do menu
@@ -184,7 +265,7 @@ export function ProfileMenu({
         };
       } else {
         // O menu não cabe abaixo, então vamos posicioná-lo acima
-        const spacingUp = 1;
+        const spacingUp = 5;
         
         // Posição Y acima do elemento
         const topPosition = Math.max(16, position.y - menuHeight - spacingUp);
@@ -209,9 +290,9 @@ export function ProfileMenu({
       },
       default: {
         position: 'absolute' as 'absolute',
-        right: 16, // SPACING.lg equivalente
-        width: 200, // Largura específica conforme mencionado
-        top: -10, // Posicionando muito mais próximo do header
+        right: 16,
+        width: 200,
+        top: -10,
         zIndex: 2147483647,
       }
     });
@@ -243,8 +324,9 @@ export function ProfileMenu({
     },
     container: getPositionStyle() as any
   };
-
-  return (
+  
+  // Componente interno que será renderizado
+  const MenuContent = () => (
     <View style={{ 
       position: Platform.OS === 'web' ? 'fixed' : 'absolute', 
       top: 0, 
@@ -270,7 +352,6 @@ export function ProfileMenu({
       
       {/* Menu de perfil */}
       <View style={Platform.OS !== 'web' ? {
-        // Sombra suave
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
@@ -283,45 +364,40 @@ export function ProfileMenu({
             styles.container,
             responsiveStyles.container,
             {
-              backgroundColor: themeColors.secondaryBackground,
-              borderColor: themeColors.divider,
+              backgroundColor: themeColors['bg-secondary'],
+              borderColor: themeColors['divider'],
               opacity: fadeAnim,
               transform: [{ translateY: translateYAnim }],
               width: isMobile ? (Platform.OS === 'web' ? '85%' : 200) : 220,
               maxWidth: Platform.OS === 'web' ? 220 : undefined,
-              // Sombra para web
-              ...(Platform.OS === 'web' 
-                ? { boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' } 
-                : {}
-              ),
             },
           ]}
           data-profile-menu="true"
         >
           {/* Cabeçalho do Perfil */}
           <View style={styles.profileHeader}>
-            <Text style={[styles.name, { color: themeColors.textPrimary }]}>
+            <Text style={[styles.name, { color: themeColors['text-primary'] }]}>
               {session?.user?.user_metadata?.display_name || session?.user?.user_metadata?.name || 'Usuário'}
             </Text>
-            <Text style={[styles.email, { color: themeColors.textSecondary }]}>
+            <Text style={[styles.email, { color: themeColors['text-secondary'] }]}>
               {session?.user?.email || 'email@exemplo.com'}
             </Text>
           </View>
 
-          <View style={[styles.divider, { backgroundColor: themeColors.divider }]} />
+          <View style={[styles.divider, { backgroundColor: themeColors['divider'] }]} />
 
           {/* Opções de Tema */}
           <View style={styles.themeSection}>
-            <Text style={[styles.sectionTitle, { color: themeColors.textPrimary }]}>Tema</Text>
+            <Text style={[styles.sectionTitle, { color: themeColors['text-primary'] }]}>Tema</Text>
             <View style={styles.themeOptions}>
               <HoverableView
                 style={getThemeOptionStyle(themeMode === 'light')}
                 onPress={() => setThemeMode('light')}
               >
-                <Sun size={16} color={themeMode === 'light' ? (isDark ? twColors['primary-dark'] : twColors['primary-light']) : themeColors.textPrimary} />
+                <Sun size={16} color={themeMode === 'light' ? themeColors['primary'] : themeColors['text-primary']} />
                 <Text style={[
                   styles.themeText,
-                  { color: themeMode === 'light' ? (isDark ? twColors['primary-dark'] : twColors['primary-light']) : themeColors.textPrimary }
+                  { color: themeMode === 'light' ? themeColors['primary'] : themeColors['text-primary'] }
                 ]}>Claro</Text>
               </HoverableView>
 
@@ -329,10 +405,10 @@ export function ProfileMenu({
                 style={getThemeOptionStyle(themeMode === 'dark')}
                 onPress={() => setThemeMode('dark')}
               >
-                <Moon size={16} color={themeMode === 'dark' ? (isDark ? twColors['primary-dark'] : twColors['primary-dark']) : themeColors.textPrimary} />
+                <Moon size={16} color={themeMode === 'dark' ? themeColors['primary'] : themeColors['text-primary']} />
                 <Text style={[
                   styles.themeText,
-                  { color: themeMode === 'dark' ? (isDark ? twColors['primary-dark'] : twColors['primary-dark']) : themeColors.textPrimary }
+                  { color: themeMode === 'dark' ? themeColors['primary'] : themeColors['text-primary'] }
                 ]}>Escuro</Text>
               </HoverableView>
 
@@ -340,16 +416,16 @@ export function ProfileMenu({
                 style={getThemeOptionStyle(themeMode === 'system')}
                 onPress={() => setThemeMode('system')}
               >
-                <Monitor size={16} color={themeMode === 'system' ? (isDark ? twColors['primary-dark'] : twColors['primary-dark']) : themeColors.textPrimary} />
+                <Monitor size={16} color={themeMode === 'system' ? themeColors['primary'] : themeColors['text-primary']} />
                 <Text style={[
                   styles.themeText,
-                  { color: themeMode === 'system' ? (isDark ? twColors['primary-dark'] : twColors['primary-dark']) : themeColors.textPrimary }
+                  { color: themeMode === 'system' ? themeColors['primary'] : themeColors['text-primary'] }
                 ]}>Sistema</Text>
               </HoverableView>
             </View>
           </View>
 
-          <View style={[styles.divider, { backgroundColor: themeColors.divider }]} />
+          <View style={[styles.divider, { backgroundColor: themeColors['divider'] }]} />
 
           {/* Menu Items */}
           <MenuItem
@@ -369,35 +445,26 @@ export function ProfileMenu({
             icon={LogOut}
             label="Sair"
             onClick={handleLogout}
-            color={themeColors.primary}
+            color={themeColors['primary']}
           />
         </Animated.View>
       </View>
     </View>
   );
+
+  // Usando createPortal para renderizar diretamente no body (apenas web)
+  if (Platform.OS === 'web' && typeof document !== 'undefined') {
+    return createPortal(
+      <MenuContent />,
+      document.body
+    );
+  }
+  
+  // Renderização normal para plataformas não-web
+  return <MenuContent />;
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    ...Platform.select({
-      web: {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 45,
-      },
-      default: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height,
-        zIndex: 45,
-      }
-    }) as any
-  },
   container: {
     borderRadius: 12,
     borderWidth: 1,

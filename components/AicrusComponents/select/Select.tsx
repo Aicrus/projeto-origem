@@ -6,6 +6,7 @@ import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../../lib/supabase';
+import { colors } from '../../../constants/theme';
 
 /**
  * @component Select
@@ -74,34 +75,27 @@ interface MultiSelectProps extends BaseDropdownProps {
 
 type SelectProps = SingleSelectProps | MultiSelectProps;
 
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#C13636',
-      'bg-secondary-light': '#FFFFFF',
-      'bg-secondary-dark': '#14181B',
-      'divider-light': '#E0E3E7',
-      'divider-dark': '#262D34',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-      'text-secondary-light': '#57636C',
-      'text-secondary-dark': '#95A1AC',
-    };
-  }
+// Função para obter as cores do theme.ts em vez de tailwind.config.js
+const getThemeColors = (isDark: boolean) => {
+  return {
+    'primary': isDark ? colors['primary-dark'] : colors['primary-light'],
+    'primary-hover': isDark ? colors['primary-dark-hover'] : colors['primary-light-hover'],
+    'primary-active': isDark ? colors['primary-dark-active'] : colors['primary-light-active'],
+    'bg-secondary': isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+    'divider': isDark ? colors['divider-dark'] : colors['divider-light'],
+    'text-primary': isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+    'text-secondary': isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+    'text-tertiary': isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light'],
+    'hover': isDark ? colors['hover-dark'] : colors['hover-light'],
+    'active': isDark ? colors['active-dark'] : colors['active-light'],
+    'primary-main': isDark ? colors['primary-dark'] : colors['primary-light'],
+  };
 };
 
 // Componente para renderizar um item da lista de opções
 const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
   const [isHovered, setIsHovered] = useState(false);
-  const twColors = getTailwindConfig();
+  const themeColors = getThemeColors(isDark);
   
   const handleHoverIn = () => {
     if (Platform.OS === 'web') {
@@ -124,9 +118,9 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
       paddingVertical: 8,
       paddingHorizontal: 12,
       borderBottomWidth: 1,
-      borderBottomColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+      borderBottomColor: themeColors['divider'],
       backgroundColor: selected 
-        ? (isDark ? `${twColors['primary-dark']}08` : `${twColors['primary-light']}05`)
+        ? (isDark ? `${themeColors['primary']}08` : `${themeColors['primary']}05`)
         : (isHovered && !selected && Platform.OS === 'web' 
             ? (isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)') 
             : 'transparent')
@@ -134,8 +128,8 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
     itemText: {
       fontSize: 14,
       color: selected 
-        ? (isDark ? twColors['primary-dark'] : twColors['primary-light'])
-        : (isDark ? twColors['text-primary-dark'] : twColors['text-secondary-light']),
+        ? themeColors['primary']
+        : themeColors['text-primary'],
       fontWeight: selected ? '500' : 'normal'
     }
   });
@@ -152,7 +146,7 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
         {item.label}
       </Text>
       {selected && (
-        <Check size={16} color={isDark ? twColors['primary-dark'] : twColors['primary-light']} strokeWidth={2} />
+        <Check size={16} color={themeColors['primary']} strokeWidth={2} />
       )}
     </TouchableOpacity>
   );
@@ -182,8 +176,8 @@ const WebDropdownOptions = ({
   // Estado para controlar a pesquisa
   const [searchValue, setSearchValue] = useState('');
   
-  // Obter cores do tailwind
-  const twColors = getTailwindConfig();
+  // Obter cores do theme.ts
+  const themeColors = getThemeColors(isDark);
   
   // Função para normalizar texto (remover acentos)
   const normalizeText = (text: string): string => {
@@ -893,8 +887,12 @@ export const Select = ({
   // Ref para calcular a posição do dropdown
   const selectRef = useRef<any>(null);
   
-  // Obter cores do tailwind
-  const twColors = getTailwindConfig();
+  // Tema atual
+  const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
+  
+  // Obter cores do theme.ts
+  const themeColors = getThemeColors(isDark);
   
   // Estado para controlar abertura do dropdown
   const [open, setOpen] = useState(false);
@@ -907,10 +905,6 @@ export const Select = ({
     bottom?: number;
     openDown?: boolean;
   }>({ top: 0, left: 0, width: 0 });
-  
-  // Tema atual
-  const { currentTheme } = useTheme();
-  const isDark = currentTheme === 'dark';
   
   // Verificar se estamos usando Supabase
   const isUsingSupabase = !!supabaseTable && !!supabaseColumn;
@@ -1146,7 +1140,7 @@ export const Select = ({
       style.textContent = `
         /* Estilo para o trigger do dropdown */
         .dropdown-trigger:hover {
-          border-color: ${isDark ? twColors['primary-dark'] : twColors['primary-main']};
+          border-color: ${themeColors['primary']};
           transition: all 0.2s ease;
         }
         
@@ -1182,7 +1176,7 @@ export const Select = ({
         document.head.removeChild(style);
       };
     }
-  }, [isDark]);
+  }, [isDark, themeColors]);
   
   // Adicionar classe para hover no web
   useEffect(() => {
@@ -1316,7 +1310,7 @@ export const Select = ({
       borderRadius: 8,
       borderWidth: 2,
       borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
-      borderTopColor: isDark ? '#4A6' : twColors['primary-main'],
+      borderTopColor: isDark ? '#4A6' : themeColors['primary'],
       marginRight: 8
     },
     errorText: {
