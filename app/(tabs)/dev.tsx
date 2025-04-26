@@ -6,7 +6,73 @@ import { useResponsive } from '../../hooks/useResponsive';
 import { Input } from '../../components/AicrusComponents/input';
 import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
-import { colors } from '../../components/AicrusComponents/constants/theme';
+
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {};
+  }
+};
+
+// Cores compatíveis com o formato anterior
+const colors = {
+  primary: {
+    main: '#892CDC',
+    light: '#3D5C8C',
+    dark: '#C13636',
+    contrastText: '#FFFFFF',
+  },
+  secondary: {
+    main: '#22D',
+    light: '#06B6',
+    dark: '#2C3E',
+    contrastText: '#FFFFFF',
+  },
+  gray: {
+    '50': '#F9FAFB',
+    '100': '#F3F4F6',
+    '200': '#E5E7EB',
+    '300': '#D1D5DB',
+    '400': '#9CA3AF',
+    '500': '#6B7280',
+    '600': '#4B5563',
+    '700': '#374151',
+    '800': '#1F2937',
+    '900': '#111827',
+  },
+  white: '#FFFFFF',
+  black: '#000000',
+  error: {
+    main: '#EF4444',
+    light: '#FEE2E2',
+    dark: '#B91C1C',
+    contrastText: '#FFFFFF',
+  },
+  warning: {
+    main: '#F59E0B',
+    light: '#FEF3C7',
+    dark: '#D97706',
+    contrastText: '#FFFFFF',
+  },
+  success: {
+    main: '#10B981',
+    light: '#ECFDF5',
+    dark: '#059669',
+    contrastText: '#FFFFFF',
+  },
+  info: {
+    main: '#3B82F6',
+    light: '#EFF6FF',
+    dark: '#1D4ED8',
+    contrastText: '#FFFFFF',
+  },
+};
+
 import { Button } from '../../components/AicrusComponents/button';
 import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette, Layout, ArrowUpDown, MoreHorizontal } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';

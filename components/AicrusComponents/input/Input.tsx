@@ -3,7 +3,6 @@ import { StyleSheet, View, TextInput, Text, TouchableOpacity, Platform, Keyboard
 import { Eye, EyeOff, Search, X, Calendar, Plus, Minus, Clock, ChevronUp, ChevronDown } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { colors } from '../constants/theme';
 
 // Função para obter as cores do tailwind.config.js
 const getTailwindConfig = () => {
@@ -616,7 +615,7 @@ export const Input = ({
       style.textContent = `
         /* Estilos para o input */
         [data-input-container="true"]:hover:not([data-disabled="true"]) {
-          border-color: ${isDark ? colors.primary.dark : colors.primary.main};
+          border-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']};
           transition: all 0.2s ease;
         }
         
@@ -671,14 +670,14 @@ export const Input = ({
         
         /* Hack para aplicar cores no spinner */
         :root {
-          accent-color: ${isDark ? colors.primary.dark : colors.primary.main} !important;
-          --number-spinner-color: ${isDark ? colors.primary.dark : colors.primary.main} !important;
+          accent-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']} !important;
+          --number-spinner-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']} !important;
         }
         
         /* Adiciona suporte a cores personalizadas no spinner */
-        @supports (accent-color: ${isDark ? colors.primary.dark : colors.primary.main}) {
+        @supports (accent-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']}) {
           input[type="number"] {
-            accent-color: ${isDark ? colors.primary.dark : colors.primary.main};
+            accent-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']};
           }
         }
         

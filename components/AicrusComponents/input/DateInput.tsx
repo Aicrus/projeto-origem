@@ -3,7 +3,6 @@ import { Platform, Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Di
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input, InputProps } from './Input';
 import { useTheme } from '../../../hooks/ThemeContext';
-import { colors } from '../constants/theme';
 
 // Função para obter as cores do tailwind.config.js
 const getTailwindConfig = () => {
@@ -66,22 +65,20 @@ export const DateInput: React.FC<DateInputProps> = ({
   disabled = false,
   ...otherProps
 }) => {
-  // Tema atual
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [tempDate, setTempDate] = useState<Date | null>(null);
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   
-  // Estado para controlar visibilidade do seletor de data
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  // Obter as cores do tailwind.config.js
+  const twColors = getTailwindConfig();
   
-  // Estado para armazenar a data selecionada temporariamente (antes de confirmar)
-  const [tempDate, setTempDate] = useState<Date | null>(null);
-  
-  // Referência ao input nativo de data para web
-  const nativeTimeInputRef = useRef<HTMLInputElement>(null);
-  
-  // Animação para o overlay
+  // Animations
+  const slideAnim = useRef(new Animated.Value(500)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(150)).current;
+  
+  // Referência para o input nativo de data no web
+  const nativeTimeInputRef = useRef<HTMLInputElement>(null);
   
   // Animação de entrada e saída do modal
   useEffect(() => {
@@ -102,7 +99,7 @@ export const DateInput: React.FC<DateInputProps> = ({
     } else {
       // Animação de saída (não usamos porque o Modal fecha instantaneamente)
       fadeAnim.setValue(0);
-      slideAnim.setValue(150);
+      slideAnim.setValue(500);
     }
   }, [showDatePicker, fadeAnim, slideAnim]);
   
@@ -283,9 +280,6 @@ export const DateInput: React.FC<DateInputProps> = ({
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   
-  // Obter cores do tailwind
-  const twColors = getTailwindConfig();
-  
   // Estilo para o modal e componentes relacionados
   const styles = StyleSheet.create({
     modalContainer: {
@@ -365,7 +359,7 @@ export const DateInput: React.FC<DateInputProps> = ({
   useEffect(() => {
     if (Platform.OS === 'web') {
       const style = document.createElement('style');
-      const primaryColor = isDark ? colors.primary.dark : colors.primary.main;
+      const primaryColor = isDark ? twColors['primary-dark'] : twColors['primary-light'];
       
       style.textContent = `
         /* Estilização do calendário nativo HTML5 */

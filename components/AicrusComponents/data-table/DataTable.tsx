@@ -28,7 +28,6 @@ import { Button } from '../button';
 import { ArrowUpDown, ChevronDown, MoreHorizontal, AlertCircle } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { colors } from '../constants/theme';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { createPortal } from 'react-dom';
 import { SupabaseClient } from '@supabase/supabase-js';
@@ -1238,10 +1237,10 @@ export function DataTable<TData>({
               bottom: !dropdownPosition.openDown ? dropdownPosition.bottom : undefined,
               width: dropdownPosition.width || 230, // Ajustado para uma largura menos exagerada
               maxHeight: 250,
-              backgroundColor: isDark ? colors.gray['800'] : colors.white,
+              backgroundColor: isDark ? twColors['bg-tertiary-dark'] : twColors['white'],
               borderRadius: 6,
               borderWidth: 1,
-              borderColor: isDark ? colors.gray['700'] : colors.gray['200'],
+              borderColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
               shadowColor: 'rgba(0, 0, 0, 0.5)',
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: isDark ? 0.25 : 0.1,
@@ -1253,10 +1252,10 @@ export function DataTable<TData>({
               style={{
                 fontSize: 13,
                 fontWeight: '500',
-                color: isDark ? colors.gray['400'] : colors.gray['600'],
+                color: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
                 padding: 8,
                 borderBottomWidth: 1,
-                borderBottomColor: isDark ? colors.gray['700'] : colors.gray['200'],
+                borderBottomColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
               }}
             >
               Alternar colunas
@@ -1306,7 +1305,7 @@ export function DataTable<TData>({
                         style={{
                           marginLeft: 8,
                           fontSize: 14,
-                          color: isDark ? colors.gray['100'] : colors.gray['900'],
+                          color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
                           textTransform: 'capitalize',
                           flex: 1,
                           flexShrink: 1,
@@ -1325,6 +1324,9 @@ export function DataTable<TData>({
       </Modal>
     );
   };
+  
+  // Obter cores do tailwind.config.js
+  const twColors = getTailwindConfig();
   
   // Calcular larguras das colunas baseado no espaço disponível
   const calculateColumnWidths = () => {
@@ -1376,9 +1378,6 @@ export function DataTable<TData>({
   
   // Cores do tema seguindo o padrão do Accordion.tsx e theme.ts
   const getThemeColors = () => {
-    // Obter cores do tailwind.config.js
-    const twColors = getTailwindConfig();
-    
     return {
       // Cores primárias
       primary: {
@@ -1809,7 +1808,6 @@ export function DataTable<TData>({
   const renderErrorState = () => {
     if (!error) return null;
     
-    const twColors = getTailwindConfig();
     const bgColor = isDark ? twColors['error-bg-dark'] || twColors['bg-tertiary-dark'] : twColors['error-bg-light'] || twColors['bg-tertiary-light'];
     const textColor = isDark ? twColors['error-text-dark'] || twColors['text-primary-dark'] : twColors['error-text-light'] || twColors['text-primary-light'];
     const buttonBgColor = isDark ? twColors['primary-dark'] : twColors['primary-light'];

@@ -3,7 +3,6 @@ import { Platform, Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Di
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input, InputProps } from './Input';
 import { useTheme } from '../../../hooks/ThemeContext';
-import { colors } from '../constants/theme';
 
 // Função para obter as cores do tailwind.config.js
 const getTailwindConfig = () => {
@@ -69,6 +68,9 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   // Tema atual
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
+  
+  // Obter as cores do tailwind.config.js
+  const twColors = getTailwindConfig();
   
   // Estado para controlar visibilidade do seletor de hora
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -313,9 +315,6 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   // Pegar a largura da tela para centralizar o seletor
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
-  
-  // Obter cores do tailwind
-  const twColors = getTailwindConfig();
   
   // Estilo para o modal e componentes relacionados
   const styles = StyleSheet.create({
@@ -570,7 +569,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
                   display="spinner"
                   onChange={handleTimePickerChange}
                   is24Hour={is24Hour}
-                  minuteInterval={1}
+                  minuteInterval={minuteInterval}
                   locale="pt-BR"
                   textColor={isDark ? '#FFFFFF' : '#000000'}
                   themeVariant={isDark ? 'dark' : 'light'}

@@ -20,9 +20,6 @@ export * from './checkbox';
 export * from './data-table';
 export * from './sheet';
 
-// Exportações de constantes
-export * from './constants/theme';
-
 // Exportando o componente GradientView
 export { GradientView, GRADIENTS } from './gradient';
 export type { GradientViewProps, GradientType } from './gradient';
