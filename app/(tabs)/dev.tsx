@@ -118,39 +118,6 @@ const SupabaseDataTable = () => {
   const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
   const textSecondary = isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light';
   
-  const [supabaseUsers, setSupabaseUsers] = useState<UserAicrusAcademy[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Função para buscar usuários do Supabase
-  const fetchSupabaseUsers = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const { data, error: supabaseError } = await supabase
-        .from('usersAicrusAcademy')
-        .select('id, created_at, nome, email, idCustomerAsaas')
-        .order('created_at', { ascending: false });
-
-      if (supabaseError) {
-        throw supabaseError;
-      }
-
-      setSupabaseUsers(data || []);
-    } catch (err: any) {
-      console.error('Erro ao buscar usuários:', err);
-      setError(err.message || 'Erro ao buscar dados do Supabase');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Carregar dados ao montar o componente
-  useEffect(() => {
-    fetchSupabaseUsers();
-  }, []);
-
   // Definição das colunas para o Supabase
   const supabaseColumns: ColumnDef<UserAicrusAcademy>[] = [
     {
@@ -282,65 +249,16 @@ const SupabaseDataTable = () => {
     },
   ];
 
-  // Renderizar a tabela com base nos estados
-  if (isLoading) {
-    return (
-      <View className="p-6 items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <View className="w-8 h-8 border-2 border-primary-dark dark:border-primary-light border-t-transparent dark:border-t-transparent rounded-full animate-spin mb-2" />
-        <Text className={`${textPrimary} text-center font-jakarta-regular`}>Carregando dados do Supabase...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    // Determinar o tipo de erro para exibir mensagem apropriada
-    let errorMessage = error;
-    let errorTitle = "Erro ao carregar dados";
-    
-    if (error.includes("table") && error.includes("not found")) {
-      errorTitle = "Tabela não encontrada";
-      errorMessage = "A tabela 'usersAicrusAcademy' não foi encontrada no seu projeto Supabase. Verifique se ela existe ou se o nome está correto.";
-    } else if (error.includes("authentication") || error.includes("auth")) {
-      errorTitle = "Erro de autenticação";
-      errorMessage = "Não foi possível autenticar com o Supabase. Verifique se as credenciais estão corretas.";
-    } else if (error.includes("network") || error.includes("connection")) {
-      errorTitle = "Erro de conexão";
-      errorMessage = "Não foi possível conectar ao servidor Supabase. Verifique sua conexão com a internet.";
-    }
-    
-    return (
-      <View className="p-6 items-center bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <View className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900 items-center justify-center mb-3">
-          <AlertCircle size={24} color={isDark ? '#FCA5A5' : '#DC2626'} />
-        </View>
-        <Text className="text-headline-sm font-jakarta-bold text-red-500 dark:text-red-400 mb-2">{errorTitle}</Text>
-        <Text className={`${textSecondary} text-center mb-4 max-w-md`}>{errorMessage}</Text>
-        <TouchableOpacity 
-          className="px-4 py-2 bg-primary-light dark:bg-primary-dark rounded-md flex-row items-center" 
-          onPress={fetchSupabaseUsers}
-        >
-          <Text className="text-white font-jakarta-medium">Tentar novamente</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  // Se não houver dados, mostrar mensagem
-  if (supabaseUsers.length === 0) {
-    return (
-      <View className="p-6 items-center bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-2`}>Nenhum dado encontrado</Text>
-        <Text className={`${textSecondary} text-center mb-4`}>
-          A tabela 'usersAicrusAcademy' existe, mas não possui registros.
-        </Text>
-      </View>
-    );
-  }
-
+  // Usar o DataTable com configuração Supabase, deixando o componente cuidar dos estados
   return (
     <DataTable 
-      data={supabaseUsers}
       columns={supabaseColumns}
+      supabaseConfig={{
+        client: supabase,
+        table: 'usersAicrusAcademy',
+        select: 'id, created_at, nome, email, idCustomerAsaas',
+        orderBy: { column: 'created_at', ascending: false }
+      }}
       enableRowSelection
       enableSorting
       enableFiltering

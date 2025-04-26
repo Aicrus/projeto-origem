@@ -388,6 +388,9 @@ export function DataTable<TData>({
   // Estado para determinar se estamos usando dados padrão
   const [usingDefaultData, setUsingDefaultData] = useState(false);
   
+  // Adicionando uma flag para controlar tentativas de nova busca após erro
+  const [shouldRetryFetch, setShouldRetryFetch] = useState(true);
+  
   // Função para buscar dados do Supabase
   const fetchSupabaseData = async () => {
     if (supabaseConfig?.client || window.supabase) {
@@ -432,16 +435,23 @@ export function DataTable<TData>({
             console.error('Erro ao buscar dados:', fetchError);
             setError(fetchError.message);
             if (onError) onError(fetchError);
+            return false; // Retorna falso para indicar que ocorreu um erro
           } else if (fetchedData) {
-            setTableData(fetchedData as unknown as TData[]);
-            
-            if (onDataLoaded) onDataLoaded(fetchedData as unknown as TData[]);
-            
-            // Gerar colunas automaticamente se não forem fornecidas
-            if (!columns && fetchedData.length > 0) {
-              const generatedCols = generateColumnsFromData();
-              setGeneratedColumns(generatedCols);
+            if (fetchedData.length === 0) {
+              // Define o estado para dados vazios, mas não é um erro
+              setTableData([]);
+            } else {
+              setTableData(fetchedData as unknown as TData[]);
+              
+              if (onDataLoaded) onDataLoaded(fetchedData as unknown as TData[]);
+              
+              // Gerar colunas automaticamente se não forem fornecidas
+              if (!columns && fetchedData.length > 0) {
+                const generatedCols = generateColumnsFromData();
+                setGeneratedColumns(generatedCols);
+              }
             }
+            return true; // Retorna verdadeiro para indicar sucesso
           }
         } catch (err) {
           setIsLoading(false);
@@ -449,9 +459,11 @@ export function DataTable<TData>({
           console.error('Erro ao buscar dados do Supabase:', err);
           setError(errorMessage);
           if (onError) onError(err);
+          return false; // Retorna falso para indicar que ocorreu um erro
         }
       }
     }
+    return false; // Retorna falso se não foi possível executar a consulta
   };
   
   // Se não há dados fornecidos e não tem configuração de Supabase, usar dados de exemplo
@@ -509,9 +521,14 @@ export function DataTable<TData>({
   
   // Efeito para carregar dados do Supabase quando supabaseConfig for fornecido
   useEffect(() => {
-    // Obtenha dados do Supabase, se estiver configurado
-    if (supabaseConfig?.client || window.supabase) {
-      fetchSupabaseData();
+    // Obtenha dados do Supabase, se estiver configurado e devemos tentar buscar
+    if ((supabaseConfig?.client || window.supabase) && shouldRetryFetch) {
+      fetchSupabaseData().then(success => {
+        // Se a busca falhou, não tente novamente até que o usuário solicite explicitamente
+        if (!success) {
+          setShouldRetryFetch(false);
+        }
+      });
     } else {
       // Se temos dados explicitamente fornecidos, usar esses dados
       if (data.length > 0) {
@@ -524,7 +541,7 @@ export function DataTable<TData>({
         setUsingDefaultData(true);
       }
     }
-  }, [supabaseConfig, data, columns, onDataLoaded, onError]);
+  }, [supabaseConfig, data, columns, onDataLoaded, onError, shouldRetryFetch]);
 
   // Auto-gerar colunas baseado nos dados do Supabase se não fornecermos explicitamente
   const generateColumnsFromData = (): ColumnDef<TData, any>[] => {
@@ -1715,6 +1732,82 @@ export function DataTable<TData>({
     };
   }, []);
   
+  // Modificando o botão "Tentar novamente" para reiniciar o processo de busca
+  const handleRetryFetch = () => {
+    setShouldRetryFetch(true);
+    fetchSupabaseData();
+  };
+  
+  // Renderizar estado de erro para Supabase
+  const renderErrorState = () => {
+    if (!error) return null;
+    
+    // Determinar o tipo de erro para exibir mensagem apropriada
+    let errorMessage = error;
+    let errorTitle = "Erro ao carregar dados";
+    
+    if (error.includes("relation") && (error.includes("does not exist") || error.includes("não existe"))) {
+      errorTitle = "Tabela não encontrada";
+      errorMessage = `A tabela '${supabaseConfig?.table || 'usersAicrusAcademy'}' não foi encontrada no seu projeto Supabase. Verifique se ela existe ou se o nome está correto.`;
+    } else if (error.includes("authentication") || error.includes("auth")) {
+      errorTitle = "Erro de autenticação";
+      errorMessage = "Não foi possível autenticar com o Supabase. Verifique se as credenciais estão corretas.";
+    } else if (error.includes("network") || error.includes("connection")) {
+      errorTitle = "Erro de conexão";
+      errorMessage = "Não foi possível conectar ao servidor Supabase. Verifique sua conexão com a internet.";
+    } else if (error.includes("permission") || error.includes("permissão")) {
+      errorTitle = "Erro de permissão";
+      errorMessage = "Você não tem permissão para acessar esta tabela. Verifique suas permissões no Supabase.";
+    } else if (error.includes("timeout") || error.includes("timed out")) {
+      errorTitle = "Tempo esgotado";
+      errorMessage = "A conexão com o Supabase atingiu o tempo limite. Tente novamente mais tarde.";
+    }
+    
+    return (
+      <View style={{
+        padding: 24, 
+        alignItems: 'center', 
+        backgroundColor: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'], 
+        borderRadius: 8
+      }}>
+        <View style={{
+          width: 64, 
+          height: 64, 
+          borderRadius: 32, 
+          backgroundColor: isDark ? colors['error-bg-dark'] : colors['error-bg-light'], 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          marginBottom: 12,
+        }}>
+          <AlertCircle size={24} color={isDark ? colors['error-icon-dark'] : colors['error-icon-light']} />
+        </View>
+        <Text style={{
+          fontSize: 18, 
+          fontWeight: '700', 
+          textAlign: 'center', 
+          marginBottom: 8, 
+          color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+        }}>
+          {errorTitle}
+        </Text>
+        <Text style={{
+          textAlign: 'center', 
+          color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+          marginBottom: 16,
+        }}>
+          {errorMessage}
+        </Text>
+        <Button
+          variant="primary"
+          onPress={handleRetryFetch}
+          size="md"
+        >
+          Tentar novamente
+        </Button>
+      </View>
+    );
+  };
+  
   // Renderizar estado de carregamento para Supabase
   const renderLoadingState = () => {
     if (!isLoading) return null;
@@ -1735,6 +1828,7 @@ export function DataTable<TData>({
           borderTopColor: 'transparent', 
           borderRadius: 16,
           marginBottom: 8,
+          transform: [{ rotate: '45deg' }],
         }} />
         <Text style={{
           textAlign: 'center',
@@ -1746,26 +1840,9 @@ export function DataTable<TData>({
       </View>
     );
   };
-
-  // Renderizar estado de erro para Supabase
-  const renderErrorState = () => {
-    if (!error) return null;
-    
-    // Determinar o tipo de erro para exibir mensagem apropriada
-    let errorMessage = error;
-    let errorTitle = "Erro ao carregar dados";
-    
-    if (error.includes("table") && error.includes("not found")) {
-      errorTitle = "Tabela não encontrada";
-      errorMessage = `A tabela '${supabaseConfig?.table}' não foi encontrada no seu projeto Supabase. Verifique se ela existe ou se o nome está correto.`;
-    } else if (error.includes("authentication") || error.includes("auth")) {
-      errorTitle = "Erro de autenticação";
-      errorMessage = "Não foi possível autenticar com o Supabase. Verifique se as credenciais estão corretas.";
-    } else if (error.includes("network") || error.includes("connection")) {
-      errorTitle = "Erro de conexão";
-      errorMessage = "Não foi possível conectar ao servidor Supabase. Verifique sua conexão com a internet.";
-    }
-    
+  
+  // Renderizar estado de dados vazios
+  const renderEmptyState = () => {
     return (
       <View style={{
         padding: 24, 
@@ -1773,40 +1850,21 @@ export function DataTable<TData>({
         backgroundColor: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'], 
         borderRadius: 8
       }}>
-        <View style={{
-          width: 64, 
-          height: 64, 
-          borderRadius: 32, 
-          backgroundColor: isDark ? colors['error-bg-dark'] : colors['error-bg-light'], 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          marginBottom: 12,
-        }}>
-          <AlertCircle size={24} color={isDark ? colors['error-text-dark'] : colors['error-icon-light']} />
-        </View>
         <Text style={{
           fontSize: 18, 
-          fontWeight: '700', 
+          fontWeight: '600', 
           textAlign: 'center', 
           marginBottom: 8, 
           color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
         }}>
-          {errorTitle}
+          Nenhum dado encontrado
         </Text>
         <Text style={{
           textAlign: 'center', 
           color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
-          marginBottom: 16,
         }}>
-          {errorMessage}
+          A tabela '{supabaseConfig?.table || "usersAicrusAcademy"}' existe, mas não possui registros.
         </Text>
-        <Button
-          variant="primary"
-          onPress={fetchSupabaseData}
-          size="md"
-        >
-          Tentar novamente
-        </Button>
       </View>
     );
   };
@@ -1822,7 +1880,12 @@ export function DataTable<TData>({
     if (supabaseConfig && error) {
       return renderErrorState();
     }
-  
+
+    // Se estivermos usando Supabase e não houver dados, mostrar estado vazio
+    if (supabaseConfig && tableData.length === 0 && !usingDefaultData) {
+      return renderEmptyState();
+    }
+
     // Renderizar tabela normal
     return (
       <>
