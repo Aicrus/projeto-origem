@@ -17,6 +17,38 @@ import { Portal } from '@gorhom/portal';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from 'lucide-react-native';
 
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'success-icon-light': '#059669',
+      'success-icon-dark': '#10B981',
+      'error-icon-light': '#DC2626',
+      'error-icon-dark': '#F87171',
+      'warning-icon-light': '#D97706',
+      'warning-icon-dark': '#FBBF24',
+      'info-icon-light': '#0284C7',
+      'info-icon-dark': '#38BDF8',
+      'success-bg-light': '#ECFDF5',
+      'success-bg-dark': '#064E3B',
+      'error-bg-light': '#FEF2F2',
+      'error-bg-dark': '#450A0A',
+      'warning-bg-light': '#FFFBEB',
+      'warning-bg-dark': '#451A03',
+      'info-bg-light': '#EFF6FF',
+      'info-bg-dark': '#082F49',
+      'text-tertiary-light': '#8B97A2',
+      'text-tertiary-dark': '#6B7280',
+    };
+  }
+};
+
 /**
  * @component Toast
  * @description Componente de notificação moderno e personalizável que suporta:
@@ -137,6 +169,9 @@ export function Toast({
   const screenHeight = Dimensions.get('window').height;
   const screenWidth = Dimensions.get('window').width;
   
+  // Obtém as cores do tailwind.config.js
+  const twColors = getTailwindConfig();
+  
   // Simplifica a posição para ambientes nativos (só usando top e bottom)
   const getNativePosition = (): ToastPosition => {
     if (isNative) {
@@ -157,27 +192,27 @@ export function Toast({
       backgroundColor: isDark ? 'bg-success-bg-dark' : 'bg-success-bg-light',
       textColor: isDark ? 'text-success-text-dark' : 'text-success-text-light',
       borderColor: 'border-gray-200 dark:border-gray-700',
-      icon: () => <CheckCircle size={20} color={isDark ? '#10B981' : '#059669'} />,
+      icon: () => <CheckCircle size={20} color={isDark ? twColors['success-icon-dark'] : twColors['success-icon-light']} />,
     },
     error: {
       backgroundColor: isDark ? 'bg-error-bg-dark' : 'bg-error-bg-light',
       textColor: isDark ? 'text-error-text-dark' : 'text-error-text-light',
       borderColor: 'border-gray-200 dark:border-gray-700',
-      icon: () => <AlertCircle size={20} color={isDark ? '#F87171' : '#DC2626'} />,
+      icon: () => <AlertCircle size={20} color={isDark ? twColors['error-icon-dark'] : twColors['error-icon-light']} />,
     },
     warning: {
       backgroundColor: isDark ? 'bg-warning-bg-dark' : 'bg-warning-bg-light',
       textColor: isDark ? 'text-warning-text-dark' : 'text-warning-text-light',
       borderColor: 'border-gray-200 dark:border-gray-700',
-      icon: () => <AlertTriangle size={20} color={isDark ? '#FBBF24' : '#D97706'} />,
+      icon: () => <AlertTriangle size={20} color={isDark ? twColors['warning-icon-dark'] : twColors['warning-icon-light']} />,
     },
     info: {
       backgroundColor: isDark ? 'bg-info-bg-dark' : 'bg-info-bg-light',
       textColor: isDark ? 'text-info-text-dark' : 'text-info-text-light',
       borderColor: 'border-gray-200 dark:border-gray-700',
-      icon: () => <Info size={20} color={isDark ? '#38BDF8' : '#0284C7'} />,
+      icon: () => <Info size={20} color={isDark ? twColors['info-icon-dark'] : twColors['info-icon-light']} />,
     },
-  }), [isDark]);
+  }), [isDark, twColors]);
 
   // Calcula posição baseada na prop position
   const getPositionStyle = (): ViewStyle => {
@@ -300,10 +335,10 @@ export function Toast({
     if (!showProgressBar || duration <= 0) return null;
 
     const progressBarColor = {
-      success: isDark ? '#10B981' : '#059669',
-      error: isDark ? '#F87171' : '#DC2626',
-      warning: isDark ? '#FBBF24' : '#D97706',
-      info: isDark ? '#38BDF8' : '#0284C7',
+      success: isDark ? twColors['success-icon-dark'] : twColors['success-icon-light'],
+      error: isDark ? twColors['error-icon-dark'] : twColors['error-icon-light'],
+      warning: isDark ? twColors['warning-icon-dark'] : twColors['warning-icon-light'],
+      info: isDark ? twColors['info-icon-dark'] : twColors['info-icon-light'],
     };
     
     return (
@@ -355,7 +390,7 @@ export function Toast({
         <View 
           className={`${toastConfig[type].backgroundColor} border ${toastConfig[type].borderColor} rounded-lg overflow-hidden`}
           style={[styles.container, {
-            shadowColor: isDark ? '#000000' : '#000000',
+            shadowColor: isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: isDark ? 0.2 : 0.1,
             shadowRadius: 10,
@@ -363,14 +398,14 @@ export function Toast({
             borderWidth: isDark ? 0.5 : 0.7,
             borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
             backgroundColor: isDark ? 
-              (type === 'success' ? '#064E3B' : 
-               type === 'error' ? '#450A0A' : 
-               type === 'warning' ? '#451A03' : 
-               '#082F49') : 
-              (type === 'success' ? '#ECFDF5' : 
-               type === 'error' ? '#FEF2F2' : 
-               type === 'warning' ? '#FFFBEB' : 
-               '#EFF6FF'),
+              (type === 'success' ? twColors['success-bg-dark'] : 
+               type === 'error' ? twColors['error-bg-dark'] : 
+               type === 'warning' ? twColors['warning-bg-dark'] : 
+               twColors['info-bg-dark']) : 
+              (type === 'success' ? twColors['success-bg-light'] : 
+               type === 'error' ? twColors['error-bg-light'] : 
+               type === 'warning' ? twColors['warning-bg-light'] : 
+               twColors['info-bg-light']),
           }]}
         >
           <View style={styles.contentContainer}>
@@ -408,14 +443,14 @@ export function Toast({
                 <X 
                   size={16} 
                   color={isDark ? 
-                    (type === 'info' ? '#38BDF8' : 
-                     type === 'success' ? '#10B981' : 
-                     type === 'warning' ? '#FBBF24' : 
-                     '#F87171') : 
-                    (type === 'info' ? '#0284C7' : 
-                     type === 'success' ? '#059669' : 
-                     type === 'warning' ? '#D97706' : 
-                     '#DC2626')
+                    (type === 'info' ? twColors['info-icon-dark'] : 
+                     type === 'success' ? twColors['success-icon-dark'] : 
+                     type === 'warning' ? twColors['warning-icon-dark'] : 
+                     twColors['error-icon-dark']) : 
+                    (type === 'info' ? twColors['info-icon-light'] : 
+                     type === 'success' ? twColors['success-icon-light'] : 
+                     type === 'warning' ? twColors['warning-icon-light'] : 
+                     twColors['error-icon-light'])
                   } 
                 />
               </Pressable>
@@ -465,22 +500,22 @@ export function Toast({
           <View 
             className={`${toastConfig[type].backgroundColor} border ${toastConfig[type].borderColor} rounded-lg overflow-hidden`}
             style={[styles.container, {
-              shadowColor: isDark ? '#000000' : '#000000',
+              shadowColor: isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: isDark ? 0.2 : 0.1,
               shadowRadius: 10,
-              elevation: 5,
+              elevation: 10,
               borderWidth: isDark ? 0.5 : 0.7,
               borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
               backgroundColor: isDark ? 
-                (type === 'success' ? '#064E3B' : 
-                 type === 'error' ? '#450A0A' : 
-                 type === 'warning' ? '#451A03' : 
-                 '#082F49') : 
-                (type === 'success' ? '#ECFDF5' : 
-                 type === 'error' ? '#FEF2F2' : 
-                 type === 'warning' ? '#FFFBEB' : 
-                 '#EFF6FF'),
+                (type === 'success' ? twColors['success-bg-dark'] : 
+                 type === 'error' ? twColors['error-bg-dark'] : 
+                 type === 'warning' ? twColors['warning-bg-dark'] : 
+                 twColors['info-bg-dark']) : 
+                (type === 'success' ? twColors['success-bg-light'] : 
+                 type === 'error' ? twColors['error-bg-light'] : 
+                 type === 'warning' ? twColors['warning-bg-light'] : 
+                 twColors['info-bg-light']),
             }]}
           >
             <View style={styles.contentContainer}>
@@ -518,14 +553,14 @@ export function Toast({
                   <X 
                     size={16} 
                     color={isDark ? 
-                      (type === 'info' ? '#38BDF8' : 
-                       type === 'success' ? '#10B981' : 
-                       type === 'warning' ? '#FBBF24' : 
-                       '#F87171') : 
-                      (type === 'info' ? '#0284C7' : 
-                       type === 'success' ? '#059669' : 
-                       type === 'warning' ? '#D97706' : 
-                       '#DC2626')
+                      (type === 'info' ? twColors['info-icon-dark'] : 
+                       type === 'success' ? twColors['success-icon-dark'] : 
+                       type === 'warning' ? twColors['warning-icon-dark'] : 
+                       twColors['error-icon-dark']) : 
+                      (type === 'info' ? twColors['info-icon-light'] : 
+                       type === 'success' ? twColors['success-icon-light'] : 
+                       type === 'warning' ? twColors['warning-icon-light'] : 
+                       twColors['error-icon-light'])
                     } 
                   />
                 </Pressable>
@@ -560,22 +595,22 @@ export function Toast({
       <View 
         className={`${toastConfig[type].backgroundColor} border ${toastConfig[type].borderColor} rounded-lg overflow-hidden`}
         style={[styles.container, {
-          shadowColor: isDark ? '#000000' : '#000000',
+          shadowColor: isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: isDark ? 0.2 : 0.1,
           shadowRadius: 10,
-          elevation: 5,
+          elevation: 10,
           borderWidth: isDark ? 0.5 : 0.7,
           borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
           backgroundColor: isDark ? 
-            (type === 'success' ? '#064E3B' : 
-             type === 'error' ? '#450A0A' : 
-             type === 'warning' ? '#451A03' : 
-             '#082F49') : 
-            (type === 'success' ? '#ECFDF5' : 
-             type === 'error' ? '#FEF2F2' : 
-             type === 'warning' ? '#FFFBEB' : 
-             '#EFF6FF'),
+            (type === 'success' ? twColors['success-bg-dark'] : 
+             type === 'error' ? twColors['error-bg-dark'] : 
+             type === 'warning' ? twColors['warning-bg-dark'] : 
+             twColors['info-bg-dark']) : 
+            (type === 'success' ? twColors['success-bg-light'] : 
+             type === 'error' ? twColors['error-bg-light'] : 
+             type === 'warning' ? twColors['warning-bg-light'] : 
+             twColors['info-bg-light']),
         }]}
       >
         <View style={styles.contentContainer}>
@@ -613,14 +648,14 @@ export function Toast({
               <X 
                 size={16} 
                 color={isDark ? 
-                  (type === 'info' ? '#38BDF8' : 
-                   type === 'success' ? '#10B981' : 
-                   type === 'warning' ? '#FBBF24' : 
-                   '#F87171') : 
-                  (type === 'info' ? '#0284C7' : 
-                   type === 'success' ? '#059669' : 
-                   type === 'warning' ? '#D97706' : 
-                   '#DC2626')
+                  (type === 'info' ? twColors['info-icon-dark'] : 
+                   type === 'success' ? twColors['success-icon-dark'] : 
+                   type === 'warning' ? twColors['warning-icon-dark'] : 
+                   twColors['error-icon-dark']) : 
+                  (type === 'info' ? twColors['info-icon-light'] : 
+                   type === 'success' ? twColors['success-icon-light'] : 
+                   type === 'warning' ? twColors['warning-icon-light'] : 
+                   twColors['error-icon-light'])
                 } 
               />
             </Pressable>

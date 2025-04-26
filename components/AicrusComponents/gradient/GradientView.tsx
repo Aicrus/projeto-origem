@@ -2,7 +2,32 @@ import React from 'react';
 import { View, ViewStyle, StyleSheet, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../../hooks/ThemeContext';
-import { colors } from '../constants/theme';
+
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#C13636',
+      'secondary-light': '#22D',
+      'secondary-dark': '#2C3E',
+      'tertiary-light': '#D3545D',
+      'tertiary-dark': '#D3545D',
+      'gradient-primary-start': '#4A6FA5',
+      'gradient-primary-end': '#22D3EE',
+      'gradient-secondary-start': '#4A6FA5',
+      'gradient-secondary-end': '#D3545D',
+      'gradient-tertiary-start': '#22D3EE',
+      'gradient-tertiary-end': '#D3545D',
+    };
+  }
+};
 
 export type GradientType = 'primary' | 'secondary' | 'tertiary' | 'custom';
 
@@ -14,19 +39,6 @@ export interface GradientViewProps {
   start?: { x: number; y: number };
   end?: { x: number; y: number };
 }
-
-// Gradientes definidos para os temas claro e escuro
-const GRADIENTS_LIGHT: Record<Exclude<GradientType, 'custom'>, [string, string]> = {
-  primary: ['#892CDC', '#BC6FF1'],     // primário (purple) - modo claro
-  secondary: ['#52B69A', '#76C893'],   // secundário (green) - modo claro
-  tertiary: ['#4A6FA5', '#5E7CB9'],    // terciário (blue) - modo claro
-};
-
-const GRADIENTS_DARK: Record<Exclude<GradientType, 'custom'>, [string, string]> = {
-  primary: ['#4A6', '#6C91C7'],       // primário - modo escuro
-  secondary: ['#2C3E', '#4E6072'],    // secundário - modo escuro
-  tertiary: ['#D3545D', '#F5767F'],   // terciário - modo escuro
-};
 
 /**
  * Componente de gradiente que se adapta para web e nativo
@@ -46,6 +58,22 @@ export const GradientView: React.FC<GradientViewProps> = ({
   // Obter o tema atual
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
+  
+  // Obter as cores do tailwind.config.js
+  const twColors = getTailwindConfig();
+  
+  // Definir gradientes com base nas cores do tailwind
+  const GRADIENTS_LIGHT: Record<Exclude<GradientType, 'custom'>, [string, string]> = {
+    primary: [twColors['primary-light'], twColors['gradient-primary-end']],
+    secondary: [twColors['secondary-light'], twColors['gradient-secondary-end']],
+    tertiary: [twColors['tertiary-light'], twColors['gradient-tertiary-end']],
+  };
+
+  const GRADIENTS_DARK: Record<Exclude<GradientType, 'custom'>, [string, string]> = {
+    primary: [twColors['primary-dark'], twColors['gradient-primary-end']],
+    secondary: [twColors['secondary-dark'], twColors['gradient-secondary-end']],
+    tertiary: [twColors['tertiary-dark'], twColors['gradient-tertiary-end']],
+  };
   
   // Selecionar o conjunto de gradientes com base no tema
   const GRADIENTS = isDark ? GRADIENTS_DARK : GRADIENTS_LIGHT;
