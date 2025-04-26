@@ -162,14 +162,14 @@ const SupabaseDataTable = () => {
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          accessibilityLabel="Selecionar todos"
+          aria-label="Selecionar todos"
         />
       ),
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
-          accessibilityLabel="Selecionar linha"
+          aria-label="Selecionar linha"
         />
       ),
       enableSorting: false,
@@ -4001,14 +4001,14 @@ return (
               (table.getIsSomePageRowsSelected() && "indeterminate")
             }
             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            accessibilityLabel="Selecionar todos"
+            aria-label="Selecionar todos"
           />
         ),
         cell: ({ row }) => (
           <Checkbox
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
-            accessibilityLabel="Selecionar linha"
+            aria-label="Selecionar linha"
           />
         ),
         enableSorting: false,

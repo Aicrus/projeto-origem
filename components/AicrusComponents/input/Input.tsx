@@ -3,32 +3,7 @@ import { StyleSheet, View, TextInput, Text, TouchableOpacity, Platform, Keyboard
 import { Eye, EyeOff, Search, X, Calendar, Plus, Minus, Clock, ChevronUp, ChevronDown } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#C13636',
-      'bg-primary-light': '#F7F8FA',
-      'bg-primary-dark': '#1C1E26',
-      'bg-secondary-light': '#FFFFFF',
-      'bg-secondary-dark': '#14181B',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-      'text-secondary-light': '#57636C',
-      'text-secondary-dark': '#95A1AC',
-      'divider-light': '#E0E3E7',
-      'divider-dark': '#262D34',
-    };
-  }
-};
+import { colors } from '../../../constants/theme';
 
 /**
  * @component Input
@@ -217,11 +192,11 @@ export const Input = ({
   const nativeNumberInputRef = useRef<HTMLInputElement>(null);
   
   // Tema atual
-  const { currentTheme } = useTheme();
+  const { currentTheme, getColorByMode } = useTheme();
   const isDark = currentTheme === 'dark';
   
   // Obter cores do tailwind
-  const twColors = getTailwindConfig();
+  const twColors = colors;
   
   // Responsividade
   const { isMobile } = useResponsive();
@@ -337,18 +312,18 @@ export const Input = ({
       alignItems: 'center',
       borderWidth: 1,
       borderRadius: 6,
-      backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
+      backgroundColor: getColorByMode('bg-secondary'),
       borderColor: error 
-        ? (isDark ? '#FF6B6B' : '#FF4040')
+        ? getColorByMode('error')
         : isFocused
-          ? (isDark ? twColors['primary-dark'] : twColors['primary-light'])
-          : (isDark ? twColors['divider-dark'] : twColors['divider-light']),
+          ? getColorByMode('primary')
+          : getColorByMode('divider'),
       minHeight: 38,
       paddingHorizontal: 12,
     },
     inputStyle: {
       flex: 1,
-      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+      color: getColorByMode('text-primary'),
       fontSize: 14,
       paddingVertical: 8,
       height: multiline ? undefined : 38,
@@ -368,12 +343,12 @@ export const Input = ({
     labelStyle: {
       fontSize: 12,
       marginBottom: 4,
-      color: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+      color: getColorByMode('text-secondary'),
       fontWeight: '500',
     },
     errorText: {
       fontSize: 12,
-      color: isDark ? '#FF6B6B' : '#FF4040',
+      color: getColorByMode('error'),
       marginTop: 2,
     },
     // Estilos para input numérico nativo
@@ -388,9 +363,9 @@ export const Input = ({
       overflow: 'hidden',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      backgroundColor: isDark ? '#262D34' : '#F1F4F8',
+      backgroundColor: getColorByMode('bg-secondary'),
       borderLeftWidth: 1,
-      borderLeftColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+      borderLeftColor: getColorByMode('divider'),
     },
     numberControlButton: {
       height: '50%',
@@ -400,7 +375,7 @@ export const Input = ({
     },
     numberControlButtonUp: {
       borderBottomWidth: 1,
-      borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+      borderBottomColor: getColorByMode('divider'),
     },
     numberControlButtonDown: {
       borderTopWidth: 0,
@@ -615,7 +590,7 @@ export const Input = ({
       style.textContent = `
         /* Estilos para o input */
         [data-input-container="true"]:hover:not([data-disabled="true"]) {
-          border-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']};
+          border-color: ${getColorByMode('primary')};
           transition: all 0.2s ease;
         }
         
@@ -644,12 +619,12 @@ export const Input = ({
         
         /* Estilo para controles numéricos */
         [data-input-number-control]:hover:not(:disabled) {
-          background-color: ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'};
+          background-color: ${getColorByMode('divider')};
           cursor: pointer;
         }
         
         [data-input-number-control]:active:not(:disabled) {
-          background-color: ${isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'};
+          background-color: ${getColorByMode('primary')};
         }
         
         /* Estilos para o input numérico nativo do HTML5 */
@@ -665,19 +640,19 @@ export const Input = ({
         
         /* Cor primária para os elementos do número */
         input[type="number"] {
-          color: ${isDark ? '#FFFFFF' : '#14181B'};
+          color: ${getColorByMode('primary')};
         }
         
         /* Hack para aplicar cores no spinner */
         :root {
-          accent-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']} !important;
-          --number-spinner-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']} !important;
+          accent-color: ${getColorByMode('primary')} !important;
+          --number-spinner-color: ${getColorByMode('primary')} !important;
         }
         
         /* Adiciona suporte a cores personalizadas no spinner */
-        @supports (accent-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']}) {
+        @supports (accent-color: ${getColorByMode('primary')}) {
           input[type="number"] {
-            accent-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']};
+            accent-color: ${getColorByMode('primary')};
           }
         }
         
@@ -702,7 +677,7 @@ export const Input = ({
           opacity: 1;
           background: transparent;
           border: none;
-          color: ${isDark ? '#FFFFFF' : '#14181B'};
+          color: ${getColorByMode('primary')};
           font-size: 14px;
           padding: 8px 25px 8px 12px;
           z-index: 1;
@@ -883,7 +858,7 @@ export const Input = ({
           <View style={containerStyle.searchIcon}>
             <Search 
               size={16} 
-              color={isDark ? '#95A1AC' : '#57636C'} 
+              color={getColorByMode('text-secondary')} 
             />
           </View>
         )}
@@ -917,12 +892,12 @@ export const Input = ({
               value={value}
               onChangeText={handleChangeText}
               placeholder={placeholder}
-              placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
+              placeholderTextColor={getColorByMode('text-secondary')}
               editable={!disabled}
               keyboardType={getKeyboardType()}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              selectionColor={isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}
+              selectionColor={getColorByMode('primary')}
             />
           </View>
         ) : (
@@ -944,7 +919,7 @@ export const Input = ({
             value={value}
             onChangeText={handleChangeText}
             placeholder={placeholder}
-            placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
+            placeholderTextColor={getColorByMode('text-secondary')}
             editable={!disabled}
             secureTextEntry={type === 'password' && !passwordVisible}
             keyboardType={getKeyboardType()}
@@ -961,7 +936,7 @@ export const Input = ({
             numberOfLines={multiline ? numberOfLines : 1}
             testID={testID}
             // Cor de seleção mais sutil
-            selectionColor={isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}
+            selectionColor={getColorByMode('primary')}
             autoFocus={autoFocus}
             onContentSizeChange={handleContentSizeChange}
             // Para web, adiciona suporte nativo ao input de data HTML5
@@ -999,7 +974,7 @@ export const Input = ({
           >
             <X 
               size={16} 
-              color={isDark ? '#95A1AC' : '#57636C'} 
+              color={getColorByMode('text-secondary')} 
             />
           </TouchableOpacity>
         )}
@@ -1014,7 +989,7 @@ export const Input = ({
           >
             <Calendar 
               size={16} 
-              color={isDark ? '#95A1AC' : '#57636C'} 
+              color={getColorByMode('text-secondary')} 
             />
           </TouchableOpacity>
         )}
@@ -1029,7 +1004,7 @@ export const Input = ({
           >
             <Clock 
               size={16} 
-              color={isDark ? '#95A1AC' : '#57636C'} 
+              color={getColorByMode('text-secondary')} 
             />
           </TouchableOpacity>
         )}
@@ -1045,12 +1020,12 @@ export const Input = ({
             {passwordVisible ? (
               <EyeOff 
                 size={16} 
-                color={isDark ? '#95A1AC' : '#57636C'} 
+                color={getColorByMode('text-secondary')} 
               />
             ) : (
               <Eye 
                 size={16} 
-                color={isDark ? '#95A1AC' : '#57636C'} 
+                color={getColorByMode('text-secondary')} 
               />
             )}
           </TouchableOpacity>
@@ -1067,7 +1042,7 @@ export const Input = ({
             >
               <ChevronUp 
                 size={12} 
-                color={isDark ? '#95A1AC' : '#57636C'} 
+                color={getColorByMode('text-secondary')} 
               />
             </TouchableOpacity>
             
@@ -1079,7 +1054,7 @@ export const Input = ({
             >
               <ChevronDown 
                 size={12} 
-                color={isDark ? '#95A1AC' : '#57636C'} 
+                color={getColorByMode('text-secondary')} 
               />
             </TouchableOpacity>
           </View>
@@ -1111,21 +1086,21 @@ export const Input = ({
               <View style={{
                 width: 10,
                 height: 1,
-                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                backgroundColor: getColorByMode('divider'),
                 marginBottom: 2,
                 transform: [{ rotate: '-45deg' }, { translateX: 1 }],
               }} />
               <View style={{
                 width: 7,
                 height: 1,
-                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                backgroundColor: getColorByMode('divider'),
                 marginBottom: 2,
                 transform: [{ rotate: '-45deg' }],
               }} />
               <View style={{
                 width: 4,
                 height: 1,
-                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                backgroundColor: getColorByMode('divider'),
                 transform: [{ rotate: '-45deg' }, { translateX: -1 }],
               }} />
             </View>
@@ -1161,21 +1136,21 @@ export const Input = ({
               <View style={{
                 width: 10,
                 height: 1,
-                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                backgroundColor: getColorByMode('divider'),
                 marginBottom: 2,
                 transform: [{ rotate: '-45deg' }, { translateX: 1 }],
               }} />
               <View style={{
                 width: 7,
                 height: 1,
-                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                backgroundColor: getColorByMode('divider'),
                 marginBottom: 2,
                 transform: [{ rotate: '-45deg' }],
               }} />
               <View style={{
                 width: 4,
                 height: 1,
-                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                backgroundColor: getColorByMode('divider'),
                 transform: [{ rotate: '-45deg' }, { translateX: -1 }],
               }} />
             </View>

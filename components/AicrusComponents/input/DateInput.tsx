@@ -3,28 +3,7 @@ import { Platform, Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Di
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input, InputProps } from './Input';
 import { useTheme } from '../../../hooks/ThemeContext';
-
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#C13636',
-      'bg-primary-light': '#F7F8FA',
-      'bg-primary-dark': '#1C1E26',
-      'bg-secondary-light': '#FFFFFF',
-      'bg-secondary-dark': '#14181B',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-    };
-  }
-};
+import { colors } from '../../../constants/theme';
 
 /**
  * @component DateInput
@@ -67,11 +46,8 @@ export const DateInput: React.FC<DateInputProps> = ({
 }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDate, setTempDate] = useState<Date | null>(null);
-  const { currentTheme } = useTheme();
+  const { currentTheme, getColorByMode } = useTheme();
   const isDark = currentTheme === 'dark';
-  
-  // Obter as cores do tailwind.config.js
-  const twColors = getTailwindConfig();
   
   // Animations
   const slideAnim = useRef(new Animated.Value(500)).current;
@@ -296,7 +272,7 @@ export const DateInput: React.FC<DateInputProps> = ({
     },
     modalContent: {
       width: Math.min(windowWidth * 0.9, 320),
-      backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
+      backgroundColor: getColorByMode('bg-secondary'),
       borderRadius: 12,
       padding: 16,
       shadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -311,7 +287,7 @@ export const DateInput: React.FC<DateInputProps> = ({
       marginTop: 16,
       paddingTop: 16,
       borderTopWidth: 1,
-      borderTopColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+      borderTopColor: getColorByMode('divider'),
     },
     button: {
       padding: 10,
@@ -323,10 +299,10 @@ export const DateInput: React.FC<DateInputProps> = ({
       backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
     },
     buttonConfirm: {
-      backgroundColor: isDark ? twColors['primary-dark'] : twColors['primary-light'],
+      backgroundColor: getColorByMode('primary'),
     },
     buttonTextCancel: {
-      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+      color: getColorByMode('text-primary'),
       fontWeight: '500',
       fontSize: 14,
     },
@@ -337,12 +313,12 @@ export const DateInput: React.FC<DateInputProps> = ({
     },
     pickerContainer: {
       alignItems: 'center',
-      backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
+      backgroundColor: getColorByMode('bg-secondary'),
     },
     pickerTitle: {
       fontSize: 18,
       fontWeight: '600',
-      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+      color: getColorByMode('text-primary'),
       marginBottom: 16,
       textAlign: 'center',
     },
@@ -359,7 +335,7 @@ export const DateInput: React.FC<DateInputProps> = ({
   useEffect(() => {
     if (Platform.OS === 'web') {
       const style = document.createElement('style');
-      const primaryColor = isDark ? twColors['primary-dark'] : twColors['primary-light'];
+      const primaryColor = getColorByMode('primary');
       
       style.textContent = `
         /* Estilização do calendário nativo HTML5 */
@@ -375,7 +351,7 @@ export const DateInput: React.FC<DateInputProps> = ({
         
         /* Cor principal para o calendário e elementos selecionados */
         input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-          color: ${isDark ? '#FFFFFF' : '#14181B'};
+          color: ${getColorByMode('text-primary')};
         }
         
         /* Reposicionar o calendário para não sobrepor o campo */
@@ -397,11 +373,11 @@ export const DateInput: React.FC<DateInputProps> = ({
         
         /* Estilizações para o calendário nativo */
         ::-webkit-calendar-picker {
-          background-color: ${isDark ? '#1A1F24' : '#FFFFFF'};
+          background-color: ${getColorByMode('bg-secondary')};
         }
         
         ::-webkit-datetime-edit {
-          color: ${isDark ? '#FFFFFF' : '#14181B'};
+          color: ${getColorByMode('text-primary')};
         }
         
         /* Para navegadores baseados em Chromium */

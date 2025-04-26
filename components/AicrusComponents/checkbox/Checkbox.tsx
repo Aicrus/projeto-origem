@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Check, Minus } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
+import { colors } from '../../../constants/theme';
 
 /**
  * @component Checkbox
@@ -34,106 +35,51 @@ import { useTheme } from '../../../hooks/ThemeContext';
  * ```
  */
 
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#4A6',
-      'text-secondary-light': '#57636C',
-      'text-secondary-dark': '#95A1AC',
-    };
-  }
-};
-
-export interface CheckboxProps {
-  /** 
-   * Estado atual do checkbox: 
-   * - true: marcado
-   * - false: desmarcado
-   * - "indeterminate": estado intermediário 
-   */
-  checked: boolean | "indeterminate";
-  /** Função chamada quando o estado muda */
+interface CheckboxProps {
+  /** Estado do checkbox (marcado ou não) */
+  checked: boolean | 'indeterminate';
+  /** Função chamada quando o estado do checkbox muda */
   onCheckedChange: (checked: boolean) => void;
   /** Se o checkbox está desabilitado */
   disabled?: boolean;
-  /** ID para testes automatizados */
+  /** ID para testes */
   testID?: string;
-  /** Label de acessibilidade */
-  accessibilityLabel?: string;
-  /** Estilo customizado */
-  style?: any;
-  /** Tamanho do checkbox */
-  size?: 'sm' | 'md' | 'lg';
+  /** Atributo aria-label para acessibilidade */
+  'aria-label'?: string;
 }
 
-export const Checkbox = ({
+/**
+ * Componente Checkbox com suporte a temas claro/escuro automático
+ */
+export const Checkbox: React.FC<CheckboxProps> = ({
   checked,
   onCheckedChange,
   disabled = false,
   testID,
-  accessibilityLabel = 'Checkbox',
-  style,
-  size = 'md',
-}: CheckboxProps) => {
-  // Tema atual
-  const { currentTheme } = useTheme();
+  'aria-label': ariaLabel,
+}) => {
+  const { currentTheme, getColorByMode } = useTheme();
   const isDark = currentTheme === 'dark';
-  
-  // Obter cores do tailwind.config.js
-  const twColors = getTailwindConfig();
-  
-  // Determinar tamanho do checkbox
-  const getSize = () => {
-    switch (size) {
-      case 'sm':
-        return 16;
-      case 'lg':
-        return 24;
-      default:
-        return 20;
+
+  const handleToggle = () => {
+    if (!disabled) {
+      onCheckedChange(!checked);
     }
   };
-  
-  // Estilo do checkbox
-  const styles = StyleSheet.create({
-    container: {
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    checkbox: {
-      width: getSize(),
-      height: getSize(),
-      borderWidth: 1.5,
-      borderRadius: 4,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: (checked === true || checked === "indeterminate")
-        ? (isDark ? twColors['primary-dark'] : twColors['primary-light'])
-        : 'transparent',
-      borderColor: (checked === true || checked === "indeterminate")
-        ? (isDark ? twColors['primary-dark'] : twColors['primary-light']) 
-        : (isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light']),
-      opacity: disabled ? 0.5 : 1,
-    },
-  });
-  
+
   // Adicionar estilos de hover para web
-  React.useEffect(() => {
+  useEffect(() => {
     if (Platform.OS === 'web') {
       const style = document.createElement('style');
       style.textContent = `
-        /* Estilo de hover para checkbox */
-        [data-checkbox-container="true"]:hover:not([data-disabled="true"]) [data-checkbox="true"] {
-          border-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']};
-          transition: all 0.2s ease;
+        .checkbox-container:hover:not([data-disabled="true"]) {
+          background-color: ${isDark ? colors['hover-dark'] : colors['hover-light']};
+          transition: background-color 0.2s ease;
+        }
+        
+        .checkbox-container[data-disabled="true"] {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
       `;
       document.head.appendChild(style);
@@ -142,51 +88,72 @@ export const Checkbox = ({
         document.head.removeChild(style);
       };
     }
-  }, [isDark]);
-  
-  // Renderizar o conteúdo do checkbox
-  const renderCheckboxContent = () => {
-    if (checked === "indeterminate") {
-      return (
-        <Minus
-          size={getSize() * 0.7}
-          color="#FFFFFF"
-        />
-      );
-    }
-    
-    if (checked === true) {
-      return (
-        <Check 
-          size={getSize() * 0.7} 
-          color="#FFFFFF"
-        />
-      );
-    }
-    
-    return null;
-  };
-  
+  }, [checked, isDark]);
+
+  const isChecked = checked === true;
+  const isIndeterminate = checked === 'indeterminate';
+
   return (
     <TouchableOpacity
-      style={[styles.container, style]}
-      onPress={() => !disabled && onCheckedChange(!checked as boolean)}
+      style={styles.container}
+      onPress={handleToggle}
       disabled={disabled}
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked: checked === true, disabled }}
-      accessibilityLabel={accessibilityLabel}
       testID={testID}
+      accessibilityLabel={ariaLabel || 'Checkbox'}
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked: !!checked, disabled }}
       {...(Platform.OS === 'web' ? {
-        'data-checkbox-container': 'true',
-        'data-disabled': disabled ? 'true' : 'false'
+        className: 'checkbox-container',
+        'data-disabled': disabled ? 'true' : 'false',
       } : {})}
     >
-      <View 
-        style={styles.checkbox}
-        {...(Platform.OS === 'web' ? { 'data-checkbox': 'true' } : {})}
+      <View
+        style={[
+          styles.checkbox,
+          {
+            backgroundColor: (isChecked || isIndeterminate) 
+              ? isDark ? colors['primary-dark'] : colors['primary-light']
+              : isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+            borderColor: (isChecked || isIndeterminate) 
+              ? isDark ? colors['primary-dark'] : colors['primary-light']
+              : isDark ? colors['divider-dark'] : colors['divider-light'],
+          },
+          disabled && styles.disabled,
+        ]}
       >
-        {renderCheckboxContent()}
+        {isChecked && (
+          <Check
+            size={14}
+            color="#FFFFFF"
+            strokeWidth={3}
+          />
+        )}
+        {isIndeterminate && (
+          <Minus
+            size={14}
+            color="#FFFFFF"
+            strokeWidth={3}
+          />
+        )}
       </View>
     </TouchableOpacity>
   );
-}; 
+};
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 2,
+    borderRadius: 4,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  disabled: {
+    opacity: 0.5,
+  },
+}); 

@@ -3,28 +3,7 @@ import { Platform, Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Di
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input, InputProps } from './Input';
 import { useTheme } from '../../../hooks/ThemeContext';
-
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#C13636',
-      'bg-primary-light': '#F7F8FA',
-      'bg-primary-dark': '#1C1E26',
-      'bg-secondary-light': '#FFFFFF',
-      'bg-secondary-dark': '#14181B',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-    };
-  }
-};
+import { colors } from '../../../constants/theme';
 
 /**
  * @component TimeInput
@@ -66,11 +45,8 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   ...otherProps
 }) => {
   // Tema atual
-  const { currentTheme } = useTheme();
+  const { currentTheme, getColorByMode } = useTheme();
   const isDark = currentTheme === 'dark';
-  
-  // Obter as cores do tailwind.config.js
-  const twColors = getTailwindConfig();
   
   // Estado para controlar visibilidade do seletor de hora
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -332,7 +308,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
     },
     modalContent: {
       width: Math.min(windowWidth * 0.9, 320),
-      backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
+      backgroundColor: getColorByMode('bg-secondary'),
       borderRadius: 12,
       padding: 16,
       shadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -347,7 +323,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
       marginTop: 16,
       paddingTop: 16,
       borderTopWidth: 1,
-      borderTopColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+      borderTopColor: getColorByMode('divider'),
     },
     button: {
       padding: 10,
@@ -359,26 +335,26 @@ export const TimeInput: React.FC<TimeInputProps> = ({
       backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
     },
     buttonConfirm: {
-      backgroundColor: isDark ? twColors['primary-dark'] : twColors['primary-light'],
+      backgroundColor: getColorByMode('primary'),
     },
     buttonTextCancel: {
-      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+      color: getColorByMode('text-primary'),
       fontWeight: '500',
       fontSize: 14,
     },
     buttonTextConfirm: {
-      color: twColors['text-primary-dark'],
+      color: '#FFFFFF',
       fontWeight: '600',
       fontSize: 14,
     },
     pickerContainer: {
       alignItems: 'center',
-      backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
+      backgroundColor: getColorByMode('bg-secondary'),
     },
     pickerTitle: {
       fontSize: 18,
       fontWeight: '600',
-      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+      color: getColorByMode('text-primary'),
       marginBottom: 16,
       textAlign: 'center',
     },
@@ -395,9 +371,9 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   useEffect(() => {
     if (Platform.OS === 'web') {
       const style = document.createElement('style');
-      const primaryColor = isDark ? twColors['primary-dark'] : twColors['primary-light'];
-      const textColor = isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'];
-      const bgColor = isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'];
+      const primaryColor = getColorByMode('primary');
+      const textColor = getColorByMode('text-primary');
+      const bgColor = getColorByMode('bg-secondary');
       
       style.textContent = `
         /* Estilização do seletor de hora HTML5 nativo */

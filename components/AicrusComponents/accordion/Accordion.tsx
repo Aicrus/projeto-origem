@@ -62,32 +62,6 @@ import { useResponsive } from '../../../hooks/useResponsive';
  * ```
  */
 
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'bg-primary-light': '#FFFFFF',
-      'bg-primary-dark': '#1C1E26',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-      'text-secondary-light': '#57636C',
-      'text-secondary-dark': '#95A1AC',
-      'text-tertiary-light': '#8B97A2',
-      'text-tertiary-dark': '#6B7280',
-      'divider-light': '#E0E3E7',
-      'divider-dark': '#262D34',
-      'icon-light': '#57636C',
-      'icon-dark': '#95A1AC',
-    };
-  }
-};
-
 // Contexto para gerenciar o estado de grupo dos accordions
 const AccordionGroupContext = React.createContext<{
   activeAccordion: string | null;
@@ -304,11 +278,8 @@ export const Accordion = ({
   const contentRef = useRef<View>(null);
   
   // Tema atual
-  const { currentTheme } = useTheme();
+  const { currentTheme, getColorByMode } = useTheme();
   const isDark = currentTheme === 'dark';
-  
-  // Obter cores do tailwind.config.js
-  const twColors = getTailwindConfig();
   
   // Responsividade
   const { isMobile } = useResponsive();
@@ -478,11 +449,11 @@ export const Accordion = ({
     container: {
       width: '100%',
       overflow: 'hidden',
-      backgroundColor: isDark ? twColors['bg-primary-dark'] : twColors['bg-primary-light'],
+      backgroundColor: getColorByMode('bg-primary'),
       borderRadius: effectiveShowOutline ? 6 : 0,
       marginBottom: effectiveShowOutline ? 8 : 0, // Remover margem inferior quando não tem contorno
       borderWidth: effectiveShowOutline && bordered ? 1 : 0,
-      borderColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+      borderColor: getColorByMode('divider'),
     },
     header: {
       flexDirection: 'row',
@@ -493,7 +464,7 @@ export const Accordion = ({
     },
     title: {
       fontSize: 16,
-      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+      color: getColorByMode('text-primary'),
       fontWeight: '500',
       flex: 1,
     } as TextStyle,
@@ -512,13 +483,13 @@ export const Accordion = ({
     } as ViewStyle,
     contentText: {
       fontSize: 14,
-      color: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+      color: getColorByMode('text-secondary'),
       lineHeight: 20,
     } as TextStyle,
     // Separador externo - linha divisória única
     outerSeparator: {
       height: 1,
-      backgroundColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+      backgroundColor: getColorByMode('divider'),
       width: '100%',
       marginTop: 0,
       marginBottom: 0,
@@ -597,7 +568,7 @@ export const Accordion = ({
             'data-accordion-icon': 'true',
           } : {})}
         >
-          <ChevronDown size={16} color={isDark ? twColors['icon-dark'] : twColors['icon-light']} />
+          <ChevronDown size={16} color={getColorByMode('icon')} />
         </Animated.View>
       </TouchableOpacity>
     );

@@ -1,13 +1,23 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useColorScheme as useDeviceColorScheme, Appearance } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-type ThemeMode = 'light' | 'dark' | 'system';
+import { 
+  ThemeMode, 
+  ColorScheme, 
+  theme, 
+  getColorByMode, 
+  getThemedValue 
+} from '../constants/theme';
 
 interface ThemeContextType {
   themeMode: ThemeMode;
   setThemeMode: (mode: ThemeMode) => void;
-  currentTheme: 'light' | 'dark';
+  currentTheme: ColorScheme;
+  // Expõe todos os valores do tema
+  theme: typeof theme;
+  // Funções utilitárias
+  getColorByMode: (colorBase: string) => string;
+  getThemedValue: <T>(lightValue: T, darkValue: T) => T;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -18,7 +28,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Estado para o modo do tema (light/dark/system)
   const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
   // Estado para o tema do dispositivo
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(Appearance.getColorScheme() || 'light');
+  const [systemTheme, setSystemTheme] = useState<ColorScheme>(Appearance.getColorScheme() || 'light');
   const [isLoading, setIsLoading] = useState(true);
 
   // Carrega o tema salvo quando o app inicia
@@ -45,7 +55,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
       const newTheme = colorScheme || 'light';
       console.log('🔄 Tema do sistema mudou para:', newTheme);
-      setSystemTheme(newTheme as 'light' | 'dark');
+      setSystemTheme(newTheme as ColorScheme);
     });
 
     return () => {
@@ -65,7 +75,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Determina o tema atual baseado no modo e tema do sistema
-  const currentTheme = themeMode === 'system' ? systemTheme : themeMode;
+  const currentTheme: ColorScheme = themeMode === 'system' ? systemTheme : themeMode as ColorScheme;
+  
+  // Funções utilitárias especificas deste contexto
+  const getThemeColor = (colorBase: string): string => {
+    return getColorByMode(colorBase, currentTheme);
+  };
+  
+  // Função utilitária para obter valores baseados no tema
+  const getThemed = <T,>(lightValue: T, darkValue: T): T => {
+    return getThemedValue(currentTheme, lightValue, darkValue);
+  };
 
   // Log para debug
   useEffect(() => {
@@ -86,6 +106,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         themeMode,
         setThemeMode,
         currentTheme,
+        theme,
+        getColorByMode: getThemeColor,
+        getThemedValue: getThemed,
       }}>
       {children}
     </ThemeContext.Provider>

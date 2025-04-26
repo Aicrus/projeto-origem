@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
   Platform,
   Modal,
+  ActivityIndicator,
+  Animated,
+  TextInput as RNTextInput,
+  Dimensions,
 } from 'react-native';
 import {
   ColumnDef,
@@ -28,14 +32,10 @@ import { Button } from '../button';
 import { ArrowUpDown, ChevronDown, MoreHorizontal, AlertCircle } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
+import { colors, ColorType } from '../../../constants/theme';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { createPortal } from 'react-dom';
 import { SupabaseClient } from '@supabase/supabase-js';
-
-// Este componente utiliza as cores definidas em tailwind.config.js
-// As cores são importadas dinâmicamente através da função getTailwindConfig()
-// Para o tema escuro: primary-dark = #C13636
-// Para o tema claro: primary-light = #892CDC
 
 // Declaração para adicionar supabase ao objeto window
 declare global {
@@ -144,119 +144,82 @@ const defaultSupabaseConfig: SupabaseConfig = {
   orderBy: { column: 'created_at', ascending: false }
 };
 
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#C13636',
-      'primary-light-hover': '#3D5C8C',
-      'primary-dark-hover': '#5B80B6',
-      'bg-primary-light': '#F7F8FA',
-      'bg-primary-dark': '#1C1E26',
-      'bg-secondary-light': '#FFFFFF',
-      'bg-secondary-dark': '#14181B',
-      'bg-tertiary-light': '#F1F4F8',
-      'bg-tertiary-dark': '#262D34',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-      'text-secondary-light': '#57636C',
-      'text-secondary-dark': '#95A1AC',
-      'text-tertiary-light': '#8B97A2',
-      'text-tertiary-dark': '#6B7280',
-      'divider-light': '#E0E3E7',
-      'divider-dark': '#262D34',
-      'hover-light': '#00000008',
-      'hover-dark': '#FFFFFF08',
-      'active-light': '#00000012',
-      'active-dark': '#FFFFFF12',
-      'error-icon-light': '#EF4444',
-      'error-icon-dark': '#F87171',
-      'warning-icon-light': '#F59E0B',
-      'warning-icon-dark': '#FBBF24',
-      'success-icon-light': '#059669',
-      'success-icon-dark': '#10B981',
-      'info-icon-light': '#0EA5E9',
-      'info-icon-dark': '#38BDF8',
-    };
-  }
-};
-
 // Colunas padrão para os dados de exemplo
-const createDefaultColumns = (isDark: boolean): ColumnDef<DefaultPaymentData>[] => {
-  // Obter cores do tailwind.config.js
-  const twColors = getTailwindConfig();
-  
-  return [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          accessibilityLabel="Selecionar todos"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          accessibilityLabel="Selecionar linha"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => (
-        <View>
-          <Text style={{ color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'] }} className="capitalize">
-            {row.getValue("status")}
-          </Text>
-        </View>
-      ),
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
-      cell: ({ row }) => (
-        <View>
-          <Text style={{ color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'] }} className="lowercase">
-            {row.getValue("email")}
-          </Text>
-        </View>
-      ),
-    },
-    {
-      accessorKey: "amount",
-      header: () => <Text style={{ textAlign: 'right', width: '100%', color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'] }}>Valor</Text>,
-      cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("amount"));
-        const formatted = new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        }).format(amount);
+const createDefaultColumns = (isDark: boolean): ColumnDef<DefaultPaymentData>[] => [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ? 
+          true : 
+          (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Selecionar todos"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Selecionar linha"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => (
+      <View>
+        <Text style={{ color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'] }} className="capitalize">
+          {row.getValue("status")}
+        </Text>
+      </View>
+    ),
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+    cell: ({ row }) => (
+      <View>
+        <Text style={{ color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'] }} className="lowercase">
+          {row.getValue("email")}
+        </Text>
+      </View>
+    ),
+  },
+  {
+    accessorKey: "amount",
+    header: () => <Text style={{ textAlign: 'right', width: '100%', color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'] }}>Valor</Text>,
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("amount"));
+      const formatted = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(amount);
 
-        return (
-          <Text style={{ textAlign: 'right', width: '100%', color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'] }}>
-            {formatted}
-          </Text>
-        );
-      },
+      return (
+        <Text style={{ textAlign: 'right', width: '100%', color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'] }}>
+          {formatted}
+        </Text>
+      );
     },
-  ];
-};
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: () => (
+      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <TouchableOpacity style={{ padding: 4 }}>
+          <MoreHorizontal size={16} color={isDark ? colors['text-primary-dark'] : colors['text-primary-light']} />
+        </TouchableOpacity>
+      </View>
+    ),
+  },
+];
 
 export interface SupabaseConfig {
   /** 
@@ -426,84 +389,70 @@ export function DataTable<TData>({
   const [usingDefaultData, setUsingDefaultData] = useState(false);
   
   // Função para buscar dados do Supabase
-  const fetchSupabaseData = useCallback(async () => {
-    if (!supabaseConfig?.client || !supabaseConfig?.table) return;
-    
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const client = supabaseConfig.client || window.supabase;
-      const table = supabaseConfig.table;
+  const fetchSupabaseData = async () => {
+    if (supabaseConfig?.client || window.supabase) {
+      const client = supabaseConfig?.client || window.supabase;
+      const table = supabaseConfig?.table || 'usersAicrusAcademy';
       
-      let query = client.from(table).select(supabaseConfig.select || '*');
-      
-      // Aplicar ordenação se configurada
-      if (supabaseConfig.orderBy) {
-        query = query.order(supabaseConfig.orderBy.column, { 
-          ascending: supabaseConfig.orderBy.ascending !== undefined ? supabaseConfig.orderBy.ascending : false 
-        });
-      } else {
-        query = query.order('id');
-      }
-      
-      // Aplicar filtros se configurados
-      if (supabaseConfig.filters && supabaseConfig.filters.length > 0) {
-        supabaseConfig.filters.forEach(filter => {
-          if (filter.value) {
-            if (filter.operator === 'ilike') {
-              query = query.ilike(filter.column, `%${filter.value}%`);
-            } else if (filter.operator === 'eq') {
-              query = query.eq(filter.column, filter.value);
-            } else if (filter.operator === 'gt') {
-              query = query.gt(filter.column, filter.value);
-            } else if (filter.operator === 'lt') {
-              query = query.lt(filter.column, filter.value);
-            } else if (filter.operator === 'gte') {
-              query = query.gte(filter.column, filter.value);
-            } else if (filter.operator === 'lte') {
-              query = query.lte(filter.column, filter.value);
-            } else if (filter.operator === 'like') {
-              query = query.like(filter.column, `%${filter.value}%`);
-            } else if (filter.operator === 'neq') {
-              query = query.neq(filter.column, filter.value);
+      if (client && table) {
+        try {
+          setIsLoading(true);
+          setError(null);
+          
+          let query = client
+            .from(table)
+            .select(supabaseConfig?.select || '*');
+          
+          // Aplicar ordenação se configurada
+          if (supabaseConfig?.orderBy) {
+            query = query.order(supabaseConfig.orderBy.column, { 
+              ascending: supabaseConfig.orderBy.ascending !== undefined ? supabaseConfig.orderBy.ascending : false 
+            });
+          } else {
+            query = query.order('id');
+          }
+          
+          // Aplicar filtros se configurados
+          if (supabaseConfig?.filters && supabaseConfig.filters.length > 0) {
+            supabaseConfig.filters.forEach(filter => {
+              query = query.filter(filter.column, filter.operator, filter.value);
+            });
+          }
+          
+          // Aplicar limite se configurado
+          if (supabaseConfig?.limit) {
+            query = query.limit(supabaseConfig.limit);
+          }
+          
+          const { data: fetchedData, error: fetchError } = await query;
+          
+          setIsLoading(false);
+          
+          if (fetchError) {
+            console.error('Erro ao buscar dados:', fetchError);
+            setError(fetchError.message);
+            if (onError) onError(fetchError);
+          } else if (fetchedData) {
+            setTableData(fetchedData as unknown as TData[]);
+            
+            if (onDataLoaded) onDataLoaded(fetchedData as unknown as TData[]);
+            
+            // Gerar colunas automaticamente se não forem fornecidas
+            if (!columns && fetchedData.length > 0) {
+              const generatedCols = generateColumnsFromData();
+              setGeneratedColumns(generatedCols);
             }
           }
-        });
-      }
-      
-      // Aplicar limite se configurado
-      if (supabaseConfig.limit) {
-        query = query.limit(supabaseConfig.limit);
-      }
-      
-      const { data: fetchedData, error: fetchError } = await query;
-      
-      setIsLoading(false);
-      
-      if (fetchError) {
-        console.error('Erro ao buscar dados:', fetchError);
-        setError(fetchError.message);
-        if (onError) onError(fetchError);
-      } else if (fetchedData) {
-        setTableData(fetchedData as unknown as TData[]);
-        
-        if (onDataLoaded) onDataLoaded(fetchedData as unknown as TData[]);
-        
-        // Gerar colunas automaticamente se não forem fornecidas
-        if (!columns && fetchedData.length > 0) {
-          const generatedCols = generateColumnsFromData();
-          setGeneratedColumns(generatedCols);
+        } catch (err) {
+          setIsLoading(false);
+          const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido ao buscar dados';
+          console.error('Erro ao buscar dados do Supabase:', err);
+          setError(errorMessage);
+          if (onError) onError(err);
         }
       }
-    } catch (err: any) {
-      setIsLoading(false);
-      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido ao buscar dados';
-      console.error('Erro ao buscar dados do Supabase:', err);
-      setError(errorMessage);
-      if (onError) onError(err);
     }
-  }, [supabaseConfig, columns, onDataLoaded, onError]);
+  };
   
   // Se não há dados fornecidos e não tem configuração de Supabase, usar dados de exemplo
   useEffect(() => {
@@ -577,49 +526,42 @@ export function DataTable<TData>({
     }
   }, [supabaseConfig, data, columns, onDataLoaded, onError]);
 
-  // Gerar colunas automaticamente a partir dos dados
+  // Auto-gerar colunas baseado nos dados do Supabase se não fornecermos explicitamente
   const generateColumnsFromData = (): ColumnDef<TData, any>[] => {
-    // Se não tiver dados, retornar array vazio
-    if (!tableData.length) return [];
+    if (!tableData || tableData.length === 0) return [];
     
-    // Criar um array para armazenar as colunas
-    const generatedColumns: ColumnDef<TData, any>[] = [];
+    // Vamos pegar as chaves do primeiro item para criar colunas
+    const firstItem = tableData[0];
+    if (!firstItem) return [];
     
-    // Adicionar coluna de seleção se habilitado
-    if (enableRowSelection) {
-      generatedColumns.push({
+    const keys = Object.keys(firstItem);
+    
+    // Geramos as colunas começando com a coluna de seleção
+    const generatedColumns: ColumnDef<TData, any>[] = [
+      {
         id: "select",
         header: ({ table }) => (
           <Checkbox
             checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
+              table.getIsAllPageRowsSelected() ? 
+              true : 
+              (table.getIsSomePageRowsSelected() ? 'indeterminate' : false)
             }
             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            accessibilityLabel="Selecionar todos"
+            aria-label="Selecionar todos"
           />
         ),
         cell: ({ row }) => (
           <Checkbox
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
-            accessibilityLabel="Selecionar linha"
+            aria-label="Selecionar linha"
           />
         ),
         enableSorting: false,
         enableHiding: false,
-      });
-    }
-    
-    // Pegar o primeiro item para determinar as colunas
-    const firstItem = tableData[0];
-    if (!firstItem) return generatedColumns;
-    
-    // Obter todas as chaves do objeto, excluindo as que começam com "_"
-    const keys = Object.keys(firstItem).filter(key => !key.startsWith('_'));
-    
-    // Obter cores do tailwind.config.js
-    const twColors = getTailwindConfig();
+      }
+    ];
     
     // Para cada chave do objeto, criar uma coluna apropriada
     keys.forEach(key => {
@@ -643,7 +585,7 @@ export function DataTable<TData>({
             
           return (
             <Text style={{ 
-              color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+              color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
               textAlign: ['amount', 'valor', 'price', 'preco', 'total'].includes(key.toLowerCase()) ? 'right' : 'left',
               width: '100%'
             }}>
@@ -674,14 +616,14 @@ export function DataTable<TData>({
             
             return (
               <Text style={{ 
-                color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+                color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
                 textAlign: 'left',
                 width: '100%'
               }}>
                 {formattedDate}
               </Text>
             );
-          }
+          } 
           else if (['amount', 'valor', 'price', 'preco', 'total'].includes(key.toLowerCase())) {
             // Formatar valores monetários
             let formattedValue = '';
@@ -697,7 +639,7 @@ export function DataTable<TData>({
             
             return (
               <Text style={{ 
-                color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+                color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
                 textAlign: 'right',
                 width: '100%'
               }}>
@@ -709,7 +651,7 @@ export function DataTable<TData>({
             // Status com capitalização
             return (
               <Text style={{ 
-                color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+                color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
                 textTransform: 'capitalize'
               }}>
                 {String(rawValue)}
@@ -720,7 +662,7 @@ export function DataTable<TData>({
             // Email em lowercase
             return (
               <Text style={{ 
-                color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+                color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
                 textTransform: 'lowercase'
               }}>
                 {String(rawValue)}
@@ -730,7 +672,7 @@ export function DataTable<TData>({
           else {
             // Formato padrão para outros tipos
             return (
-              <Text style={{ color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'] }}>
+              <Text style={{ color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'] }}>
                 {String(rawValue)}
               </Text>
             );
@@ -739,6 +681,19 @@ export function DataTable<TData>({
       };
       
       generatedColumns.push(column);
+    });
+    
+    // Adicionar coluna de ações no final
+    generatedColumns.push({
+      id: "actions",
+      enableHiding: false,
+      cell: () => (
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+          <TouchableOpacity style={{ padding: 4 }}>
+            <MoreHorizontal size={16} color={isDark ? colors['text-primary-dark'] : colors['text-primary-light']} />
+          </TouchableOpacity>
+        </View>
+      ),
     });
     
     return generatedColumns;
@@ -958,9 +913,6 @@ export function DataTable<TData>({
   useEffect(() => {
     if (Platform.OS === 'web' as any) {
       const style = document.createElement('style');
-      // Obter cores do tailwind.config.js
-      const twColors = getTailwindConfig();
-      
       style.textContent = `
         /* Garantir que elementos com position:fixed não sejam cortados */
         *, *::before, *::after {
@@ -983,26 +935,21 @@ export function DataTable<TData>({
         }
         
         *::-webkit-scrollbar-thumb {
-          background-color: ${isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)'};
+          background-color: ${isDark ? colors['hover-dark'] : colors['hover-light']};
           border-radius: 3px;
         }
 
         /* Melhorar aparência dos checkboxes */
         [data-dropdown-content="true"] input[type="checkbox"] {
           margin-right: 8px;
-          accent-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']};
+          accent-color: ${isDark ? colors['primary-dark'] : colors['primary-light']};
         }
 
         /* Adicionar efeitos de hover para o botão do dropdown */
         [data-table-button="true"]:hover {
-          border-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']};
+          border-color: ${isDark ? `${colors['primary-dark']}50` : `${colors['primary-light']}30`} !important;
           transition: border-color 0.2s ease;
         }
-        
-        /* Importante: As cores são sincronizadas com tailwind.config.js 
-           - No tema claro: primary-light = #892CDC
-           - No tema escuro: primary-dark = #C13636
-        */
       `;
       document.head.appendChild(style);
       
@@ -1035,37 +982,18 @@ export function DataTable<TData>({
     
     // Componente interno do dropdown que será renderizado no portal
     const ColumnsDropdownContent = () => {
-      const [hoveredColumnId, setHoveredColumnId] = useState<string | null>(null);
+      // Estado de hover para todas as colunas em um único objeto
+      const [hoveredColumns, setHoveredColumns] = useState<Record<string, boolean>>({});
       
       const handleMouseEnter = (columnId: string) => {
-        setHoveredColumnId(columnId);
+        setHoveredColumns(prev => ({ ...prev, [columnId]: true }));
       };
       
       const handleMouseLeave = (columnId: string) => {
-        setHoveredColumnId(null);
+        setHoveredColumns(prev => ({ ...prev, [columnId]: false }));
       };
       
-      // Obter cores do tailwind.config.js
-      const twColors = getTailwindConfig();
-      
       const dropdownStyle = StyleSheet.create({
-        container: {
-          position: 'absolute',
-          top: dropdownPosition.openDown ? dropdownPosition.top : undefined,
-          right: dropdownPosition.right,
-          left: dropdownPosition.left,
-          width: dropdownPosition.width,
-          maxHeight: 250,
-          backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
-          borderRadius: 6,
-          borderWidth: 1,
-          borderStyle: 'solid',
-          borderColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
-          padding: 4,
-          boxShadow: isDark ? '0 2px 4px rgba(0,0,0,0.25)' : '0 2px 4px rgba(0,0,0,0.1)',
-          zIndex: 2000,
-          overflowY: 'auto',
-        },
         overlay: {
           position: 'fixed',
           top: 0,
@@ -1075,13 +1003,30 @@ export function DataTable<TData>({
           zIndex: 1999,
           backgroundColor: 'transparent',
         },
+        container: {
+          position: 'absolute',
+          top: dropdownPosition.openDown ? dropdownPosition.top : undefined,
+          right: dropdownPosition.right,
+          left: dropdownPosition.left,
+          width: dropdownPosition.width,
+          maxHeight: 250,
+          backgroundColor: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+          borderRadius: 6,
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: isDark ? colors['divider-dark'] : colors['divider-light'],
+          padding: 4,
+          boxShadow: isDark ? `0 2px 4px ${colors['active-dark']}` : `0 2px 4px ${colors['active-light']}`,
+          zIndex: 2000,
+          overflowY: 'auto',
+        },
         header: {
           fontSize: 13,
           fontWeight: '500',
-          color: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+          color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
           padding: 8,
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+          borderBottomColor: isDark ? colors['divider-dark'] : colors['divider-light'],
           marginBottom: 4,
         },
         item: {
@@ -1093,13 +1038,13 @@ export function DataTable<TData>({
           cursor: 'pointer',
         },
         itemHover: {
-          backgroundColor: isDark ? twColors['hover-dark'] : twColors['hover-light'],
+          backgroundColor: isDark ? colors['hover-dark'] : colors['hover-light'],
         },
         itemText: {
           fontSize: 14,
           marginLeft: 8,
           textTransform: 'capitalize',
-          color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+          color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
         }
       });
 
@@ -1131,7 +1076,7 @@ export function DataTable<TData>({
               .getAllColumns()
               .filter((column) => column.getCanHide())
               .map((column) => {
-                const isHovered = hoveredColumnId === column.id;
+                const isHovered = hoveredColumns[column.id] || false;
                 
                 // Extrair nome de exibição do cabeçalho para mostrar no dropdown
                 let displayName = column.id;
@@ -1158,21 +1103,6 @@ export function DataTable<TData>({
                   }
                 }
                 
-                // Formatando nomes de id de colunas para exibição
-                if (displayName === 'select') displayName = 'Seleção';
-                else if (displayName === 'status') displayName = 'Status';
-                else if (displayName === 'email') displayName = 'Email';
-                else if (displayName === 'amount') displayName = 'Valor';
-                else if (displayName === 'actions') displayName = 'Ações';
-                else {
-                  // Formatar nomes genéricos (converter snake_case para Title Case)
-                  displayName = displayName
-                    .replace(/_/g, ' ')
-                    .split(' ')
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(' ');
-                }
-                
                 return (
                   <div
                     key={column.id}
@@ -1180,20 +1110,18 @@ export function DataTable<TData>({
                       ...dropdownStyle.item as React.CSSProperties,
                       ...(isHovered ? dropdownStyle.itemHover as React.CSSProperties : {})
                     }}
+                    onClick={() => column.toggleVisibility(!column.getIsVisible())}
                     onMouseEnter={() => handleMouseEnter(column.id)}
                     onMouseLeave={() => handleMouseLeave(column.id)}
                   >
                     <Checkbox
                       checked={column.getIsVisible()}
-                      onCheckedChange={(checked) => {
-                        column.toggleVisibility(checked);
+                      onCheckedChange={(value) => {
+                        column.toggleVisibility(!!value);
                       }}
-                      size="sm"
+                      aria-label={`Mostrar coluna ${displayName}`}
                     />
-                    <span 
-                      style={dropdownStyle.itemText as React.CSSProperties}
-                      onClick={() => column.toggleVisibility(!column.getIsVisible())}
-                    >
+                    <span style={dropdownStyle.itemText as React.CSSProperties}>
                       {displayName}
                     </span>
                   </div>
@@ -1237,11 +1165,11 @@ export function DataTable<TData>({
               bottom: !dropdownPosition.openDown ? dropdownPosition.bottom : undefined,
               width: dropdownPosition.width || 230, // Ajustado para uma largura menos exagerada
               maxHeight: 250,
-              backgroundColor: isDark ? twColors['bg-tertiary-dark'] : twColors['white'],
+              backgroundColor: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
               borderRadius: 6,
               borderWidth: 1,
-              borderColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
+              borderColor: isDark ? colors['divider-dark'] : colors['divider-light'],
+              shadowColor: '#000',
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: isDark ? 0.25 : 0.1,
               shadowRadius: 3,
@@ -1252,10 +1180,10 @@ export function DataTable<TData>({
               style={{
                 fontSize: 13,
                 fontWeight: '500',
-                color: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+                color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
                 padding: 8,
                 borderBottomWidth: 1,
-                borderBottomColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+                borderBottomColor: isDark ? colors['divider-dark'] : colors['divider-light'],
               }}
             >
               Alternar colunas
@@ -1305,7 +1233,7 @@ export function DataTable<TData>({
                         style={{
                           marginLeft: 8,
                           fontSize: 14,
-                          color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+                          color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
                           textTransform: 'capitalize',
                           flex: 1,
                           flexShrink: 1,
@@ -1324,9 +1252,6 @@ export function DataTable<TData>({
       </Modal>
     );
   };
-  
-  // Obter cores do tailwind.config.js
-  const twColors = getTailwindConfig();
   
   // Calcular larguras das colunas baseado no espaço disponível
   const calculateColumnWidths = () => {
@@ -1381,45 +1306,45 @@ export function DataTable<TData>({
     return {
       // Cores primárias
       primary: {
-        main: isDark ? twColors['primary-dark'] : twColors['primary-light'],
-        light: isDark ? twColors['primary-dark-hover'] : twColors['primary-light-hover'],
-        dark: isDark ? twColors['primary-dark'] : twColors['primary-light'],
-        contrastText: isDark ? twColors['text-primary-dark'] : '#FFFFFF',
+        main: isDark ? colors['primary-dark'] : colors['primary-light'],
+        light: isDark ? colors['primary-dark-hover'] : colors['primary-light-hover'],
+        dark: isDark ? colors['primary-dark-active'] : colors['primary-light-active'],
+        contrastText: '#FFFFFF',
       },
-      // Cores de feedback
-      error: isDark ? twColors['error-icon-dark'] || twColors['tertiary-dark'] : twColors['error-icon-light'] || twColors['tertiary-light'],
-      warning: isDark ? twColors['warning-icon-dark'] || twColors['tertiary-dark'] : twColors['warning-icon-light'] || twColors['tertiary-light'],
-      success: isDark ? twColors['success-icon-dark'] || twColors['tertiary-dark'] : twColors['success-icon-light'] || twColors['tertiary-light'],
-      info: isDark ? twColors['info-icon-dark'] || twColors['tertiary-dark'] : twColors['info-icon-light'] || twColors['tertiary-light'],
+      // Cores de feedback - adicionei valores diretos já que nomes específicos não existem no theme.ts
+      error: isDark ? colors['error-icon-dark'] : colors['error-icon-light'],
+      warning: isDark ? colors['warning-icon-dark'] : colors['warning-icon-light'],
+      success: isDark ? colors['success-icon-dark'] : colors['success-icon-light'],
+      info: isDark ? colors['info-icon-dark'] : colors['info-icon-light'],
       // Cores de background
       background: {
-        default: isDark ? twColors['bg-primary-dark'] : twColors['bg-primary-light'],
-        paper: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
-        alt: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
-        elevated: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
+        default: isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'],
+        paper: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+        alt: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'],
+        elevated: isDark ? colors['alternate-dark'] : colors['alternate-light'],
       },
       // Cores de texto
       text: {
-        primary: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
-        secondary: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
-        disabled: isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
-        hint: isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
+        primary: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+        secondary: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+        disabled: isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light'],
+        hint: isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light'],
       },
       // Cores de borda
       border: {
-        light: isDark ? twColors['divider-dark'] : twColors['divider-light'],
-        main: isDark ? twColors['divider-dark'] : twColors['divider-light'],
-        dark: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+        light: isDark ? colors['divider-dark'] : colors['divider-light'],
+        main: isDark ? colors['divider-dark'] : colors['divider-light'],
+        dark: isDark ? colors['divider-dark'] : colors['divider-light'],
       },
       // Estados da interface
       state: {
-        hover: isDark ? twColors['hover-dark'] : twColors['hover-light'],
-        selected: isDark ? `${twColors['primary-dark']}40` : `${twColors['primary-light']}20`,
+        hover: isDark ? colors['hover-dark'] : colors['hover-light'],
+        selected: isDark ? `${colors['primary-dark']}15` : `${colors['primary-light']}15`,
         disabled: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
-        focus: isDark ? `${twColors['primary-dark']}40` : `${twColors['primary-light']}40`,
+        focus: isDark ? `${colors['primary-dark']}30` : `${colors['primary-light']}30`,
       },
       // Cores de divisor
-      divider: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+      divider: isDark ? colors['divider-dark'] : colors['divider-light'],
     };
   };
   
@@ -1460,11 +1385,11 @@ export function DataTable<TData>({
       borderWidth: 1,
       borderColor: themeColors.border.light,
       padding: 4,
-      shadowColor: 'rgba(0, 0, 0, 0.5)',
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: isDark ? 0.25 : 0.1,
       shadowRadius: 3,
-      elevation: 5,
+      elevation: 4,
       zIndex: 2000,
     },
     dropdownItem: {
@@ -1760,12 +1685,12 @@ export function DataTable<TData>({
         /* Estilo para linhas selecionadas */
         [data-selected-row="true"] {
           background-color: ${themeColors.state.selected} !important;
-          border-color: ${isDark ? 'rgba(193, 54, 54, 0.5)' : 'rgba(137, 44, 220, 0.2)'} !important;
+          border-color: ${isDark ? 'rgba(137, 44, 220, 0.5)' : 'rgba(137, 44, 220, 0.2)'} !important;
         }
         
         /* Checkbox personalizado para tema escuro */
         input[type="checkbox"] {
-          accent-color: ${isDark ? themeColors.primary.main : themeColors.primary.main};
+          accent-color: ${isDark ? colors['primary-dark'] : colors['primary-light']};
           cursor: pointer !important;
         }
       `;
@@ -1795,62 +1720,93 @@ export function DataTable<TData>({
     if (!isLoading) return null;
     
     return (
-      <View className="p-6 items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <View className="w-8 h-8 border-2 border-primary-dark dark:border-primary-light border-t-transparent dark:border-t-transparent rounded-full animate-spin mb-2" />
-        <Text className={`text-center ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+      <View style={{
+        padding: 24, 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        backgroundColor: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'], 
+        borderRadius: 8,
+      }}>
+        <View style={{
+          width: 32, 
+          height: 32, 
+          borderWidth: 2, 
+          borderColor: isDark ? colors['primary-dark'] : colors['primary-light'], 
+          borderTopColor: 'transparent', 
+          borderRadius: 16,
+          marginBottom: 8,
+        }} />
+        <Text style={{
+          textAlign: 'center',
+          fontSize: 14,
+          color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+        }}>
           Carregando dados do Supabase...
         </Text>
       </View>
     );
   };
 
-  // Renderiza o estado de erro para o Supabase
+  // Renderizar estado de erro para Supabase
   const renderErrorState = () => {
     if (!error) return null;
     
-    const bgColor = isDark ? twColors['error-bg-dark'] || twColors['bg-tertiary-dark'] : twColors['error-bg-light'] || twColors['bg-tertiary-light'];
-    const textColor = isDark ? twColors['error-text-dark'] || twColors['text-primary-dark'] : twColors['error-text-light'] || twColors['text-primary-light'];
-    const buttonBgColor = isDark ? twColors['primary-dark'] : twColors['primary-light'];
-    const buttonTextColor = isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'];
+    // Determinar o tipo de erro para exibir mensagem apropriada
+    let errorMessage = error;
+    let errorTitle = "Erro ao carregar dados";
+    
+    if (error.includes("table") && error.includes("not found")) {
+      errorTitle = "Tabela não encontrada";
+      errorMessage = `A tabela '${supabaseConfig?.table}' não foi encontrada no seu projeto Supabase. Verifique se ela existe ou se o nome está correto.`;
+    } else if (error.includes("authentication") || error.includes("auth")) {
+      errorTitle = "Erro de autenticação";
+      errorMessage = "Não foi possível autenticar com o Supabase. Verifique se as credenciais estão corretas.";
+    } else if (error.includes("network") || error.includes("connection")) {
+      errorTitle = "Erro de conexão";
+      errorMessage = "Não foi possível conectar ao servidor Supabase. Verifique sua conexão com a internet.";
+    }
     
     return (
-      <View
-        style={{
-          padding: 16,
-          backgroundColor: bgColor,
-          borderRadius: 6,
-          marginBottom: 16,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Text style={{ 
-          color: textColor, 
-          fontWeight: 'bold', 
-          marginBottom: 8 
+      <View style={{
+        padding: 24, 
+        alignItems: 'center', 
+        backgroundColor: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'], 
+        borderRadius: 8
+      }}>
+        <View style={{
+          width: 64, 
+          height: 64, 
+          borderRadius: 32, 
+          backgroundColor: isDark ? colors['error-bg-dark'] : colors['error-bg-light'], 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          marginBottom: 12,
         }}>
-          Erro ao carregar dados do Supabase
-        </Text>
-        <Text style={{ 
-          color: textColor, 
-          marginBottom: 16,
-          textAlign: 'center'
+          <AlertCircle size={24} color={isDark ? colors['error-text-dark'] : colors['error-icon-light']} />
+        </View>
+        <Text style={{
+          fontSize: 18, 
+          fontWeight: '700', 
+          textAlign: 'center', 
+          marginBottom: 8, 
+          color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
         }}>
-          {error}
+          {errorTitle}
         </Text>
-        <TouchableOpacity
+        <Text style={{
+          textAlign: 'center', 
+          color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+          marginBottom: 16,
+        }}>
+          {errorMessage}
+        </Text>
+        <Button
+          variant="primary"
           onPress={fetchSupabaseData}
-          style={{
-            backgroundColor: buttonBgColor,
-            paddingVertical: 8,
-            paddingHorizontal: 16,
-            borderRadius: 4,
-          }}
+          size="md"
         >
-          <Text style={{ color: buttonTextColor, fontWeight: '500' }}>
-            Tentar novamente
-          </Text>
-        </TouchableOpacity>
+          Tentar novamente
+        </Button>
       </View>
     );
   };

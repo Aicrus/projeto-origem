@@ -49,7 +49,7 @@ module.exports = {
         
         // ===== TEMA ESCURO =====
         // Cores primárias - Tema Escuro
-        'primary-dark': '#C13636',
+        'primary-dark': '#C87e22',
         'primary-dark-hover': '#5B80B6', 
         'primary-dark-active': '#6C91C7',
         
