@@ -5,6 +5,7 @@ import { HoverableView } from '../hoverable-view/HoverableView';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { router } from 'expo-router';
+import { colors } from '@/constants/theme';
 
 /**
  * @component NotificationsMenu
@@ -107,32 +108,6 @@ const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
   },
 ];
 
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#C13636',
-      'bg-secondary-light': '#FFFFFF',
-      'bg-secondary-dark': '#14181B',
-      'divider-light': '#E0E3E7',
-      'divider-dark': '#262D34',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-      'text-secondary-light': '#57636C',
-      'text-secondary-dark': '#95A1AC',
-      'text-tertiary-light': '#8B97A2',
-      'text-tertiary-dark': '#6B7280',
-    };
-  }
-};
-
 export function NotificationsMenu({ 
   isVisible, 
   onClose,
@@ -156,17 +131,14 @@ export function NotificationsMenu({
   // Ref para a lista de notificações
   const scrollViewRef = useRef<ScrollView>(null);
 
-  // Obtém as cores do tailwind.config.js
-  const twColors = getTailwindConfig();
-
   // Cores para o tema atual
   const themeColors = {
-    primary: isDark ? twColors['primary-dark'] : twColors['primary-light'],
-    secondaryBackground: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
-    divider: isDark ? twColors['divider-dark'] : twColors['divider-light'],
-    textPrimary: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
-    textSecondary: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
-    textTertiary: isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
+    primary: isDark ? colors['primary-dark'] : colors['primary-light'],
+    secondaryBackground: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+    divider: isDark ? colors['divider-dark'] : colors['divider-light'],
+    textPrimary: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+    textSecondary: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+    textTertiary: isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light'],
   };
 
   // Função para lidar com o clique em "Ver todas as notificações"

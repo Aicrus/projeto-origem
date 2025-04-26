@@ -5,45 +5,10 @@ import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { NotificationsMenu } from '../../AicrusComponents/notifications-menu/NotificationsMenu';
 import { ProfileMenu } from '../../AicrusComponents/profile-menu/ProfileMenu';
-
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#C13636',
-      'primary-light-hover': '#3D5C8C',
-      'primary-dark-hover': '#5B80B6',
-      'bg-primary-light': '#F7F8FA',
-      'bg-primary-dark': '#1C1E26',
-      'bg-secondary-light': '#FFFFFF',
-      'bg-secondary-dark': '#14181B',
-      'bg-tertiary-light': '#F1F4F8',
-      'bg-tertiary-dark': '#262D34',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-      'text-secondary-light': '#57636C',
-      'text-secondary-dark': '#95A1AC',
-      'text-tertiary-light': '#8B97A2',
-      'text-tertiary-dark': '#6B7280',
-      'divider-light': '#E0E3E7',
-      'divider-dark': '#262D34',
-      'hover-light': '#00000008',
-      'hover-dark': '#FFFFFF08',
-      'active-light': '#00000012',
-      'active-dark': '#FFFFFF12',
-    };
-  }
-};
+import { colors } from '@/constants/theme';
 
 // Definição de cores temporária até termos acesso ao arquivo de tema
-const colors = {
+const customColors = {
   white: '#FFFFFF',
   black: '#000000',
   primary: '#3B82F6',
@@ -144,10 +109,9 @@ export function Header({
   const avatarButtonRef = useRef<View>(null);
   const [avatarPosition, setAvatarPosition] = useState({ x: 0, y: 0 });
 
-  // Definir cores conforme o tema do Tailwind
-  const twColors = getTailwindConfig();
-  const bgColor = isDark ? twColors['bg-primary-dark'] : twColors['bg-secondary-light'];
-  const borderColor = isDark ? twColors['divider-dark'] : twColors['divider-light'];
+  // Definir cores conforme o tema
+  const bgColor = isDark ? colors['bg-primary-dark'] : colors['bg-secondary-light'];
+  const borderColor = isDark ? colors['divider-dark'] : colors['divider-light'];
 
   // Fechar menus quando a tela for redimensionada
   useEffect(() => {
@@ -317,7 +281,7 @@ export function Header({
                 style={styles.menuButton}
                 onPress={toggleDrawer}
               >
-                <Menu size={24} color={isDark ? colors.gray[300] : colors.gray[700]} strokeWidth={1.5} />
+                <Menu size={24} color={isDark ? customColors.gray[300] : customColors.gray[700]} strokeWidth={1.5} />
               </Pressable>
               
               <View style={styles.logoMobile}>
@@ -339,7 +303,7 @@ export function Header({
                   style={[styles.iconButton, isDark && styles.iconButtonDark, styles.iconButtonMobile]}
                   onPress={handleNotificationsClick}
                 >
-                  <Bell size={16} color={isDark ? colors.gray[300] : colors.gray[700]} strokeWidth={1.5} />
+                  <Bell size={16} color={isDark ? customColors.gray[300] : customColors.gray[700]} strokeWidth={1.5} />
                   <View style={styles.notificationBadge} />
                 </Pressable>
                 
@@ -455,7 +419,7 @@ export function Header({
                 style={[styles.iconButton, isDark && styles.iconButtonDark]}
                 onPress={() => {}}
               >
-                <Search size={18} color={isDark ? colors.gray[300] : colors.gray[500]} strokeWidth={1.5} />
+                <Search size={18} color={isDark ? customColors.gray[300] : customColors.gray[500]} strokeWidth={1.5} />
               </Pressable>
 
               <Pressable 
@@ -463,7 +427,7 @@ export function Header({
                 style={[styles.iconButton, isDark && styles.iconButtonDark]}
                 onPress={handleNotificationsClick}
               >
-                <Bell size={18} color={isDark ? colors.gray[300] : colors.gray[500]} strokeWidth={1.5} />
+                <Bell size={18} color={isDark ? customColors.gray[300] : customColors.gray[500]} strokeWidth={1.5} />
                 <View style={styles.notificationBadge} />
               </Pressable>
 
@@ -586,7 +550,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.gray[100],
+    backgroundColor: customColors.gray[100],
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -594,15 +558,15 @@ const styles = StyleSheet.create({
       cursor: 'pointer',
       transition: 'all 0.2s ease-in-out',
       ':hover': {
-        backgroundColor: colors.gray[200],
+        backgroundColor: customColors.gray[200],
       },
     }),
   },
   iconButtonDark: {
-    backgroundColor: colors.gray[800],
+    backgroundColor: customColors.gray[800],
     ...(Platform.OS === 'web' && {
       ':hover': {
-        backgroundColor: colors.gray[700],
+        backgroundColor: customColors.gray[700],
       },
     }),
   },
@@ -629,14 +593,14 @@ const styles = StyleSheet.create({
   logoTextBold: {
     fontWeight: 'bold',
     fontSize: 16,
-    color: colors.gray[900],
+    color: customColors.gray[900],
   },
   logoText: {
     fontSize: 16,
-    color: colors.gray[600],
+    color: customColors.gray[600],
   },
   textDark: {
-    color: colors.gray[100],
+    color: customColors.gray[100],
   },
   notificationBadge: {
     position: 'absolute',
@@ -645,16 +609,16 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 3.5,
-    backgroundColor: colors.danger,
+    backgroundColor: customColors.danger,
     borderWidth: 1.5,
-    borderColor: colors.white,
+    borderColor: customColors.white,
   },
   avatarContainer: {
     width: 36,
     height: 36,
     borderRadius: 18,
     overflow: 'hidden',
-    backgroundColor: colors.gray[100],
+    backgroundColor: customColors.gray[100],
     ...(Platform.OS === 'web' && {
       cursor: 'pointer',
     }),
@@ -669,9 +633,9 @@ const styles = StyleSheet.create({
     top: 56,
     right: 0,
     width: 240,
-    backgroundColor: colors.white,
+    backgroundColor: customColors.white,
     borderRadius: 8,
-    shadowColor: colors.black,
+    shadowColor: customColors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -679,7 +643,7 @@ const styles = StyleSheet.create({
     zIndex: Z_INDEX.MENU,
   },
   profileMenuDark: {
-    backgroundColor: colors.gray[800],
+    backgroundColor: customColors.gray[800],
   },
   sidebar: {
     position: 'absolute',
@@ -687,8 +651,8 @@ const styles = StyleSheet.create({
     left: 0,
     width: 280,
     height: '100%',
-    backgroundColor: colors.white,
-    shadowColor: colors.black,
+    backgroundColor: customColors.white,
+    shadowColor: customColors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -696,14 +660,14 @@ const styles = StyleSheet.create({
     zIndex: Z_INDEX.SIDEBAR,
   },
   sidebarDark: {
-    backgroundColor: colors.gray[800],
+    backgroundColor: customColors.gray[800],
   },
   closeButton: {
     padding: 12,
     alignItems: 'center',
   },
   closeButtonText: {
-    color: colors.primary,
+    color: customColors.primary,
     fontWeight: '500',
   },
   backdrop: {

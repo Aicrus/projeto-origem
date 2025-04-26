@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View, ViewStyle, Platform, Dimensions } from 'react-native';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { useTheme } from '../../../hooks/ThemeContext';
+import { colors, spacing } from '@/constants/theme';
 
 /**
  * PageContainer - Componente responsável por gerenciar os espaçamentos e layout padrão da aplicação
@@ -110,22 +111,6 @@ interface PageContainerProps {
   headerHeight?: number;
 }
 
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'bg-primary-light': '#F7F8FA',
-      'bg-primary-dark': '#1C1E26',
-    };
-  }
-};
-
 /**
  * PageContainer - Componente responsável por gerenciar os espaçamentos e layout padrão da aplicação
  * 
@@ -179,9 +164,6 @@ export function PageContainer({
   const { isMobile, isTablet, isDesktop } = useResponsive();
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  
-  // Obtém as cores do tailwind.config.js
-  const twColors = getTailwindConfig();
 
   // Ajustes de layout baseados no dispositivo e configuração
   const effectiveSidebarWidth = (!isMobile && withSidebar) ? sidebarWidth : 0;
@@ -192,7 +174,7 @@ export function PageContainer({
   const containerStyle: ViewStyle = {
     marginTop: effectiveHeaderHeight,
     padding: isMobile ? SPACING.md : isTablet ? SPACING.lg : SPACING.xl,
-    backgroundColor: isDark ? twColors['bg-primary-dark'] : twColors['bg-primary-light'],
+    backgroundColor: isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'],
   };
 
   // Ajustes para sidebar em tablets e desktops

@@ -27,32 +27,7 @@ import { useTheme } from '../../../hooks/ThemeContext';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { GradientView } from '../gradient/GradientView';
 import { useAuth } from '../../../contexts/auth';
-
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#C13636',
-      'bg-primary-light': '#F7F8FA',
-      'bg-primary-dark': '#1C1E26',
-      'bg-secondary-light': '#FFFFFF',
-      'bg-secondary-dark': '#14181B',
-      'divider-light': '#E0E3E7',
-      'divider-dark': '#262D34',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-      'text-secondary-light': '#57636C',
-      'text-secondary-dark': '#95A1AC',
-    };
-  }
-};
+import { colors } from '@/constants/theme';
 
 // Constante para z-index
 const Z_INDEX = {
@@ -98,16 +73,13 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
   const isDark = currentTheme === 'dark';
   const { signOut } = useAuth();
   
-  // Obtém as cores do tailwind.config.js
-  const twColors = getTailwindConfig();
-  
   // Para facilitar o acesso às cores mais usadas
   const colorWhite = '#FFFFFF';
   const colorGray = {
-    '200': isDark ? twColors['divider-dark'] : twColors['divider-light'],
-    '300': isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
-    '600': isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
-    '900': isDark ? twColors['text-primary-dark'] : twColors['text-primary-light']
+    '200': isDark ? colors['divider-dark'] : colors['divider-light'],
+    '300': isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light'],
+    '600': isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+    '900': isDark ? colors['text-primary-dark'] : colors['text-primary-light']
   };
   
   // Animation values

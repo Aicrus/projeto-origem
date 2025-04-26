@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Pressable, View, ViewStyle, PressableProps, Platform, StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/ThemeContext';
+import { colors } from '@/constants/theme';
 
 export interface HoverableViewProps extends PressableProps {
   children: React.ReactNode;
@@ -80,11 +81,10 @@ export function HoverableView({
   const viewRef = React.useRef<View>(null);
   
   // Cores padrão baseadas no tema
-  const twColors = getTailwindConfig();
   const defaultColors = {
     background: backgroundColor || 'transparent',
-    hover: hoverColor || (isDark ? twColors['hover-dark'] : twColors['hover-light']),
-    active: activeColor || (isDark ? twColors['active-dark'] : twColors['active-light']),
+    hover: hoverColor || (isDark ? colors['hover-dark'] : colors['hover-light']),
+    active: activeColor || (isDark ? colors['active-dark'] : colors['active-light']),
   };
 
   // Manipulação direta do DOM para elementos desabilitados na web
@@ -253,24 +253,4 @@ export function HoverableView({
       {children}
     </Pressable>
   );
-}
-
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#C13636',
-      'hover-light': '#00000008',
-      'hover-dark': '#FFFFFF08',
-      'active-light': '#00000012',
-      'active-dark': '#FFFFFF12',
-    };
-  }
-}; 
+} 
