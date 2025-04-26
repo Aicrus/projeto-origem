@@ -9,7 +9,26 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useTheme } from '@/hooks/ThemeContext';
-import { colors } from '../constants/theme';
+
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#C13636',
+      'bg-primary-light': '#F7F8FA',
+      'bg-primary-dark': '#1C1E26',
+      'text-primary-light': '#14181B',
+      'text-primary-dark': '#FFFFFF',
+    };
+  }
+};
 
 /**
  * Ícones para cada modo de tema
@@ -147,6 +166,9 @@ export function ThemeSelector({
   const { themeMode, setThemeMode, currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   
+  // Obtém as cores do tailwind.config.js
+  const twColors = getTailwindConfig();
+  
   // Obter dimensões com base no tamanho selecionado
   const { buttonWidth: baseButtonWidth, height: baseHeight, iconSize: baseIconSize } = THEME_SELECTOR_SIZES[size];
   
@@ -212,39 +234,39 @@ export function ThemeSelector({
   
   // Configurar cores com base no tema atual e customizações
   const backgroundColors = {
-    default: isDark ? colors.gray[800] : colors.gray[200],
-    pill: isDark ? colors.gray[800] : colors.gray[200],
+    default: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
+    pill: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
     minimal: 'transparent',
-    labeled: isDark ? colors.gray[800] : colors.gray[200],
-    toggle: isDark ? colors.gray[700] : colors.gray[300],
-    single: isDark ? colors.gray[700] : colors.gray[300],
+    labeled: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
+    toggle: isDark ? twColors['bg-secondary-dark'] : twColors['bg-tertiary-light'],
+    single: isDark ? twColors['bg-secondary-dark'] : twColors['bg-tertiary-light'],
   };
   
   const sliderColors = {
-    default: isDark ? '#4A6' : '#892CDC',
-    pill: isDark ? '#4A6' : '#892CDC',
+    default: isDark ? twColors['primary-dark'] : twColors['primary-light'],
+    pill: isDark ? twColors['primary-dark'] : twColors['primary-light'],
     minimal: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-    labeled: isDark ? '#4A6' : '#892CDC',
-    toggle: isDark ? '#4A6' : '#892CDC',
-    single: isDark ? '#4A6' : '#892CDC',
+    labeled: isDark ? twColors['primary-dark'] : twColors['primary-light'],
+    toggle: isDark ? twColors['primary-dark'] : twColors['primary-light'],
+    single: isDark ? twColors['primary-dark'] : twColors['primary-light'],
   };
   
   const activeTextColors = {
-    default: '#FFFFFF',
-    pill: '#FFFFFF',
-    minimal: isDark ? '#4A6' : colors.primary.main,
-    labeled: '#FFFFFF',
-    toggle: '#FFFFFF',
-    single: '#FFFFFF',
+    default: twColors['text-primary-dark'],
+    pill: twColors['text-primary-dark'],
+    minimal: isDark ? twColors['primary-dark'] : twColors['primary-light'],
+    labeled: twColors['text-primary-dark'],
+    toggle: twColors['text-primary-dark'],
+    single: twColors['text-primary-dark'],
   };
   
   const textColors = {
-    default: isDark ? colors.gray[400] : colors.gray[600],
-    pill: isDark ? colors.gray[400] : colors.gray[600],
-    minimal: isDark ? colors.gray[400] : colors.gray[600],
-    labeled: isDark ? colors.gray[400] : colors.gray[600],
-    toggle: isDark ? '#FFFFFF' : colors.gray[800],
-    single: isDark ? '#FFFFFF' : colors.gray[800],
+    default: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+    pill: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+    minimal: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+    labeled: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+    toggle: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+    single: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
   };
   
   const backgroundColor = customColors.background || backgroundColors[variant];
@@ -258,24 +280,24 @@ export function ThemeSelector({
     if (mode === themeMode) {
       if (variant === 'minimal') {
         // Para minimal, usar apenas a cor primária
-        return isDark ? '#4A6' : colors.primary.main;
+        return isDark ? twColors['primary-dark'] : twColors['primary-light'];
       } else if (variant === 'single') {
         // Para single: se for iconOnly, usar cor primária, caso contrário branco
         if (iconOnly) {
-          return isDark ? '#4A6' : colors.primary.main;
+          return isDark ? twColors['primary-dark'] : twColors['primary-light'];
         } else if (transparentSingle) {
-          return isDark ? '#4A6' : colors.primary.main;
+          return isDark ? twColors['primary-dark'] : twColors['primary-light'];
         } else {
-          return '#FFFFFF';
+          return twColors['text-primary-dark'];
         }
       } else {
         // Para variantes com slider (default, pill, labeled, toggle), usar branco
-        return '#FFFFFF';
+        return twColors['text-primary-dark'];
       }
     }
     
     // Ícones não selecionados são semi-transparentes
-    return isDark ? '#FFFFFF80' : '#00000080';
+    return isDark ? twColors['text-primary-dark'] + '80' : twColors['text-primary-light'] + '80';
   };
   
   // Configurar posição inicial e animação
@@ -329,7 +351,7 @@ export function ThemeSelector({
             left: padding + Math.floor(buttonWidth * 0.01),
             top: Math.max(2, Math.floor(height * 0.06)),
             backgroundColor: sliderBackgroundColor,
-            shadowColor: '#000',
+            shadowColor: isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.1,
             shadowRadius: 1,
@@ -359,13 +381,13 @@ export function ThemeSelector({
             {themeMode === 'light' ? (
               <Sun
                 size={singleIconSize}
-                color={isDark ? colors.primary.dark : colors.primary.main}
+                color={isDark ? twColors['primary-dark'] : twColors['primary-light']}
                 strokeWidth={1.5}
               />
             ) : (
               <Moon
                 size={singleIconSize}
-                color={isDark ? colors.primary.dark : colors.primary.main}
+                color={isDark ? twColors['primary-dark'] : twColors['primary-light']}
                 strokeWidth={1.5}
               />
             )}
@@ -384,14 +406,14 @@ export function ThemeSelector({
             borderRadius: singleHeight / 2,
             backgroundColor: transparentSingle 
               ? 'transparent' 
-              : isDark ? '#4A6' : colors.primary.main,
+              : isDark ? twColors['primary-dark'] : twColors['primary-light'],
             alignItems: 'center',
             justifyContent: 'center',
             ...(transparentSingle && {
               borderWidth: 1,
               borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
             }),
-            shadowColor: transparentSingle ? 'transparent' : '#000',
+            shadowColor: transparentSingle ? 'transparent' : isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: transparentSingle ? 0 : 0.1,
             shadowRadius: transparentSingle ? 0 : 2,
@@ -403,8 +425,8 @@ export function ThemeSelector({
             <Sun
               size={singleIconSize}
               color={transparentSingle 
-                ? (isDark ? '#4A6' : colors.primary.main) 
-                : '#FFFFFF'
+                ? (isDark ? twColors['primary-dark'] : twColors['primary-light']) 
+                : twColors['text-primary-dark']
               }
               strokeWidth={1.5}
             />
@@ -412,8 +434,8 @@ export function ThemeSelector({
             <Moon
               size={singleIconSize}
               color={transparentSingle 
-                ? (isDark ? '#4A6' : colors.primary.main) 
-                : '#FFFFFF'
+                ? (isDark ? twColors['primary-dark'] : twColors['primary-light']) 
+                : twColors['text-primary-dark']
               }
               strokeWidth={1.5}
             />
@@ -444,7 +466,7 @@ export function ThemeSelector({
                 width: buttonWidth - 4,
                 height: height - 4,
                 borderRadius: height / 2,
-                backgroundColor: isDark ? '#4A6' : colors.primary.main,
+                backgroundColor: isDark ? twColors['primary-dark'] : twColors['primary-light'],
                 top: 2,
                 left: 2,
                 zIndex: 0,
@@ -468,7 +490,7 @@ export function ThemeSelector({
               <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Sun
                   size={iconSize}
-                  color={themeMode === 'light' ? '#FFFFFF' : isDark ? '#FFFFFF' : colors.gray[600]}
+                  color={themeMode === 'light' ? twColors['text-primary-dark'] : isDark ? twColors['text-primary-dark'] : twColors['text-secondary-light']}
                   strokeWidth={1.5}
                 />
               </View>
@@ -486,7 +508,7 @@ export function ThemeSelector({
               <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Moon
                   size={iconSize}
-                  color={themeMode === 'dark' ? '#FFFFFF' : isDark ? '#FFFFFF' : colors.gray[600]}
+                  color={themeMode === 'dark' ? twColors['text-primary-dark'] : isDark ? twColors['text-primary-dark'] : twColors['text-secondary-light']}
                   strokeWidth={1.5}
                 />
               </View>

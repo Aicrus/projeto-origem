@@ -23,11 +23,36 @@ import Animated, {
   interpolate,
   Extrapolate
 } from 'react-native-reanimated';
-import { colors } from '../constants/theme';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { GradientView } from '../gradient/GradientView';
 import { useAuth } from '../../../contexts/auth';
+
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#C13636',
+      'bg-primary-light': '#F7F8FA',
+      'bg-primary-dark': '#1C1E26',
+      'bg-secondary-light': '#FFFFFF',
+      'bg-secondary-dark': '#14181B',
+      'divider-light': '#E0E3E7',
+      'divider-dark': '#262D34',
+      'text-primary-light': '#14181B',
+      'text-primary-dark': '#FFFFFF',
+      'text-secondary-light': '#57636C',
+      'text-secondary-dark': '#95A1AC',
+    };
+  }
+};
 
 // Constante para z-index
 const Z_INDEX = {
@@ -72,6 +97,18 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   const { signOut } = useAuth();
+  
+  // Obtém as cores do tailwind.config.js
+  const twColors = getTailwindConfig();
+  
+  // Para facilitar o acesso às cores mais usadas
+  const colorWhite = '#FFFFFF';
+  const colorGray = {
+    '200': isDark ? twColors['divider-dark'] : twColors['divider-light'],
+    '300': isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
+    '600': isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+    '900': isDark ? twColors['text-primary-dark'] : twColors['text-primary-light']
+  };
   
   // Animation values
   const drawerProgress = useSharedValue(0);
@@ -268,7 +305,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                       >
                         <item.icon 
                           size={22}
-                          color={colors.white}
+                          color={colorWhite}
                           strokeWidth={1.5}
                         />
                         <Text style={[
@@ -285,7 +322,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                         </Text>
                         <ChevronRight 
                           size={20} 
-                          color={colors.white}
+                          color={colorWhite}
                           strokeWidth={1.5}
                         />
                       </GradientView>
@@ -307,7 +344,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                     ]) as ViewStyle}>
                       <item.icon 
                         size={20}
-                        color={isActive ? colors.white : isDark ? colors.gray[300] : colors.gray[600]}
+                        color={isActive ? colorWhite : isDark ? colorGray['300'] : colorGray['600']}
                         strokeWidth={1.5}
                       />
                       <Text style={[
@@ -325,7 +362,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                       {isActive && (
                         <ChevronRight 
                           size={16} 
-                          color={colors.white}
+                          color={colorWhite}
                           strokeWidth={1.5}
                         />
                       )}
@@ -344,7 +381,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                 <View style={styles.logoutContent}>
                   <LogOut 
                     size={20} 
-                    color={isDark ? colors.gray[300] : colors.gray[600]}
+                    color={isDark ? colorGray['300'] : colorGray['600']}
                     strokeWidth={1.5}
                   />
                   <Text style={[styles.logoutText, isDark && styles.logoutTextDark]}>Sair</Text>
@@ -410,7 +447,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                 >
                   <item.icon 
                     size={22}
-                    color={colors.white}
+                    color={colorWhite}
                     strokeWidth={1.5}
                   />
                   {!isTablet && (
@@ -430,7 +467,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                   {!isTablet && (
                     <ChevronRight 
                       size={20} 
-                      color={colors.white}
+                      color={colorWhite}
                       strokeWidth={1.5}
                     />
                   )}
@@ -454,7 +491,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
               >
                 <item.icon 
                   size={20}
-                  color={isActive ? colors.white : isDark ? colors.gray[300] : colors.gray[600]}
+                  color={isActive ? colorWhite : isDark ? colorGray['300'] : colorGray['600']}
                   strokeWidth={1.5}
                 />
                 {!isTablet && (
@@ -474,7 +511,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                 {!isTablet && isActive && (
                   <ChevronRight 
                     size={16} 
-                    color={colors.white}
+                    color={colorWhite}
                     strokeWidth={1.5}
                   />
                 )}
@@ -495,7 +532,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
           <View style={getConditionalStyle(styles.logoutContent, styles.logoutContentCompact)}>
             <LogOut 
               size={20} 
-              color={isDark ? colors.gray[300] : colors.gray[600]}
+              color={isDark ? colorGray['300'] : colorGray['600']}
               strokeWidth={1.5}
             />
             {!isTablet && <Text style={[styles.logoutText, isDark && styles.logoutTextDark]}>Sair</Text>}
@@ -509,12 +546,12 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
 const styles = StyleSheet.create({
   sidebar: {
     width: 250,
-    backgroundColor: colors.white,
+    backgroundColor: '#FFFFFF',
     height: '100%',
     paddingVertical: 24,
     paddingHorizontal: 16,
     borderRightWidth: 1,
-    borderRightColor: colors.gray[200],
+    borderRightColor: '#E0E3E7',
     ...(Platform.OS === 'web' && {
       position: 'fixed',
       top: 0,
@@ -556,17 +593,17 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: colors.gray[900],
+    color: '#14181B',
   },
   logoTextDark: {
-    color: colors.white,
+    color: '#FFFFFF',
   },
   subLogoText: {
     fontSize: 14,
-    color: colors.gray[600],
+    color: '#57636C',
   },
   subLogoTextDark: {
-    color: colors.gray[300],
+    color: '#95A1AC',
   },
   nav: {
     gap: 4,
@@ -601,7 +638,7 @@ const styles = StyleSheet.create({
       boxShadow: '0 2px 6px rgba(38, 68, 80, 0.2)',
       cursor: 'pointer',
     } : {
-      backgroundColor: colors.primary.main,
+      backgroundColor: '#892CDC',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.2,
@@ -630,13 +667,13 @@ const styles = StyleSheet.create({
   navText: {
     fontSize: 15,
     flex: 1,
-    color: colors.gray[600],
+    color: '#57636C',
   },
   navTextDark: {
-    color: colors.gray[300],
+    color: '#95A1AC',
   },
   activeNavText: {
-    color: colors.white,
+    color: '#FFFFFF',
     fontWeight: '800',
   },
   footer: {
@@ -668,10 +705,10 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     fontSize: 14,
-    color: colors.gray[600],
+    color: '#57636C',
   },
   logoutTextDark: {
-    color: colors.gray[300],
+    color: '#95A1AC',
   },
   modalContainer: {
     flex: 1,
@@ -702,7 +739,7 @@ const styles = StyleSheet.create({
   drawer: {
     width: 280,
     height: '100%',
-    backgroundColor: colors.white,
+    backgroundColor: '#FFFFFF',
     paddingTop: Platform.OS === 'ios' ? 65 : 40,
     paddingBottom: 24,
     paddingHorizontal: 16,

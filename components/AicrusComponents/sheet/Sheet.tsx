@@ -1,7 +1,28 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated, Dimensions, Platform, SafeAreaView, KeyboardAvoidingView } from 'react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
-import { colors } from '../constants/theme';
+
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'bg-primary-light': '#F7F8FA',
+      'bg-secondary-light': '#FFFFFF',
+      'bg-primary-dark': '#1C1E26',
+      'bg-secondary-dark': '#14181B',
+      'text-primary-light': '#14181B',
+      'text-primary-dark': '#FFFFFF',
+      'text-secondary-light': '#57636C',
+      'text-secondary-dark': '#95A1AC',
+    };
+  }
+};
 
 export type SheetPosition = 'top' | 'right' | 'bottom' | 'left';
 
@@ -71,6 +92,9 @@ const Sheet: React.FC<SheetProps> = ({
   // Usando o hook useTheme do contexto de tema da aplicação
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
+  
+  // Obtém as cores do tailwind.config.js
+  const twColors = getTailwindConfig();
   
   // Valores de padding para diferentes plataformas
   const webPadding = 20;
@@ -275,11 +299,11 @@ const Sheet: React.FC<SheetProps> = ({
   // Obtenha as cores baseadas no tema atual
   const getThemeColors = () => {
     return {
-      background: isDark ? colors.gray[800] : colors.white,
-      text: isDark ? colors.gray[200] : colors.gray[800],
-      closeButtonBackground: isDark ? colors.gray[700] : colors.gray[200],
-      closeButtonText: isDark ? colors.white : colors.black,
-      contentBackground: isDark ? colors.gray[700] : colors.gray[100], // Cor de fundo para destacar o conteúdo
+      background: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
+      text: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+      closeButtonBackground: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
+      closeButtonText: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+      contentBackground: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
     };
   };
 
@@ -408,7 +432,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.black,
+    backgroundColor: '#000000',
   },
   overlayTouchable: {
     flex: 1,

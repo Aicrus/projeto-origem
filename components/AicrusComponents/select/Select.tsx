@@ -4,7 +4,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { ChevronUp, ChevronDown, Check, Search, X } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { colors } from '../constants/theme';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../../lib/supabase';
 
@@ -75,9 +74,34 @@ interface MultiSelectProps extends BaseDropdownProps {
 
 type SelectProps = SingleSelectProps | MultiSelectProps;
 
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#C13636',
+      'bg-secondary-light': '#FFFFFF',
+      'bg-secondary-dark': '#14181B',
+      'divider-light': '#E0E3E7',
+      'divider-dark': '#262D34',
+      'text-primary-light': '#14181B',
+      'text-primary-dark': '#FFFFFF',
+      'text-secondary-light': '#57636C',
+      'text-secondary-dark': '#95A1AC',
+    };
+  }
+};
+
 // Componente para renderizar um item da lista de opções
 const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
   const [isHovered, setIsHovered] = useState(false);
+  const twColors = getTailwindConfig();
   
   const handleHoverIn = () => {
     if (Platform.OS === 'web') {
@@ -100,9 +124,9 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
       paddingVertical: 8,
       paddingHorizontal: 12,
       borderBottomWidth: 1,
-      borderBottomColor: isDark ? '#262D34' : '#E0E3E7',
+      borderBottomColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
       backgroundColor: selected 
-        ? (isDark ? 'rgba(74, 102, 102, 0.08)' : 'rgba(137, 44, 220, 0.05)')
+        ? (isDark ? `${twColors['primary-dark']}08` : `${twColors['primary-light']}05`)
         : (isHovered && !selected && Platform.OS === 'web' 
             ? (isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)') 
             : 'transparent')
@@ -110,8 +134,8 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
     itemText: {
       fontSize: 14,
       color: selected 
-        ? (isDark ? '#4A6' : colors.primary.main)
-        : (isDark ? '#D1D5DB' : '#57636C'),
+        ? (isDark ? twColors['primary-dark'] : twColors['primary-light'])
+        : (isDark ? twColors['text-primary-dark'] : twColors['text-secondary-light']),
       fontWeight: selected ? '500' : 'normal'
     }
   });
@@ -128,7 +152,7 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
         {item.label}
       </Text>
       {selected && (
-        <Check size={16} color={isDark ? '#4A6' : colors.primary.main} strokeWidth={2} />
+        <Check size={16} color={isDark ? twColors['primary-dark'] : twColors['primary-light']} strokeWidth={2} />
       )}
     </TouchableOpacity>
   );
@@ -157,6 +181,9 @@ const WebDropdownOptions = ({
   
   // Estado para controlar a pesquisa
   const [searchValue, setSearchValue] = useState('');
+  
+  // Obter cores do tailwind
+  const twColors = getTailwindConfig();
   
   // Função para normalizar texto (remover acentos)
   const normalizeText = (text: string): string => {
@@ -854,16 +881,23 @@ export const Select = ({
   supabaseOrderBy,
   supabaseAscending = true,
 }: SelectProps) => {
-  // Estado para controlar abertura do dropdown
-  const [open, setOpen] = useState(false);
-  
-  // Ref para o componente principal
-  const selectRef = useRef<any>(null);
+  const { isMobile } = useResponsive();
+  const [isOpen, setIsOpen] = useState(false);
+  const [internalOptions, setInternalOptions] = useState<DropdownOption[]>(options);
   
   // Estados para dados do Supabase
   const [supabaseOptions, setSupabaseOptions] = useState<DropdownOption[]>([]);
   const [isLoadingSupabase, setIsLoadingSupabase] = useState(false);
   const [supabaseError, setSupabaseError] = useState<string | null>(null);
+  
+  // Ref para calcular a posição do dropdown
+  const selectRef = useRef<any>(null);
+  
+  // Obter cores do tailwind
+  const twColors = getTailwindConfig();
+  
+  // Estado para controlar abertura do dropdown
+  const [open, setOpen] = useState(false);
   
   // Posicionamento para o dropdown web
   const [position, setPosition] = useState<{
@@ -883,40 +917,46 @@ export const Select = ({
   
   // Função para buscar dados do Supabase
   const fetchSupabaseOptions = async () => {
-    if (!isUsingSupabase) return;
+    // Verifica se tem dados suficientes para fazer a consulta
+    if (!supabaseTable || !supabaseColumn) {
+      return;
+    }
     
     try {
+      // Valores de fallback para as props opcionais
+      const orderByColumn = supabaseOrderBy || supabaseColumn;
+      const ascending = supabaseAscending !== undefined ? supabaseAscending : true;
+      
+      // Indicador de carregamento - usar diretamente setIsLoading
       setIsLoadingSupabase(true);
-      setSupabaseError(null);
       
       const { data, error } = await supabase
         .from(supabaseTable)
-        .select(`${supabaseColumn}`)
-        .order(supabaseOrderBy || supabaseColumn, { ascending: supabaseAscending });
-        
+        .select(`${supabaseColumn}, id`)
+        .order(orderByColumn, { ascending });
+      
       if (error) {
-        throw error;
+        console.error('Erro do Supabase:', error);
+        return;
       }
       
       if (data && data.length > 0) {
-        // Transformar dados em formato de opções para o Select
-        const newOptions = data.map(item => {
-          const value = item[supabaseColumn as keyof typeof item];
-          return {
-            value: String(value || ''),
-            label: String(value || '')
-          };
-        });
+        // Mapear os dados para o formato de opções do dropdown
+        const newOptions = data.map((item: any) => ({
+          label: item[supabaseColumn],
+          value: String(item.id),
+        }));
         
-        setSupabaseOptions(newOptions);
+        setInternalOptions(newOptions);
       } else {
-        setSupabaseOptions([]);
+        setInternalOptions([]);
       }
     } catch (err: any) {
       console.error('Erro ao buscar dados do Supabase:', err);
-      setSupabaseError(err.message || 'Erro ao buscar dados');
     } finally {
       setIsLoadingSupabase(false);
+      // Atualizamos o estado de loading diretamente ao final da operação
+      setIsLoading(loading);
     }
   };
   
@@ -933,7 +973,10 @@ export const Select = ({
   }, [isUsingSupabase, supabaseOptions, options]);
   
   // Estado de carregamento efetivo
-  const isLoading = loading || (isUsingSupabase && isLoadingSupabase);
+  const [isLoading, setIsLoading] = useState(loading);
+  useEffect(() => {
+    setIsLoading(loading || (isUsingSupabase && isLoadingSupabase));
+  }, [loading, isUsingSupabase, isLoadingSupabase]);
   
   // Otimizar recálculo de posição para evitar tremedeira
   useEffect(() => {
@@ -1103,7 +1146,7 @@ export const Select = ({
       style.textContent = `
         /* Estilo para o trigger do dropdown */
         .dropdown-trigger:hover {
-          border-color: ${isDark ? colors.primary.dark : colors.primary.main};
+          border-color: ${isDark ? twColors['primary-dark'] : twColors['primary-main']};
           transition: all 0.2s ease;
         }
         
@@ -1273,7 +1316,7 @@ export const Select = ({
       borderRadius: 8,
       borderWidth: 2,
       borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
-      borderTopColor: isDark ? '#4A6' : colors.primary.main,
+      borderTopColor: isDark ? '#4A6' : twColors['primary-main'],
       marginRight: 8
     },
     errorText: {
