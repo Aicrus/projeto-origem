@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
+import colors from '../../../tailwind.config';
 
 /**
  * @component Button
@@ -116,6 +117,34 @@ export interface ButtonProps extends TouchableOpacityProps {
   borderRadius?: number;
 }
 
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-light-hover': '#9D3CED',
+      'primary-light-active': '#7D1CC9',
+      'primary-dark': '#4A6',
+      'primary-dark-hover': '#5B8',
+      'primary-dark-active': '#394',
+      'tertiary-light': '#D3545D',
+      'tertiary-light-hover': '#E3656E',
+      'tertiary-light-active': '#C1414A',
+      'tertiary-dark': '#E4656E',
+      'tertiary-dark-hover': '#F5767F',
+      'tertiary-dark-active': '#D3545D',
+      'text-primary-light': '#14181B',
+      'text-primary-dark': '#FFFFFF',
+    };
+  }
+};
+
 export const Button = ({
   children,
   variant = 'primary',
@@ -146,27 +175,30 @@ export const Button = ({
   // Determina se o botão tem texto ou apenas ícone
   const hasText = !isIconOnly && React.isValidElement(children);
   
+  // Obtém as cores do tailwind.config.js
+  const twColors = getTailwindConfig();
+  
   // Cores para os diferentes temas e variantes baseadas no tailwind.config.js
   const colorScheme = {
     primary: {
-      background: isDark ? '#4A6' : '#892CDC',
-      backgroundHover: isDark ? '#5B8' : '#9D3CED',
-      backgroundPressed: isDark ? '#394' : '#7D1CC9',
+      background: isDark ? twColors['primary-dark'] : twColors['primary-light'],
+      backgroundHover: isDark ? twColors['primary-dark-hover'] : twColors['primary-light-hover'],
+      backgroundPressed: isDark ? twColors['primary-dark-active'] : twColors['primary-light-active'],
       text: '#FFFFFF',
       border: 'transparent',
-      disabled: isDark ? 'rgba(68, 170, 102, 0.5)' : 'rgba(137, 44, 220, 0.5)',
+      disabled: isDark ? `${twColors['primary-dark']}80` : `${twColors['primary-light']}80`,
       disabledText: '#FFFFFF',
       textHover: undefined,
       textPressed: undefined,
       disabledBorder: undefined,
     },
     destructive: {
-      background: isDark ? '#E4656E' : '#D3545D',
-      backgroundHover: isDark ? '#F5767F' : '#E3656E',
-      backgroundPressed: isDark ? '#D3545D' : '#C1414A',
+      background: isDark ? twColors['tertiary-dark'] : twColors['tertiary-light'],
+      backgroundHover: isDark ? twColors['tertiary-dark-hover'] : twColors['tertiary-light-hover'],
+      backgroundPressed: isDark ? twColors['tertiary-dark-active'] : twColors['tertiary-light-active'],
       text: '#FFFFFF',
       border: 'transparent',
-      disabled: isDark ? 'rgba(211, 84, 93, 0.5)' : 'rgba(211, 84, 93, 0.5)',
+      disabled: isDark ? `${twColors['tertiary-dark']}80` : `${twColors['tertiary-light']}80`,
       disabledText: '#FFFFFF',
       textHover: undefined,
       textPressed: undefined,
@@ -176,7 +208,7 @@ export const Button = ({
       background: 'transparent',
       backgroundHover: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
       backgroundPressed: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      text: isDark ? '#FFFFFF' : '#14181B',
+      text: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
       border: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
       disabled: 'transparent',
       disabledText: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
@@ -188,7 +220,7 @@ export const Button = ({
       background: 'transparent',
       backgroundHover: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
       backgroundPressed: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      text: isDark ? '#FFFFFF' : '#14181B',
+      text: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
       border: 'transparent',
       disabled: 'transparent',
       disabledText: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
@@ -200,12 +232,12 @@ export const Button = ({
       background: 'transparent',
       backgroundHover: 'transparent',
       backgroundPressed: 'transparent',
-      text: isDark ? '#4A6' : '#892CDC',
-      textHover: isDark ? '#5B8' : '#9D3CED',
-      textPressed: isDark ? '#394' : '#7D1CC9',
+      text: isDark ? twColors['primary-dark'] : twColors['primary-light'],
+      textHover: isDark ? twColors['primary-dark-hover'] : twColors['primary-light-hover'],
+      textPressed: isDark ? twColors['primary-dark-active'] : twColors['primary-light-active'],
       border: 'transparent',
       disabled: 'transparent',
-      disabledText: isDark ? 'rgba(68, 170, 102, 0.5)' : 'rgba(137, 44, 220, 0.5)',
+      disabledText: isDark ? `${twColors['primary-dark']}80` : `${twColors['primary-light']}80`,
       disabledBorder: undefined,
     },
   };
@@ -338,7 +370,7 @@ export const Button = ({
         }
         
         .button-link-hover:not(:disabled):hover {
-          color: ${variantColors.textHover || '#9D3CED'} !important;
+          color: ${variantColors.textHover || twColors['primary-light-hover']} !important;
           transition: color 0.3s ease !important;
         }
         

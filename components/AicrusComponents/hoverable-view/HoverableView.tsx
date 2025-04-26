@@ -81,10 +81,11 @@ export function HoverableView({
   const viewRef = React.useRef<View>(null);
   
   // Cores padrão baseadas no tema
+  const twColors = getTailwindConfig();
   const defaultColors = {
     background: backgroundColor || 'transparent',
-    hover: hoverColor || (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)'),
-    active: activeColor || (isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)'),
+    hover: hoverColor || (isDark ? twColors['hover-dark'] : twColors['hover-light']),
+    active: activeColor || (isDark ? twColors['active-dark'] : twColors['active-light']),
   };
 
   // Manipulação direta do DOM para elementos desabilitados na web
@@ -253,4 +254,24 @@ export function HoverableView({
       {children}
     </Pressable>
   );
-} 
+}
+
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#C13636',
+      'hover-light': '#00000008',
+      'hover-dark': '#FFFFFF08',
+      'active-light': '#00000012',
+      'active-dark': '#FFFFFF12',
+    };
+  }
+}; 

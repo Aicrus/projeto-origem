@@ -1,4 +1,4 @@
-import React, { useState, useEffect, RefObject, useRef, useMemo } from 'react';
+import React, { useState, useEffect, RefObject, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -32,6 +32,11 @@ import { colors } from '../constants/theme';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { createPortal } from 'react-dom';
 import { SupabaseClient } from '@supabase/supabase-js';
+
+// Este componente utiliza as cores definidas em tailwind.config.js
+// As cores são importadas dinâmicamente através da função getTailwindConfig()
+// Para o tema escuro: primary-dark = #C13636
+// Para o tema claro: primary-light = #892CDC
 
 // Declaração para adicionar supabase ao objeto window
 declare global {
@@ -140,81 +145,119 @@ const defaultSupabaseConfig: SupabaseConfig = {
   orderBy: { column: 'created_at', ascending: false }
 };
 
-// Colunas padrão para os dados de exemplo
-const createDefaultColumns = (isDark: boolean): ColumnDef<DefaultPaymentData>[] => [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        accessibilityLabel="Selecionar todos"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        accessibilityLabel="Selecionar linha"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <View>
-        <Text style={{ color: isDark ? colors.gray['100'] : colors.gray['900'] }} className="capitalize">
-          {row.getValue("status")}
-        </Text>
-      </View>
-    ),
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => (
-      <View>
-        <Text style={{ color: isDark ? colors.gray['100'] : colors.gray['900'] }} className="lowercase">
-          {row.getValue("email")}
-        </Text>
-      </View>
-    ),
-  },
-  {
-    accessorKey: "amount",
-    header: () => <Text style={{ textAlign: 'right', width: '100%', color: isDark ? colors.gray['100'] : colors.gray['900'] }}>Valor</Text>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      }).format(amount);
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#C13636',
+      'primary-light-hover': '#3D5C8C',
+      'primary-dark-hover': '#5B80B6',
+      'bg-primary-light': '#F7F8FA',
+      'bg-primary-dark': '#1C1E26',
+      'bg-secondary-light': '#FFFFFF',
+      'bg-secondary-dark': '#14181B',
+      'bg-tertiary-light': '#F1F4F8',
+      'bg-tertiary-dark': '#262D34',
+      'text-primary-light': '#14181B',
+      'text-primary-dark': '#FFFFFF',
+      'text-secondary-light': '#57636C',
+      'text-secondary-dark': '#95A1AC',
+      'text-tertiary-light': '#8B97A2',
+      'text-tertiary-dark': '#6B7280',
+      'divider-light': '#E0E3E7',
+      'divider-dark': '#262D34',
+      'hover-light': '#00000008',
+      'hover-dark': '#FFFFFF08',
+      'active-light': '#00000012',
+      'active-dark': '#FFFFFF12',
+      'error-icon-light': '#EF4444',
+      'error-icon-dark': '#F87171',
+      'warning-icon-light': '#F59E0B',
+      'warning-icon-dark': '#FBBF24',
+      'success-icon-light': '#059669',
+      'success-icon-dark': '#10B981',
+      'info-icon-light': '#0EA5E9',
+      'info-icon-dark': '#38BDF8',
+    };
+  }
+};
 
-      return (
-        <Text style={{ textAlign: 'right', width: '100%', color: isDark ? colors.gray['100'] : colors.gray['900'] }}>
-          {formatted}
-        </Text>
-      );
+// Colunas padrão para os dados de exemplo
+const createDefaultColumns = (isDark: boolean): ColumnDef<DefaultPaymentData>[] => {
+  // Obter cores do tailwind.config.js
+  const twColors = getTailwindConfig();
+  
+  return [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          accessibilityLabel="Selecionar todos"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          accessibilityLabel="Selecionar linha"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
     },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: () => (
-      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <TouchableOpacity style={{ padding: 4 }}>
-          <MoreHorizontal size={16} color={isDark ? '#E5E7EB' : '#374151'} />
-        </TouchableOpacity>
-      </View>
-    ),
-  },
-];
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => (
+        <View>
+          <Text style={{ color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'] }} className="capitalize">
+            {row.getValue("status")}
+          </Text>
+        </View>
+      ),
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => (
+        <View>
+          <Text style={{ color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'] }} className="lowercase">
+            {row.getValue("email")}
+          </Text>
+        </View>
+      ),
+    },
+    {
+      accessorKey: "amount",
+      header: () => <Text style={{ textAlign: 'right', width: '100%', color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'] }}>Valor</Text>,
+      cell: ({ row }) => {
+        const amount = parseFloat(row.getValue("amount"));
+        const formatted = new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(amount);
+
+        return (
+          <Text style={{ textAlign: 'right', width: '100%', color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'] }}>
+            {formatted}
+          </Text>
+        );
+      },
+    },
+  ];
+};
 
 export interface SupabaseConfig {
   /** 
@@ -384,70 +427,84 @@ export function DataTable<TData>({
   const [usingDefaultData, setUsingDefaultData] = useState(false);
   
   // Função para buscar dados do Supabase
-  const fetchSupabaseData = async () => {
-    if (supabaseConfig?.client || window.supabase) {
-      const client = supabaseConfig?.client || window.supabase;
-      const table = supabaseConfig?.table || 'usersAicrusAcademy';
+  const fetchSupabaseData = useCallback(async () => {
+    if (!supabaseConfig?.client || !supabaseConfig?.table) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const client = supabaseConfig.client || window.supabase;
+      const table = supabaseConfig.table;
       
-      if (client && table) {
-        try {
-          setIsLoading(true);
-          setError(null);
-          
-          let query = client
-            .from(table)
-            .select(supabaseConfig?.select || '*');
-          
-          // Aplicar ordenação se configurada
-          if (supabaseConfig?.orderBy) {
-            query = query.order(supabaseConfig.orderBy.column, { 
-              ascending: supabaseConfig.orderBy.ascending !== undefined ? supabaseConfig.orderBy.ascending : false 
-            });
-          } else {
-            query = query.order('id');
-          }
-          
-          // Aplicar filtros se configurados
-          if (supabaseConfig?.filters && supabaseConfig.filters.length > 0) {
-            supabaseConfig.filters.forEach(filter => {
-              query = query.filter(filter.column, filter.operator, filter.value);
-            });
-          }
-          
-          // Aplicar limite se configurado
-          if (supabaseConfig?.limit) {
-            query = query.limit(supabaseConfig.limit);
-          }
-          
-          const { data: fetchedData, error: fetchError } = await query;
-          
-          setIsLoading(false);
-          
-          if (fetchError) {
-            console.error('Erro ao buscar dados:', fetchError);
-            setError(fetchError.message);
-            if (onError) onError(fetchError);
-          } else if (fetchedData) {
-            setTableData(fetchedData as unknown as TData[]);
-            
-            if (onDataLoaded) onDataLoaded(fetchedData as unknown as TData[]);
-            
-            // Gerar colunas automaticamente se não forem fornecidas
-            if (!columns && fetchedData.length > 0) {
-              const generatedCols = generateColumnsFromData();
-              setGeneratedColumns(generatedCols);
+      let query = client.from(table).select(supabaseConfig.select || '*');
+      
+      // Aplicar ordenação se configurada
+      if (supabaseConfig.orderBy) {
+        query = query.order(supabaseConfig.orderBy.column, { 
+          ascending: supabaseConfig.orderBy.ascending !== undefined ? supabaseConfig.orderBy.ascending : false 
+        });
+      } else {
+        query = query.order('id');
+      }
+      
+      // Aplicar filtros se configurados
+      if (supabaseConfig.filters && supabaseConfig.filters.length > 0) {
+        supabaseConfig.filters.forEach(filter => {
+          if (filter.value) {
+            if (filter.operator === 'ilike') {
+              query = query.ilike(filter.column, `%${filter.value}%`);
+            } else if (filter.operator === 'eq') {
+              query = query.eq(filter.column, filter.value);
+            } else if (filter.operator === 'gt') {
+              query = query.gt(filter.column, filter.value);
+            } else if (filter.operator === 'lt') {
+              query = query.lt(filter.column, filter.value);
+            } else if (filter.operator === 'gte') {
+              query = query.gte(filter.column, filter.value);
+            } else if (filter.operator === 'lte') {
+              query = query.lte(filter.column, filter.value);
+            } else if (filter.operator === 'like') {
+              query = query.like(filter.column, `%${filter.value}%`);
+            } else if (filter.operator === 'neq') {
+              query = query.neq(filter.column, filter.value);
             }
           }
-        } catch (err) {
-          setIsLoading(false);
-          const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido ao buscar dados';
-          console.error('Erro ao buscar dados do Supabase:', err);
-          setError(errorMessage);
-          if (onError) onError(err);
+        });
+      }
+      
+      // Aplicar limite se configurado
+      if (supabaseConfig.limit) {
+        query = query.limit(supabaseConfig.limit);
+      }
+      
+      const { data: fetchedData, error: fetchError } = await query;
+      
+      setIsLoading(false);
+      
+      if (fetchError) {
+        console.error('Erro ao buscar dados:', fetchError);
+        setError(fetchError.message);
+        if (onError) onError(fetchError);
+      } else if (fetchedData) {
+        setTableData(fetchedData as unknown as TData[]);
+        
+        if (onDataLoaded) onDataLoaded(fetchedData as unknown as TData[]);
+        
+        // Gerar colunas automaticamente se não forem fornecidas
+        if (!columns && fetchedData.length > 0) {
+          const generatedCols = generateColumnsFromData();
+          setGeneratedColumns(generatedCols);
         }
       }
+    } catch (err: any) {
+      setIsLoading(false);
+      const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido ao buscar dados';
+      console.error('Erro ao buscar dados do Supabase:', err);
+      setError(errorMessage);
+      if (onError) onError(err);
     }
-  };
+  }, [supabaseConfig, columns, onDataLoaded, onError]);
   
   // Se não há dados fornecidos e não tem configuração de Supabase, usar dados de exemplo
   useEffect(() => {
@@ -521,19 +578,17 @@ export function DataTable<TData>({
     }
   }, [supabaseConfig, data, columns, onDataLoaded, onError]);
 
-  // Auto-gerar colunas baseado nos dados do Supabase se não fornecermos explicitamente
+  // Gerar colunas automaticamente a partir dos dados
   const generateColumnsFromData = (): ColumnDef<TData, any>[] => {
-    if (!tableData || tableData.length === 0) return [];
+    // Se não tiver dados, retornar array vazio
+    if (!tableData.length) return [];
     
-    // Vamos pegar as chaves do primeiro item para criar colunas
-    const firstItem = tableData[0];
-    if (!firstItem) return [];
+    // Criar um array para armazenar as colunas
+    const generatedColumns: ColumnDef<TData, any>[] = [];
     
-    const keys = Object.keys(firstItem);
-    
-    // Geramos as colunas começando com a coluna de seleção
-    const generatedColumns: ColumnDef<TData, any>[] = [
-      {
+    // Adicionar coluna de seleção se habilitado
+    if (enableRowSelection) {
+      generatedColumns.push({
         id: "select",
         header: ({ table }) => (
           <Checkbox
@@ -554,8 +609,18 @@ export function DataTable<TData>({
         ),
         enableSorting: false,
         enableHiding: false,
-      }
-    ];
+      });
+    }
+    
+    // Pegar o primeiro item para determinar as colunas
+    const firstItem = tableData[0];
+    if (!firstItem) return generatedColumns;
+    
+    // Obter todas as chaves do objeto, excluindo as que começam com "_"
+    const keys = Object.keys(firstItem).filter(key => !key.startsWith('_'));
+    
+    // Obter cores do tailwind.config.js
+    const twColors = getTailwindConfig();
     
     // Para cada chave do objeto, criar uma coluna apropriada
     keys.forEach(key => {
@@ -579,7 +644,7 @@ export function DataTable<TData>({
             
           return (
             <Text style={{ 
-              color: isDark ? colors.gray['100'] : colors.gray['900'],
+              color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
               textAlign: ['amount', 'valor', 'price', 'preco', 'total'].includes(key.toLowerCase()) ? 'right' : 'left',
               width: '100%'
             }}>
@@ -610,14 +675,14 @@ export function DataTable<TData>({
             
             return (
               <Text style={{ 
-                color: isDark ? colors.gray['100'] : colors.gray['900'],
+                color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
                 textAlign: 'left',
                 width: '100%'
               }}>
                 {formattedDate}
               </Text>
             );
-          } 
+          }
           else if (['amount', 'valor', 'price', 'preco', 'total'].includes(key.toLowerCase())) {
             // Formatar valores monetários
             let formattedValue = '';
@@ -633,7 +698,7 @@ export function DataTable<TData>({
             
             return (
               <Text style={{ 
-                color: isDark ? colors.gray['100'] : colors.gray['900'],
+                color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
                 textAlign: 'right',
                 width: '100%'
               }}>
@@ -645,7 +710,7 @@ export function DataTable<TData>({
             // Status com capitalização
             return (
               <Text style={{ 
-                color: isDark ? colors.gray['100'] : colors.gray['900'],
+                color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
                 textTransform: 'capitalize'
               }}>
                 {String(rawValue)}
@@ -656,7 +721,7 @@ export function DataTable<TData>({
             // Email em lowercase
             return (
               <Text style={{ 
-                color: isDark ? colors.gray['100'] : colors.gray['900'],
+                color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
                 textTransform: 'lowercase'
               }}>
                 {String(rawValue)}
@@ -666,7 +731,7 @@ export function DataTable<TData>({
           else {
             // Formato padrão para outros tipos
             return (
-              <Text style={{ color: isDark ? colors.gray['100'] : colors.gray['900'] }}>
+              <Text style={{ color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'] }}>
                 {String(rawValue)}
               </Text>
             );
@@ -675,19 +740,6 @@ export function DataTable<TData>({
       };
       
       generatedColumns.push(column);
-    });
-    
-    // Adicionar coluna de ações no final
-    generatedColumns.push({
-      id: "actions",
-      enableHiding: false,
-      cell: () => (
-        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <TouchableOpacity style={{ padding: 4 }}>
-            <MoreHorizontal size={16} color={isDark ? '#E5E7EB' : '#374151'} />
-          </TouchableOpacity>
-        </View>
-      ),
     });
     
     return generatedColumns;
@@ -907,6 +959,9 @@ export function DataTable<TData>({
   useEffect(() => {
     if (Platform.OS === 'web' as any) {
       const style = document.createElement('style');
+      // Obter cores do tailwind.config.js
+      const twColors = getTailwindConfig();
+      
       style.textContent = `
         /* Garantir que elementos com position:fixed não sejam cortados */
         *, *::before, *::after {
@@ -936,14 +991,19 @@ export function DataTable<TData>({
         /* Melhorar aparência dos checkboxes */
         [data-dropdown-content="true"] input[type="checkbox"] {
           margin-right: 8px;
-          accent-color: ${isDark ? colors.primary.dark : colors.primary.main};
+          accent-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']};
         }
 
         /* Adicionar efeitos de hover para o botão do dropdown */
         [data-table-button="true"]:hover {
-          border-color: ${isDark ? colors.primary.dark : colors.primary.main};
+          border-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']};
           transition: border-color 0.2s ease;
         }
+        
+        /* Importante: As cores são sincronizadas com tailwind.config.js 
+           - No tema claro: primary-light = #892CDC
+           - No tema escuro: primary-dark = #C13636
+        */
       `;
       document.head.appendChild(style);
       
@@ -976,18 +1036,37 @@ export function DataTable<TData>({
     
     // Componente interno do dropdown que será renderizado no portal
     const ColumnsDropdownContent = () => {
-      // Estado de hover para todas as colunas em um único objeto
-      const [hoveredColumns, setHoveredColumns] = useState<Record<string, boolean>>({});
+      const [hoveredColumnId, setHoveredColumnId] = useState<string | null>(null);
       
       const handleMouseEnter = (columnId: string) => {
-        setHoveredColumns(prev => ({ ...prev, [columnId]: true }));
+        setHoveredColumnId(columnId);
       };
       
       const handleMouseLeave = (columnId: string) => {
-        setHoveredColumns(prev => ({ ...prev, [columnId]: false }));
+        setHoveredColumnId(null);
       };
       
+      // Obter cores do tailwind.config.js
+      const twColors = getTailwindConfig();
+      
       const dropdownStyle = StyleSheet.create({
+        container: {
+          position: 'absolute',
+          top: dropdownPosition.openDown ? dropdownPosition.top : undefined,
+          right: dropdownPosition.right,
+          left: dropdownPosition.left,
+          width: dropdownPosition.width,
+          maxHeight: 250,
+          backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
+          borderRadius: 6,
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+          padding: 4,
+          boxShadow: isDark ? '0 2px 4px rgba(0,0,0,0.25)' : '0 2px 4px rgba(0,0,0,0.1)',
+          zIndex: 2000,
+          overflowY: 'auto',
+        },
         overlay: {
           position: 'fixed',
           top: 0,
@@ -997,30 +1076,13 @@ export function DataTable<TData>({
           zIndex: 1999,
           backgroundColor: 'transparent',
         },
-        container: {
-          position: 'absolute',
-          top: dropdownPosition.openDown ? dropdownPosition.top : undefined,
-          right: dropdownPosition.right,
-          left: dropdownPosition.left,
-          width: dropdownPosition.width,
-          maxHeight: 250,
-          backgroundColor: isDark ? colors.gray['800'] : colors.white,
-          borderRadius: 6,
-          borderWidth: 1,
-          borderStyle: 'solid',
-          borderColor: isDark ? colors.gray['700'] : colors.gray['200'],
-          padding: 4,
-          boxShadow: isDark ? '0 2px 4px rgba(0,0,0,0.25)' : '0 2px 4px rgba(0,0,0,0.1)',
-          zIndex: 2000,
-          overflowY: 'auto',
-        },
         header: {
           fontSize: 13,
           fontWeight: '500',
-          color: isDark ? colors.gray['400'] : colors.gray['600'],
+          color: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
           padding: 8,
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? colors.gray['700'] : colors.gray['200'],
+          borderBottomColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
           marginBottom: 4,
         },
         item: {
@@ -1032,13 +1094,13 @@ export function DataTable<TData>({
           cursor: 'pointer',
         },
         itemHover: {
-          backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+          backgroundColor: isDark ? twColors['hover-dark'] : twColors['hover-light'],
         },
         itemText: {
           fontSize: 14,
           marginLeft: 8,
           textTransform: 'capitalize',
-          color: isDark ? colors.gray['100'] : colors.gray['900'],
+          color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
         }
       });
 
@@ -1070,7 +1132,7 @@ export function DataTable<TData>({
               .getAllColumns()
               .filter((column) => column.getCanHide())
               .map((column) => {
-                const isHovered = hoveredColumns[column.id] || false;
+                const isHovered = hoveredColumnId === column.id;
                 
                 // Extrair nome de exibição do cabeçalho para mostrar no dropdown
                 let displayName = column.id;
@@ -1097,6 +1159,21 @@ export function DataTable<TData>({
                   }
                 }
                 
+                // Formatando nomes de id de colunas para exibição
+                if (displayName === 'select') displayName = 'Seleção';
+                else if (displayName === 'status') displayName = 'Status';
+                else if (displayName === 'email') displayName = 'Email';
+                else if (displayName === 'amount') displayName = 'Valor';
+                else if (displayName === 'actions') displayName = 'Ações';
+                else {
+                  // Formatar nomes genéricos (converter snake_case para Title Case)
+                  displayName = displayName
+                    .replace(/_/g, ' ')
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
+                }
+                
                 return (
                   <div
                     key={column.id}
@@ -1104,20 +1181,20 @@ export function DataTable<TData>({
                       ...dropdownStyle.item as React.CSSProperties,
                       ...(isHovered ? dropdownStyle.itemHover as React.CSSProperties : {})
                     }}
-                    onClick={() => column.toggleVisibility(!column.getIsVisible())}
                     onMouseEnter={() => handleMouseEnter(column.id)}
                     onMouseLeave={() => handleMouseLeave(column.id)}
                   >
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={column.getIsVisible()}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        column.toggleVisibility(e.target.checked);
+                      onCheckedChange={(checked) => {
+                        column.toggleVisibility(checked);
                       }}
-                      style={{ cursor: 'pointer' }}
+                      size="sm"
                     />
-                    <span style={dropdownStyle.itemText as React.CSSProperties}>
+                    <span 
+                      style={dropdownStyle.itemText as React.CSSProperties}
+                      onClick={() => column.toggleVisibility(!column.getIsVisible())}
+                    >
                       {displayName}
                     </span>
                   </div>
@@ -1165,7 +1242,7 @@ export function DataTable<TData>({
               borderRadius: 6,
               borderWidth: 1,
               borderColor: isDark ? colors.gray['700'] : colors.gray['200'],
-              shadowColor: '#000',
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: isDark ? 0.25 : 0.1,
               shadowRadius: 3,
@@ -1299,48 +1376,51 @@ export function DataTable<TData>({
   
   // Cores do tema seguindo o padrão do Accordion.tsx e theme.ts
   const getThemeColors = () => {
+    // Obter cores do tailwind.config.js
+    const twColors = getTailwindConfig();
+    
     return {
       // Cores primárias
       primary: {
-        main: isDark ? '#4A6' : colors.primary.main,
-        light: isDark ? '#5B80B6' : colors.primary.light,
-        dark: isDark ? '#6C91C7' : colors.primary.dark,
-        contrastText: '#FFFFFF',
+        main: isDark ? twColors['primary-dark'] : twColors['primary-light'],
+        light: isDark ? twColors['primary-dark-hover'] : twColors['primary-light-hover'],
+        dark: isDark ? twColors['primary-dark'] : twColors['primary-light'],
+        contrastText: isDark ? twColors['text-primary-dark'] : '#FFFFFF',
       },
       // Cores de feedback
-      error: isDark ? colors.error.dark : colors.error.main,
-      warning: isDark ? colors.warning.dark : colors.warning.main,
-      success: isDark ? colors.success.dark : colors.success.main,
-      info: isDark ? colors.info.dark : colors.info.main,
+      error: isDark ? twColors['error-icon-dark'] || twColors['tertiary-dark'] : twColors['error-icon-light'] || twColors['tertiary-light'],
+      warning: isDark ? twColors['warning-icon-dark'] || twColors['tertiary-dark'] : twColors['warning-icon-light'] || twColors['tertiary-light'],
+      success: isDark ? twColors['success-icon-dark'] || twColors['tertiary-dark'] : twColors['success-icon-light'] || twColors['tertiary-light'],
+      info: isDark ? twColors['info-icon-dark'] || twColors['tertiary-dark'] : twColors['info-icon-light'] || twColors['tertiary-light'],
       // Cores de background
       background: {
-        default: isDark ? colors.gray['900'] : colors.white,
-        paper: isDark ? colors.gray['800'] : colors.white,
-        alt: isDark ? colors.gray['800'] : colors.gray['50'],
-        elevated: isDark ? colors.gray['700'] : colors.gray['100'],
+        default: isDark ? twColors['bg-primary-dark'] : twColors['bg-primary-light'],
+        paper: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
+        alt: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
+        elevated: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
       },
       // Cores de texto
       text: {
-        primary: isDark ? colors.gray['100'] : colors.gray['900'],
-        secondary: isDark ? colors.gray['400'] : colors.gray['600'],
-        disabled: isDark ? colors.gray['500'] : colors.gray['400'],
-        hint: isDark ? colors.gray['500'] : colors.gray['400'],
+        primary: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
+        secondary: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
+        disabled: isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
+        hint: isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
       },
       // Cores de borda
       border: {
-        light: isDark ? colors.gray['700'] : colors.gray['200'],
-        main: isDark ? colors.gray['600'] : colors.gray['300'],
-        dark: isDark ? colors.gray['500'] : colors.gray['400'],
+        light: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+        main: isDark ? twColors['divider-dark'] : twColors['divider-light'],
+        dark: isDark ? twColors['divider-dark'] : twColors['divider-light'],
       },
       // Estados da interface
       state: {
-        hover: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-        selected: isDark ? 'rgba(74, 102, 102, 0.25)' : 'rgba(137, 44, 220, 0.08)',
+        hover: isDark ? twColors['hover-dark'] : twColors['hover-light'],
+        selected: isDark ? `${twColors['primary-dark']}40` : `${twColors['primary-light']}20`,
         disabled: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
-        focus: isDark ? '#4A640' : `${colors.primary.main}40`,
+        focus: isDark ? `${twColors['primary-dark']}40` : `${twColors['primary-light']}40`,
       },
       // Cores de divisor
-      divider: isDark ? colors.gray['700'] : colors.gray['200'],
+      divider: isDark ? twColors['divider-dark'] : twColors['divider-light'],
     };
   };
   
@@ -1381,11 +1461,11 @@ export function DataTable<TData>({
       borderWidth: 1,
       borderColor: themeColors.border.light,
       padding: 4,
-      shadowColor: '#000',
+      shadowColor: 'rgba(0, 0, 0, 0.5)',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: isDark ? 0.25 : 0.1,
       shadowRadius: 3,
-      elevation: 4,
+      elevation: 5,
       zIndex: 2000,
     },
     dropdownItem: {
@@ -1681,12 +1761,12 @@ export function DataTable<TData>({
         /* Estilo para linhas selecionadas */
         [data-selected-row="true"] {
           background-color: ${themeColors.state.selected} !important;
-          border-color: ${isDark ? 'rgba(137, 44, 220, 0.5)' : 'rgba(137, 44, 220, 0.2)'} !important;
+          border-color: ${isDark ? 'rgba(193, 54, 54, 0.5)' : 'rgba(137, 44, 220, 0.2)'} !important;
         }
         
         /* Checkbox personalizado para tema escuro */
         input[type="checkbox"] {
-          accent-color: ${colors.primary.main};
+          accent-color: ${isDark ? themeColors.primary.main : themeColors.primary.main};
           cursor: pointer !important;
         }
       `;
@@ -1725,41 +1805,53 @@ export function DataTable<TData>({
     );
   };
 
-  // Renderizar estado de erro para Supabase
+  // Renderiza o estado de erro para o Supabase
   const renderErrorState = () => {
     if (!error) return null;
     
-    // Determinar o tipo de erro para exibir mensagem apropriada
-    let errorMessage = error;
-    let errorTitle = "Erro ao carregar dados";
-    
-    if (error.includes("table") && error.includes("not found")) {
-      errorTitle = "Tabela não encontrada";
-      errorMessage = `A tabela '${supabaseConfig?.table}' não foi encontrada no seu projeto Supabase. Verifique se ela existe ou se o nome está correto.`;
-    } else if (error.includes("authentication") || error.includes("auth")) {
-      errorTitle = "Erro de autenticação";
-      errorMessage = "Não foi possível autenticar com o Supabase. Verifique se as credenciais estão corretas.";
-    } else if (error.includes("network") || error.includes("connection")) {
-      errorTitle = "Erro de conexão";
-      errorMessage = "Não foi possível conectar ao servidor Supabase. Verifique sua conexão com a internet.";
-    }
+    const twColors = getTailwindConfig();
+    const bgColor = isDark ? twColors['error-bg-dark'] || twColors['bg-tertiary-dark'] : twColors['error-bg-light'] || twColors['bg-tertiary-light'];
+    const textColor = isDark ? twColors['error-text-dark'] || twColors['text-primary-dark'] : twColors['error-text-light'] || twColors['text-primary-light'];
+    const buttonBgColor = isDark ? twColors['primary-dark'] : twColors['primary-light'];
+    const buttonTextColor = isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'];
     
     return (
-      <View className="p-6 items-center bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <View className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900 items-center justify-center mb-3">
-          <AlertCircle size={24} color={isDark ? '#FCA5A5' : '#DC2626'} />
-        </View>
-        <Text className={`text-lg font-bold text-center mb-2 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
-          {errorTitle}
+      <View
+        style={{
+          padding: 16,
+          backgroundColor: bgColor,
+          borderRadius: 6,
+          marginBottom: 16,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text style={{ 
+          color: textColor, 
+          fontWeight: 'bold', 
+          marginBottom: 8 
+        }}>
+          Erro ao carregar dados do Supabase
         </Text>
-        <Text className={`text-center ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-          {errorMessage}
+        <Text style={{ 
+          color: textColor, 
+          marginBottom: 16,
+          textAlign: 'center'
+        }}>
+          {error}
         </Text>
         <TouchableOpacity
-          className="mt-4 bg-primary-dark dark:bg-primary-light px-4 py-2 rounded-md"
           onPress={fetchSupabaseData}
+          style={{
+            backgroundColor: buttonBgColor,
+            paddingVertical: 8,
+            paddingHorizontal: 16,
+            borderRadius: 4,
+          }}
         >
-          <Text className="text-white dark:text-gray-900 font-medium">Tentar novamente</Text>
+          <Text style={{ color: buttonTextColor, fontWeight: '500' }}>
+            Tentar novamente
+          </Text>
         </TouchableOpacity>
       </View>
     );

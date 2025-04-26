@@ -5,6 +5,28 @@ import { Input, InputProps } from './Input';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { colors } from '../constants/theme';
 
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#C13636',
+      'bg-primary-light': '#F7F8FA',
+      'bg-primary-dark': '#1C1E26',
+      'bg-secondary-light': '#FFFFFF',
+      'bg-secondary-dark': '#14181B',
+      'text-primary-light': '#14181B',
+      'text-primary-dark': '#FFFFFF',
+    };
+  }
+};
+
 /**
  * @component TimeInput
  * @description Componente de entrada de hora com suporte a:
@@ -183,6 +205,10 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   
   // Função para converter Date para string no formato HH:MM
   const timeToString = (date: Date): string => {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return '';
+    }
+    
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     
@@ -194,6 +220,9 @@ export const TimeInput: React.FC<TimeInputProps> = ({
     // Remove caracteres não numéricos
     text = text.replace(/\D/g, '');
     
+    // Limita a 4 dígitos (2 para hora, 2 para minutos)
+    text = text.substring(0, 4);
+    
     // Formata para HH:MM
     if (text.length <= 2) {
       // Apenas horas
@@ -202,7 +231,15 @@ export const TimeInput: React.FC<TimeInputProps> = ({
       // Horas e minutos
       const hours = text.substring(0, 2);
       const minutes = text.substring(2, 4);
-      return `${hours}:${minutes}`;
+      
+      // Validação básica
+      const hoursNum = parseInt(hours, 10);
+      const minutesNum = parseInt(minutes, 10);
+      
+      const validHours = hoursNum <= 23 ? hours : '23';
+      const validMinutes = minutesNum <= 59 ? minutes : '59';
+      
+      return `${validHours}:${validMinutes || '00'}`;
     }
   };
   
@@ -214,22 +251,31 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   
   // Função para lidar com a mudança de hora no seletor nativo (iOS/Android)
   const handleTimePickerChange = (event: any, selectedTime?: Date) => {
-    // Não fecha mais o picker automaticamente
-    
     // Se o usuário cancelou ou não selecionou nenhuma hora
     if (!selectedTime) {
       return;
     }
     
-    // Atualiza apenas a hora temporária, não confirma ainda
-    setTempTime(selectedTime);
+    // Garantir que os minutos sejam preservados
+    const newTime = new Date(selectedTime);
+    
+    // Atualiza a hora temporária, não confirma ainda
+    setTempTime(newTime);
   };
   
   // Função para lidar com a confirmação da hora
   const handleConfirm = () => {
     // Se temos uma hora temporária selecionada, aplica-a
     if (tempTime) {
-      onChangeText(timeToString(tempTime));
+      // Assegurar que estamos capturando horas e minutos corretamente
+      const timeString = timeToString(tempTime);
+      onChangeText(timeString);
+      
+      // Depuração para verificar valores
+      if (Platform.OS === 'web' && process.env.NODE_ENV === 'development') {
+        console.log('Hora confirmada:', tempTime);
+        console.log('String formatada:', timeString);
+      }
     }
     
     // Fecha o picker
@@ -268,6 +314,9 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   
+  // Obter cores do tailwind
+  const twColors = getTailwindConfig();
+  
   // Estilo para o modal e componentes relacionados
   const styles = StyleSheet.create({
     modalContainer: {
@@ -284,10 +333,10 @@ export const TimeInput: React.FC<TimeInputProps> = ({
     },
     modalContent: {
       width: Math.min(windowWidth * 0.9, 320),
-      backgroundColor: isDark ? '#1A1F24' : '#FFFFFF',
+      backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
       borderRadius: 12,
       padding: 16,
-      shadowColor: '#000',
+      shadowColor: 'rgba(0, 0, 0, 0.5)',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
@@ -299,7 +348,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
       marginTop: 16,
       paddingTop: 16,
       borderTopWidth: 1,
-      borderTopColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+      borderTopColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
     },
     button: {
       padding: 10,
@@ -311,26 +360,26 @@ export const TimeInput: React.FC<TimeInputProps> = ({
       backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
     },
     buttonConfirm: {
-      backgroundColor: colors.primary.main,
+      backgroundColor: isDark ? twColors['primary-dark'] : twColors['primary-light'],
     },
     buttonTextCancel: {
-      color: isDark ? '#FFFFFF' : '#000000',
+      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
       fontWeight: '500',
       fontSize: 14,
     },
     buttonTextConfirm: {
-      color: '#FFFFFF',
+      color: twColors['text-primary-dark'],
       fontWeight: '600',
       fontSize: 14,
     },
     pickerContainer: {
       alignItems: 'center',
-      backgroundColor: isDark ? '#1A1F24' : '#FFFFFF',
+      backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
     },
     pickerTitle: {
       fontSize: 18,
       fontWeight: '600',
-      color: isDark ? '#FFFFFF' : '#000000',
+      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
       marginBottom: 16,
       textAlign: 'center',
     },
@@ -347,7 +396,9 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   useEffect(() => {
     if (Platform.OS === 'web') {
       const style = document.createElement('style');
-      const primaryColor = isDark ? colors.primary.dark : colors.primary.main;
+      const primaryColor = isDark ? twColors['primary-dark'] : twColors['primary-light'];
+      const textColor = isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'];
+      const bgColor = isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'];
       
       style.textContent = `
         /* Estilização do seletor de hora HTML5 nativo */
@@ -363,7 +414,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
         
         /* Cor principal para o calendário e elementos selecionados */
         input[type="time"]::-webkit-datetime-edit-fields-wrapper {
-          color: ${isDark ? '#FFFFFF' : '#14181B'};
+          color: ${textColor};
         }
         
         /* Reposicionar o seletor para não sobrepor o campo */
@@ -385,11 +436,12 @@ export const TimeInput: React.FC<TimeInputProps> = ({
         
         /* Estilizações para o seletor nativo */
         ::-webkit-time-picker {
-          background-color: ${isDark ? '#1A1F24' : '#FFFFFF'};
+          background-color: ${bgColor};
         }
         
+        /* Estilizações para o seletor nativo */
         ::-webkit-datetime-edit {
-          color: ${isDark ? '#FFFFFF' : '#14181B'};
+          color: ${textColor};
         }
         
         /* Para navegadores baseados em Chromium */
@@ -518,7 +570,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
                   display="spinner"
                   onChange={handleTimePickerChange}
                   is24Hour={is24Hour}
-                  minuteInterval={minuteInterval}
+                  minuteInterval={1}
                   locale="pt-BR"
                   textColor={isDark ? '#FFFFFF' : '#000000'}
                   themeVariant={isDark ? 'dark' : 'light'}

@@ -5,6 +5,32 @@ import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { colors } from '../constants/theme';
 
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#C13636',
+      'bg-primary-light': '#F7F8FA',
+      'bg-primary-dark': '#1C1E26',
+      'bg-secondary-light': '#FFFFFF',
+      'bg-secondary-dark': '#14181B',
+      'text-primary-light': '#14181B',
+      'text-primary-dark': '#FFFFFF',
+      'text-secondary-light': '#57636C',
+      'text-secondary-dark': '#95A1AC',
+      'divider-light': '#E0E3E7',
+      'divider-dark': '#262D34',
+    };
+  }
+};
+
 /**
  * @component Input
  * @description Componente de entrada de texto altamente personalizável que suporta:
@@ -195,6 +221,9 @@ export const Input = ({
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   
+  // Obter cores do tailwind
+  const twColors = getTailwindConfig();
+  
   // Responsividade
   const { isMobile } = useResponsive();
   
@@ -309,18 +338,18 @@ export const Input = ({
       alignItems: 'center',
       borderWidth: 1,
       borderRadius: 6,
-      backgroundColor: isDark ? '#14181B' : '#FFFFFF',
+      backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
       borderColor: error 
         ? (isDark ? '#FF6B6B' : '#FF4040')
         : isFocused
-          ? (isDark ? colors.primary.dark : colors.primary.main)
-          : (isDark ? '#262D34' : '#E0E3E7'),
+          ? (isDark ? twColors['primary-dark'] : twColors['primary-light'])
+          : (isDark ? twColors['divider-dark'] : twColors['divider-light']),
       minHeight: 38,
       paddingHorizontal: 12,
     },
     inputStyle: {
       flex: 1,
-      color: isDark ? '#FFFFFF' : '#14181B',
+      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
       fontSize: 14,
       paddingVertical: 8,
       height: multiline ? undefined : 38,
@@ -340,7 +369,7 @@ export const Input = ({
     labelStyle: {
       fontSize: 12,
       marginBottom: 4,
-      color: isDark ? '#95A1AC' : '#57636C',
+      color: isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
       fontWeight: '500',
     },
     errorText: {

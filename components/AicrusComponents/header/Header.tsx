@@ -6,6 +6,42 @@ import { useResponsive } from '../../../hooks/useResponsive';
 import { NotificationsMenu } from '../../AicrusComponents/notifications-menu/NotificationsMenu';
 import { ProfileMenu } from '../../AicrusComponents/profile-menu/ProfileMenu';
 
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#C13636',
+      'primary-light-hover': '#3D5C8C',
+      'primary-dark-hover': '#5B80B6',
+      'bg-primary-light': '#F7F8FA',
+      'bg-primary-dark': '#1C1E26',
+      'bg-secondary-light': '#FFFFFF',
+      'bg-secondary-dark': '#14181B',
+      'bg-tertiary-light': '#F1F4F8',
+      'bg-tertiary-dark': '#262D34',
+      'text-primary-light': '#14181B',
+      'text-primary-dark': '#FFFFFF',
+      'text-secondary-light': '#57636C',
+      'text-secondary-dark': '#95A1AC',
+      'text-tertiary-light': '#8B97A2',
+      'text-tertiary-dark': '#6B7280',
+      'divider-light': '#E0E3E7',
+      'divider-dark': '#262D34',
+      'hover-light': '#00000008',
+      'hover-dark': '#FFFFFF08',
+      'active-light': '#00000012',
+      'active-dark': '#FFFFFF12',
+    };
+  }
+};
+
 // Definição de cores temporária até termos acesso ao arquivo de tema
 const colors = {
   white: '#FFFFFF',
@@ -109,8 +145,9 @@ export function Header({
   const [avatarPosition, setAvatarPosition] = useState({ x: 0, y: 0 });
 
   // Definir cores conforme o tema do Tailwind
-  const bgColor = isDark ? '#1C1E26' : '#FFFFFF';
-  const borderColor = isDark ? '#262D34' : '#E0E3E7';
+  const twColors = getTailwindConfig();
+  const bgColor = isDark ? twColors['bg-primary-dark'] : twColors['bg-secondary-light'];
+  const borderColor = isDark ? twColors['divider-dark'] : twColors['divider-light'];
 
   // Fechar menus quando a tela for redimensionada
   useEffect(() => {

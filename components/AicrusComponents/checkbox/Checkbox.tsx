@@ -2,7 +2,6 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { Check, Minus } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
-import { colors } from '../constants/theme';
 
 /**
  * @component Checkbox
@@ -34,6 +33,24 @@ import { colors } from '../constants/theme';
  * />
  * ```
  */
+
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#4A6',
+      'text-secondary-light': '#57636C',
+      'text-secondary-dark': '#95A1AC',
+    };
+  }
+};
 
 export interface CheckboxProps {
   /** 
@@ -70,6 +87,9 @@ export const Checkbox = ({
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   
+  // Obter cores do tailwind.config.js
+  const twColors = getTailwindConfig();
+  
   // Determinar tamanho do checkbox
   const getSize = () => {
     switch (size) {
@@ -96,11 +116,11 @@ export const Checkbox = ({
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: (checked === true || checked === "indeterminate")
-        ? (isDark ? colors.primary.dark : colors.primary.main)
+        ? (isDark ? twColors['primary-dark'] : twColors['primary-light'])
         : 'transparent',
       borderColor: (checked === true || checked === "indeterminate")
-        ? (isDark ? colors.primary.dark : colors.primary.main) 
-        : (isDark ? '#95A1AC' : '#57636C'),
+        ? (isDark ? twColors['primary-dark'] : twColors['primary-light']) 
+        : (isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light']),
       opacity: disabled ? 0.5 : 1,
     },
   });
@@ -112,7 +132,7 @@ export const Checkbox = ({
       style.textContent = `
         /* Estilo de hover para checkbox */
         [data-checkbox-container="true"]:hover:not([data-disabled="true"]) [data-checkbox="true"] {
-          border-color: ${isDark ? colors.primary.dark : colors.primary.main};
+          border-color: ${isDark ? twColors['primary-dark'] : twColors['primary-light']};
           transition: all 0.2s ease;
         }
       `;

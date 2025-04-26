@@ -28,7 +28,7 @@ module.exports = {
         'active-light': '#00000012',
         
         // Dark theme colors
-        'primary-dark': '#4A6',
+        'primary-dark': '#C13636',
         'primary-dark-hover': '#5B80B6', 
         'primary-dark-active': '#6C91C7',
         'secondary-dark': '#2C3E',

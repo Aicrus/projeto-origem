@@ -5,6 +5,28 @@ import { Input, InputProps } from './Input';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { colors } from '../constants/theme';
 
+// Função para obter as cores do tailwind.config.js
+const getTailwindConfig = () => {
+  try {
+    // Importando dinamicamente o tailwind.config.js
+    const tailwindConfig = require('../../../tailwind.config.js');
+    return tailwindConfig.theme.extend.colors;
+  } catch (error) {
+    // Fallback para valores padrão caso não consiga importar
+    console.error('Erro ao carregar tailwind.config.js:', error);
+    return {
+      'primary-light': '#892CDC',
+      'primary-dark': '#C13636',
+      'bg-primary-light': '#F7F8FA',
+      'bg-primary-dark': '#1C1E26',
+      'bg-secondary-light': '#FFFFFF',
+      'bg-secondary-dark': '#14181B',
+      'text-primary-light': '#14181B',
+      'text-primary-dark': '#FFFFFF',
+    };
+  }
+};
+
 /**
  * @component DateInput
  * @description Componente de entrada de data com suporte a:
@@ -261,6 +283,9 @@ export const DateInput: React.FC<DateInputProps> = ({
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   
+  // Obter cores do tailwind
+  const twColors = getTailwindConfig();
+  
   // Estilo para o modal e componentes relacionados
   const styles = StyleSheet.create({
     modalContainer: {
@@ -277,10 +302,10 @@ export const DateInput: React.FC<DateInputProps> = ({
     },
     modalContent: {
       width: Math.min(windowWidth * 0.9, 320),
-      backgroundColor: isDark ? '#1A1F24' : '#FFFFFF',
+      backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
       borderRadius: 12,
       padding: 16,
-      shadowColor: '#000',
+      shadowColor: 'rgba(0, 0, 0, 0.5)',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
@@ -292,7 +317,7 @@ export const DateInput: React.FC<DateInputProps> = ({
       marginTop: 16,
       paddingTop: 16,
       borderTopWidth: 1,
-      borderTopColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+      borderTopColor: isDark ? twColors['divider-dark'] : twColors['divider-light'],
     },
     button: {
       padding: 10,
@@ -304,10 +329,10 @@ export const DateInput: React.FC<DateInputProps> = ({
       backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
     },
     buttonConfirm: {
-      backgroundColor: colors.primary.main,
+      backgroundColor: isDark ? twColors['primary-dark'] : twColors['primary-light'],
     },
     buttonTextCancel: {
-      color: isDark ? '#FFFFFF' : '#000000',
+      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
       fontWeight: '500',
       fontSize: 14,
     },
@@ -318,12 +343,12 @@ export const DateInput: React.FC<DateInputProps> = ({
     },
     pickerContainer: {
       alignItems: 'center',
-      backgroundColor: isDark ? '#1A1F24' : '#FFFFFF',
+      backgroundColor: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
     },
     pickerTitle: {
       fontSize: 18,
       fontWeight: '600',
-      color: isDark ? '#FFFFFF' : '#000000',
+      color: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
       marginBottom: 16,
       textAlign: 'center',
     },
