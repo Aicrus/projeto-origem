@@ -259,7 +259,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                       style={styles.navItemContainer}
                     >
                       <GradientView
-                        colors={[colors['primary-dark'], colors['primary-dark-active']]}
+                        colors={isDark ? [colors['primary-dark'], colors['primary-dark-active']] : [colors['primary-light'], colors['primary-light-active']]}
                         start={{ x: 0.2, y: 0 }}
                         end={{ x: 0.8, y: 1 }}
                         style={{
@@ -397,7 +397,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
             return (
               <Link key={item.path} href={item.path as any} asChild>
                 <GradientView
-                  colors={[colors['primary-dark'], colors['primary-dark-active']]}
+                  colors={isDark ? [colors['primary-dark'], colors['primary-dark-active']] : [colors['primary-light'], colors['primary-light-active']]}
                   start={{ x: 0.2, y: 0 }}
                   end={{ x: 0.8, y: 1 }}
                   style={{
