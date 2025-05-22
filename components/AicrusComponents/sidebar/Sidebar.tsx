@@ -27,7 +27,7 @@ import { useTheme } from '../../../hooks/ThemeContext';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { GradientView } from '../gradient/GradientView';
 import { useAuth } from '../../../contexts/auth';
-import { colors } from '@/constants/theme';
+import { colors } from '../../../designer-system/tokens/colors';
 
 // Constante para z-index
 const Z_INDEX = {
@@ -74,7 +74,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
   const { signOut } = useAuth();
   
   // Para facilitar o acesso às cores mais usadas
-  const colorWhite = '#FFFFFF';
+  const colorWhite = colors['text-primary-dark']; // Branco está definido como text-primary-dark
   const colorGray = {
     '200': isDark ? colors['divider-dark'] : colors['divider-light'],
     '300': isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light'],
@@ -236,7 +236,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
             {/* Logo */}
             <View style={styles.logoContainer}>
               <View style={getConditionalStyle(styles.logoBox, styles.logoBoxCompact)}>
-                <Building size={20} color="#333333" strokeWidth={1.5} />
+                <Building size={20} color={isDark ? colors['icon-dark'] : colors['icon-light']} strokeWidth={1.5} />
               </View>
               <View>
                 <Text style={[styles.logoText, isDark && styles.logoTextDark]}>Projeto</Text>
@@ -259,7 +259,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                       style={styles.navItemContainer}
                     >
                       <GradientView
-                        colors={['#8A40CF', '#5F2D85']}
+                        colors={[colors['primary-dark'], colors['primary-dark-active']]}
                         start={{ x: 0.2, y: 0 }}
                         end={{ x: 0.8, y: 1 }}
                         style={{
@@ -376,7 +376,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
       {/* Logo */}
       <View style={getConditionalStyle(styles.logoContainer, styles.logoContainerCompact)}>
         <View style={getConditionalStyle(styles.logoBox, styles.logoBoxCompact)}>
-          <Building size={20} color="#333333" strokeWidth={1.5} />
+          <Building size={20} color={isDark ? colors['icon-dark'] : colors['icon-light']} strokeWidth={1.5} />
         </View>
         {!isTablet && (
           <View>
@@ -397,7 +397,7 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
             return (
               <Link key={item.path} href={item.path as any} asChild>
                 <GradientView
-                  colors={['#8A40CF', '#5F2D85']}
+                  colors={[colors['primary-dark'], colors['primary-dark-active']]}
                   start={{ x: 0.2, y: 0 }}
                   end={{ x: 0.8, y: 1 }}
                   style={{
@@ -518,12 +518,12 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
 const styles = StyleSheet.create({
   sidebar: {
     width: 250,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors['bg-secondary-light'],
     height: '100%',
     paddingVertical: 24,
     paddingHorizontal: 16,
     borderRightWidth: 1,
-    borderRightColor: '#E0E3E7',
+    borderRightColor: colors['divider-light'],
     ...(Platform.OS === 'web' && {
       position: 'fixed',
       top: 0,
@@ -532,8 +532,8 @@ const styles = StyleSheet.create({
     }),
   },
   sidebarDark: {
-    backgroundColor: '#1C1E26',
-    borderRightColor: '#262D34',
+    backgroundColor: colors['bg-primary-dark'],
+    borderRightColor: colors['divider-dark'],
   },
   sidebarCompact: {
     width: 65,
@@ -565,17 +565,17 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#14181B',
+    color: colors['text-primary-light'],
   },
   logoTextDark: {
-    color: '#FFFFFF',
+    color: colors['text-primary-dark'],
   },
   subLogoText: {
     fontSize: 14,
-    color: '#57636C',
+    color: colors['text-secondary-light'],
   },
   subLogoTextDark: {
-    color: '#95A1AC',
+    color: colors['text-secondary-dark'],
   },
   nav: {
     gap: 4,
@@ -606,11 +606,11 @@ const styles = StyleSheet.create({
   },
   activeNavItem: {
     ...(Platform.OS === 'web' ? {
-      backgroundImage: 'linear-gradient(135deg, #3A6B7E 0%, #264450 50%, #1a2f37 100%)',
+      backgroundImage: `linear-gradient(135deg, ${colors['primary-light']} 0%, ${colors['primary-light-hover']} 50%, ${colors['primary-light-active']} 100%)`,
       boxShadow: '0 2px 6px rgba(38, 68, 80, 0.2)',
       cursor: 'pointer',
     } : {
-      backgroundColor: '#892CDC',
+      backgroundColor: colors['primary-light'],
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.2,
@@ -618,7 +618,7 @@ const styles = StyleSheet.create({
       elevation: 4,
     }),
     borderLeftWidth: Platform.OS === 'web' ? 3 : 0,
-    borderLeftColor: '#4FADCF',
+    borderLeftColor: colors['secondary-light'],
     borderRadius: 10,
     transform: [{ scale: 1.02 }]
   },
@@ -639,13 +639,13 @@ const styles = StyleSheet.create({
   navText: {
     fontSize: 15,
     flex: 1,
-    color: '#57636C',
+    color: colors['text-secondary-light'],
   },
   navTextDark: {
-    color: '#95A1AC',
+    color: colors['text-secondary-dark'],
   },
   activeNavText: {
-    color: '#FFFFFF',
+    color: colors['text-primary-dark'],
     fontWeight: '800',
   },
   footer: {
@@ -677,10 +677,10 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     fontSize: 14,
-    color: '#57636C',
+    color: colors['text-secondary-light'],
   },
   logoutTextDark: {
-    color: '#95A1AC',
+    color: colors['text-secondary-dark'],
   },
   modalContainer: {
     flex: 1,
@@ -711,7 +711,7 @@ const styles = StyleSheet.create({
   drawer: {
     width: 280,
     height: '100%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors['bg-secondary-light'],
     paddingTop: Platform.OS === 'ios' ? 65 : 40,
     paddingBottom: 24,
     paddingHorizontal: 16,

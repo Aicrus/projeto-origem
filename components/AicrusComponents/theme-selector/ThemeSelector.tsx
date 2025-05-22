@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useTheme } from '@/hooks/ThemeContext';
-import { colors } from '@/constants/theme';
+import { colors } from '../../../designer-system/tokens/colors';
 
 /**
  * Ícones para cada modo de tema

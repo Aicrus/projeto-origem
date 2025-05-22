@@ -1,23 +1,42 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useColorScheme as useDeviceColorScheme, Appearance } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { 
-  ThemeMode, 
-  ColorScheme, 
-  theme, 
-  getColorByMode, 
-  getThemedValue 
-} from '../constants/theme';
+
+// Importar tokens diretamente do design system
+import { colors } from '../designer-system/tokens/colors';
+import { spacing } from '../designer-system/tokens/spacing';
+import { fontSize as fontSizes, fontFamily } from '../designer-system/tokens/typography';
+import { borderRadius } from '../designer-system/tokens/borders';
+import { boxShadow, opacity, zIndex, transitionDuration } from '../designer-system/tokens/effects';
+
+// Tipos básicos mantidos
+export type ThemeMode = 'light' | 'dark' | 'system';
+export type ColorScheme = 'light' | 'dark';
 
 interface ThemeContextType {
+  // Estados do tema
   themeMode: ThemeMode;
-  setThemeMode: (mode: ThemeMode) => void;
   currentTheme: ColorScheme;
-  // Expõe todos os valores do tema
-  theme: typeof theme;
+  // Funções de controle
+  setThemeMode: (mode: ThemeMode) => void;
+  toggleTheme: () => void;
+  // Tokens do design system
+  colors: typeof colors;
+  spacing: typeof spacing;
+  fontSize: typeof fontSizes;
+  fontFamily: typeof fontFamily;
+  borderRadius: typeof borderRadius;
+  boxShadow: typeof boxShadow;
+  opacity: typeof opacity;
+  zIndex: typeof zIndex;
+  transitionDuration: typeof transitionDuration;
   // Funções utilitárias
-  getColorByMode: (colorBase: string) => string;
   getThemedValue: <T>(lightValue: T, darkValue: T) => T;
+  getColorByMode: (colorBase: string, colorScheme?: ColorScheme) => string;
+  // Helpers
+  isDark: boolean;
+  isLight: boolean;
+  isSystem: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -74,18 +93,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Função para alternar entre os temas
+  const toggleTheme = () => {
+    const newMode: ThemeMode = 
+      themeMode === 'light' ? 'dark' : 
+      themeMode === 'dark' ? 'system' : 'light';
+    setThemeMode(newMode);
+  };
+
   // Determina o tema atual baseado no modo e tema do sistema
   const currentTheme: ColorScheme = themeMode === 'system' ? systemTheme : themeMode as ColorScheme;
   
-  // Funções utilitárias especificas deste contexto
-  const getThemeColor = (colorBase: string): string => {
-    return getColorByMode(colorBase, currentTheme);
-  };
-  
   // Função utilitária para obter valores baseados no tema
   const getThemed = <T,>(lightValue: T, darkValue: T): T => {
-    return getThemedValue(currentTheme, lightValue, darkValue);
+    return currentTheme === 'dark' ? darkValue : lightValue;
   };
+
+  // Helpers para verificar o estado do tema
+  const isDark = currentTheme === 'dark';
+  const isLight = currentTheme === 'light';
+  const isSystem = themeMode === 'system';
 
   // Log para debug
   useEffect(() => {
@@ -93,6 +120,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       themeMode,
       systemTheme,
       currentTheme,
+      isDark,
+      isLight,
+      isSystem
     });
   }, [themeMode, systemTheme, currentTheme]);
 
@@ -103,12 +133,33 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <ThemeContext.Provider
       value={{
+        // Estados
         themeMode,
-        setThemeMode,
         currentTheme,
-        theme,
-        getColorByMode: getThemeColor,
+        // Funções de controle
+        setThemeMode,
+        toggleTheme,
+        // Tokens do design system
+        colors,
+        spacing,
+        fontSize: fontSizes,
+        fontFamily,
+        borderRadius,
+        boxShadow,
+        opacity,
+        zIndex,
+        transitionDuration,
+        // Funções utilitárias
         getThemedValue: getThemed,
+        getColorByMode: (colorBase: string, colorScheme?: ColorScheme) => {
+          const scheme = colorScheme || currentTheme;
+          const colorKey = `${colorBase}-${scheme}` as keyof typeof colors;
+          return colors[colorKey] || '';
+        },
+        // Helpers
+        isDark,
+        isLight,
+        isSystem,
       }}>
       {children}
     </ThemeContext.Provider>

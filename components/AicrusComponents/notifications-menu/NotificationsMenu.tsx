@@ -5,7 +5,7 @@ import { HoverableView } from '../hoverable-view/HoverableView';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { router } from 'expo-router';
-import { colors } from '@/constants/theme';
+import { colors } from '../../../designer-system/tokens/colors';
 
 /**
  * @component NotificationsMenu

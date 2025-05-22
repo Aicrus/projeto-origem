@@ -3,7 +3,11 @@ import { StyleSheet, View, TextInput, Text, TouchableOpacity, Platform, Keyboard
 import { Eye, EyeOff, Search, X, Calendar, Plus, Minus, Clock, ChevronUp, ChevronDown } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { colors } from '../../../constants/theme';
+import { colors, ColorType } from '../../../designer-system/tokens/colors';
+import { spacing } from '../../../designer-system/tokens/spacing';
+import { borderRadius, getBorderRadius } from '../../../designer-system/tokens/borders';
+import { fontSize, fontFamily } from '../../../designer-system/tokens/typography';
+import { opacity, getOpacity } from '../../../designer-system/tokens/effects';
 
 /**
  * @component Input
@@ -192,11 +196,15 @@ export const Input = ({
   const nativeNumberInputRef = useRef<HTMLInputElement>(null);
   
   // Tema atual
-  const { currentTheme, getColorByMode } = useTheme();
+  const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   
-  // Obter cores do tailwind
-  const twColors = colors;
+  // Obter cores do design system
+  const getThemeColor = (baseColor: string): string => {
+    const darkKey = `${baseColor}-dark` as ColorType;
+    const lightKey = `${baseColor}-light` as ColorType;
+    return isDark ? colors[darkKey] : colors[lightKey];
+  };
   
   // Responsividade
   const { isMobile } = useResponsive();
@@ -305,77 +313,79 @@ export const Input = ({
   const containerStyle = StyleSheet.create({
     container: {
       width: '100%',
-      marginBottom: error ? 4 : 0,
+      marginBottom: error ? Number(spacing['1'].replace('px', '')) : 0,
     },
     inputContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       borderWidth: 1,
-      borderRadius: 6,
-      backgroundColor: getColorByMode('bg-secondary'),
+      borderRadius: Number(getBorderRadius('md').replace('px', '')),
+      backgroundColor: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
       borderColor: error 
-        ? getColorByMode('error')
+        ? isDark ? colors['error-border-dark'] : colors['error-border-light']
         : isFocused
-          ? getColorByMode('primary')
-          : getColorByMode('divider'),
-      minHeight: 38,
-      paddingHorizontal: 12,
+          ? isDark ? colors['primary-dark'] : colors['primary-light']
+          : isDark ? colors['divider-dark'] : colors['divider-light'],
+      minHeight: Number(spacing['9'].replace('px', '')),
+      paddingHorizontal: Number(spacing['3'].replace('px', '')),
     },
     inputStyle: {
       flex: 1,
-      color: getColorByMode('text-primary'),
-      fontSize: 14,
-      paddingVertical: 8,
-      height: multiline ? undefined : 38,
+      color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+      fontSize: Number(fontSize['body-md'].size.replace('px', '')),
+      lineHeight: Number(fontSize['body-md'].lineHeight.replace('px', '')),
+      fontFamily: fontFamily['jakarta-regular'],
+      paddingVertical: Number(spacing['2'].replace('px', '')),
+      height: multiline ? undefined : Number(spacing['9'].replace('px', '')),
       textAlignVertical: multiline ? 'top' : 'center',
-      ...(Platform.OS === 'ios' && multiline ? { paddingTop: 8 } : {}), // Ajuste específico para iOS
+      ...(Platform.OS === 'ios' && multiline ? { paddingTop: Number(spacing['2'].replace('px', '')) } : {}),
     },
-    // Estilo específico para o ícone de pesquisa (mais à esquerda)
     searchIcon: {
-      padding: 2,
-      marginRight: 4,
-      marginLeft: -4, // Move o ícone mais para a esquerda
+      padding: Number(spacing['0.5'].replace('px', '')),
+      marginRight: Number(spacing['1'].replace('px', '')),
+      marginLeft: -4, // Valor fixo para manter o alinhamento
     },
-    // Estilos padrão para ícones à direita
     iconContainer: {
-      padding: 4,
+      padding: Number(spacing['1'].replace('px', '')),
     },
     labelStyle: {
-      fontSize: 12,
-      marginBottom: 4,
-      color: getColorByMode('text-secondary'),
-      fontWeight: '500',
+      fontSize: Number(fontSize['label-sm'].size.replace('px', '')),
+      lineHeight: Number(fontSize['label-sm'].lineHeight.replace('px', '')),
+      fontFamily: fontFamily['jakarta-medium'],
+      marginBottom: Number(spacing['1'].replace('px', '')),
+      color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
     },
     errorText: {
-      fontSize: 12,
-      color: getColorByMode('error'),
-      marginTop: 2,
+      fontSize: Number(fontSize['body-sm'].size.replace('px', '')),
+      lineHeight: Number(fontSize['body-sm'].lineHeight.replace('px', '')),
+      fontFamily: fontFamily['jakarta-regular'],
+      color: isDark ? colors['error-text-dark'] : colors['error-text-light'],
+      marginTop: Number(spacing['0.5'].replace('px', '')),
     },
-    // Estilos para input numérico nativo
     numberControlsContainer: {
       position: 'absolute',
       right: 0,
       top: 0,
       bottom: 0,
-      width: 26,
-      borderTopRightRadius: 6,
-      borderBottomRightRadius: 6,
+      width: Number(spacing['6'].replace('px', '')),
+      borderTopRightRadius: Number(getBorderRadius('md').replace('px', '')),
+      borderBottomRightRadius: Number(getBorderRadius('md').replace('px', '')),
       overflow: 'hidden',
       flexDirection: 'column',
       justifyContent: 'space-between',
-      backgroundColor: getColorByMode('bg-secondary'),
+      backgroundColor: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
       borderLeftWidth: 1,
-      borderLeftColor: getColorByMode('divider'),
+      borderLeftColor: isDark ? colors['divider-dark'] : colors['divider-light'],
     },
     numberControlButton: {
       height: '50%',
-      width: 26,
+      width: Number(spacing['6'].replace('px', '')),
       alignItems: 'center',
       justifyContent: 'center',
     },
     numberControlButtonUp: {
       borderBottomWidth: 1,
-      borderBottomColor: getColorByMode('divider'),
+      borderBottomColor: isDark ? colors['divider-dark'] : colors['divider-light'],
     },
     numberControlButtonDown: {
       borderTopWidth: 0,
@@ -590,7 +600,7 @@ export const Input = ({
       style.textContent = `
         /* Estilos para o input */
         [data-input-container="true"]:hover:not([data-disabled="true"]) {
-          border-color: ${getColorByMode('primary')};
+          border-color: ${getThemeColor('primary')};
           transition: all 0.2s ease;
         }
         
@@ -619,12 +629,12 @@ export const Input = ({
         
         /* Estilo para controles numéricos */
         [data-input-number-control]:hover:not(:disabled) {
-          background-color: ${getColorByMode('divider')};
+          background-color: ${getThemeColor('divider')};
           cursor: pointer;
         }
         
         [data-input-number-control]:active:not(:disabled) {
-          background-color: ${getColorByMode('primary')};
+          background-color: ${getThemeColor('primary')};
         }
         
         /* Estilos para o input numérico nativo do HTML5 */
@@ -640,19 +650,19 @@ export const Input = ({
         
         /* Cor primária para os elementos do número */
         input[type="number"] {
-          color: ${getColorByMode('primary')};
+          color: ${getThemeColor('primary')};
         }
         
         /* Hack para aplicar cores no spinner */
         :root {
-          accent-color: ${getColorByMode('primary')} !important;
-          --number-spinner-color: ${getColorByMode('primary')} !important;
+          accent-color: ${getThemeColor('primary')} !important;
+          --number-spinner-color: ${getThemeColor('primary')} !important;
         }
         
         /* Adiciona suporte a cores personalizadas no spinner */
-        @supports (accent-color: ${getColorByMode('primary')}) {
+        @supports (accent-color: ${getThemeColor('primary')}) {
           input[type="number"] {
-            accent-color: ${getColorByMode('primary')};
+            accent-color: ${getThemeColor('primary')};
           }
         }
         
@@ -677,7 +687,7 @@ export const Input = ({
           opacity: 1;
           background: transparent;
           border: none;
-          color: ${getColorByMode('primary')};
+          color: ${getThemeColor('primary')};
           font-size: 14px;
           padding: 8px 25px 8px 12px;
           z-index: 1;
@@ -858,7 +868,7 @@ export const Input = ({
           <View style={containerStyle.searchIcon}>
             <Search 
               size={16} 
-              color={getColorByMode('text-secondary')} 
+              color={getThemeColor('text-secondary')} 
             />
           </View>
         )}
@@ -892,12 +902,12 @@ export const Input = ({
               value={value}
               onChangeText={handleChangeText}
               placeholder={placeholder}
-              placeholderTextColor={getColorByMode('text-secondary')}
+              placeholderTextColor={getThemeColor('text-secondary')}
               editable={!disabled}
               keyboardType={getKeyboardType()}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              selectionColor={getColorByMode('primary')}
+              selectionColor={getThemeColor('primary')}
             />
           </View>
         ) : (
@@ -919,7 +929,7 @@ export const Input = ({
             value={value}
             onChangeText={handleChangeText}
             placeholder={placeholder}
-            placeholderTextColor={getColorByMode('text-secondary')}
+            placeholderTextColor={getThemeColor('text-secondary')}
             editable={!disabled}
             secureTextEntry={type === 'password' && !passwordVisible}
             keyboardType={getKeyboardType()}
@@ -936,7 +946,7 @@ export const Input = ({
             numberOfLines={multiline ? numberOfLines : 1}
             testID={testID}
             // Cor de seleção mais sutil
-            selectionColor={getColorByMode('primary')}
+            selectionColor={getThemeColor('primary')}
             autoFocus={autoFocus}
             onContentSizeChange={handleContentSizeChange}
             // Para web, adiciona suporte nativo ao input de data HTML5
@@ -974,7 +984,7 @@ export const Input = ({
           >
             <X 
               size={16} 
-              color={getColorByMode('text-secondary')} 
+              color={getThemeColor('text-secondary')} 
             />
           </TouchableOpacity>
         )}
@@ -989,7 +999,7 @@ export const Input = ({
           >
             <Calendar 
               size={16} 
-              color={getColorByMode('text-secondary')} 
+              color={getThemeColor('text-secondary')} 
             />
           </TouchableOpacity>
         )}
@@ -1004,7 +1014,7 @@ export const Input = ({
           >
             <Clock 
               size={16} 
-              color={getColorByMode('text-secondary')} 
+              color={getThemeColor('text-secondary')} 
             />
           </TouchableOpacity>
         )}
@@ -1020,12 +1030,12 @@ export const Input = ({
             {passwordVisible ? (
               <EyeOff 
                 size={16} 
-                color={getColorByMode('text-secondary')} 
+                color={getThemeColor('text-secondary')} 
               />
             ) : (
               <Eye 
                 size={16} 
-                color={getColorByMode('text-secondary')} 
+                color={getThemeColor('text-secondary')} 
               />
             )}
           </TouchableOpacity>
@@ -1042,7 +1052,7 @@ export const Input = ({
             >
               <ChevronUp 
                 size={12} 
-                color={getColorByMode('text-secondary')} 
+                color={getThemeColor('text-secondary')} 
               />
             </TouchableOpacity>
             
@@ -1054,7 +1064,7 @@ export const Input = ({
             >
               <ChevronDown 
                 size={12} 
-                color={getColorByMode('text-secondary')} 
+                color={getThemeColor('text-secondary')} 
               />
             </TouchableOpacity>
           </View>
@@ -1086,21 +1096,21 @@ export const Input = ({
               <View style={{
                 width: 10,
                 height: 1,
-                backgroundColor: getColorByMode('divider'),
+                backgroundColor: getThemeColor('divider'),
                 marginBottom: 2,
                 transform: [{ rotate: '-45deg' }, { translateX: 1 }],
               }} />
               <View style={{
                 width: 7,
                 height: 1,
-                backgroundColor: getColorByMode('divider'),
+                backgroundColor: getThemeColor('divider'),
                 marginBottom: 2,
                 transform: [{ rotate: '-45deg' }],
               }} />
               <View style={{
                 width: 4,
                 height: 1,
-                backgroundColor: getColorByMode('divider'),
+                backgroundColor: getThemeColor('divider'),
                 transform: [{ rotate: '-45deg' }, { translateX: -1 }],
               }} />
             </View>
@@ -1136,21 +1146,21 @@ export const Input = ({
               <View style={{
                 width: 10,
                 height: 1,
-                backgroundColor: getColorByMode('divider'),
+                backgroundColor: getThemeColor('divider'),
                 marginBottom: 2,
                 transform: [{ rotate: '-45deg' }, { translateX: 1 }],
               }} />
               <View style={{
                 width: 7,
                 height: 1,
-                backgroundColor: getColorByMode('divider'),
+                backgroundColor: getThemeColor('divider'),
                 marginBottom: 2,
                 transform: [{ rotate: '-45deg' }],
               }} />
               <View style={{
                 width: 4,
                 height: 1,
-                backgroundColor: getColorByMode('divider'),
+                backgroundColor: getThemeColor('divider'),
                 transform: [{ rotate: '-45deg' }, { translateX: -1 }],
               }} />
             </View>

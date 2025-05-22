@@ -3,6 +3,20 @@ import { Stack } from 'expo-router';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Switch, Image, Platform, useWindowDimensions, Pressable, Dimensions, TextStyle, ViewStyle } from 'react-native';
 import { useTheme } from '../../hooks/ThemeContext';
 import { useResponsive } from '../../hooks/useResponsive';
+// Importar tokens do sistema de design
+import { 
+  colors as designColors, 
+  spacing as designSpacing, 
+  borderRadius as designBorderRadius,
+  boxShadow as designBoxShadow,
+  opacity as designOpacity,
+  zIndex as designZIndex,
+  transitionDuration as designTransitionDuration,
+  fontFamily as designFontFamily,
+  fontSize as designFontSize,
+  breakpoints as designBreakpoints,
+  responsiveSpacing as designResponsiveSpacing
+} from '../../designer-system';
 import { Input } from '../../components/AicrusComponents/input';
 import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
@@ -1562,8 +1576,39 @@ export default function DevPage() {
             Design System
           </Text>
           <Text className={`text-body-md ${textSecondary} mb-xl`}>
-            Use este guia como referência para implementar a UI consistente em todo o aplicativo.
+            Configuração dinâmica do sistema de design do projeto. Todas as informações são carregadas diretamente dos tokens de design em tempo real.
           </Text>
+          
+          {/* Resumo da configuração atual */}
+          <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>Resumo da Configuração</Text>
+            <View className="flex-row flex-wrap gap-md">
+              <View className="flex-1 min-w-[200px]">
+                <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Cores: {Object.keys(designColors).length}</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Incluindo variações de tema</Text>
+              </View>
+              <View className="flex-1 min-w-[200px]">
+                <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Espaçamentos: {Object.keys(designSpacing).length}</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Aliases semânticos + valores</Text>
+              </View>
+              <View className="flex-1 min-w-[200px]">
+                <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tipografia: {Object.keys(designFontSize).length}</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Escalas completas de texto</Text>
+              </View>
+              <View className="flex-1 min-w-[200px]">
+                <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Breakpoints: {Object.keys(designBreakpoints).length}</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Para responsividade</Text>
+              </View>
+              <View className="flex-1 min-w-[200px]">
+                <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Border Radius: {Object.keys(designBorderRadius).length}</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>De none até full</Text>
+              </View>
+              <View className="flex-1 min-w-[200px]">
+                <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Efeitos: {Object.keys(designBoxShadow).length + Object.keys(designOpacity).length + Object.keys(designZIndex).length + Object.keys(designTransitionDuration).length}</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>Sombras, opacidade, z-index, transições</Text>
+              </View>
+            </View>
+          </View>
 
           {/* Seção de Cores */}
           <SectionTitle title="Cores" textColor={textPrimary} />
@@ -1571,36 +1616,116 @@ export default function DevPage() {
           {/* Cores Primárias - Light/Dark theme */}
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Cores Primárias</Text>
           <View className="flex-row flex-wrap gap-md mb-lg">
-            <ColorCard name="Primary" color={isDark ? "bg-primary-dark" : "bg-primary-light"} textColor={textPrimary} />
-            <ColorCard name="Primary Hover" color={isDark ? "bg-primary-dark-hover" : "bg-primary-light-hover"} textColor={textPrimary} />
-            <ColorCard name="Primary Active" color={isDark ? "bg-primary-dark-active" : "bg-primary-light-active"} textColor={textPrimary} />
-            <ColorCard name="Secondary" color={isDark ? "bg-secondary-dark" : "bg-secondary-light"} textColor={textPrimary} />
-            <ColorCard name="Secondary Hover" color={isDark ? "bg-secondary-dark-hover" : "bg-secondary-light-hover"} textColor={textPrimary} />
-            <ColorCard name="Secondary Active" color={isDark ? "bg-secondary-dark-active" : "bg-secondary-light-active"} textColor={textPrimary} />
-            <ColorCard name="Tertiary" color={isDark ? "bg-tertiary-dark" : "bg-tertiary-light"} textColor={textPrimary} />
-            <ColorCard name="Tertiary Hover" color={isDark ? "bg-tertiary-dark-hover" : "bg-tertiary-light-hover"} textColor={textPrimary} />
-            <ColorCard name="Tertiary Active" color={isDark ? "bg-tertiary-dark-active" : "bg-tertiary-light-active"} textColor={textPrimary} />
-            <ColorCard name="Alternate" color={isDark ? "bg-alternate-dark" : "bg-alternate-light"} textColor={textPrimary} />
+            <DynamicColorCard 
+              name="Primary" 
+              colorValue={isDark ? designColors['primary-dark'] : designColors['primary-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Primary Hover" 
+              colorValue={isDark ? designColors['primary-dark-hover'] : designColors['primary-light-hover']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Primary Active" 
+              colorValue={isDark ? designColors['primary-dark-active'] : designColors['primary-light-active']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Secondary" 
+              colorValue={isDark ? designColors['secondary-dark'] : designColors['secondary-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Secondary Hover" 
+              colorValue={isDark ? designColors['secondary-dark-hover'] : designColors['secondary-light-hover']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Secondary Active" 
+              colorValue={isDark ? designColors['secondary-dark-active'] : designColors['secondary-light-active']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Tertiary" 
+              colorValue={isDark ? designColors['tertiary-dark'] : designColors['tertiary-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Tertiary Hover" 
+              colorValue={isDark ? designColors['tertiary-dark-hover'] : designColors['tertiary-light-hover']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Tertiary Active" 
+              colorValue={isDark ? designColors['tertiary-dark-active'] : designColors['tertiary-light-active']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Alternate" 
+              colorValue={isDark ? designColors['alternate-dark'] : designColors['alternate-light']} 
+              textColor={textPrimary} 
+            />
           </View>
           
           {/* Cores de Texto */}
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Texto</Text>
           <View className="flex-row flex-wrap gap-md mb-lg">
-            <ColorCard name="Text Primary" color={isDark ? "bg-text-primary-dark" : "bg-text-primary-light"} textColor={textPrimary} />
-            <ColorCard name="Text Secondary" color={isDark ? "bg-text-secondary-dark" : "bg-text-secondary-light"} textColor={textPrimary} />
-            <ColorCard name="Text Tertiary" color={isDark ? "bg-text-tertiary-dark" : "bg-text-tertiary-light"} textColor={textPrimary} />
+            <DynamicColorCard 
+              name="Text Primary" 
+              colorValue={isDark ? designColors['text-primary-dark'] : designColors['text-primary-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Text Secondary" 
+              colorValue={isDark ? designColors['text-secondary-dark'] : designColors['text-secondary-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Text Tertiary" 
+              colorValue={isDark ? designColors['text-tertiary-dark'] : designColors['text-tertiary-light']} 
+              textColor={textPrimary} 
+            />
           </View>
           
           {/* Cores de Background */}
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Background</Text>
           <View className="flex-row flex-wrap gap-md mb-lg">
-            <ColorCard name="BG Primary" color={isDark ? "bg-bg-primary-dark" : "bg-bg-primary-light"} textColor={textPrimary} />
-            <ColorCard name="BG Secondary" color={isDark ? "bg-bg-secondary-dark" : "bg-bg-secondary-light"} textColor={textPrimary} />
-            <ColorCard name="BG Tertiary" color={isDark ? "bg-bg-tertiary-dark" : "bg-bg-tertiary-light"} textColor={textPrimary} />
-            <ColorCard name="Icon" color={isDark ? "bg-icon-dark" : "bg-icon-light"} textColor={textPrimary} />
-            <ColorCard name="Divider" color={isDark ? "bg-divider-dark" : "bg-divider-light"} textColor={textPrimary} />
-            <ColorCard name="Hover" color={isDark ? "bg-hover-dark" : "bg-hover-light"} textColor={textPrimary} />
-            <ColorCard name="Active" color={isDark ? "bg-active-dark" : "bg-active-light"} textColor={textPrimary} />
+            <DynamicColorCard 
+              name="BG Primary" 
+              colorValue={isDark ? designColors['bg-primary-dark'] : designColors['bg-primary-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="BG Secondary" 
+              colorValue={isDark ? designColors['bg-secondary-dark'] : designColors['bg-secondary-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="BG Tertiary" 
+              colorValue={isDark ? designColors['bg-tertiary-dark'] : designColors['bg-tertiary-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Icon" 
+              colorValue={isDark ? designColors['icon-dark'] : designColors['icon-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Divider" 
+              colorValue={isDark ? designColors['divider-dark'] : designColors['divider-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Hover" 
+              colorValue={isDark ? designColors['hover-dark'] : designColors['hover-light']} 
+              textColor={textPrimary} 
+            />
+            <DynamicColorCard 
+              name="Active" 
+              colorValue={isDark ? designColors['active-dark'] : designColors['active-light']} 
+              textColor={textPrimary} 
+            />
           </View>
           
           {/* Cores de Feedback */}
@@ -1610,10 +1735,26 @@ export default function DevPage() {
             <View className="mb-sm">
               <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Sucesso</Text>
               <View className="flex-row flex-wrap gap-sm">
-                <ColorCard name="Success BG" color="bg-success-bg-light dark:bg-success-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Success Text" color="bg-success-text-light dark:bg-success-text-dark" textColor={textPrimary} />
-                <ColorCard name="Success Border" color="bg-success-border-light dark:bg-success-border-dark" textColor={textPrimary} />
-                <ColorCard name="Success Icon" color="bg-success-icon-light dark:bg-success-icon-dark" textColor={textPrimary} />
+                <DynamicColorCard 
+                  name="Success BG" 
+                  colorValue={isDark ? designColors['success-bg-dark'] : designColors['success-bg-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Success Text" 
+                  colorValue={isDark ? designColors['success-text-dark'] : designColors['success-text-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Success Border" 
+                  colorValue={isDark ? designColors['success-border-dark'] : designColors['success-border-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Success Icon" 
+                  colorValue={isDark ? designColors['success-icon-dark'] : designColors['success-icon-light']} 
+                  textColor={textPrimary} 
+                />
               </View>
             </View>
             
@@ -1621,10 +1762,26 @@ export default function DevPage() {
             <View className="mb-sm">
               <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Alerta</Text>
               <View className="flex-row flex-wrap gap-sm">
-                <ColorCard name="Warning BG" color="bg-warning-bg-light dark:bg-warning-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Warning Text" color="bg-warning-text-light dark:bg-warning-text-dark" textColor={textPrimary} />
-                <ColorCard name="Warning Border" color="bg-warning-border-light dark:bg-warning-border-dark" textColor={textPrimary} />
-                <ColorCard name="Warning Icon" color="bg-warning-icon-light dark:bg-warning-icon-dark" textColor={textPrimary} />
+                <DynamicColorCard 
+                  name="Warning BG" 
+                  colorValue={isDark ? designColors['warning-bg-dark'] : designColors['warning-bg-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Warning Text" 
+                  colorValue={isDark ? designColors['warning-text-dark'] : designColors['warning-text-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Warning Border" 
+                  colorValue={isDark ? designColors['warning-border-dark'] : designColors['warning-border-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Warning Icon" 
+                  colorValue={isDark ? designColors['warning-icon-dark'] : designColors['warning-icon-light']} 
+                  textColor={textPrimary} 
+                />
               </View>
             </View>
             
@@ -1632,10 +1789,26 @@ export default function DevPage() {
             <View className="mb-sm">
               <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Erro</Text>
               <View className="flex-row flex-wrap gap-sm">
-                <ColorCard name="Error BG" color="bg-error-bg-light dark:bg-error-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Error Text" color="bg-error-text-light dark:bg-error-text-dark" textColor={textPrimary} />
-                <ColorCard name="Error Border" color="bg-error-border-light dark:bg-error-border-dark" textColor={textPrimary} />
-                <ColorCard name="Error Icon" color="bg-error-icon-light dark:bg-error-icon-dark" textColor={textPrimary} />
+                <DynamicColorCard 
+                  name="Error BG" 
+                  colorValue={isDark ? designColors['error-bg-dark'] : designColors['error-bg-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Error Text" 
+                  colorValue={isDark ? designColors['error-text-dark'] : designColors['error-text-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Error Border" 
+                  colorValue={isDark ? designColors['error-border-dark'] : designColors['error-border-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Error Icon" 
+                  colorValue={isDark ? designColors['error-icon-dark'] : designColors['error-icon-light']} 
+                  textColor={textPrimary} 
+                />
               </View>
             </View>
             
@@ -1643,10 +1816,26 @@ export default function DevPage() {
             <View className="mb-sm">
               <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-xs`}>Informação</Text>
               <View className="flex-row flex-wrap gap-sm">
-                <ColorCard name="Info BG" color="bg-info-bg-light dark:bg-info-bg-dark" textColor={textPrimary} />
-                <ColorCard name="Info Text" color="bg-info-text-light dark:bg-info-text-dark" textColor={textPrimary} />
-                <ColorCard name="Info Border" color="bg-info-border-light dark:bg-info-border-dark" textColor={textPrimary} />
-                <ColorCard name="Info Icon" color="bg-info-icon-light dark:bg-info-icon-dark" textColor={textPrimary} />
+                <DynamicColorCard 
+                  name="Info BG" 
+                  colorValue={isDark ? designColors['info-bg-dark'] : designColors['info-bg-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Info Text" 
+                  colorValue={isDark ? designColors['info-text-dark'] : designColors['info-text-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Info Border" 
+                  colorValue={isDark ? designColors['info-border-dark'] : designColors['info-border-light']} 
+                  textColor={textPrimary} 
+                />
+                <DynamicColorCard 
+                  name="Info Icon" 
+                  colorValue={isDark ? designColors['info-icon-dark'] : designColors['info-icon-light']} 
+                  textColor={textPrimary} 
+                />
               </View>
             </View>
           </View>
@@ -1655,36 +1844,24 @@ export default function DevPage() {
           <SectionTitle title="Tipografia" textColor={textPrimary} />
           
           <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-            <Text className={`text-display-xl font-jakarta-extrabold ${textPrimary} mb-sm`}>Display XL (Jakarta ExtraBold)</Text>
-            <Text className={`text-display-lg font-jakarta-extrabold ${textPrimary} mb-sm`}>Display Lg (Jakarta ExtraBold)</Text>
-            <Text className={`text-display-md font-jakarta-bold ${textPrimary} mb-sm`}>Display Md (Jakarta Bold)</Text>
-            <Text className={`text-display-sm font-jakarta-bold ${textPrimary} mb-sm`}>Display Sm (Jakarta Bold)</Text>
-            
-            <Text className={`text-headline-xl font-jakarta-bold ${textPrimary} mb-sm`}>Headline XL (Jakarta Bold)</Text>
-            <Text className={`text-headline-lg font-jakarta-bold ${textPrimary} mb-sm`}>Headline Lg (Jakarta Bold)</Text>
-            <Text className={`text-headline-md font-jakarta-bold ${textPrimary} mb-sm`}>Headline Md (Jakarta Bold)</Text>
-            <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>Headline Sm (Jakarta Bold)</Text>
-            
-            <Text className={`text-title-lg font-jakarta-bold ${textPrimary} mb-sm`}>Title Lg (Jakarta Bold)</Text>
-            <Text className={`text-title-md font-jakarta-bold ${textPrimary} mb-sm`}>Title Md (Jakarta Bold)</Text>
-            <Text className={`text-title-sm font-jakarta-bold ${textPrimary} mb-sm`}>Title Sm (Jakarta Bold)</Text>
-            
-            <Text className={`text-subtitle-lg font-jakarta-semibold ${textPrimary} mb-sm`}>Subtitle Lg (Jakarta SemiBold)</Text>
-            <Text className={`text-subtitle-md font-jakarta-semibold ${textPrimary} mb-sm`}>Subtitle Md (Jakarta SemiBold)</Text>
-            <Text className={`text-subtitle-sm font-jakarta-semibold ${textPrimary} mb-sm`}>Subtitle Sm (Jakarta SemiBold)</Text>
-            
-            <Text className={`text-label-lg font-jakarta-semibold ${textPrimary} mb-sm`}>Label Lg (Jakarta SemiBold)</Text>
-            <Text className={`text-label-md font-jakarta-semibold ${textPrimary} mb-sm`}>Label Md (Jakarta SemiBold)</Text>
-            <Text className={`text-label-sm font-jakarta-semibold ${textPrimary} mb-sm`}>Label Sm (Jakarta SemiBold)</Text>
-            
-            <Text className={`text-body-lg font-jakarta-regular ${textPrimary} mb-sm`}>Body Lg (Jakarta Regular)</Text>
-            <Text className={`text-body-md font-jakarta-regular ${textPrimary} mb-sm`}>Body Md (Jakarta Regular)</Text>
-            <Text className={`text-body-sm font-jakarta-regular ${textPrimary} mb-sm`}>Body Sm (Jakarta Regular)</Text>
-            <Text className={`text-body-xs font-jakarta-regular ${textPrimary} mb-sm`}>Body Xs (Jakarta Regular)</Text>
-            
-            <Text className={`text-mono-lg font-mono-regular ${textPrimary} mb-sm`}>Mono Lg (Space Mono)</Text>
-            <Text className={`text-mono-md font-mono-regular ${textPrimary} mb-sm`}>Mono Md (Space Mono)</Text>
-            <Text className={`text-mono-sm font-mono-regular ${textPrimary} mb-sm`}>Mono Sm (Space Mono)</Text>
+            {Object.entries(designFontSize).map(([key, config]) => (
+              <View key={key} className="mb-sm">
+                <Text 
+                  className={textPrimary}
+                  style={{
+                    fontSize: parseInt(config.size),
+                    lineHeight: parseInt(config.lineHeight),
+                    fontWeight: config.fontWeight as any,
+                    marginBottom: 4
+                  }}
+                >
+                  {key.charAt(0).toUpperCase() + key.slice(1)} - {config.size}/{config.lineHeight} ({config.fontWeight})
+                </Text>
+                <Text className={`text-body-xs ${textSecondary} opacity-60`}>
+                  Size: {config.size} | Line Height: {config.lineHeight} | Weight: {config.fontWeight}
+                </Text>
+              </View>
+            ))}
             
             <View className={`border-t ${isDark ? 'border-divider-dark' : 'border-divider-light'} my-md`}></View>
             
@@ -1719,34 +1896,51 @@ export default function DevPage() {
                 </Text>
               </View>
               
-              <View className={`h-24 w-24 rounded-full ${isDark ? 'bg-primary-dark/20' : 'bg-primary-light/20'} items-center justify-center`}>
-                <Text className={`text-display-md font-jakarta-bold ${isDark ? 'text-primary-dark' : 'text-primary-light'}`}>
+              <View className={`h-24 w-24 rounded-full items-center justify-center`} style={{ backgroundColor: isDark ? designColors['primary-dark'] + '33' : designColors['primary-light'] + '33' }}>
+                <Text className={`text-display-md font-jakarta-bold`} style={{ color: isDark ? designColors['primary-dark'] : designColors['primary-light'] }}>
                   {currentBreakpoint.charAt(0)}
                 </Text>
               </View>
             </View>
             
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Intervalos de Breakpoints</Text>
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Intervalos de Breakpoints (Dinâmicos)</Text>
+            <View className={`${bgTertiary} p-md rounded-lg`}>
+              {Object.entries(designBreakpoints).map(([key, value], index) => {
+                const nextBreakpoint = Object.values(designBreakpoints)[index + 1];
+                const isLast = index === Object.entries(designBreakpoints).length - 1;
+                const colorIndex = index % 3;
+                let bgColor;
+                
+                if (colorIndex === 0) {
+                  bgColor = isDark ? designColors['primary-dark'] : designColors['primary-light'];
+                } else if (colorIndex === 1) {
+                  bgColor = isDark ? designColors['secondary-dark'] : designColors['secondary-light'];
+                } else {
+                  bgColor = isDark ? designColors['tertiary-dark'] : designColors['tertiary-light'];
+                }
+                
+                return (
+                  <View key={key} className="flex-row items-center mb-sm">
+                    <View className="h-3 w-3 rounded-full mr-xs" style={{ backgroundColor: bgColor }} />
+                    <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>
+                      {key}: {isLast ? `${value}px ou mais` : `${index === 0 ? '0' : Object.values(designBreakpoints)[index - 1] + 'px'} a ${value - 1}px`}
+                    </Text>
+                    <Text className={`text-body-sm ${textSecondary} ml-auto`}>{value}px</Text>
+                  </View>
+                );
+              })}
+            </View>
+            
+            {/* Espaçamento responsivo dinâmico */}
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md mt-lg`}>Espaçamento Responsivo</Text>
             <View className={`${bgTertiary} p-md rounded-lg`}>
               <View className="flex-row items-center mb-sm">
-                <View className={`h-3 w-3 rounded-full ${isDark ? 'bg-primary-dark' : 'bg-primary-light'} mr-xs`} />
-                <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>SMALL_MOBILE: 0 a 320px</Text>
-              </View>
-              <View className="flex-row items-center mb-sm">
-                <View className={`h-3 w-3 rounded-full ${isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} mr-xs`} />
-                <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>MOBILE: 321px a 739px</Text>
-              </View>
-              <View className="flex-row items-center mb-sm">
-                <View className={`h-3 w-3 rounded-full ${isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} mr-xs`} />
-                <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>TABLET: 740px a 1199px</Text>
-              </View>
-              <View className="flex-row items-center mb-sm">
-                <View className={`h-3 w-3 rounded-full ${isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} mr-xs`} />
-                <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>DESKTOP: 1200px a 1599px</Text>
+                <Text className={`text-body-md font-jakarta-medium ${textPrimary} flex-1`}>Page Padding atual:</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>{designResponsiveSpacing.getPagePadding(width)}px</Text>
               </View>
               <View className="flex-row items-center">
-                <View className={`h-3 w-3 rounded-full ${isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} mr-xs`} />
-                <Text className={`text-body-md font-jakarta-medium ${textPrimary}`}>LARGE_DESKTOP: 1600px ou mais</Text>
+                <Text className={`text-body-md font-jakarta-medium ${textPrimary} flex-1`}>Gap atual:</Text>
+                <Text className={`text-body-sm ${textSecondary}`}>{designResponsiveSpacing.getGap(width)}px</Text>
               </View>
             </View>
           </View>
@@ -1755,76 +1949,81 @@ export default function DevPage() {
           <SectionTitle title="Espaçamentos" textColor={textPrimary} />
           
           <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Aliases Semânticos</Text>
-            <View className="flex-row flex-wrap mb-lg">
-              <SpacingExample size="xxxs" value="2px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="xxs" value="4px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="xs" value="8px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="sm" value="12px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="md" value="16px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="lg" value="24px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="xl" value="32px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="2xl" value="48px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="3xl" value="64px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="4xl" value="80px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="5xl" value="96px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <SpacingExample size="6xl" value="128px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-            </View>
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Configuração Dinâmica de Espaçamentos</Text>
+            <Text className={`text-body-md ${textSecondary} mb-lg`}>
+              Todos os valores são carregados diretamente dos tokens de design. Total: {Object.keys(designSpacing).length} tokens.
+            </Text>
             
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Extra Pequenos/Pequenos (0-20px)</Text>
-            <View className="flex-row flex-wrap mb-lg">
-              <SpacingExample size="0" value="0px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-              <SpacingExample size="px" value="1px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-              <SpacingExample size="0.5" value="2px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-              <SpacingExample size="1" value="4px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-              <SpacingExample size="1.5" value="6px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-              <SpacingExample size="2" value="8px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-              <SpacingExample size="2.5" value="10px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-              <SpacingExample size="3" value="12px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-              <SpacingExample size="3.5" value="14px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-              <SpacingExample size="4" value="16px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-              <SpacingExample size="5" value="20px" bgColor={isDark ? 'bg-secondary-dark' : 'bg-secondary-light'} textColor={textPrimary} />
-            </View>
+            {/* Mostrar todos os espaçamentos dinamicamente, agrupados */}
+            {[
+              { 
+                title: 'Aliases Semânticos', 
+                keys: ['xxxs', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl', '5xl', '6xl'],
+                color: isDark ? designColors['primary-dark'] : designColors['primary-light']
+              },
+              { 
+                title: 'Extra Pequenos/Pequenos (0-20px)', 
+                keys: ['0', 'px', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '5'],
+                color: isDark ? designColors['secondary-dark'] : designColors['secondary-light']
+              },
+              { 
+                title: 'Médios (24-64px)', 
+                keys: ['6', '7', '8', '9', '10', '11', '12', '14', '16'],
+                color: isDark ? designColors['tertiary-dark'] : designColors['tertiary-light']
+              }
+            ].map((group, groupIndex) => (
+              <View key={groupIndex} className="mb-lg">
+                <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>{group.title}</Text>
+                <View className="flex-row flex-wrap mb-lg">
+                  {group.keys.map(key => {
+                    const value = designSpacing[key as keyof typeof designSpacing];
+                    return value ? (
+                      <DynamicSpacingExample 
+                        key={key}
+                        name={key} 
+                        value={value} 
+                        bgColor={group.color} 
+                        textColor={textPrimary} 
+                      />
+                    ) : null;
+                  })}
+                </View>
+              </View>
+            ))}
             
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Médios (24-64px)</Text>
-            <View className="flex-row flex-wrap mb-lg">
-              <SpacingExample size="6" value="24px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-              <SpacingExample size="7" value="28px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-              <SpacingExample size="8" value="32px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-              <SpacingExample size="9" value="36px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-              <SpacingExample size="10" value="40px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-              <SpacingExample size="11" value="44px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-              <SpacingExample size="12" value="48px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-              <SpacingExample size="14" value="56px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-              <SpacingExample size="16" value="64px" bgColor={isDark ? 'bg-tertiary-dark' : 'bg-tertiary-light'} textColor={textPrimary} />
-            </View>
-            
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Grandes (72-128px)</Text>
-            <View className="flex-row flex-wrap mb-lg">
-              <SpacingExample size="18" value="72px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="20" value="80px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="24" value="96px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="28" value="112px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-              <SpacingExample size="32" value="128px" bgColor={isDark ? 'bg-primary-dark/70' : 'bg-primary-light/70'} textColor={textPrimary} />
-            </View>
-            
-            {/* Gigantes só são mostrados em telas maiores */}
+            {/* Mostrar grandes e gigantes apenas em telas maiores */}
             {!isMobile && (
               <>
-                <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Gigantes (144-384px)</Text>
-                <View className="flex-row flex-wrap mb-md">
-                  <SpacingExample size="36" value="144px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="40" value="160px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="44" value="176px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="48" value="192px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="52" value="208px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="56" value="224px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="60" value="240px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="64" value="256px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="72" value="288px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="80" value="320px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                  <SpacingExample size="96" value="384px" bgColor={isDark ? 'bg-secondary-dark/70' : 'bg-secondary-light/70'} textColor={textPrimary} />
-                </View>
+                {[
+                  { 
+                    title: 'Grandes (72-128px)', 
+                    keys: ['18', '20', '24', '28', '32'],
+                    color: isDark ? designColors['primary-dark'] + '88' : designColors['primary-light'] + '88'
+                  },
+                  { 
+                    title: 'Gigantes (144-384px)', 
+                    keys: ['36', '40', '44', '48', '52', '56', '60', '64', '72', '80', '96'],
+                    color: isDark ? designColors['secondary-dark'] + '88' : designColors['secondary-light'] + '88'
+                  }
+                ].map((group, groupIndex) => (
+                  <View key={groupIndex} className="mb-lg">
+                    <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>{group.title}</Text>
+                    <View className="flex-row flex-wrap mb-lg">
+                      {group.keys.map(key => {
+                        const value = designSpacing[key as keyof typeof designSpacing];
+                        return value ? (
+                          <DynamicSpacingExample 
+                            key={key}
+                            name={key} 
+                            value={value} 
+                            bgColor={group.color} 
+                            textColor={textPrimary} 
+                          />
+                        ) : null;
+                      })}
+                    </View>
+                  </View>
+                ))}
               </>
             )}
           </View>
@@ -1833,18 +2032,19 @@ export default function DevPage() {
           <SectionTitle title="Border Radius" textColor={textPrimary} />
           
           <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <Text className={`text-body-md ${textSecondary} mb-md`}>
+              Todos os raios de borda disponíveis: {Object.keys(designBorderRadius).length} opções
+            </Text>
             <View className="flex-row flex-wrap gap-md">
-              <BorderRadiusExample name="none" value="0" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <BorderRadiusExample name="xs" value="2px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <BorderRadiusExample name="sm" value="4px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <BorderRadiusExample name="md" value="8px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <BorderRadiusExample name="lg" value="12px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <BorderRadiusExample name="xl" value="16px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <BorderRadiusExample name="2xl" value="20px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <BorderRadiusExample name="3xl" value="24px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <BorderRadiusExample name="4xl" value="28px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <BorderRadiusExample name="5xl" value="32px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <BorderRadiusExample name="full" value="9999px" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              {Object.entries(designBorderRadius).map(([name, value]) => (
+                <DynamicBorderRadiusExample 
+                  key={name}
+                  name={name} 
+                  value={value} 
+                  bgColor={isDark ? designColors['primary-dark'] : designColors['primary-light']} 
+                  textColor={textPrimary} 
+                />
+              ))}
             </View>
           </View>
           
@@ -1852,18 +2052,76 @@ export default function DevPage() {
           <SectionTitle title="Sombras" textColor={textPrimary} />
           
           <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <Text className={`text-body-md ${textSecondary} mb-md`}>
+              Sombras dinâmicas dos tokens de design. Total: {Object.keys(designBoxShadow).length} opções
+            </Text>
+
+                          {/* 1. Direção da Sombra */}
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Direção da Sombra</Text>
+            <Text className={`text-body-sm ${textSecondary} mb-md`}>
+              Indica de onde vem a luz e para onde vai a sombra
+            </Text>
+            <View className="grid grid-cols-2 md:grid-cols-3 gap-md mb-xl">
+              {(['shadow-down', 'shadow-up', 'shadow-left', 'shadow-right', 'shadow-around', 'shadow-all'] as const).map((name) => (
+                <DynamicShadowExample 
+                  key={name}
+                  name={name.replace('shadow-', '')} 
+                  shadowValue={designBoxShadow[name]}
+                  textColor={textPrimary} 
+                  bgColor={bgTertiary} 
+                />
+              ))}
+            </View>
+
+            {/* 2. Intensidade / Elevação */}
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Intensidade / Elevação</Text>
+            <Text className={`text-body-sm ${textSecondary} mb-md`}>
+              Inspirado nos níveis de elevação do Material Design
+            </Text>
+            <View className="grid grid-cols-2 md:grid-cols-3 gap-md mb-xl">
+              {(['shadow-xs', 'shadow-sm', 'shadow-md', 'shadow-lg', 'shadow-xl', 'shadow-2xl'] as const).map((name) => (
+                <DynamicShadowExample 
+                  key={name}
+                  name={name.replace('shadow-', '')} 
+                  shadowValue={designBoxShadow[name]}
+                  textColor={textPrimary} 
+                  bgColor={bgTertiary} 
+                />
+              ))}
+            </View>
+
+            {/* 3. Tipos Especiais */}
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Tipos Especiais</Text>
+            <Text className={`text-body-sm ${textSecondary} mb-md`}>
+              Casos específicos e efeitos únicos
+            </Text>
+            <View className="grid grid-cols-2 md:grid-cols-3 gap-md mb-xl">
+              {(['shadow-inner', 'shadow-float', 'shadow-glow', 'shadow-none'] as const).map((name) => (
+                <DynamicShadowExample 
+                  key={name}
+                  name={name.replace('shadow-', '')} 
+                  shadowValue={designBoxShadow[name]}
+                  textColor={textPrimary} 
+                  bgColor={bgTertiary} 
+                />
+              ))}
+            </View>
+
+            {/* 4. Componentes Específicos */}
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Componentes Específicos</Text>
+            <Text className={`text-body-sm ${textSecondary} mb-md`}>
+              Sombras otimizadas para casos de uso comuns
+            </Text>
             <View className="grid grid-cols-2 md:grid-cols-3 gap-md">
-              <ShadowExample name="none" shadow="shadow-none" textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="xs" shadow="shadow-xs" textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="sm" shadow="shadow-sm" textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="md" shadow="shadow-md" textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="lg" shadow="shadow-lg" textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="xl" shadow="shadow-xl" textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="2xl" shadow="shadow-2xl" textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="inner" shadow="shadow-inner" textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="light-card" shadow={isDark ? "shadow-dark-card" : "shadow-light-card"} textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="light-button" shadow={isDark ? "shadow-dark-button" : "shadow-light-button"} textColor={textPrimary} bgColor={bgTertiary} />
-              <ShadowExample name="float" shadow="shadow-float" textColor={textPrimary} bgColor={bgTertiary} />
+              {(['shadow-card', 'shadow-button', 'shadow-dropdown', 'shadow-modal', 'shadow-popover'] as const).map((name) => (
+                <DynamicShadowExample 
+                  key={name}
+                  name={name.replace('shadow-', '')} 
+                  shadowValue={designBoxShadow[name]}
+                  textColor={textPrimary} 
+                  bgColor={bgTertiary} 
+                />
+              ))}
             </View>
           </View>
           
@@ -1871,24 +2129,19 @@ export default function DevPage() {
           <SectionTitle title="Opacidade" textColor={textPrimary} />
           
           <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <Text className={`text-body-md ${textSecondary} mb-md`}>
+              Valores de opacidade dinâmicos dos tokens de design. Total: {Object.keys(designOpacity).length} opções
+            </Text>
             <View className="grid grid-cols-3 md:grid-cols-6 gap-md">
-              <OpacityExample name="0" value="0" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="5" value="0.05" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="10" value="0.1" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="15" value="0.15" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="20" value="0.2" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="25" value="0.25" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="30" value="0.3" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="40" value="0.4" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="50" value="0.5" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="60" value="0.6" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="70" value="0.7" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="75" value="0.75" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="80" value="0.8" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="85" value="0.85" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="90" value="0.9" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="95" value="0.95" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
-              <OpacityExample name="100" value="1" bgColor={isDark ? 'bg-primary-dark' : 'bg-primary-light'} textColor={textPrimary} />
+              {Object.entries(designOpacity).map(([name, value]) => (
+                <DynamicOpacityExample 
+                  key={name}
+                  name={name} 
+                  value={value} 
+                  bgColor={isDark ? designColors['primary-dark'] : designColors['primary-light']} 
+                  textColor={textPrimary} 
+                />
+              ))}
             </View>
           </View>
           
@@ -1896,19 +2149,18 @@ export default function DevPage() {
           <SectionTitle title="Z-Index" textColor={textPrimary} />
           
           <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <Text className={`text-body-md ${textSecondary} mb-md`}>
+              Valores de z-index dinâmicos dos tokens de design. Total: {Object.keys(designZIndex).length} opções
+            </Text>
             <View className="grid grid-cols-3 md:grid-cols-6 gap-md">
-              <ValueDisplay name="0" value="0" textColor={textPrimary} />
-              <ValueDisplay name="10" value="10" textColor={textPrimary} />
-              <ValueDisplay name="20" value="20" textColor={textPrimary} />
-              <ValueDisplay name="30" value="30" textColor={textPrimary} />
-              <ValueDisplay name="40" value="40" textColor={textPrimary} />
-              <ValueDisplay name="50" value="50" textColor={textPrimary} />
-              <ValueDisplay name="60" value="60" textColor={textPrimary} />
-              <ValueDisplay name="70" value="70" textColor={textPrimary} />
-              <ValueDisplay name="80" value="80" textColor={textPrimary} />
-              <ValueDisplay name="90" value="90" textColor={textPrimary} />
-              <ValueDisplay name="100" value="100" textColor={textPrimary} />
-              <ValueDisplay name="auto" value="auto" textColor={textPrimary} />
+              {Object.entries(designZIndex).map(([name, value]) => (
+                <ValueDisplay 
+                  key={name}
+                  name={name} 
+                  value={String(value)} 
+                  textColor={textPrimary} 
+                />
+              ))}
             </View>
           </View>
           
@@ -1916,15 +2168,18 @@ export default function DevPage() {
           <SectionTitle title="Tempos de Transição" textColor={textPrimary} />
           
           <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <Text className={`text-body-md ${textSecondary} mb-md`}>
+              Tempos de transição dinâmicos dos tokens de design. Total: {Object.keys(designTransitionDuration).length} opções
+            </Text>
             <View className="grid grid-cols-2 md:grid-cols-4 gap-md">
-              <ValueDisplay name="75" value="75ms" textColor={textPrimary} />
-              <ValueDisplay name="100" value="100ms" textColor={textPrimary} />
-              <ValueDisplay name="150" value="150ms" textColor={textPrimary} />
-              <ValueDisplay name="200" value="200ms" textColor={textPrimary} />
-              <ValueDisplay name="300" value="300ms" textColor={textPrimary} />
-              <ValueDisplay name="500" value="500ms" textColor={textPrimary} />
-              <ValueDisplay name="700" value="700ms" textColor={textPrimary} />
-              <ValueDisplay name="1000" value="1000ms" textColor={textPrimary} />
+              {Object.entries(designTransitionDuration).map(([name, value]) => (
+                <ValueDisplay 
+                  key={name}
+                  name={name} 
+                  value={value} 
+                  textColor={textPrimary} 
+                />
+              ))}
             </View>
           </View>
           
@@ -4408,6 +4663,161 @@ const ColorCard = ({ name, color, textColor }: ColorCardProps) => (
     <Text className={`text-label-sm ${textColor}`}>{name}</Text>
   </View>
 );
+
+// Componente para mostrar cores dinâmicas dos tokens
+interface DynamicColorCardProps {
+  name: string;
+  colorValue: string;
+  textColor: string;
+}
+
+const DynamicColorCard = ({ name, colorValue, textColor }: DynamicColorCardProps) => (
+  <View className="mb-sm">
+    <View 
+      className="w-16 h-16 rounded-md mb-xs" 
+      style={{ backgroundColor: colorValue }}
+    />
+    <Text className={`text-label-sm ${textColor}`}>{name}</Text>
+    <Text className={`text-body-xs ${textColor} opacity-60`}>{colorValue}</Text>
+  </View>
+);
+
+// Componente para mostrar espaçamentos dinâmicos dos tokens
+interface DynamicSpacingExampleProps {
+  name: string;
+  value: string;
+  bgColor: string;
+  textColor: string;
+}
+
+const DynamicSpacingExample = ({ name, value, bgColor, textColor }: DynamicSpacingExampleProps) => {
+  const numericValue = parseInt(value.replace('px', ''));
+  return (
+    <View className="items-center mr-md mb-md">
+      <View 
+        className="h-8" 
+        style={{ 
+          width: Math.max(numericValue, 4), // Mínimo de 4px para visibilidade
+          backgroundColor: bgColor 
+        }} 
+      />
+      <Text className={`text-label-sm ${textColor} mt-xs`}>{name}</Text>
+      <Text className={`text-body-xs ${textColor} opacity-60`}>{value}</Text>
+    </View>
+  );
+};
+
+// Componente para mostrar border radius dinâmicos dos tokens
+interface DynamicBorderRadiusExampleProps {
+  name: string;
+  value: string;
+  bgColor: string;
+  textColor: string;
+}
+
+const DynamicBorderRadiusExample = ({ name, value, bgColor, textColor }: DynamicBorderRadiusExampleProps) => {
+  return (
+    <View className="items-center mr-md mb-md">
+      <View 
+        className="h-20 w-20 flex items-center justify-center mb-xs" 
+        style={{ 
+          backgroundColor: bgColor,
+          borderRadius: name === "full" ? 9999 : parseInt(value.replace(/[^0-9]/g, '') || '0') 
+        }}
+      >
+        <Text className="text-white text-label-sm">{value}</Text>
+      </View>
+      <Text className={`text-label-sm ${textColor}`}>{name}</Text>
+      <Text className={`text-body-xs ${textColor} opacity-60`}>{value}</Text>
+    </View>
+  );
+};
+
+// Componente para mostrar sombras dinâmicas dos tokens
+interface DynamicShadowExampleProps {
+  name: string;
+  shadowValue: string;
+  textColor: string;
+  bgColor: string;
+}
+
+const DynamicShadowExample = ({ name, shadowValue, textColor, bgColor }: DynamicShadowExampleProps) => {
+  const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
+  
+  // Para modo escuro, vamos criar sombras mais visíveis
+  const getEnhancedShadow = (originalShadow: string): string => {
+    if (!isDark) return originalShadow;
+    
+    // No modo escuro, usar um cinza escuro para as sombras
+    const darkGray = '68, 68, 68'; // RGB para um cinza escuro
+    
+    if (originalShadow === 'none') return 'none';
+    
+    return originalShadow.replace(/rgba\(0,\s*0,\s*0,\s*([\d.]+)\)/g, (_, opacity) => {
+      // Aumenta a opacidade para o modo escuro
+      const darkOpacity = Math.min(parseFloat(opacity) * 3.5, 0.6);
+      return `rgba(${darkGray}, ${darkOpacity})`;
+    });
+  };
+
+  return (
+    <View className="items-center mb-md">
+      <View 
+        className={`h-20 w-full rounded-md flex items-center justify-center mb-xs`}
+        style={{
+          backgroundColor: isDark ? designColors['bg-secondary-dark'] : designColors['bg-secondary-light'],
+          // Aplicar a sombra diretamente do valor do token
+          ...Platform.select({
+            web: {
+              boxShadow: getEnhancedShadow(shadowValue)
+            },
+            default: {
+              // Para React Native, usar valores específicos baseados no tema
+              shadowColor: isDark ? '#444444' : '#000000', // Cinza escuro no modo escuro
+              shadowOffset: { width: 0, height: name === 'none' ? 0 : 2 },
+              shadowOpacity: isDark ? 0.45 : 0.1, // Maior opacidade no modo escuro
+              shadowRadius: name === 'none' ? 0 : isDark ? 6 : 4, // Raio maior no modo escuro
+              elevation: name === 'none' ? 0 : isDark ? 4 : 3, // Elevação maior no modo escuro
+            }
+          })
+        }}
+      >
+        <Text className={`text-body-sm ${textColor}`}>{name}</Text>
+      </View>
+      <Text className={`text-label-sm ${textColor}`}>{name}</Text>
+      <Text className={`text-body-xs ${textColor} opacity-60`}>
+        {isDark ? getEnhancedShadow(shadowValue) : shadowValue}
+      </Text>
+    </View>
+  );
+};
+
+// Componente para mostrar opacidade dinâmica dos tokens
+interface DynamicOpacityExampleProps {
+  name: string;
+  value: string;
+  bgColor: string;
+  textColor: string;
+}
+
+const DynamicOpacityExample = ({ name, value, bgColor, textColor }: DynamicOpacityExampleProps) => {
+  const opacityValue = parseFloat(value);
+  
+  return (
+    <View className="items-center mb-md">
+      <View 
+        className="h-12 w-full rounded-md mb-xs"
+        style={{ 
+          backgroundColor: bgColor,
+          opacity: opacityValue 
+        }}
+      />
+      <Text className={`text-label-sm ${textColor}`}>{name}</Text>
+      <Text className={`text-body-xs ${textColor} opacity-60`}>{value}</Text>
+    </View>
+  );
+};
 
 const SpacingExample = ({ size, bgColor, textColor, value }: SpacingExampleProps) => {
   return (

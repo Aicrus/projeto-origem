@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Dimensions, Platform, ScaledSize, useWindowDimensions } from 'react-native';
 import { 
-  BREAKPOINTS, 
+  breakpoints as BREAKPOINTS, 
   isMobileWidth, 
   isTabletWidth, 
   isDesktopWidth,
   getCurrentBreakpoint
-} from '../constants/responsive';
+} from '../designer-system';
 
 /**
  * Obtém breakpoint inicial baseado no user agent ou dimensões da janela

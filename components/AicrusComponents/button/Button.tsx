@@ -12,7 +12,10 @@ import {
 } from 'react-native';
 import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { colors, ColorType } from '../../../constants/theme';
+import { colors, ColorType, getColorByMode } from '../../../designer-system/tokens/colors';
+import { spacing } from '../../../designer-system/tokens/spacing';
+import { borderRadius, BorderRadiusType, getBorderRadius } from '../../../designer-system/tokens/borders';
+import { fontSize, fontFamily, FontSizeType, getFontStyle } from '../../../designer-system/tokens/typography';
 
 /**
  * @component Button
@@ -114,7 +117,7 @@ export interface ButtonProps extends TouchableOpacityProps {
   /** Largura total disponível */
   fullWidth?: boolean;
   /** Raio da borda do botão */
-  borderRadius?: number;
+  borderRadius?: BorderRadiusType;
   /** Classe CSS para estilizar no web */
   className?: string;
   /** Cor de fundo quando hover (para web) */
@@ -147,7 +150,7 @@ export const Button = ({
   ...rest
 }: ButtonProps) => {
   // Obtém o tema atual e verifica se está no modo escuro
-  const { currentTheme, getColorByMode } = useTheme();
+  const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   
   // Responsividade
@@ -156,27 +159,32 @@ export const Button = ({
   // Determina se o botão tem texto ou apenas ícone
   const hasText = !isIconOnly && React.isValidElement(children);
   
+  // Função para obter a cor baseada no modo do tema
+  const getThemeColor = (colorBase: string) => {
+    return getColorByMode(colorBase, isDark ? 'dark' : 'light');
+  };
+  
   // Cores para os diferentes temas e variantes baseadas no nosso sistema de tema
   const colorScheme = {
     primary: {
-      background: getColorByMode('primary'),
-      backgroundHover: getColorByMode('primary-hover'),
-      backgroundPressed: getColorByMode('primary-active'),
+      background: getThemeColor('primary'),
+      backgroundHover: getThemeColor('primary-hover'),
+      backgroundPressed: getThemeColor('primary-active'),
       text: '#FFFFFF',
       border: 'transparent',
-      disabled: `${getColorByMode('primary')}80`, // 80 = 50% de opacidade
+      disabled: `${getThemeColor('primary')}80`, // 80 = 50% de opacidade
       disabledText: '#FFFFFF',
       textHover: undefined,
       textPressed: undefined,
       disabledBorder: undefined,
     },
     destructive: {
-      background: getColorByMode('tertiary'),
-      backgroundHover: getColorByMode('tertiary-hover'),
-      backgroundPressed: getColorByMode('tertiary-active'),
+      background: getThemeColor('tertiary'),
+      backgroundHover: getThemeColor('tertiary-hover'),
+      backgroundPressed: getThemeColor('tertiary-active'),
       text: '#FFFFFF',
       border: 'transparent',
-      disabled: `${getColorByMode('tertiary')}80`,
+      disabled: `${getThemeColor('tertiary')}80`,
       disabledText: '#FFFFFF',
       textHover: undefined,
       textPressed: undefined,
@@ -186,7 +194,7 @@ export const Button = ({
       background: 'transparent',
       backgroundHover: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
       backgroundPressed: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      text: getColorByMode('text-primary'),
+      text: getThemeColor('text-primary'),
       border: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
       disabled: 'transparent',
       disabledText: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
@@ -198,7 +206,7 @@ export const Button = ({
       background: 'transparent',
       backgroundHover: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
       backgroundPressed: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-      text: getColorByMode('text-primary'),
+      text: getThemeColor('text-primary'),
       border: 'transparent',
       disabled: 'transparent',
       disabledText: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
@@ -210,12 +218,12 @@ export const Button = ({
       background: 'transparent',
       backgroundHover: 'transparent',
       backgroundPressed: 'transparent',
-      text: getColorByMode('primary'),
-      textHover: getColorByMode('primary-hover'),
-      textPressed: getColorByMode('primary-active'),
+      text: getThemeColor('primary'),
+      textHover: getThemeColor('primary-hover'),
+      textPressed: getThemeColor('primary-active'),
       border: 'transparent',
       disabled: 'transparent',
-      disabledText: `${getColorByMode('primary')}80`,
+      disabledText: `${getThemeColor('primary')}80`,
       disabledBorder: undefined,
     },
   };
@@ -223,44 +231,44 @@ export const Button = ({
   // Dimensões para os diferentes tamanhos
   const sizes = {
     xs: {
-      height: isIconOnly ? 24 : 28,
-      paddingHorizontal: isIconOnly ? 0 : 12,
-      fontSize: 12,
-      fontWeight: '400',
-      iconSize: 12,
-      borderRadius: borderRadius !== undefined ? borderRadius : 6,
-      iconButtonDimension: 24,
-      spacing: 10,
+      height: isIconOnly ? Number(spacing['6'].replace('px', '')) : Number(spacing['7'].replace('px', '')),
+      paddingHorizontal: isIconOnly ? 0 : Number(spacing['3'].replace('px', '')),
+      fontStyle: getFontStyle('body-sm'),
+      fontFamily: fontFamily['jakarta-regular'],
+      iconSize: Number(spacing['3'].replace('px', '')),
+      borderRadius: Number(getBorderRadius(borderRadius || 'sm').replace('px', '')),
+      iconButtonDimension: Number(spacing['6'].replace('px', '')),
+      spacing: Number(spacing['2.5'].replace('px', '')),
     },
     sm: {
-      height: isIconOnly ? 32 : 36,
-      paddingHorizontal: isIconOnly ? 0 : 14,
-      fontSize: 13,
-      fontWeight: '400',
-      iconSize: 14,
-      borderRadius: borderRadius !== undefined ? borderRadius : 8,
-      iconButtonDimension: 32,
-      spacing: 12,
+      height: isIconOnly ? Number(spacing['8'].replace('px', '')) : Number(spacing['9'].replace('px', '')),
+      paddingHorizontal: isIconOnly ? 0 : Number(spacing['3.5'].replace('px', '')),
+      fontStyle: getFontStyle('body-md'),
+      fontFamily: fontFamily['jakarta-regular'],
+      iconSize: Number(spacing['3.5'].replace('px', '')),
+      borderRadius: Number(getBorderRadius(borderRadius || 'md').replace('px', '')),
+      iconButtonDimension: Number(spacing['8'].replace('px', '')),
+      spacing: Number(spacing['3'].replace('px', '')),
     },
     md: {
-      height: isIconOnly ? 40 : 42,
-      paddingHorizontal: isIconOnly ? 0 : 16,
-      fontSize: 14,
-      fontWeight: '400',
-      iconSize: 16,
-      borderRadius: borderRadius !== undefined ? borderRadius : 8,
-      iconButtonDimension: 40,
-      spacing: 14,
+      height: isIconOnly ? Number(spacing['10'].replace('px', '')) : 42,
+      paddingHorizontal: isIconOnly ? 0 : Number(spacing['4'].replace('px', '')),
+      fontStyle: getFontStyle('body-lg'),
+      fontFamily: fontFamily['jakarta-regular'],
+      iconSize: Number(spacing['4'].replace('px', '')),
+      borderRadius: Number(getBorderRadius(borderRadius || 'lg').replace('px', '')),
+      iconButtonDimension: Number(spacing['10'].replace('px', '')),
+      spacing: Number(spacing['4'].replace('px', '')),
     },
     lg: {
-      height: isIconOnly ? 48 : 48,
-      paddingHorizontal: isIconOnly ? 0 : 20,
-      fontSize: 15,
-      fontWeight: '400',
-      iconSize: 18,
-      borderRadius: borderRadius !== undefined ? borderRadius : 10,
-      iconButtonDimension: 48,
-      spacing: 14,
+      height: isIconOnly ? Number(spacing['12'].replace('px', '')) : Number(spacing['14'].replace('px', '')),
+      paddingHorizontal: isIconOnly ? 0 : Number(spacing['5'].replace('px', '')),
+      fontStyle: getFontStyle('subtitle-md'),
+      fontFamily: fontFamily['jakarta-regular'],
+      iconSize: Number(spacing['5'].replace('px', '')),
+      borderRadius: Number(getBorderRadius(borderRadius || 'xl').replace('px', '')),
+      iconButtonDimension: Number(spacing['12'].replace('px', '')),
+      spacing: Number(spacing['5'].replace('px', '')),
     },
   };
   
@@ -284,47 +292,37 @@ export const Button = ({
   const getButtonStyles = (): ViewStyle => {
     const variantColors = colorScheme[variant];
     
-    // Estilos base
-    const baseStyle: ViewStyle = {
+    return {
+      height: sizeConfig.height,
+      paddingHorizontal: sizeConfig.paddingHorizontal,
+      backgroundColor: disabled ? variantColors.disabled : variantColors.background,
+      borderRadius: sizeConfig.borderRadius,
+      borderWidth: variant === 'outline' ? 1 : 0,
+      borderColor: disabled ? variantColors.disabledBorder : variantColors.border,
+      opacity: loading ? 0.7 : 1,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      height: isIconOnly ? sizeConfig.iconButtonDimension : sizeConfig.height,
-      paddingHorizontal: isIconOnly ? 0 : sizeConfig.paddingHorizontal,
-      borderRadius: sizeConfig.borderRadius,
       width: isIconOnly ? sizeConfig.iconButtonDimension : fullWidth ? '100%' : 'auto',
-      backgroundColor: disabled ? (variant === 'primary' || variant === 'destructive' ? variantColors.disabled : variantColors.background) : variantColors.background,
-      borderWidth: variant === 'outline' ? 1 : 0,
-      borderColor: disabled && variant === 'outline' ? variantColors.disabledBorder : variantColors.border,
-      opacity: variant !== 'primary' && variant !== 'destructive' && disabled ? 0.6 : 1,
+      minWidth: isIconOnly ? sizeConfig.iconButtonDimension : undefined,
+      ...style,
     };
-    
-    // Ajustes para botão de ícone
-    if (isIconOnly) {
-      return {
-        ...baseStyle,
-        width: sizeConfig.iconButtonDimension,
-        aspectRatio: 1,
-        paddingHorizontal: 0,
-      };
-    }
-    
-    return baseStyle;
   };
   
-  // Gera os estilos do texto do botão
+  // Função para obter os estilos do texto
   const getTextStyles = (): TextStyle => {
+    const sizeConfig = sizes[size];
     const variantColors = colorScheme[variant];
-    
+    const fontStyle = sizeConfig.fontStyle;
+
     return {
-      fontSize: sizeConfig.fontSize,
-      color: variant === 'link' ? variantColors.text : 
-             disabled ? variantColors.disabledText : variantColors.text,
-      fontWeight: sizeConfig.fontWeight as '400' | '500' | '600' | '700',
-      fontFamily: 'PlusJakartaSans_400Regular',
+      color: disabled ? variantColors.disabledText : variantColors.text,
+      fontSize: Number(fontStyle.size.replace('px', '')),
+      fontFamily: sizeConfig.fontFamily,
+      fontWeight: fontStyle.fontWeight as TextStyle['fontWeight'],
       marginLeft: leftIcon && hasText ? sizeConfig.spacing : 0,
       marginRight: rightIcon && hasText ? sizeConfig.spacing : 0,
-      textDecorationLine: variant === 'link' ? 'underline' : 'none',
+      ...textStyle,
     };
   };
   
@@ -360,85 +358,57 @@ export const Button = ({
   
   // Renderiza o spinner de carregamento
   const renderSpinner = () => (
-    <ActivityIndicator 
-      size={size === 'lg' || size === 'md' ? 'small' : 'small'} 
-      color={getSpinnerColor()}
-      style={{ marginRight: loadingText ? 0 : 0 }}
+    <ActivityIndicator
+      size={isIconOnly ? sizeConfig.iconSize : 'small'}
+      color={spinnerColor || getSpinnerColor()}
     />
   );
   
   // Renderiza o conteúdo do botão
   const renderContent = () => {
+    const sizeConfig = sizes[size];
+    const fontStyle = sizeConfig.fontStyle;
+
     if (loading) {
       return (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
+        <>
           {renderSpinner()}
           {loadingText && (
-            <Text 
-              style={[
-                {
-                  fontFamily: 'PlusJakartaSans_400Regular',
-                  color: colorScheme[variant].text,
-                  fontSize: sizeConfig.fontSize,
-                  fontWeight: sizeConfig.fontWeight as '400' | '500' | '600' | '700',
-                  marginLeft: 6,
-                },
-                textStyle
-              ]}
-              data-button-text={variant}
+            <Text
+              style={{
+                fontFamily: sizeConfig.fontFamily,
+                color: colorScheme[variant].text,
+                fontSize: Number(fontStyle.size.replace('px', '')),
+                fontWeight: fontStyle.fontWeight as TextStyle['fontWeight'],
+                marginLeft: 6,
+              }}
             >
               {loadingText}
             </Text>
           )}
-        </View>
+        </>
       );
     }
-    
+
     return (
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {leftIcon ? (
-          <>
-            {leftIcon}
-            <View style={{ width: 6 }} />
-          </>
-        ) : null}
-        {children ? (
+      <>
+        {leftIcon && <View style={{ marginRight: hasText ? sizeConfig.spacing : 0 }}>{leftIcon}</View>}
+        {!isIconOnly && (
           <Text
-            data-button-text={variant}
-            style={[
-              {
-                fontFamily: 'PlusJakartaSans_400Regular',
-                color: colorScheme[variant].text,
-                fontSize: sizeConfig.fontSize,
-                fontWeight: sizeConfig.fontWeight as '400' | '500' | '600' | '700',
-                marginLeft: leftIcon ? 0 : 0,
-                marginRight: rightIcon ? 0 : 0,
-              },
-              textStyle,
-            ]}
+            style={{
+              fontFamily: sizeConfig.fontFamily,
+              color: colorScheme[variant].text,
+              fontSize: Number(fontStyle.size.replace('px', '')),
+              fontWeight: fontStyle.fontWeight as TextStyle['fontWeight'],
+              marginLeft: leftIcon ? 0 : 0,
+              marginRight: rightIcon ? 0 : 0,
+            }}
           >
             {children}
           </Text>
-        ) : null}
-        {rightIcon ? (
-          <>
-            <View style={{ width: 6 }} />
-            {rightIcon}
-          </>
-        ) : null}
-      </View>
+        )}
+        {rightIcon && <View style={{ marginLeft: hasText ? sizeConfig.spacing : 0 }}>{rightIcon}</View>}
+      </>
     );
   };
   

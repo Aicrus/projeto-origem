@@ -6,7 +6,10 @@ import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../../lib/supabase';
-import { colors } from '../../../constants/theme';
+import { colors } from '../../../designer-system/tokens/colors';
+import { spacing } from '../../../designer-system/tokens/spacing';
+import { borderRadius, getBorderRadius } from '../../../designer-system/tokens/borders';
+import { fontSize, fontFamily } from '../../../designer-system/tokens/typography';
 
 /**
  * @component Select

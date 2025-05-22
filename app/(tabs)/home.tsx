@@ -7,7 +7,7 @@ import { PageContainer } from '../../components/AicrusComponents/page-container'
 import { Portal } from '@gorhom/portal';
 import { useResponsive } from '../../hooks/useResponsive';
 import { Building2, Users, ClipboardList, AlertTriangle } from 'lucide-react-native';
-import { BREAKPOINTS } from '../../constants/responsive';
+import { breakpoints as BREAKPOINTS } from '../../designer-system';
 
 export default function Home() {
   const { currentTheme } = useTheme();

@@ -5,7 +5,7 @@ import { useTheme } from '../../../hooks/ThemeContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { NotificationsMenu } from '../../AicrusComponents/notifications-menu/NotificationsMenu';
 import { ProfileMenu } from '../../AicrusComponents/profile-menu/ProfileMenu';
-import { colors } from '@/constants/theme';
+import { colors } from '../../../designer-system/tokens/colors';
 
 // Definição de cores temporária até termos acesso ao arquivo de tema
 const customColors = {
