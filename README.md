@@ -21,12 +21,14 @@ Bem-vindo ao Projeto Origem! Este é um template moderno e flexível para criar 
 
 ## ✨ Destaques
 
-- 🌓 Modo Claro e Escuro (igual ao Instagram/WhatsApp)
-- 📱 Design Responsivo (funciona em qualquer tela)
-- 🎯 Componentes Reutilizáveis
-- 🖌️ Design System Completo
-- 🌐 Suporte Web e Mobile Nativo
-- 🚀 Deploy Simplificado
+- 🌓 **Design System Completo** (modo claro e escuro automático)
+- 📱 **Design Responsivo** (funciona em qualquer tela)
+- 🎯 **Componentes Reutilizáveis** (prontos para usar)
+- 🖌️ **Tailwind + Tokens Unificados** (duas formas de estilizar)
+- 🌐 **Suporte Web e Mobile Nativo** 
+- 🚀 **Deploy Simplificado**
+- ⚡ **NativeWind 4.x** (Tailwind para React Native)
+- 🎨 **Design System Dinâmico** (tokens atualizados em tempo real)
 
 ## 🚀 Começando
 
@@ -245,36 +247,252 @@ export default function SuaRotaPublica() {
 
 ## 🎨 Design System
 
-O projeto utiliza um design system completo e consistente para todas as plataformas (web, iOS e Android). 
+O projeto utiliza um **sistema de design completo e inovador** que combina o melhor de duas abordagens: **Tailwind CSS** para agilidade e **Tokens dinâmicos** para personalização avançada.
 
-Principais características:
-- 🎨 Cores temáticas para modo claro e escuro
-- 📏 Sistema consistente de espaçamento e tipografia
-- 📱 Componentes adaptados para todas as plataformas
-- 🔄 Suporte completo a temas
+### 🏗️ **Arquitetura do Design System**
 
-### 🔤 Fontes do Projeto
+```mermaid
+graph TD
+    A[designer-system/tokens/] --> B[tailwind.config.js]
+    A --> C[useDesignSystem Hook]
+    B --> D[Classes Tailwind]
+    C --> E[Valores JavaScript/TypeScript]
+    D --> F[Componentes com className]
+    E --> F[Componentes com style]
+    F --> G[Interface Final]
+```
 
-O projeto utiliza fontes de duas maneiras:
+### 📁 **Estrutura dos Tokens**
 
-#### 1. Fontes via Expo Google Fonts (Recomendado)
+```
+designer-system/
+├── index.ts              # Exportações centralizadas
+└── tokens/
+    ├── colors.ts         # 🎨 Todas as cores (light/dark)
+    ├── spacing.ts        # 📏 Espaçamentos consistentes
+    ├── typography.ts     # 🔤 Fontes e tamanhos
+    ├── borders.ts        # 🔲 Border radius
+    ├── effects.ts        # ✨ Sombras, opacidade, etc.
+    └── breakpoints.ts    # 📱 Responsividade
+```
 
-A abordagem principal é usar o pacote `@expo-google-fonts` que oferece acesso a mais de 1000 fontes do Google Fonts:
+### 🎯 **Como Usar o Design System**
 
+O projeto oferece **duas formas** de aplicar estilos, ambas sincronizadas automaticamente:
+
+#### **1. 📝 Via Classes Tailwind (Recomendado para rapidez)**
+```tsx
+<View className="bg-primary-light p-md rounded-lg shadow-card">
+  <Text className="text-headline-lg font-jakarta-bold text-primary-dark">
+    Título
+  </Text>
+  <Text className="text-body-md text-text-secondary-light mt-sm">
+    Descrição do conteúdo
+  </Text>
+</View>
+```
+
+#### **2. ⚙️ Via Hook useDesignSystem (Recomendado para lógica dinâmica)**
+```tsx
+import { useDesignSystem } from '@/hooks/DesignSystemContext';
+
+function MeuComponente() {
+  const { colors, spacing, fontSize, isDark } = useDesignSystem();
+  
+  return (
+    <View style={{
+      backgroundColor: colors['primary-light'],
+      padding: spacing.md,
+      borderRadius: spacing.sm
+    }}>
+      <Text style={{
+        fontSize: fontSize['headline-lg'].size,
+        color: colors['text-primary-light']
+      }}>
+        Título Dinâmico
+      </Text>
+    </View>
+  );
+}
+```
+
+#### **3. 🔄 Híbrido (Melhor dos dois mundos)**
+```tsx
+function ComponenteInteligente() {
+  const { isDark } = useDesignSystem();
+  
+  return (
+    <View className={`p-lg rounded-xl ${
+      isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'
+    }`}>
+      <Text className="text-headline-md font-jakarta-bold">
+        Texto que adapta ao tema
+      </Text>
+    </View>
+  );
+}
+```
+
+### 🎨 **Tema Claro/Escuro Automático**
+
+O sistema de tema é **completamente automático** e oferece três modos:
+
+```tsx
+const { themeMode, currentTheme, setThemeMode, isDark } = useDesignSystem();
+
+// Modos disponíveis:
+setThemeMode('light');   // ☀️ Força tema claro
+setThemeMode('dark');    // 🌙 Força tema escuro  
+setThemeMode('system');  // 🔄 Segue o sistema (padrão)
+
+// Helpers úteis:
+isDark   // boolean - true se estiver no modo escuro
+isLight  // boolean - true se estiver no modo claro
+isSystem // boolean - true se estiver seguindo o sistema
+```
+
+### 🔧 **Personalizando o Design System**
+
+Para alterar qualquer aspecto visual do projeto:
+
+#### **1. 🎨 Alterando Cores**
+Edite `designer-system/tokens/colors.ts`:
+```typescript
+export const colors = {
+  // Cores primárias
+  'primary-light': '#0a7ea4',    // Sua nova cor primária clara
+  'primary-dark': '#4A90E2',     // Sua nova cor primária escura
+  
+  // Backgrounds
+  'bg-primary-light': '#FFFFFF', // Fundo principal claro
+  'bg-primary-dark': '#1C1E26',  // Fundo principal escuro
+  
+  // Textos
+  'text-primary-light': '#11181C', // Texto principal claro
+  'text-primary-dark': '#ECEDEE',  // Texto principal escuro
+  // ... mais cores
+};
+```
+
+#### **2. 📏 Alterando Espaçamentos**
+Edite `designer-system/tokens/spacing.ts`:
+```typescript
+export const spacing = {
+  'xs': '8px',    // Espaçamento extra pequeno
+  'sm': '12px',   // Espaçamento pequeno
+  'md': '16px',   // Espaçamento médio
+  'lg': '24px',   // Espaçamento grande
+  'xl': '32px',   // Espaçamento extra grande
+  // ... mais espaçamentos
+};
+```
+
+#### **3. 🔤 Alterando Tipografia**
+Edite `designer-system/tokens/typography.ts`:
+```typescript
+export const fontSize = {
+  'headline-lg': {
+    size: '32px',
+    lineHeight: '40px',
+    fontWeight: '700'
+  },
+  'body-md': {
+    size: '16px',
+    lineHeight: '24px',
+    fontWeight: '400'
+  },
+  // ... mais tamanhos
+};
+```
+
+### ⚡ **Mudanças Instantâneas**
+
+Quando você altera qualquer token em `designer-system/tokens/`:
+
+✅ **Classes Tailwind** são atualizadas automaticamente  
+✅ **Hook useDesignSystem** reflete as mudanças  
+✅ **Todos os componentes** são atualizados  
+✅ **Hot reload** funciona perfeitamente  
+
+### 🎯 **Tokens Disponíveis**
+
+| Token | Descrição | Exemplo de Uso |
+|-------|-----------|----------------|
+| `colors` | Todas as cores do sistema | `bg-primary-light`, `colors['primary-light']` |
+| `spacing` | Espaçamentos consistentes | `p-md`, `spacing.md` |
+| `fontSize` | Tamanhos e pesos de fonte | `text-headline-lg`, `fontSize['headline-lg']` |
+| `borderRadius` | Bordas arredondadas | `rounded-lg`, `borderRadius.lg` |
+| `boxShadow` | Sombras padronizadas | `shadow-card`, `boxShadow['card']` |
+| `breakpoints` | Pontos de quebra responsivos | `md:flex-row`, `breakpoints.md` |
+
+### 🔍 **Visualizando o Design System**
+
+Para ver todos os tokens em ação, acesse a tela de desenvolvimento:
+- **Web**: `http://localhost:8081/(tabs)/dev`
+- **Mobile**: Navegue para a aba "Dev" no app
+
+Esta tela mostra:
+- 🎨 Todas as cores em tempo real
+- 📏 Exemplos de espaçamento
+- 🔤 Tipografia completa
+- ✨ Sombras e efeitos
+- 📱 Breakpoints responsivos
+- 🧩 Componentes do sistema
+
+### 🔄 **Compatibilidade**
+
+Para manter compatibilidade com códigos antigos, mantemos os aliases:
+
+```tsx
+// ✅ Novo (recomendado)
+import { useDesignSystem } from '@/hooks/DesignSystemContext';
+const theme = useDesignSystem();
+
+// ✅ Antigo (ainda funciona)
+import { useTheme } from '@/hooks/DesignSystemContext';
+const theme = useTheme(); // Aponta para useDesignSystem
+```
+
+### 📱 **Responsividade Inteligente**
+
+O sistema inclui breakpoints inteligentes que se adaptam automaticamente:
+
+```tsx
+// Classes responsivas
+<View className="flex-col md:flex-row lg:grid lg:grid-cols-3">
+  <Text className="text-body-sm md:text-body-md lg:text-headline-sm">
+    Texto que cresce com a tela
+  </Text>
+</View>
+
+// Via hook
+const { currentBreakpoint, isMobile, isTablet, isDesktop } = useDesignSystem();
+```
+
+### 🎨 **Cores do Sistema e NativeWind**
+
+O projeto utiliza o NativeWind (Tailwind para React Native) para estilização. As definições de cores, espaçamento, tipografia e sombras estão no arquivo `tailwind.config.js`, mas são **importadas automaticamente** dos tokens do Design System.
+
+**⚠️ Importante**: Nunca edite o `tailwind.config.js` diretamente. Sempre altere os tokens em `designer-system/tokens/` para garantir sincronização.
+
+### 🔤 **Configuração de Fontes**
+
+O projeto oferece duas formas de configurar fontes:
+
+#### **1. 🌐 Fontes via Expo Google Fonts (Recomendado)**
 ```bash
 # Instalar uma nova fonte do Google Fonts
 npx expo install @expo-google-fonts/nome-da-fonte
 ```
 
-Exemplo de configuração (no arquivo `app/_layout.tsx`):
-```jsx
+Configuração no `app/_layout.tsx`:
+```tsx
 import { useFonts, 
   PlusJakartaSans_200ExtraLight,
   PlusJakartaSans_400Regular,
   PlusJakartaSans_700Bold 
 } from '@expo-google-fonts/plus-jakarta-sans';
 
-// No componente principal
 const [fontsLoaded] = useFonts({
   PlusJakartaSans_200ExtraLight,
   PlusJakartaSans_400Regular,
@@ -282,208 +500,75 @@ const [fontsLoaded] = useFonts({
 });
 ```
 
-#### 2. Fontes personalizadas (via assets/fonts)
+#### **2. 📁 Fontes Personalizadas**
+1. Adicione arquivos `.ttf` ou `.otf` em `assets/fonts/`
+2. Configure no `designer-system/tokens/typography.ts`
+3. O sistema sincroniza automaticamente com o Tailwind
 
-Para fontes não disponíveis no Google Fonts ou fontes personalizadas:
+### 📈 **SEO e Meta Tags**
 
-1. **Adicione os arquivos de fonte (.ttf ou .otf)** na pasta `assets/fonts/`
-2. **Registre a fonte no `app.json`**:
-   ```json
-   {
-     "expo": {
-       "fonts": [
-         {
-           "asset": "./assets/fonts/SuaFonte-Regular.ttf",
-           "family": "SuaFonte"
-         }
-       ]
-     }
-   }
-   ```
-3. **Configure no Tailwind**:
-   ```js
-   // Em tailwind.config.js
-   fontFamily: {
-     'sua-fonte': ['SuaFonte', 'sans-serif'],
-   }
-   ```
-
-> 💡 **Quando usar cada abordagem?**
-> - Para fontes do Google: Use `@expo-google-fonts` (mais fácil e recomendado)
-> - Para fontes personalizadas ou proprietárias: Use `assets/fonts`
-> - Para fontes variáveis: Escolha com base na sua necessidade específica
-
-### 🔎 SEO e Meta Tags
-
-O projeto já vem com configurações de SEO otimizadas para web. Para personalizar o SEO:
-
-1. **Editar arquivo de SEO**: 
-   - Abra o arquivo `app/head.tsx`
-   - Este arquivo contém todas as metatags relacionadas a SEO e compartilhamento em redes sociais
-
-2. **Principais configurações**:
-   ```jsx
-   <title>Seu Título Aqui</title>
-   <meta name="description" content="Sua descrição aqui" />
-   
-   // Open Graph (para compartilhamento em redes sociais)
-   <meta property="og:title" content="Título para compartilhamento" />
-   <meta property="og:description" content="Descrição para compartilhamento" />
-   <meta property="og:image" content="https://seu-site.com/imagem.jpg" />
-   
-   // Tema e cores
-   <meta name="theme-color" content={themeColor} /> // Usa a cor primária do tema
-   ```
-
-3. **Imagens e ícones**:
-   - Para imagens de compartilhamento (og:image), use imagens de 1200x630px
-   - Substitua os ícones em `/assets/images/` com seus próprios ícones
-
-4. **Arquivos de SEO adicionais**:
-   - O projeto inclui arquivos importantes de SEO em `assets/seo-web/`:
-     - `robots.txt`: Controla o acesso de bots de busca ao seu site
-     - `sitemap.xml`: Ajuda os buscadores a indexarem suas páginas
-     - `site.webmanifest`: Configurações para instalação da app como PWA
-   - Edite estes arquivos conforme necessário para seu projeto
-
-> 💡 **Nota**: As cores e temas no arquivo `head.tsx` são obtidas do `tailwind.config.js`, garantindo consistência em todo o aplicativo.
-
-### 📱 Configuração da StatusBar
-
-A barra de status (onde aparecem as horas, sinal, bateria) está configurada para respeitar o tema atual do aplicativo.
-
-#### Configuração Completa (Recomendada)
-
-Para garantir que a StatusBar esteja perfeitamente integrada com o tema e o Header da aplicação, use a seguinte abordagem:
-
-```typescript
-// Em app/_layout.tsx
-import { StatusBar } from 'react-native'; // StatusBar nativa para controle avançado
-import { StatusBar as ExpoStatusBar } from 'expo-status-bar'; // StatusBar do Expo para compatibilidade
-
-// Cores do tema conforme definidos em tailwind.config.js e theme.ts
-const headerColors = {
-  light: '#FFFFFF', // Deve corresponder à cor do Header no tema claro
-  dark: '#1C1E26'   // Deve corresponder à cor do Header no tema escuro
-};
-
-// Configurar a StatusBar nativa para ter a mesma cor do Header
-useEffect(() => {
-  if (Platform.OS !== 'web') {
-    // Configurações para Android e iOS
-    StatusBar.setBarStyle(isDark ? 'light-content' : 'dark-content');
-    
-    if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(isDark ? headerColors.dark : headerColors.light);
-    }
-  }
-}, [isDark, headerColors]);
-
-// Use a ExpoStatusBar para manter compatibilidade
-<ExpoStatusBar 
-  style={currentTheme === 'dark' ? 'light' : 'dark'} 
-  backgroundColor={isDark ? headerColors.dark : headerColors.light}
-/>
-
-// Importante: Configure o SafeAreaView para a mesma cor do Header
-return (
-  <SafeAreaView 
-    className={`flex-1 ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}
-    edges={['top', 'right', 'left']}
-    style={{ 
-      backgroundColor: isDark ? headerColors.dark : headerColors.light 
-    }}
-  >
-    {MainContent}
-  </SafeAreaView>
-);
-```
-
-#### Por que é desafiador configurar a StatusBar?
-
-Configurar a StatusBar adequadamente pode ser complexo por vários motivos:
-
-1. **Sistema dual de cores**: Como explicado na documentação dos componentes, o projeto usa cores definidas em dois lugares: `tailwind.config.js` e `constants/theme.ts`.
-
-2. **Diferenças entre plataformas**: iOS e Android tratam a área da StatusBar de formas diferentes:
-   - No iOS, a área da StatusBar é parte do SafeAreaInsets
-   - No Android, a StatusBar pode ser configurada separadamente
-
-3. **Integração com o Header**: Para que a StatusBar pareça parte do Header, ambos precisam compartilhar a mesma cor de fundo.
-
-4. **Modos claro e escuro**: A StatusBar precisa se adaptar automaticamente aos temas.
-
-#### Dicas importantes
-
-- **Consistência de cores**: Certifique-se de que as cores da StatusBar correspondam exatamente às cores do Header
-- **SafeAreaView**: Configure o backgroundColor do SafeAreaView para a mesma cor da StatusBar
-- **Android**: Use `StatusBar.setBackgroundColor()` para Android
-- **iOS**: O iOS requer apenas a configuração de estilo ('light-content' ou 'dark-content')
-
-> 💡 **Dica importante**: Sempre que alterar as cores do tema no `tailwind.config.js` ou no `theme.ts`, atualize também as cores na configuração da StatusBar no arquivo `_layout.tsx`.
-
-### 🎨 Cores do Sistema e NativeWind
-
-O projeto utiliza o NativeWind (Tailwind para React Native) para estilização. As definições de cores, espaçamento, tipografia e sombras estão no arquivo `tailwind.config.js`.
-
-Para usar as classes do design system:
-
+Configure SEO editando `app/head.tsx`:
 ```tsx
-// Em um componente:
-const isDark = currentTheme === 'dark';
-const bgPrimary = isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light';
-const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
-
-<View className={`p-md ${bgPrimary}`}>
-  <Text className={`text-headline-lg font-jakarta-bold ${textPrimary}`}>
-    Título Principal
-  </Text>
-</View>
+<title>Seu Título Aqui</title>
+<meta name="description" content="Sua descrição aqui" />
+<meta property="og:title" content="Título para compartilhamento" />
+<meta property="og:image" content="https://seu-site.com/imagem.jpg" />
 ```
 
-### 🎨 Visualização do Design System
-
-Para visualizar todas as opções do Design System, acesse a rota "/(tabs)/dev" no aplicativo. Lá você encontrará exemplos visuais de:
-- Cores
-- Tipografia
-- Espaçamentos
-- Sombras
-- Componentes básicos
-
-### 🎨 Cores do Sistema
-```typescript
-const COLORS = {
-  light: {
-    primary: '#0a7ea4',
-    text: '#11181C',
-    background: '#fff',
-    icon: '#71717A',
-    divider: '#EBEBEB',
-  },
-  dark: {
-    primary: '#0a7ea4',
-    text: '#ECEDEE',
-    background: '#151718',
-    icon: '#A1A1AA',
-    divider: '#292929',
-  },
-};
-```
+Arquivos importantes em `assets/seo-web/`:
+- `robots.txt` - Controle de bots de busca
+- `sitemap.xml` - Mapa do site
+- `site.webmanifest` - Configurações PWA
 
 ## 📦 Componentes Principais
 
-### 🔔 Toast
-```typescript
+### 🔔 **Toast Notifications**
+```tsx
 import { useToast } from '@/hooks/useToast';
 
 const { showToast } = useToast();
+
+// Toast básico
 showToast({
   type: 'success', // 'success' | 'warning' | 'error' | 'info'
-  message: 'Deu tudo certo!',
+  message: 'Operação realizada com sucesso!',
   description: 'Seus dados foram salvos', // Opcional
   position: 'top', // Opcional
   duration: 5000, // Opcional
 });
+```
+
+### 🎯 **Usando o Design System nos Componentes**
+```tsx
+import { useDesignSystem } from '@/hooks/DesignSystemContext';
+
+function MeuComponente() {
+  const { colors, spacing, isDark } = useDesignSystem();
+  
+  return (
+    <View className={`p-md rounded-lg ${
+      isDark ? 'bg-bg-secondary-dark' : 'bg-bg-secondary-light'
+    }`}>
+      <Text className="text-headline-md font-jakarta-bold">
+        Componente com Design System
+      </Text>
+    </View>
+  );
+}
+```
+
+### 🎨 **Theme Selector Component**
+```tsx
+import { ThemeSelector } from '@/components/AicrusComponents/theme-selector/ThemeSelector';
+
+// Seletor simples
+<ThemeSelector size="md" variant="default" />
+
+// Seletor minimalista
+<ThemeSelector size="sm" variant="minimal" iconOnly />
+
+// Botão único para alternar
+<ThemeSelector variant="single" transparentSingle />
 ```
 
 ## 📁 Estrutura do Projeto
@@ -501,25 +586,59 @@ showToast({
     /home.tsx       # Home (tela inicial)
     /dev.tsx        # Ferramentas de desenvolvimento e Design System
   /+not-found.tsx   # Página 404
+  /_layout.tsx      # Layout raiz da aplicação
+  /head.tsx         # Configurações de SEO e meta tags
 
-🎨 Assets e Componentes
+🎨 Design System e Componentes
+/designer-system    # 🚀 SISTEMA DE DESIGN UNIFICADO
+  /index.ts         # Exportações centralizadas
+  /tokens/          # Tokens do design system
+    /colors.ts      # 🎨 Todas as cores (light/dark)
+    /spacing.ts     # 📏 Espaçamentos consistentes  
+    /typography.ts  # 🔤 Fontes e tamanhos
+    /borders.ts     # 🔲 Border radius
+    /effects.ts     # ✨ Sombras, opacidade, etc.
+    /breakpoints.ts # 📱 Responsividade
+
+/components        # Componentes reutilizáveis
+  /AicrusComponents/ # Biblioteca de componentes
+    /accordion/    # Componente Accordion
+    /button/       # Componente Button
+    /input/        # Componentes de Input
+    /toast/        # Sistema de notificações
+    /theme-selector/ # Seletor de tema
+    # ... mais componentes
+  /ProtectedRoute.tsx # Proteção de rotas
+
+/hooks             # Hooks personalizados
+  /DesignSystemContext.tsx # 🎯 HOOK PRINCIPAL (useDesignSystem)
+  /useToast.tsx    # Hook para notificações
+  /useResponsive.tsx # Hook para responsividade
+
+🎨 Assets e Recursos
 /assets            # Recursos estáticos
   /images         # Imagens e ícones
-  /fonts          # Fontes utilizadas
+  /fonts          # Fontes personalizadas (se necessário)
   /seo-web        # Arquivos de SEO e configurações para web
-/components        # Componentes reutilizáveis
-  /ui             # Componentes base (botões, inputs, etc)
-/constants        # Constantes de responsividade e breakpoints
+
 /contexts         # Contextos do React
-/hooks            # Hooks personalizados
+  /auth.tsx       # Contexto de autenticação
+
 /lib              # Bibliotecas e utilitários
+  /supabase.ts    # Configuração do Supabase
+  /polyfills.ts   # Polyfills para compatibilidade
+
 /types            # Definições de tipos TypeScript
 
 🛠️ Configuração
 /.env             # Variáveis de ambiente
 /.env.example     # Exemplo de variáveis de ambiente
+/tailwind.config.js # 🔄 Configuração Tailwind (sincronizado com tokens)
+/postcss.config.js # Configuração PostCSS
 /package.json     # Dependências e scripts
 /tsconfig.json    # Configuração do TypeScript
+/metro.config.js  # Configuração Metro Bundler
+/global.css       # Estilos globais NativeWind
 ```
 
 ## 💻 Desenvolvimento
