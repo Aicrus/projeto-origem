@@ -2,7 +2,7 @@ import { Tabs } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Platform, StyleSheet, View, Text } from 'react-native';
 import { Home as HomeIcon, Code as CodeIcon } from 'lucide-react-native';
-import { useTheme } from '../../hooks/ThemeContext';
+import { useTheme } from '../../hooks/DesignSystemContext';
 import { ProtectedRoute } from '../../components/ProtectedRoute';
 import { useResponsive } from '../../hooks/useResponsive';
 import { HapticTab } from '../../components/HapticTab';

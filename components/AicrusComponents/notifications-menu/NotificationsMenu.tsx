@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View, Animated, Pressable, Platform, Dimensions, ScrollView, Text } from 'react-native';
 import { Clock, DollarSign, Bell, ArrowUpRight } from 'lucide-react-native';
 import { HoverableView } from '../hoverable-view/HoverableView';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { router } from 'expo-router';
 import { colors } from '../../../designer-system/tokens/colors';

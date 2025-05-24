@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { StyleSheet, Platform, TouchableOpacity, Text, View, Modal, Pressable, ScrollView, TextInput } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { ChevronUp, ChevronDown, Check, Search, X } from 'lucide-react-native';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { createPortal } from 'react-dom';
 import { supabase } from '../../../lib/supabase';

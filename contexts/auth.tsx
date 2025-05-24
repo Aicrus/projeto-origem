@@ -6,7 +6,7 @@ import { Session } from '@supabase/supabase-js';
 import { useToast } from '@/hooks/useToast';
 import { View, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTheme } from '@/hooks/ThemeContext';
+import { useTheme } from '@/hooks/DesignSystemContext';
 
 // Tipos
 type AuthContextData = {

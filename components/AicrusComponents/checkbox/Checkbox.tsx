@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Check, Minus } from 'lucide-react-native';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { colors } from '../../../designer-system/tokens/colors';
 
 /**

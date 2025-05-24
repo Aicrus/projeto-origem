@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../contexts/auth';
 import { ActivityIndicator, View } from 'react-native';
-import { useTheme } from '../hooks/ThemeContext';
+import { useTheme } from '../hooks/DesignSystemContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

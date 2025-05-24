@@ -23,7 +23,7 @@ import Animated, {
   interpolate,
   Extrapolate
 } from 'react-native-reanimated';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { GradientView } from '../gradient/GradientView';
 import { useAuth } from '../../../contexts/auth';

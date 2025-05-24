@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useTheme } from '../hooks/ThemeContext';
+import { useTheme } from '../hooks/DesignSystemContext';
 
 /**
  * Componente Head - Responsável pelas configurações de SEO e meta tags

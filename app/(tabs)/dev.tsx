@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Switch, Image, Platform, useWindowDimensions, Pressable, Dimensions, TextStyle, ViewStyle } from 'react-native';
-import { useTheme } from '../../hooks/ThemeContext';
+import { useTheme } from '../../hooks/DesignSystemContext';
 import { useResponsive } from '../../hooks/useResponsive';
 // Importar tokens do sistema de design
 import { 

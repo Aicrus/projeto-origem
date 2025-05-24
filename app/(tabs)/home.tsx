@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, StyleSheet, Platform, ScrollView, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
-import { useTheme } from '../../hooks/ThemeContext';
+import { useTheme } from '../../hooks/DesignSystemContext';
 import { Header } from '../../components/AicrusComponents/header';
 import { Sidebar } from '../../components/AicrusComponents/sidebar';
 import { PageContainer } from '../../components/AicrusComponents/page-container';

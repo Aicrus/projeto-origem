@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Image, Platform, Pressable, Text, Dimensions, ViewStyle } from 'react-native';
 import { Share2, Bell, Search, MessageSquare, Settings, Menu } from 'lucide-react-native';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { NotificationsMenu } from '../../AicrusComponents/notifications-menu/NotificationsMenu';
 import { ProfileMenu } from '../../AicrusComponents/profile-menu/ProfileMenu';

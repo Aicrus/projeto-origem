@@ -26,8 +26,8 @@ import Head from './head';
 // Importação do arquivo global.css para NativeWind
 import '@/global.css';
 
-import { useTheme } from '@/hooks/ThemeContext';
-import { ThemeProvider } from '@/hooks/ThemeContext';
+import { useTheme } from '@/hooks/DesignSystemContext';
+import { DesignSystemProvider } from '@/hooks/DesignSystemContext';
 import { ToastProvider } from '@/hooks/useToast';
 import { AuthProvider } from '@/contexts/auth';
 import { useAuth } from '@/contexts/auth';
@@ -114,9 +114,9 @@ export default function RootLayout() {
   if (!fontsLoaded || !initialCheckDone) {
     return (
       <SafeAreaProvider>
-        <ThemeProvider>
+        <DesignSystemProvider>
           <LoadingScreen />
-        </ThemeProvider>
+        </DesignSystemProvider>
       </SafeAreaProvider>
     );
   }
@@ -134,7 +134,7 @@ export default function RootLayout() {
         </Helmet>
       )}
       <SafeAreaProvider>
-        <ThemeProvider>
+        <DesignSystemProvider>
           <Head />
           <PortalProvider>
             <ToastProvider>
@@ -143,7 +143,7 @@ export default function RootLayout() {
               </AuthProvider>
             </ToastProvider>
           </PortalProvider>
-        </ThemeProvider>
+        </DesignSystemProvider>
       </SafeAreaProvider>
     </HelmetProvider>
   );

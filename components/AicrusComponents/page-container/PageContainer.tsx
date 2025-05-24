@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle, Platform, Dimensions } from 'react-native';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { colors } from '../../../designer-system/tokens/colors';
 import { spacing } from '../../../designer-system/tokens/spacing';
 

@@ -30,7 +30,7 @@ import { Input } from '../input';
 import { Checkbox } from '../checkbox';
 import { Button } from '../button';
 import { ArrowUpDown, ChevronDown, MoreHorizontal, AlertCircle } from 'lucide-react-native';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { colors, ColorType } from '../../../designer-system/tokens/colors';
 import { HoverableView } from '../hoverable-view/HoverableView';

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { Pressable, Platform, Keyboard, View, Text, TouchableWithoutFeedback, Image, StyleSheet } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import { useTheme } from '@/hooks/ThemeContext';
+import { useTheme } from '@/hooks/DesignSystemContext';
 import { useWindowDimensions } from 'react-native';
 import { useAuth } from '@/contexts/auth';
 import { useToast } from '@/hooks/useToast';

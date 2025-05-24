@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated, Dimensions, Platform, SafeAreaView, KeyboardAvoidingView } from 'react-native';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 
 // Função para obter as cores do tailwind.config.js
 const getTailwindConfig = () => {

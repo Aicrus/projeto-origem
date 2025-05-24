@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Platform, Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input, InputProps } from './Input';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { colors } from '../../../designer-system/tokens/colors';
 
 /**

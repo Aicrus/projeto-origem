@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Animated, Platform, LayoutAnimation, UIManager, ViewStyle, TextStyle, ImageStyle } from 'react-native';
 import { ChevronDown, ChevronUp } from 'lucide-react-native';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 
 /**

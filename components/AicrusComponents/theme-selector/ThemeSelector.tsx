@@ -8,7 +8,7 @@ import Animated, {
   useDerivedValue,
 } from 'react-native-reanimated';
 
-import { useTheme } from '@/hooks/ThemeContext';
+import { useTheme } from '@/hooks/DesignSystemContext';
 import { colors } from '../../../designer-system/tokens/colors';
 
 /**

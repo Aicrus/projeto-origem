@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, Animated, TouchableOpacity, Pressable, Platform, Dimensions, ViewStyle, Text } from 'react-native';
 import { LogOut, Settings, Sun, Moon, Monitor } from 'lucide-react-native';
 import { HoverableView } from '../hoverable-view/HoverableView';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { LucideIcon } from 'lucide-react-native';
 import { useAuth } from '../../../contexts/auth';
 import { router } from 'expo-router';

@@ -13,7 +13,7 @@ import { boxShadow, opacity, zIndex, transitionDuration } from '../designer-syst
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type ColorScheme = 'light' | 'dark';
 
-interface ThemeContextType {
+interface DesignSystemContextType {
   // Estados do tema
   themeMode: ThemeMode;
   currentTheme: ColorScheme;
@@ -39,11 +39,11 @@ interface ThemeContextType {
   isSystem: boolean;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const DesignSystemContext = createContext<DesignSystemContextType | undefined>(undefined);
 
 const THEME_STORAGE_KEY = '@app_theme';
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function DesignSystemProvider({ children }: { children: React.ReactNode }) {
   // Estado para o modo do tema (light/dark/system)
   const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
   // Estado para o tema do dispositivo
@@ -131,7 +131,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ThemeContext.Provider
+    <DesignSystemContext.Provider
       value={{
         // Estados
         themeMode,
@@ -162,14 +162,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         isSystem,
       }}>
       {children}
-    </ThemeContext.Provider>
+    </DesignSystemContext.Provider>
   );
 }
 
-export function useTheme() {
-  const context = useContext(ThemeContext);
+export function useDesignSystem() {
+  const context = useContext(DesignSystemContext);
   if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error('useDesignSystem must be used within a DesignSystemProvider');
   }
   return context;
-} 
+}
+
+// Alias para manter compatibilidade
+export const useTheme = useDesignSystem; 

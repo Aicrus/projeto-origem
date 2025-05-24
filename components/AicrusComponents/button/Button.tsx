@@ -10,7 +10,7 @@ import {
   TextStyle,
   TouchableOpacityProps,
 } from 'react-native';
-import { useTheme } from '../../../hooks/ThemeContext';
+import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { colors, ColorType, getColorByMode } from '../../../designer-system/tokens/colors';
 import { spacing } from '../../../designer-system/tokens/spacing';
