@@ -117,32 +117,57 @@ export default function Home() {
   ];
 
   const renderContent = () => {
-    // Layout adaptativo:
-    // - mobile/tablet: 2x2 (grid-cols-2)
-    // - desktop: 4 em linha (grid-cols-4)
-    const topCardsLayout = isMobile || isTablet ? 'grid-cols-2' : 'grid-cols-4';
-    
-    // Layout adaptativo para cards inferiores:
-    // - mobile: coluna (flex-col)
-    // - tablet/desktop: 2 colunas (grid-cols-2)
-    const bottomCardsLayout = isMobile ? 'flex-col' : 'grid-cols-2';
-    
     return (
       <View style={styles.contentContainer}>
-        {/* Cards superiores - agora vazios */}
-        <View className={`gap-5 mb-5 grid ${topCardsLayout}`} style={styles.topSection}>
+        {/* Cards superiores - layout com flexbox para compatibilidade nativa */}
+        <View style={[
+          styles.topSection,
+          {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: 20,
+            marginBottom: 20,
+          }
+        ]}>
           {stats.map((stat) => (
-            // Renderiza apenas o container do StatCard vazio
-            <View key={stat.id} className={`${cardBg} rounded-lg p-4`} style={{ height: 140 }} />
+            <View 
+              key={stat.id} 
+              className={`${cardBg} rounded-lg p-4`} 
+              style={[
+                { height: 140 },
+                // Layout responsivo usando flex
+                isMobile || isTablet 
+                  ? { flex: 1, minWidth: '45%', maxWidth: '48%' } // 2 por linha
+                  : { flex: 1, minWidth: '22%', maxWidth: '23%' } // 4 por linha
+              ]} 
+            />
           ))}
         </View>
 
-        {/* Cards inferiores - agora vazios */}
-        <View className={`gap-5 ${isMobile ? 'flex' : 'grid'} ${bottomCardsLayout}`} style={styles.bottomSection}>
-          {/* Card inferior 1 - vazio */}
-          <View className={`${cardBg} rounded-lg p-4 flex-1`} style={styles.bottomCard} />
-          {/* Card inferior 2 - vazio */}
-          <View className={`${cardBg} rounded-lg p-4 flex-1`} style={styles.bottomCard} />
+        {/* Cards inferiores - layout com flexbox */}
+        <View style={[
+          styles.bottomSection,
+          {
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: 20,
+          }
+        ]}>
+          {/* Card inferior 1 */}
+          <View 
+            className={`${cardBg} rounded-lg p-4`} 
+            style={[
+              styles.bottomCard,
+              { flex: 1 }
+            ]} 
+          />
+          {/* Card inferior 2 */}
+          <View 
+            className={`${cardBg} rounded-lg p-4`} 
+            style={[
+              styles.bottomCard,
+              { flex: 1 }
+            ]} 
+          />
         </View>
       </View>
     );

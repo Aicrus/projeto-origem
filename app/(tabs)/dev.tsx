@@ -3837,40 +3837,36 @@ return (
     bgPrimaryClass = '', 
     isMobile = false, 
     isTablet = false, 
-    layout = '4x2' // Opções: '4x2', '3x2', '2x2', 'single'
+    layout = '4x2' // Opções: '4x2', '3x2', '3x1', '2x2', 'single'
   }) {
     const cardClass = `${bgClass} rounded-lg`;
     
     // Definir layouts com base nos parâmetros passados
-    let topCardsLayout = '';
-    let bottomCardsLayout = '';
     let topCards: number[] = [];
     let bottomCards: number[] = [];
     
     // Layout principal 4x2
     if (layout === '4x2') {
-      topCardsLayout = isMobile ? 'flex-col' : isTablet ? 'grid grid-cols-2' : 'grid grid-cols-4';
-      bottomCardsLayout = isMobile ? 'flex-col' : 'grid grid-cols-2';
       topCards = [1, 2, 3, 4];
       bottomCards = [1, 2];
     } 
-    // Layout principal 3x2
+    // Layout principal 3x2 (3 cards em cima, 2 embaixo)
     else if (layout === '3x2') {
-      topCardsLayout = isMobile ? 'flex-col' : isTablet ? 'grid grid-cols-2' : 'grid grid-cols-3';
-      bottomCardsLayout = isMobile ? 'flex-col' : 'grid grid-cols-2';
       topCards = [1, 2, 3];
       bottomCards = [1, 2];
     } 
+    // Layout principal 3x1 (3 cards em cima, 1 embaixo ocupando toda largura)
+    else if (layout === '3x1') {
+      topCards = [1, 2, 3];
+      bottomCards = [1];
+    }
     // Layout principal 2x2
     else if (layout === '2x2') {
-      topCardsLayout = isMobile ? 'flex-col' : 'grid grid-cols-2';
-      bottomCardsLayout = isMobile ? 'flex-col' : 'grid grid-cols-2';
       topCards = [1, 2];
       bottomCards = [1, 2];
     }
     // Layout single (apenas um card)
     else if (layout === 'single') {
-      topCardsLayout = 'flex-col';
       topCards = [];
       bottomCards = [1];
     }
@@ -3879,22 +3875,65 @@ return (
     const EmptyCard = ({ height, className = '', style }: { height?: number, className?: string, style?: any }) => (
       <View className={`${cardClass} ${className}`} style={[style, height ? { height } : {}]} />
     );
+
+    // Função para calcular o estilo flexbox baseado no layout
+    const getTopCardsStyle = () => {
+      if (layout === '4x2' && (isMobile || isTablet)) {
+        // Para 4x2 no mobile/tablet: permite quebra de linha (2x2)
+        return {
+          flexDirection: 'row' as const,
+          flexWrap: 'wrap' as const,
+          gap: 16,
+          marginBottom: 16,
+        };
+      }
+      
+      // Para todos os outros casos: uma linha só
+      return {
+        flexDirection: 'row' as const,
+        gap: 16,
+        marginBottom: 16,
+      };
+    };
+
+    const getCardStyle = (cardIndex: number, isTopCard: boolean) => {
+      if (isTopCard && layout === '4x2' && (isMobile || isTablet)) {
+        // Para 4x2 no mobile/tablet: 2 cards por linha (50% cada)
+        return { flex: 1, minWidth: '45%', maxWidth: '48%' };
+      }
+      
+      // Para todos os outros casos: compartilham igualmente o espaço
+      return { flex: 1 };
+    };
     
     return (
       <View style={{ minHeight: 400, flex: 1, flexDirection: 'column' }} className={`p-4 rounded-lg ${bgPrimaryClass}`}>
         {/* Cards superiores */}
         {topCards.length > 0 && (
-          <View className={`gap-4 mb-4 ${isMobile ? 'flex' : 'grid'} ${topCardsLayout}`}>
+          <View style={getTopCardsStyle()}>
             {topCards.map(index => (
-              <EmptyCard key={`top-${index}`} height={140} />
+              <EmptyCard 
+                key={`top-${index}`} 
+                height={140} 
+                style={getCardStyle(index, true)}
+              />
             ))}
           </View>
         )}
         
         {/* Cards inferiores */}
-        <View className={`gap-4 ${isMobile ? 'flex' : 'grid'} ${bottomCardsLayout}`} style={{ flex: 1, minHeight: isMobile ? 200 : 300 }}>
+        <View style={{
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: 16,
+          flex: 1,
+          minHeight: isMobile ? 200 : 300
+        }}>
           {bottomCards.map(index => (
-            <EmptyCard key={`bottom-${index}`} className="flex-1" style={{ height: '100%' }} />
+            <EmptyCard 
+              key={`bottom-${index}`} 
+              className="flex-1" 
+              style={getCardStyle(index, false)}
+            />
           ))}
         </View>
       </View>
@@ -3941,22 +3980,16 @@ return (
               />
             </PageContainer>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Layout com 4 cards superiores e 2 inferiores. Totalmente responsivo.
+              Layout Dashboard 4x2: Responsivo - Web: 4 cards em 1 linha + 2 inferiores. Mobile/Tablet: 4 cards em 2 linhas (2x2) + 2 inferiores.
             </Text>
             <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
               <Text className={`text-mono-sm ${textPrimary}`}>
-                {`// Código pronto para usar:\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4 cards */}\n    <View className={\`gap-4 mb-4 \${isMobile ? 'flex' : isTablet ? 'grid grid-cols-2' : 'grid grid-cols-4'}\`}>
-      <Card1 height={140} />
-      <Card2 height={140} />
-      <Card3 height={140} />
-      <Card4 height={140} />
-    </View>
-    {/* Cards inferiores - 2 cards */}\n    <View className={\`gap-4 \${isMobile ? 'flex' : 'grid grid-cols-2'}\`} style={{ flex: 1 }}>\n      <Card5 className="flex-1" style={{ height: '100%' }} />\n      <Card6 className="flex-1" style={{ height: '100%' }} />\n    </View>\n  </View>\n</PageContainer>`}
+                {`// Código pronto para usar (compatível com nativo):\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4 cards responsivos */}\n    <View style={{\n      flexDirection: 'row',\n      flexWrap: isMobile || isTablet ? 'wrap' : 'nowrap',\n      gap: 16,\n      marginBottom: 16\n    }}>\n      <Card1 height={140} style={{\n        flex: 1,\n        ...(isMobile || isTablet ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card2 height={140} style={{\n        flex: 1,\n        ...(isMobile || isTablet ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card3 height={140} style={{\n        flex: 1,\n        ...(isMobile || isTablet ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card4 height={140} style={{\n        flex: 1,\n        ...(isMobile || isTablet ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n    </View>\n    {/* Cards inferiores - 2 cards */}\n    <View style={{\n      flexDirection: 'row',\n      gap: 16,\n      flex: 1\n    }}>\n      <Card5 style={{ flex: 1 }} />\n      <Card6 style={{ flex: 1 }} />\n    </View>\n  </View>\n</PageContainer>`}
               </Text>
             </View>
           </View>
 
-          {/* Layout Dashboard 3x2 - Modificado para ter 2 em cima, 1 embaixo ocupando toda a largura */}
+          {/* Layout Dashboard 3x2 */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 3x2</Text>
             <PageContainer>
@@ -3969,15 +4002,33 @@ return (
               />
             </PageContainer>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Layout com 2 cards superiores e 1 card inferior ocupando toda a largura.
+              Layout com 3 cards superiores (compartilhando igualmente o espaço) e 2 cards inferiores. Sem quebra de linha.
             </Text>
             <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
               <Text className={`text-mono-sm ${textPrimary}`}>
-                {`// Código pronto para usar:\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 2 cards */}\n    <View className={\`gap-4 mb-4 \${isMobile ? 'flex' : 'grid grid-cols-2'}\`}>
-      <Card1 height={140} />
-      <Card2 height={140} />
-    </View>
-    {/* Card inferior - 1 card ocupando toda a largura */}\n    <View className="gap-4" style={{ flex: 1 }}>\n      <Card3 className="flex-1" style={{ height: '100%' }} />\n    </View>\n  </View>\n</PageContainer>`}
+                                 {`// Código pronto para usar (compatível com nativo):\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 3 cards compartilhando igualmente o espaço */}\n    <View style={{\n      flexDirection: 'row',\n      gap: 16,\n      marginBottom: 16\n    }}>\n      <Card1 height={140} style={{ flex: 1 }} />\n      <Card2 height={140} style={{ flex: 1 }} />\n      <Card3 height={140} style={{ flex: 1 }} />\n    </View>\n    {/* Cards inferiores - 2 cards */}\n    <View style={{\n      flexDirection: 'row',\n      gap: 16,\n      flex: 1\n    }}>\n      <Card4 style={{ flex: 1 }} />\n      <Card5 style={{ flex: 1 }} />\n    </View>\n  </View>\n</PageContainer>`}
+              </Text>
+            </View>
+          </View>
+
+          {/* Layout Dashboard 3x1 */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 3x1</Text>
+            <PageContainer>
+              <HomeStyleCards 
+                bgClass={bgSecondary}
+                bgPrimaryClass={bgPrimary}
+                isMobile={_isMobile} 
+                isTablet={_isTablet}
+                layout="3x1"
+              />
+            </PageContainer>
+                                      <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+                Layout com 3 cards superiores (compartilhando igualmente o espaço) e 1 card inferior ocupando toda a largura. Sem quebra de linha.
+             </Text>
+            <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
+              <Text className={`text-mono-sm ${textPrimary}`}>
+                                 {`// Código pronto para usar (compatível com nativo):\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 3 cards compartilhando igualmente o espaço */}\n    <View style={{\n      flexDirection: 'row',\n      gap: 16,\n      marginBottom: 16\n    }}>\n      <Card1 height={140} style={{ flex: 1 }} />\n      <Card2 height={140} style={{ flex: 1 }} />\n      <Card3 height={140} style={{ flex: 1 }} />\n    </View>\n    {/* Card inferior - 1 card ocupando toda largura */}\n    <View style={{ flex: 1 }}>\n      <Card4 style={{ flex: 1 }} />\n    </View>\n  </View>\n</PageContainer>`}
               </Text>
             </View>
           </View>
@@ -3995,15 +4046,11 @@ return (
               />
             </PageContainer>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Layout com 2 cards superiores e 2 inferiores.
+              Layout com 2 cards superiores (compartilhando igualmente o espaço) e 2 cards inferiores. Sem quebra de linha.
             </Text>
             <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
               <Text className={`text-mono-sm ${textPrimary}`}>
-                {`// Código pronto para usar:\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 2 cards */}\n    <View className={\`gap-4 mb-4 \${isMobile ? 'flex' : 'grid grid-cols-2'}\`}>
-      <Card1 height={140} />
-      <Card2 height={140} />
-    </View>
-    {/* Cards inferiores - 2 cards */}\n    <View className={\`gap-4 \${isMobile ? 'flex' : 'grid grid-cols-2'}\`} style={{ flex: 1 }}>\n      <Card3 className="flex-1" style={{ height: '100%' }} />\n      <Card4 className="flex-1" style={{ height: '100%' }} />\n    </View>\n  </View>\n</PageContainer>`}
+                {`// Código pronto para usar (compatível com nativo):\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 2 cards compartilhando igualmente o espaço */}\n    <View style={{\n      flexDirection: 'row',\n      gap: 16,\n      marginBottom: 16\n    }}>\n      <Card1 height={140} style={{ flex: 1 }} />\n      <Card2 height={140} style={{ flex: 1 }} />\n    </View>\n    {/* Cards inferiores - 2 cards */}\n    <View style={{\n      flexDirection: 'row',\n      gap: 16,\n      flex: 1\n    }}>\n      <Card3 style={{ flex: 1 }} />\n      <Card4 style={{ flex: 1 }} />\n    </View>\n  </View>\n</PageContainer>`}
               </Text>
             </View>
           </View>
@@ -4025,7 +4072,7 @@ return (
             </Text>
             <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
               <Text className={`text-mono-sm ${textPrimary}`}>
-                {`// Código pronto para usar:\n<PageContainer>\n  <View className={\`\${bgSecondary} rounded-lg flex-1\`} style={{ minHeight: 400 }}>\n    {/* Conteúdo do card */}\n  </View>\n</PageContainer>`}
+                {`// Código pronto para usar (compatível com nativo):\n<PageContainer>\n  <View className={\`\${bgSecondary} rounded-lg flex-1\`} style={{ minHeight: 400 }}>\n    {/* Conteúdo do card único */}\n  </View>\n</PageContainer>`}
               </Text>
             </View>
           </View>
