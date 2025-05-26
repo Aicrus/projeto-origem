@@ -22,6 +22,7 @@
     "@expo/vector-icons": "^14.0.4",
     "@gorhom/portal": "1.0.14",
     "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-community/datetimepicker": "8.2.0",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
     "@supabase/node-fetch": "2.6.15",
@@ -61,8 +62,7 @@
     "react-native-webview": "13.12.5",
     "sharp": "0.33.5",
     "tailwindcss": "3.3.3",
-    "zustand": "^5.0.3",
-    "@react-native-community/datetimepicker": "8.2.0"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -71,6 +71,7 @@
     "@expo/config": "^10.0.8",
     "@expo/metro-config": "^0.19.9",
     "@react-native-community/cli": "18.0.0",
+    "@stagewise/toolbar-react": "0.1.2",
     "@types/jest": "^29.5.12",
     "@types/react": "~18.3.12",
     "@types/react-dom": "~18.3.1",
