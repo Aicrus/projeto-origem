@@ -80,93 +80,122 @@ export default function Home() {
   const stats = [
     {
       id: 1,
-      title: 'Imobiliárias Ativas',
-      value: 152,
+      title: 'Receita Total',
+      value: 85,
       change: '+12.5%',
       trend: 'up' as const,
-      subtitle: '+8 novas',
+      subtitle: 'R$ 85k',
       icon: Building2,
     },
     {
       id: 2,
-      title: 'Vistoriadores Ativos',
-      value: 48,
+      title: 'Vendas',
+      value: 248,
       change: '+8.2%',
       trend: 'up' as const,
-      subtitle: '+3 novos',
+      subtitle: 'Este mês',
       icon: Users,
     },
     {
       id: 3,
-      title: 'Vistorias Agendadas',
-      value: 89,
+      title: 'Clientes',
+      value: 1.2,
       change: '+23.1%',
       trend: 'up' as const,
-      subtitle: 'Hoje: 12',
+      subtitle: '1.2k ativos',
       icon: ClipboardList,
     },
     {
       id: 4,
-      title: 'Vistorias Atrasadas',
+      title: 'Conversão',
       value: 12,
       change: '-5.4%',
       trend: 'down' as const,
-      subtitle: 'Crítico',
+      subtitle: '12.5%',
       icon: AlertTriangle,
     },
   ];
 
+  // Função para calcular o estilo flexbox baseado no layout responsivo
+  const getTopCardsStyle = () => {
+    if (isMobile) {
+      // Para mobile: permite quebra de linha (2x2)
+      return {
+        flexDirection: 'row' as const,
+        flexWrap: 'wrap' as const,
+        justifyContent: 'space-between' as const,
+        gap: 16,
+        marginBottom: 16,
+      };
+    }
+    
+    // Para tablet e desktop: uma linha só
+    return {
+      flexDirection: 'row' as const,
+      gap: 16,
+      marginBottom: 16,
+    };
+  };
+
+  const getCardStyle = (cardIndex: number, isTopCard: boolean) => {
+    if (isTopCard && isMobile) {
+      // Para mobile: 2 cards por linha (compatível web e nativo)
+      return Platform.OS === 'web' 
+        ? { 
+            flex: 1,
+            flexBasis: '48%',
+            maxWidth: '48%',
+            minWidth: '48%'
+          }
+        : {
+            flex: 1,
+            maxWidth: '48%',
+            minWidth: '45%'
+          };
+    }
+    
+    // Para tablet e desktop: compartilham igualmente o espaço
+    return { flex: 1 };
+  };
+
   const renderContent = () => {
     return (
       <View style={styles.contentContainer}>
-        {/* Cards superiores - layout com flexbox para compatibilidade nativa */}
-        <View style={[
-          styles.topSection,
-          {
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: 20,
-            marginBottom: 20,
-          }
-        ]}>
-          {stats.map((stat) => (
-            <View 
-              key={stat.id} 
-              className={`${cardBg} rounded-lg p-4`} 
-              style={[
-                { height: 140 },
-                // Layout responsivo usando flex
-                isMobile || isTablet 
-                  ? { flex: 1, minWidth: '45%', maxWidth: '48%' } // 2 por linha
-                  : { flex: 1, minWidth: '22%', maxWidth: '23%' } // 4 por linha
-              ]} 
+        {/* Cards superiores - Layout responsivo: mobile 2x2, tablet/desktop 1x4 */}
+        <View style={getTopCardsStyle()}>
+          {stats.map((stat, index) => (
+            <StatCard
+              key={stat.id}
+              title={stat.title}
+              value={stat.value}
+              change={stat.change}
+              trend={stat.trend}
+              subtitle={stat.subtitle}
+              icon={stat.icon}
+              height={140}
+              style={getCardStyle(index, true)}
             />
           ))}
         </View>
 
-        {/* Cards inferiores - layout com flexbox */}
+        {/* Cards inferiores - 2 cards responsivos */}
         <View style={[
           styles.bottomSection,
           {
             flexDirection: isMobile ? 'column' : 'row',
-            gap: 20,
+            gap: 16,
+            flex: 1,
           }
         ]}>
           {/* Card inferior 1 */}
           <View 
             className={`${cardBg} rounded-lg p-4`} 
-            style={[
-              styles.bottomCard,
-              { flex: 1 }
-            ]} 
+            style={{ flex: 1 }} 
           />
           {/* Card inferior 2 */}
           <View 
             className={`${cardBg} rounded-lg p-4`} 
-            style={[
-              styles.bottomCard,
-              { flex: 1 }
-            ]} 
+            style={{ flex: 1 }} 
           />
         </View>
       </View>
@@ -270,16 +299,9 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
   },
-  topSection: {
-    flexShrink: 0,
-  },
   bottomSection: {
     flex: 1,
     minHeight: Platform.select({ web: 500, default: 400 }),
-    height: '100%',
-  },
-  bottomCard: {
-    height: '100%',
   },
   statHeader: {
     flexDirection: 'row',
@@ -292,7 +314,8 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   statTitle: {
-    fontSize: 16,
+    fontSize: Platform.select({ web: 16, default: 14 }),
+    lineHeight: Platform.select({ web: 20, default: 18 }),
   },
   changeTag: {
     flexDirection: 'row',
@@ -324,12 +347,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   statValue: {
-    fontSize: 32,
+    fontSize: Platform.select({ web: 32, default: 24 }),
     fontWeight: 'bold',
     marginBottom: 4,
+    lineHeight: Platform.select({ web: 36, default: 28 }),
   },
   statSubtitle: {
-    fontSize: 14,
+    fontSize: Platform.select({ web: 14, default: 12 }),
+    lineHeight: Platform.select({ web: 18, default: 16 }),
   },
   statIcon: {
     opacity: 0.8,

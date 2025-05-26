@@ -235,7 +235,10 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
           >
             {/* Logo */}
             <View style={styles.logoContainer}>
-              <View style={getConditionalStyle(styles.logoBox, styles.logoBoxCompact)}>
+              <View style={[
+                getConditionalStyle(styles.logoBox, styles.logoBoxCompact),
+                { backgroundColor: isDark ? colors['primary-dark'] : colors['primary-light'] }
+              ]}>
                 <Building size={20} color={isDark ? colors['icon-dark'] : colors['icon-light']} strokeWidth={1.5} />
               </View>
               <View>
@@ -259,9 +262,9 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                       style={styles.navItemContainer}
                     >
                       <GradientView
-                        colors={isDark ? [colors['primary-dark'], colors['primary-dark-active']] : [colors['primary-light'], colors['primary-light-active']]}
-                        start={{ x: 0.2, y: 0 }}
-                        end={{ x: 0.8, y: 1 }}
+                        type="primary-fade"
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
@@ -375,7 +378,10 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
     ]}>
       {/* Logo */}
       <View style={getConditionalStyle(styles.logoContainer, styles.logoContainerCompact)}>
-        <View style={getConditionalStyle(styles.logoBox, styles.logoBoxCompact)}>
+        <View style={[
+          getConditionalStyle(styles.logoBox, styles.logoBoxCompact),
+          { backgroundColor: isDark ? colors['primary-dark'] : colors['primary-light'] }
+        ]}>
           <Building size={20} color={isDark ? colors['icon-dark'] : colors['icon-light']} strokeWidth={1.5} />
         </View>
         {!isTablet && (
@@ -397,9 +403,9 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
             return (
               <Link key={item.path} href={item.path as any} asChild>
                 <GradientView
-                  colors={isDark ? [colors['primary-dark'], colors['primary-dark-active']] : [colors['primary-light'], colors['primary-light-active']]}
-                  start={{ x: 0.2, y: 0 }}
-                  end={{ x: 0.8, y: 1 }}
+                  type="primary-fade"
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -553,7 +559,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(174, 100, 242, 0.4)',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -3089,6 +3089,36 @@ showToast({
             </Text>
           </View>
           
+          {/* Gradientes fade */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Gradientes fade (mesma cor)</Text>
+            <View className="flex-row flex-wrap gap-md mb-md">
+              <GradientView
+                type="primary-fade"
+                style={{ height: 80, width: 192, borderRadius: 8 }}
+              >
+                <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Primário Fade</Text>
+              </GradientView>
+              
+              <GradientView
+                type="secondary-fade"
+                style={{ height: 80, width: 192, borderRadius: 8 }}
+              >
+                <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Secundário Fade</Text>
+              </GradientView>
+              
+              <GradientView
+                type="tertiary-fade"
+                style={{ height: 80, width: 192, borderRadius: 8 }}
+              >
+                <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Terciário Fade</Text>
+              </GradientView>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Gradientes que usam a mesma cor, começando forte e terminando suave (opacidade 0.3). Ideal para botões ativos e destaques.
+            </Text>
+          </View>
+          
           {/* Gradiente customizado */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Gradiente personalizado</Text>
@@ -3136,7 +3166,7 @@ showToast({
               <View className="flex-row py-xs bg-divider-light/20 dark:bg-divider-dark/20">
                 <Text className={`text-body-sm ${textPrimary} w-1/4 px-sm`}>type</Text>
                 <Text className={`text-body-sm font-mono-regular ${textPrimary} w-1/4 px-sm`}>GradientType</Text>
-                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Tipo de gradiente: 'primary', 'secondary', 'tertiary' ou 'custom'</Text>
+                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Tipo: 'primary', 'secondary', 'tertiary', 'primary-fade', 'secondary-fade', 'tertiary-fade' ou 'custom'</Text>
               </View>
               
               <View className="flex-row py-xs">
@@ -3179,6 +3209,11 @@ showToast({
 
 // Usando gradiente predefinido
 <GradientView type="primary" style={{ height: 80, width: 200 }}>
+  <Text style={{ color: 'white' }}>Conteúdo</Text>
+</GradientView>
+
+// Usando gradiente fade (mesma cor)
+<GradientView type="primary-fade" style={{ height: 80, width: 200 }}>
   <Text style={{ color: 'white' }}>Conteúdo</Text>
 </GradientView>
 
@@ -3878,8 +3913,8 @@ return (
 
     // Função para calcular o estilo flexbox baseado no layout
     const getTopCardsStyle = () => {
-      if (layout === '4x2' && (isMobile || isTablet)) {
-        // Para 4x2 no mobile/tablet: permite quebra de linha (2x2)
+      if (layout === '4x2' && isMobile) {
+        // Para 4x2 apenas no mobile: permite quebra de linha (2x2)
         return {
           flexDirection: 'row' as const,
           flexWrap: 'wrap' as const,
@@ -3888,7 +3923,7 @@ return (
         };
       }
       
-      // Para todos os outros casos: uma linha só
+      // Para tablet e desktop: uma linha só
       return {
         flexDirection: 'row' as const,
         gap: 16,
@@ -3897,12 +3932,12 @@ return (
     };
 
     const getCardStyle = (cardIndex: number, isTopCard: boolean) => {
-      if (isTopCard && layout === '4x2' && (isMobile || isTablet)) {
-        // Para 4x2 no mobile/tablet: 2 cards por linha (50% cada)
+      if (isTopCard && layout === '4x2' && isMobile) {
+        // Para 4x2 apenas no mobile: 2 cards por linha (50% cada)
         return { flex: 1, minWidth: '45%', maxWidth: '48%' };
       }
       
-      // Para todos os outros casos: compartilham igualmente o espaço
+      // Para tablet e desktop: compartilham igualmente o espaço
       return { flex: 1 };
     };
     
@@ -3980,11 +4015,11 @@ return (
               />
             </PageContainer>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Layout Dashboard 4x2: Responsivo - Web: 4 cards em 1 linha + 2 inferiores. Mobile/Tablet: 4 cards em 2 linhas (2x2) + 2 inferiores.
+              Layout Dashboard 4x2: Responsivo - Web/Tablet: 4 cards em 1 linha + 2 inferiores. Mobile: 4 cards em 2 linhas (2x2) + 2 inferiores.
             </Text>
             <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
               <Text className={`text-mono-sm ${textPrimary}`}>
-                {`// Código pronto para usar (compatível com nativo):\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4 cards responsivos */}\n    <View style={{\n      flexDirection: 'row',\n      flexWrap: isMobile || isTablet ? 'wrap' : 'nowrap',\n      gap: 16,\n      marginBottom: 16\n    }}>\n      <Card1 height={140} style={{\n        flex: 1,\n        ...(isMobile || isTablet ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card2 height={140} style={{\n        flex: 1,\n        ...(isMobile || isTablet ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card3 height={140} style={{\n        flex: 1,\n        ...(isMobile || isTablet ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card4 height={140} style={{\n        flex: 1,\n        ...(isMobile || isTablet ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n    </View>\n    {/* Cards inferiores - 2 cards */}\n    <View style={{\n      flexDirection: 'row',\n      gap: 16,\n      flex: 1\n    }}>\n      <Card5 style={{ flex: 1 }} />\n      <Card6 style={{ flex: 1 }} />\n    </View>\n  </View>\n</PageContainer>`}
+                {`// Código pronto para usar (compatível com nativo):\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4 cards responsivos */}\n    <View style={{\n      flexDirection: 'row',\n      flexWrap: isMobile ? 'wrap' : 'nowrap',\n      gap: 16,\n      marginBottom: 16\n    }}>\n      <Card1 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card2 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card3 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card4 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n    </View>\n    {/* Cards inferiores - 2 cards */}\n    <View style={{\n      flexDirection: 'row',\n      gap: 16,\n      flex: 1\n    }}>\n      <Card5 style={{ flex: 1 }} />\n      <Card6 style={{ flex: 1 }} />\n    </View>\n  </View>\n</PageContainer>`}
               </Text>
             </View>
           </View>
@@ -4160,7 +4195,7 @@ return (
           </Text>
           <View className={`my-md border-t ${borderColor}`} />
           <Text className={`text-mono-sm ${textPrimary}`}>
-            {`// Layout Dashboard (4x2) Home\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4x1 */}\n    <View className={\`gap-4 mb-4 \${isMobile ? 'flex' : 'grid'} \${topCardsLayout}\`}>\n      {/* 4 cards aqui */}\n    </View>\n    {/* Cards inferiores - 2x1 */}\n    <View className={\`gap-4 \${isMobile ? 'flex' : 'grid'} \${bottomCardsLayout}\`}>\n      {/* 2 cards aqui */}\n    </View>\n  </View>\n</PageContainer>`}
+            {`// Layout Dashboard (4x2) Responsivo\nconst getTopCardsStyle = () => {\n  if (isMobile || isTablet) {\n    return {\n      flexDirection: 'row',\n      flexWrap: 'wrap',\n      justifyContent: 'space-between',\n      gap: 16, marginBottom: 16\n    };\n  }\n  return { flexDirection: 'row', gap: 16, marginBottom: 16 };\n};\n\nconst getCardStyle = (index, isTopCard) => {\n  if (isTopCard && (isMobile || isTablet)) {\n    return Platform.OS === 'web'\n      ? { flex: 1, flexBasis: '48%', maxWidth: '48%', minWidth: '48%' }\n      : { flex: 1, maxWidth: '48%', minWidth: '45%' };\n  }\n  return { flex: 1 };\n};\n\n<View style={getTopCardsStyle()}>\n  {cards.map((card, index) => (\n    <Card key={index} style={getCardStyle(index, true)} />\n  ))}\n</View>`}
           </Text>
         </View>
       </View>
