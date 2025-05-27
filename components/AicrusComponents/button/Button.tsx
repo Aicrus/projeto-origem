@@ -332,6 +332,10 @@ export const Button = ({
       const styleElement = document.createElement('style');
       const buttonClass = `button-${variant}-${size}-${disabled ? 'disabled' : 'enabled'}`;
       
+      // Obtém as cores dinâmicas do design system
+      const primaryColor = getThemeColor('primary');
+      const primaryHoverColor = getThemeColor('primary-hover');
+      
       styleElement.textContent = `
         .${buttonClass}:hover:not(:disabled) {
           position: relative;
@@ -352,14 +356,14 @@ export const Button = ({
         
         .button-link-${size}-enabled {
           text-decoration: underline;
-          text-decoration-color: ${getThemeColor('primary')};
+          text-decoration-color: ${primaryColor} !important;
           text-underline-offset: 2px;
           transition: all 0.2s ease;
         }
         
         .button-link-${size}-enabled:hover:not(:disabled) {
-          text-decoration-color: ${getThemeColor('primary-hover')} !important;
-          color: ${getThemeColor('primary-hover')} !important;
+          text-decoration-color: ${primaryHoverColor} !important;
+          color: ${primaryHoverColor} !important;
         }
         
         .${buttonClass}:disabled {
@@ -379,7 +383,7 @@ export const Button = ({
         document.head.removeChild(styleElement);
       };
     }
-  }, [variant, size, disabled, hoverColor]);
+  }, [variant, size, disabled, hoverColor, isDark]);
   
   // Renderiza o spinner de carregamento
   const renderSpinner = () => (
