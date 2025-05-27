@@ -362,8 +362,7 @@ export const Button = ({
         }
         
         .button-link-${size}-enabled:hover:not(:disabled) {
-          text-decoration-color: ${primaryHoverColor} !important;
-          color: ${primaryHoverColor} !important;
+          filter: brightness(0.85);
         }
         
         .${buttonClass}:disabled {
@@ -437,7 +436,11 @@ export const Button = ({
               fontWeight: fontStyle.fontWeight as TextStyle['fontWeight'],
             }}
           >
-            {children}
+            {variant === 'link' && Platform.OS === 'web' ? (
+              <span>{children}</span>
+            ) : (
+              children
+            )}
           </Text>
         )}
         {rightIcon && (
