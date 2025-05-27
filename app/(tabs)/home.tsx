@@ -143,8 +143,6 @@ export default function Home() {
       return Platform.OS === 'web' 
         ? { 
             flex: 1,
-            flexBasis: '48%',
-            maxWidth: '48%',
             minWidth: '48%'
           }
         : {

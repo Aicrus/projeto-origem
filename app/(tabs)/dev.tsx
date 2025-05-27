@@ -3872,7 +3872,7 @@ return (
     bgPrimaryClass = '', 
     isMobile = false, 
     isTablet = false, 
-    layout = '4x2' // Opções: '4x2', '3x2', '3x1', '2x2', 'single'
+    layout = '4x2' // Opções: '4x2', '4x2-wide-sidebar', '3x2', '3x1', '2x2', 'single'
   }) {
     const cardClass = `${bgClass} rounded-lg`;
     
@@ -3885,6 +3885,11 @@ return (
       topCards = [1, 2, 3, 4];
       bottomCards = [1, 2];
     } 
+    // Layout principal 4x2 para sidebar larga (tablet também fica 2x2)
+    else if (layout === '4x2-wide-sidebar') {
+      topCards = [1, 2, 3, 4];
+      bottomCards = [1, 2];
+    }
     // Layout principal 3x2 (3 cards em cima, 2 embaixo)
     else if (layout === '3x2') {
       topCards = [1, 2, 3];
@@ -3923,6 +3928,16 @@ return (
         };
       }
       
+      if (layout === '4x2-wide-sidebar' && (isMobile || isTablet)) {
+        // Para 4x2-wide-sidebar no mobile e tablet: permite quebra de linha (2x2)
+        return {
+          flexDirection: 'row' as const,
+          flexWrap: 'wrap' as const,
+          gap: 16,
+          marginBottom: 16,
+        };
+      }
+      
       // Para tablet e desktop: uma linha só
       return {
         flexDirection: 'row' as const,
@@ -3933,8 +3948,13 @@ return (
 
     const getCardStyle = (cardIndex: number, isTopCard: boolean) => {
       if (isTopCard && layout === '4x2' && isMobile) {
-        // Para 4x2 apenas no mobile: 2 cards por linha (50% cada)
-        return { flex: 1, minWidth: '45%', maxWidth: '48%' };
+        // Para 4x2 apenas no mobile: 2 cards por linha
+        return { flex: 1, minWidth: '45%' };
+      }
+      
+      if (isTopCard && layout === '4x2-wide-sidebar' && (isMobile || isTablet)) {
+        // Para 4x2-wide-sidebar no mobile e tablet: 2 cards por linha
+        return { flex: 1, minWidth: '45%' };
       }
       
       // Para tablet e desktop: compartilham igualmente o espaço
@@ -3958,10 +3978,10 @@ return (
         
         {/* Cards inferiores */}
         <View style={{
-          flexDirection: isMobile ? 'column' : 'row',
+          flexDirection: (layout === '4x2-wide-sidebar' && (isMobile || isTablet)) || (layout === '4x2' && isMobile) ? 'column' : 'row',
           gap: 16,
           flex: 1,
-          minHeight: isMobile ? 200 : 300
+          minHeight: (layout === '4x2-wide-sidebar' && (isMobile || isTablet)) || (layout === '4x2' && isMobile) ? 200 : 300
         }}>
           {bottomCards.map(index => (
             <EmptyCard 
@@ -4019,11 +4039,33 @@ return (
             </Text>
             <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
               <Text className={`text-mono-sm ${textPrimary}`}>
-                {`// Código pronto para usar (compatível com nativo):\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4 cards responsivos */}\n    <View style={{\n      flexDirection: 'row',\n      flexWrap: isMobile ? 'wrap' : 'nowrap',\n      gap: 16,\n      marginBottom: 16\n    }}>\n      <Card1 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card2 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card3 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n      <Card4 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%', maxWidth: '48%' } : {})\n      }} />\n    </View>\n    {/* Cards inferiores - 2 cards */}\n    <View style={{\n      flexDirection: 'row',\n      gap: 16,\n      flex: 1\n    }}>\n      <Card5 style={{ flex: 1 }} />\n      <Card6 style={{ flex: 1 }} />\n    </View>\n  </View>\n</PageContainer>`}
+                {`// Código pronto para usar (compatível com nativo):\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4 cards responsivos */}\n    <View style={{\n      flexDirection: 'row',\n      flexWrap: isMobile ? 'wrap' : 'nowrap',\n      gap: 16,\n      marginBottom: 16\n    }}>\n      <Card1 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%' } : {})\n      }} />\n      <Card2 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%' } : {})\n      }} />\n      <Card3 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%' } : {})\n      }} />\n      <Card4 height={140} style={{\n        flex: 1,\n        ...(isMobile ? { minWidth: '45%' } : {})\n      }} />\n    </View>\n    {/* Cards inferiores - 2 cards */}\n    <View style={{\n      flexDirection: 'row',\n      gap: 16,\n      flex: 1\n    }}>\n      <Card5 style={{ flex: 1 }} />\n      <Card6 style={{ flex: 1 }} />\n    </View>\n  </View>\n</PageContainer>`}
+              </Text>
+            </View>
+                    </View>
+          
+          {/* Layout Dashboard 4x2 para Sidebar Larga */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 4x2 (Sidebar Larga)</Text>
+            <PageContainer>
+              <HomeStyleCards 
+                bgClass={bgSecondary}
+                bgPrimaryClass={bgPrimary}
+                isMobile={_isMobile} 
+                isTablet={_isTablet}
+                layout="4x2-wide-sidebar"
+              />
+            </PageContainer>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Layout Dashboard 4x2 otimizado para sidebar larga: Web: 4 cards em 1 linha + 2 inferiores. Tablet/Mobile: 4 cards em 2 linhas (2x2) + 2 inferiores. Ideal quando a sidebar permanece sempre com largura completa.
+            </Text>
+            <View className={`mt-2 p-2 rounded-md border ${borderColor}`}>
+              <Text className={`text-mono-sm ${textPrimary}`}>
+                {`// Código pronto para usar (compatível com nativo):\n<PageContainer>\n  <View style={{ flex: 1, flexDirection: 'column' }}>\n    {/* Cards superiores - 4 cards responsivos */}\n    <View style={{\n      flexDirection: 'row',\n      flexWrap: (isMobile || isTablet) ? 'wrap' : 'nowrap',\n      gap: 16,\n      marginBottom: 16\n    }}>\n      <Card1 height={140} style={{\n        flex: 1,\n        ...((isMobile || isTablet) ? { minWidth: '45%' } : {})\n      }} />\n      <Card2 height={140} style={{\n        flex: 1,\n        ...((isMobile || isTablet) ? { minWidth: '45%' } : {})\n      }} />\n      <Card3 height={140} style={{\n        flex: 1,\n        ...((isMobile || isTablet) ? { minWidth: '45%' } : {})\n      }} />\n      <Card4 height={140} style={{\n        flex: 1,\n        ...((isMobile || isTablet) ? { minWidth: '45%' } : {})\n      }} />\n    </View>\n    {/* Cards inferiores - 2 cards */}\n    <View style={{\n      flexDirection: (isMobile || isTablet) ? 'column' : 'row',\n      gap: 16,\n      flex: 1\n    }}>\n      <Card5 style={{ flex: 1 }} />\n      <Card6 style={{ flex: 1 }} />\n    </View>\n  </View>\n</PageContainer>`}
               </Text>
             </View>
           </View>
-
+          
           {/* Layout Dashboard 3x2 */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Layout Dashboard 3x2</Text>
