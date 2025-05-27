@@ -36,7 +36,7 @@ export interface TimeInputProps extends Omit<InputProps, 'type' | 'mask' | 'onCa
 export const TimeInput: React.FC<TimeInputProps> = ({
   value,
   onChangeText,
-  initialTime = new Date(),
+  initialTime = new Date(), // Hora atual do dispositivo
   placeholder = 'HH:MM',
   label,
   disabled = false,
@@ -140,8 +140,10 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   // Função para abrir o seletor de hora
   const openTimePicker = () => {
     if (!disabled) {
-      // Inicializa a hora temporária com a hora atual do input ou a hora inicial
-      setTempTime(value ? stringToTime(value) : initialTime);
+      // Inicializa a hora temporária com a hora atual do input ou hora atual como padrão
+      const defaultTime = new Date(); // Hora atual do dispositivo
+      
+      setTempTime(value ? stringToTime(value) : defaultTime);
       
       if (Platform.OS === 'web') {
         // Para web, precisamos acionar o clique no input nativo de hora
@@ -160,16 +162,19 @@ export const TimeInput: React.FC<TimeInputProps> = ({
   
   // Função para converter string no formato HH:MM para objeto Date
   const stringToTime = (timeString: string): Date => {
-    if (!timeString || timeString.length !== 5) return initialTime;
+    // Se não há valor, usa a hora atual
+    const defaultDate = new Date();
+    
+    if (!timeString || timeString.length !== 5) return defaultDate;
     
     const parts = timeString.split(':');
-    if (parts.length !== 2) return initialTime;
+    if (parts.length !== 2) return defaultDate;
     
     const hours = parseInt(parts[0], 10);
     const minutes = parseInt(parts[1], 10);
     
     if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
-      return initialTime;
+      return defaultDate;
     }
     
     const date = new Date();
@@ -540,7 +545,7 @@ export const TimeInput: React.FC<TimeInputProps> = ({
               
               <View style={styles.pickerContainer}>
                 <DateTimePicker
-                  value={tempTime || initialTime}
+                  value={tempTime || new Date()} // Hora atual do dispositivo se não há valor
                   mode="time"
                   display="spinner"
                   onChange={handleTimePickerChange}
