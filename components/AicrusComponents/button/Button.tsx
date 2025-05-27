@@ -238,7 +238,7 @@ export const Button = ({
       iconSize: Number(spacing['3'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'xs').replace('px', '')),
       iconButtonDimension: Number(spacing['6'].replace('px', '')),
-      spacing: Number(spacing['3'].replace('px', '')), // 12px - equilibrado
+      spacing: 4, // 4px - muito próximo
     },
     sm: {
       height: isIconOnly ? Number(spacing['8'].replace('px', '')) : Number(spacing['9'].replace('px', '')),
@@ -248,7 +248,7 @@ export const Button = ({
       iconSize: Number(spacing['3.5'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'sm').replace('px', '')),
       iconButtonDimension: Number(spacing['8'].replace('px', '')),
-      spacing: Number(spacing['3.5'].replace('px', '')), // 14px - equilibrado
+      spacing: 6, // 6px - muito próximo
     },
     md: {
       height: isIconOnly ? Number(spacing['10'].replace('px', '')) : 42,
@@ -258,7 +258,7 @@ export const Button = ({
       iconSize: Number(spacing['4'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'md').replace('px', '')),
       iconButtonDimension: Number(spacing['10'].replace('px', '')),
-      spacing: Number(spacing['4'].replace('px', '')), // 16px - equilibrado
+      spacing: 8, // 8px - muito próximo
     },
     lg: {
       height: isIconOnly ? Number(spacing['12'].replace('px', '')) : Number(spacing['14'].replace('px', '')),
@@ -268,7 +268,7 @@ export const Button = ({
       iconSize: Number(spacing['5'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'lg').replace('px', '')),
       iconButtonDimension: Number(spacing['12'].replace('px', '')),
-      spacing: Number(spacing['5'].replace('px', '')), // 20px - equilibrado
+      spacing: 10, // 10px - muito próximo
     },
   };
   
@@ -344,10 +344,22 @@ export const Button = ({
           left: 0;
           right: 0;
           bottom: 0;
-          background-color: rgba(0, 0, 0, 0.05);
+          background-color: ${variant === 'link' ? 'transparent' : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)')};
           border-radius: inherit;
           pointer-events: none;
           transition: background-color 0.2s ease;
+        }
+        
+        .button-link-${size}-enabled {
+          text-decoration: underline;
+          text-decoration-color: ${getThemeColor('primary')};
+          text-underline-offset: 2px;
+          transition: all 0.2s ease;
+        }
+        
+        .button-link-${size}-enabled:hover:not(:disabled) {
+          text-decoration-color: ${getThemeColor('primary-hover')} !important;
+          color: ${getThemeColor('primary-hover')} !important;
         }
         
         .${buttonClass}:disabled {
@@ -410,7 +422,9 @@ export const Button = ({
             {leftIcon}
           </View>
         )}
-        {!isIconOnly && (
+        {isIconOnly ? (
+          children
+        ) : (
           <Text
             style={{
               fontFamily: sizeConfig.fontFamily,

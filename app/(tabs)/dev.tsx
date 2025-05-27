@@ -1380,6 +1380,59 @@ export default function DevPage() {
               Botões podem incluir ícones à esquerda, à direita ou serem compostos apenas por um ícone.
             </Text>
           </View>
+
+          {/* Botões Favicon (Circulares) */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Botões Favicon (Circulares)</Text>
+            <View className="flex-row flex-wrap gap-sm mb-sm">
+              {/* Primary */}
+              <Button 
+                variant="primary" 
+                isIconOnly
+                onPress={() => {}}
+                size="md"
+                style={{ borderRadius: 50 }}
+              >
+                <Plus size={16} strokeWidth={2} color="#FFFFFF" />
+              </Button>
+              
+              {/* Outline */}
+              <Button 
+                variant="outline" 
+                isIconOnly
+                onPress={() => {}}
+                size="md"
+                style={{ borderRadius: 50 }}
+              >
+                <Plus size={16} strokeWidth={2} color={isDark ? "#FFFFFF" : "#14181B"} />
+              </Button>
+              
+              {/* Ghost */}
+              <Button 
+                variant="ghost" 
+                isIconOnly
+                onPress={() => {}}
+                size="md"
+                style={{ borderRadius: 50 }}
+              >
+                <Plus size={16} strokeWidth={2} color={isDark ? "#FFFFFF" : "#14181B"} />
+              </Button>
+              
+              {/* Destructive */}
+              <Button 
+                variant="destructive" 
+                isIconOnly
+                onPress={() => {}}
+                size="md"
+                style={{ borderRadius: 50 }}
+              >
+                <Plus size={16} strokeWidth={2} color="#FFFFFF" />
+              </Button>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Botões circulares tipo favicon com ícone +, disponíveis em todas as variantes para diferentes contextos.
+            </Text>
+          </View>
           
           {/* Estados do botão */}
           <View className="mb-lg">
