@@ -204,8 +204,7 @@ const SubmenuComponent = ({
   };
 
   const SubmenuContent = () => (
-    <View
-      ref={submenuRef}
+    <Pressable
       style={[
         submenuStyle.container,
         Platform.OS === 'web' ? {
@@ -213,10 +212,15 @@ const SubmenuComponent = ({
           top: position.y,
           left: position.x,
         } : {
+          position: 'absolute',
           top: position.y,
           left: position.x,
         }
       ]}
+      onPress={(e) => {
+        // Impedir que o clique no submenu feche o menu principal
+        e.stopPropagation();
+      }}
       // @ts-ignore - Eventos de mouse para manter submenu aberto
       onMouseEnter={() => {
         // Manter submenu aberto quando mouse está sobre ele
@@ -228,10 +232,12 @@ const SubmenuComponent = ({
         }, 100);
       }}
     >
-      {options.map((option, index) => (
-        <SubmenuItem key={option.id} option={option} index={index} />
-      ))}
-    </View>
+      <View ref={submenuRef}>
+        {options.map((option, index) => (
+          <SubmenuItem key={option.id} option={option} index={index} />
+        ))}
+      </View>
+    </Pressable>
   );
 
   if (Platform.OS === 'web' && typeof document !== 'undefined') {
@@ -668,9 +674,15 @@ const MobileDropdownMenu = ({
   };
   
   const handlePressOutside = () => {
-    setTimeout(() => {
-      onClose();
-    }, 50);
+    // Se o submenu está visível, apenas fechar o submenu
+    if (submenuVisible) {
+      setSubmenuVisible(false);
+    } else {
+      // Se não há submenu, fechar o menu principal
+      setTimeout(() => {
+        onClose();
+      }, 50);
+    }
   };
   
   const dropdownStyle = StyleSheet.create({
@@ -778,32 +790,20 @@ const MobileDropdownMenu = ({
             ))}
           </ScrollView>
         </View>
+        
+        {/* Submenu renderizado no mesmo Modal */}
+        {submenuVisible && (
+          <SubmenuComponent
+            visible={submenuVisible}
+            options={submenuOptions}
+            onSelect={handleSubmenuSelect}
+            onClose={handleSubmenuClose}
+            isDark={isDark}
+            position={submenuPosition}
+            submenuWidth={submenuWidth}
+          />
+        )}
       </Pressable>
-      
-      {/* Submenu para mobile */}
-      {submenuVisible && (
-        <Modal
-          visible={submenuVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={handleSubmenuClose}
-        >
-          <Pressable 
-            style={dropdownStyle.overlay}
-            onPress={handleSubmenuClose}
-          >
-            <SubmenuComponent
-              visible={submenuVisible}
-              options={submenuOptions}
-              onSelect={handleSubmenuSelect}
-              onClose={handleSubmenuClose}
-              isDark={isDark}
-              position={submenuPosition}
-              submenuWidth={submenuWidth}
-            />
-      </Pressable>
-        </Modal>
-      )}
     </Modal>
   );
 };
