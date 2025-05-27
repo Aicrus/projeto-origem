@@ -152,7 +152,7 @@ export const Input = ({
   type = 'text',
   mask = 'none',
   maxLength,
-  autoCapitalize = 'sentences',
+  autoCapitalize = 'none',
   autoCorrect = true,
   autoComplete,
   keyboardType = 'default',
@@ -412,21 +412,25 @@ export const Input = ({
       case 'cpf':
         // Remove caracteres não numéricos
         text = text.replace(/\D/g, '');
+        // Limita a 11 dígitos (CPF completo)
+        text = text.substring(0, 11);
         // Aplica máscara de CPF: 000.000.000-00
         text = text.replace(/(\d{3})(\d)/, '$1.$2');
         text = text.replace(/(\d{3})(\d)/, '$1.$2');
         text = text.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-        return text.substring(0, 14);
+        return text;
         
       case 'cnpj':
         // Remove caracteres não numéricos
         text = text.replace(/\D/g, '');
+        // Limita a 14 dígitos (CNPJ completo)
+        text = text.substring(0, 14);
         // Aplica máscara de CNPJ: 00.000.000/0000-00
         text = text.replace(/(\d{2})(\d)/, '$1.$2');
         text = text.replace(/(\d{3})(\d)/, '$1.$2');
         text = text.replace(/(\d{3})(\d)/, '$1/$2');
         text = text.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
-        return text.substring(0, 18);
+        return text;
         
       case 'phone':
         // Remove caracteres não numéricos
@@ -659,21 +663,21 @@ export const Input = ({
           cursor: pointer;
         }
         
-        /* Cor primária para os elementos do número */
+        /* Cor normal para os elementos do número (igual aos outros inputs) */
         input[type="number"] {
-          color: ${getThemeColor('primary')};
+          color: ${isDark ? colors['text-primary-dark'] : colors['text-primary-light']};
         }
         
-        /* Hack para aplicar cores no spinner */
+        /* Hack para aplicar cores neutras no spinner */
         :root {
-          accent-color: ${getThemeColor('primary')} !important;
-          --number-spinner-color: ${getThemeColor('primary')} !important;
+          accent-color: ${isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']} !important;
+          --number-spinner-color: ${isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']} !important;
         }
         
-        /* Adiciona suporte a cores personalizadas no spinner */
-        @supports (accent-color: ${getThemeColor('primary')}) {
+        /* Adiciona suporte a cores neutras no spinner */
+        @supports (accent-color: ${isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']}) {
           input[type="number"] {
-            accent-color: ${getThemeColor('primary')};
+            accent-color: ${isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']};
           }
         }
         
@@ -698,7 +702,7 @@ export const Input = ({
           opacity: 1;
           background: transparent;
           border: none;
-          color: ${getThemeColor('primary')};
+          color: ${isDark ? colors['text-primary-dark'] : colors['text-primary-light']};
           font-size: 14px;
           padding: 8px 25px 8px 12px;
           z-index: 1;
@@ -724,15 +728,16 @@ export const Input = ({
         /* Ícone de redimensionamento visível (semelhante ao nativo) */
         [data-resize-handle] {
           position: absolute;
-          bottom: 4px;
-          right: 4px;
-          width: 16px;
-          height: 16px;
+          bottom: 2px;
+          right: 2px;
+          width: 18px;
+          height: 18px;
           display: flex;
           justify-content: center;
           align-items: center;
           z-index: 10;
-          pointer-events: none;
+          pointer-events: auto;
+          cursor: nw-resize;
         }
         
         /* Não esconda o redimensionador nativo, apenas estilize o nosso ícone por cima */
@@ -1086,12 +1091,11 @@ export const Input = ({
           <View 
             style={{
               position: 'absolute',
-              bottom: 4,
-              right: 4,
-              width: 14,
-              height: 14,
-              zIndex: 5,
-              pointerEvents: 'none',
+              bottom: 2,
+              right: 2,
+              width: 18,
+              height: 18,
+              zIndex: 10,
               justifyContent: 'center',
               alignItems: 'center',
             }}
@@ -1099,28 +1103,28 @@ export const Input = ({
           >
             {/* Usando o mesmo indicador visual do nativo */}
             <View style={{
-              width: 10,
-              height: 10,
+              width: 12,
+              height: 12,
               justifyContent: 'center',
               alignItems: 'center',
             }}>
               <View style={{
-                width: 10,
-                height: 1,
+                width: 12,
+                height: 1.5,
                 backgroundColor: getThemeColor('divider'),
-                marginBottom: 2,
+                marginBottom: 1.5,
                 transform: [{ rotate: '-45deg' }, { translateX: 1 }],
               }} />
               <View style={{
-                width: 7,
-                height: 1,
+                width: 9,
+                height: 1.5,
                 backgroundColor: getThemeColor('divider'),
-                marginBottom: 2,
+                marginBottom: 1.5,
                 transform: [{ rotate: '-45deg' }],
               }} />
               <View style={{
-                width: 4,
-                height: 1,
+                width: 6,
+                height: 1.5,
                 backgroundColor: getThemeColor('divider'),
                 transform: [{ rotate: '-45deg' }, { translateX: -1 }],
               }} />
