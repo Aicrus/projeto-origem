@@ -22,14 +22,14 @@ export interface GradientViewProps {
  * @param {GradientViewProps} props - Propriedades do componente
  * @returns {JSX.Element} Componente GradientView
  */
-export const GradientView: React.FC<GradientViewProps> = ({
+export const GradientView = React.forwardRef<any, GradientViewProps>(({
   children,
   style,
   type = 'primary',
   colors: customColors,
   start = { x: 0, y: 0 },
   end = { x: 1, y: 0 },
-}) => {
+}, ref) => {
   // Obter o tema atual
   const { currentTheme, getColorByMode } = useTheme();
   const isDark = currentTheme === 'dark';
@@ -62,6 +62,7 @@ export const GradientView: React.FC<GradientViewProps> = ({
   if (Platform.OS === 'web') {
     return (
       <View
+        ref={ref}
         style={[
           styles.container,
           {
@@ -77,6 +78,7 @@ export const GradientView: React.FC<GradientViewProps> = ({
 
   return (
     <LinearGradient
+      ref={ref}
       colors={gradientColors}
       start={start}
       end={end}
@@ -85,7 +87,9 @@ export const GradientView: React.FC<GradientViewProps> = ({
       {children}
     </LinearGradient>
   );
-};
+});
+
+GradientView.displayName = 'GradientView';
 
 const styles = StyleSheet.create({
   container: {

@@ -6,48 +6,83 @@ const stagewiseConfig = {
   plugins: []
 };
 
-export const StagewiseToolbar: React.FC = () => {
-  useEffect(() => {
-    // Só executar no desenvolvimento e na plataforma web
-    if (process.env.NODE_ENV === 'development' && Platform.OS === 'web') {
-      // Verificar se já existe uma instância do toolbar
-      const existingToolbar = document.getElementById('stagewise-toolbar-root');
-      if (existingToolbar) {
-        console.log('StagewiseToolbar já existe, pulando criação');
+// Singleton pattern para controlar a inicialização do toolbar
+class StagewiseManager {
+  private static instance: StagewiseManager;
+  private initialized = false;
+  private toolbarRoot: any = null;
+
+  static getInstance(): StagewiseManager {
+    if (!StagewiseManager.instance) {
+      StagewiseManager.instance = new StagewiseManager();
+    }
+    return StagewiseManager.instance;
+  }
+
+  async initializeToolbar(): Promise<void> {
+    // Só executar na web durante desenvolvimento
+    if (process.env.NODE_ENV !== 'development' || Platform.OS !== 'web') {
+      return;
+    }
+
+    // Se já foi inicializado, não fazer nada
+    if (this.initialized) {
+      console.log('StagewiseToolbar já inicializado via singleton');
+      return;
+    }
+
+    // Verificar se já existe no DOM
+    const existingElement = document.getElementById('stagewise-toolbar-root');
+    if (existingElement) {
+      console.log('StagewiseToolbar já existe no DOM');
+      this.initialized = true;
+      return;
+    }
+
+    try {
+      // Marcar como inicializado antes de começar
+      this.initialized = true;
+
+      // Importar dinamicamente
+      const { StagewiseToolbar } = await import('@stagewise/toolbar-react');
+      const { createRoot } = await import('react-dom/client');
+
+      // Verificar novamente se não foi criado durante os imports
+      const existingAfterImport = document.getElementById('stagewise-toolbar-root');
+      if (existingAfterImport) {
+        console.log('StagewiseToolbar criado durante import');
         return;
       }
 
-      // Importação dinâmica para evitar problemas em outras plataformas
-      import('@stagewise/toolbar-react').then(({ StagewiseToolbar }) => {
-        // Verificar novamente se não foi criado durante o import
-        const existingToolbarAfterImport = document.getElementById('stagewise-toolbar-root');
-        if (existingToolbarAfterImport) {
-          return;
-        }
+      // Criar elemento
+      const toolbarElement = document.createElement('div');
+      toolbarElement.id = 'stagewise-toolbar-root';
+      document.body.appendChild(toolbarElement);
 
-        // Criar um elemento separado para o toolbar
-        const toolbarElement = document.createElement('div');
-        toolbarElement.id = 'stagewise-toolbar-root';
-        document.body.appendChild(toolbarElement);
-
-        // Renderizar o toolbar em um root separado usando React 18
-        import('react-dom/client').then(({ createRoot }) => {
-          const root = createRoot(toolbarElement);
-          root.render(React.createElement(StagewiseToolbar, { config: stagewiseConfig }));
-        });
-      }).catch((error) => {
-        console.warn('Erro ao carregar stagewise toolbar:', error);
-      });
+      // Criar root e renderizar
+      this.toolbarRoot = createRoot(toolbarElement);
+      this.toolbarRoot.render(React.createElement(StagewiseToolbar, { config: stagewiseConfig }));
+      
+      console.log('StagewiseToolbar inicializado com sucesso na web');
+    } catch (error) {
+      console.warn('Erro ao inicializar StagewiseToolbar:', error);
+      this.initialized = false;
     }
+  }
+
+  cleanup(): void {
+    // Não fazer cleanup para manter o toolbar durante toda a sessão
+    // O toolbar deve persistir entre navegações
+  }
+}
+
+export const StagewiseToolbar: React.FC = () => {
+  useEffect(() => {
+    const manager = StagewiseManager.getInstance();
+    manager.initializeToolbar();
 
     return () => {
-      // Cleanup: remover o elemento do toolbar ao desmontar
-      if (Platform.OS === 'web') {
-        const toolbarElement = document.getElementById('stagewise-toolbar-root');
-        if (toolbarElement) {
-          toolbarElement.remove();
-        }
-      }
+      // Não fazer cleanup para evitar recriações
     };
   }, []);
 
