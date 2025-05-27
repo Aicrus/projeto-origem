@@ -238,7 +238,7 @@ export const Button = ({
       iconSize: Number(spacing['3'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'xs').replace('px', '')),
       iconButtonDimension: Number(spacing['6'].replace('px', '')),
-      spacing: 4, // 4px - muito próximo
+      spacing: 3, // 3px - bem próximo
     },
     sm: {
       height: isIconOnly ? Number(spacing['8'].replace('px', '')) : Number(spacing['9'].replace('px', '')),
@@ -248,7 +248,7 @@ export const Button = ({
       iconSize: Number(spacing['3.5'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'sm').replace('px', '')),
       iconButtonDimension: Number(spacing['8'].replace('px', '')),
-      spacing: 6, // 6px - muito próximo
+      spacing: 5, // 5px - bem próximo
     },
     md: {
       height: isIconOnly ? Number(spacing['10'].replace('px', '')) : 42,
@@ -258,7 +258,7 @@ export const Button = ({
       iconSize: Number(spacing['4'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'md').replace('px', '')),
       iconButtonDimension: Number(spacing['10'].replace('px', '')),
-      spacing: 8, // 8px - muito próximo
+      spacing: 6, // 6px - bem próximo
     },
     lg: {
       height: isIconOnly ? Number(spacing['12'].replace('px', '')) : Number(spacing['14'].replace('px', '')),
@@ -268,7 +268,7 @@ export const Button = ({
       iconSize: Number(spacing['5'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'lg').replace('px', '')),
       iconButtonDimension: Number(spacing['12'].replace('px', '')),
-      spacing: 10, // 10px - muito próximo
+      spacing: 8, // 8px - bem próximo
     },
   };
   

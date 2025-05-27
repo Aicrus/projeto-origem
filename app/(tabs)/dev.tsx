@@ -3109,47 +3109,19 @@ showToast({
           Componente GradientView
         </Text>
         <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          O GradientView é um componente que unifica a implementação de gradientes 
-          entre plataformas web e nativas. Nas plataformas nativas, utiliza o LinearGradient 
-          do Expo, enquanto na web usa CSS backgroundImage.
+          O GradientView é um componente universal que funciona tanto na web quanto no nativo.
+          Oferece gradientes predefinidos, direções automáticas, suporte a 3 cores e
+          adaptação completa aos temas claro/escuro.
         </Text>
         
         <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
           
-          {/* Gradientes predefinidos */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Gradientes predefinidos</Text>
-            <View className="flex-row flex-wrap gap-md mb-md">
-              <GradientView
-                type="primary"
-                style={{ height: 80, width: 192, borderRadius: 8 }}
-              >
-                <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Primário</Text>
-              </GradientView>
-              
-              <GradientView
-                type="secondary"
-                style={{ height: 80, width: 192, borderRadius: 8 }}
-              >
-                <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Secundário</Text>
-              </GradientView>
-              
-              <GradientView
-                type="tertiary"
-                style={{ height: 80, width: 192, borderRadius: 8 }}
-              >
-                <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Terciário</Text>
-              </GradientView>
-            </View>
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Gradientes predefinidos do sistema de design, acessados pela propriedade "type".
-            </Text>
-          </View>
+
           
           {/* Gradientes fade */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Gradientes fade (mesma cor)</Text>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Gradientes fade (cor forte para suave)</Text>
             <View className="flex-row flex-wrap gap-md mb-md">
               <GradientView
                 type="primary-fade"
@@ -3173,38 +3145,169 @@ showToast({
               </GradientView>
             </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Gradientes que usam a mesma cor, começando forte e terminando suave (opacidade 0.3). Ideal para botões ativos e destaques.
+              Gradientes que começam com a cor forte e terminam com a mesma cor mais suave. Ideal para botões ativos e destaques com efeito gradiente sutil.
+            </Text>
+          </View>
+
+          {/* Gradientes decorativos */}
+          <View className="mb-lg">
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Gradientes decorativos</Text>
+            <View className="flex-row flex-wrap gap-md mb-md">
+              <GradientView
+                type="sunset"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Sunset</Text>
+              </GradientView>
+              
+              <GradientView
+                type="ocean"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Ocean</Text>
+              </GradientView>
+              
+              <GradientView
+                type="forest"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Forest</Text>
+              </GradientView>
+
+              <GradientView
+                type="purple-pink"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Purple Pink</Text>
+              </GradientView>
+
+              <GradientView
+                type="orange-red"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Orange Red</Text>
+              </GradientView>
+
+              <GradientView
+                type="blue-green"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Blue Green</Text>
+              </GradientView>
+
+              <GradientView
+                type="warm"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Warm</Text>
+              </GradientView>
+
+              <GradientView
+                type="cool"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Cool</Text>
+              </GradientView>
+
+              <GradientView
+                type="rainbow"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Rainbow</Text>
+              </GradientView>
+            </View>
+            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+              Gradientes decorativos predefinidos para elementos visuais especiais. Adaptam-se automaticamente ao tema claro/escuro.
             </Text>
           </View>
           
-          {/* Gradiente customizado */}
+
+          
+          {/* Gradientes com direções pré-configuradas */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Gradiente personalizado</Text>
-            <GradientView
-              type="custom"
-              colors={['#6366F1', '#14B8A6']}
-              style={{ height: 80, width: 240, borderRadius: 8 }}
-            >
-              <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">Gradiente Personalizado</Text>
-            </GradientView>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Direções pré-configuradas</Text>
+            <View className="flex-row flex-wrap gap-md mb-md">
+              <GradientView
+                type="vertical-sunset"
+                style={{ height: 80, width: 120, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Vertical Sunset</Text>
+              </GradientView>
+              
+              <GradientView
+                type="diagonal-ocean"
+                style={{ height: 80, width: 120, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Diagonal Ocean</Text>
+              </GradientView>
+              
+              <GradientView
+                type="horizontal-forest"
+                style={{ height: 80, width: 120, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Horizontal Forest</Text>
+              </GradientView>
+
+              <GradientView
+                type="radial-warm"
+                style={{ height: 80, width: 120, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Radial Warm</Text>
+              </GradientView>
+
+              <GradientView
+                type="vertical-cool"
+                style={{ height: 80, width: 120, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Vertical Cool</Text>
+              </GradientView>
+
+              <GradientView
+                type="diagonal-rainbow"
+                style={{ height: 80, width: 120, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Diagonal Rainbow</Text>
+              </GradientView>
+            </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Você pode definir cores personalizadas através da propriedade "colors".
+              Gradientes com direções específicas já pré-configuradas no componente.
             </Text>
           </View>
-          
-          {/* Gradiente com direção personalizada */}
+
+          {/* Gradientes com 3 cores */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Direção personalizada (apenas nativo)</Text>
-            <GradientView
-              type="primary"
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={{ height: 80, width: 192, borderRadius: 8 }}
-            >
-              <Text className="text-white text-subtitle-sm font-jakarta-semibold p-md">De cima para baixo</Text>
-            </GradientView>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Gradientes com 3 cores</Text>
+            <View className="flex-row flex-wrap gap-md mb-md">
+              <GradientView
+                type="triple-sunset"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Triple Sunset</Text>
+              </GradientView>
+              
+              <GradientView
+                type="triple-ocean"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Triple Ocean</Text>
+              </GradientView>
+              
+              <GradientView
+                type="triple-forest"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Triple Forest</Text>
+              </GradientView>
+
+              <GradientView
+                type="triple-rainbow"
+                style={{ height: 80, width: 140, borderRadius: 8 }}
+              >
+                <Text className="text-white text-body-sm font-jakarta-semibold p-sm">Triple Rainbow</Text>
+              </GradientView>
+            </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Em plataformas nativas, você pode controlar a direção com start/end.
+              Gradientes com 3 cores para efeitos mais complexos e transições suaves.
             </Text>
           </View>
         </View>
@@ -3224,13 +3327,13 @@ showToast({
               <View className="flex-row py-xs bg-divider-light/20 dark:bg-divider-dark/20">
                 <Text className={`text-body-sm ${textPrimary} w-1/4 px-sm`}>type</Text>
                 <Text className={`text-body-sm font-mono-regular ${textPrimary} w-1/4 px-sm`}>GradientType</Text>
-                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Tipo: 'primary', 'secondary', 'tertiary', 'primary-fade', 'secondary-fade', 'tertiary-fade' ou 'custom'</Text>
+                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Tipos: 'primary-fade', 'secondary-fade', 'tertiary-fade', 'sunset', 'ocean', 'forest', 'vertical-sunset', 'diagonal-ocean', 'horizontal-forest', 'triple-sunset', 'triple-ocean', 'triple-forest' e mais...</Text>
               </View>
               
               <View className="flex-row py-xs">
                 <Text className={`text-body-sm ${textPrimary} w-1/4 px-sm`}>colors</Text>
-                <Text className={`text-body-sm font-mono-regular ${textPrimary} w-1/4 px-sm`}>[string, string]</Text>
-                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Array com duas cores para gradiente personalizado</Text>
+                <Text className={`text-body-sm font-mono-regular ${textPrimary} w-1/4 px-sm`}>[string, string, string?]</Text>
+                <Text className={`text-body-sm ${textPrimary} w-2/4 px-sm`}>Array com 2 ou 3 cores para gradiente personalizado</Text>
               </View>
               
               <View className="flex-row py-xs bg-divider-light/20 dark:bg-divider-dark/20">
@@ -3265,23 +3368,43 @@ showToast({
               <Text className={`text-mono-sm font-mono-regular text-text-primary-light dark:text-text-primary-dark`}>
                 {`import { GradientView } from '@/components/AicrusComponents/gradient';
 
-// Usando gradiente predefinido
-<GradientView type="primary" style={{ height: 80, width: 200 }}>
-  <Text style={{ color: 'white' }}>Conteúdo</Text>
-</GradientView>
-
-// Usando gradiente fade (mesma cor)
+// Gradiente fade (cor forte para suave)
 <GradientView type="primary-fade" style={{ height: 80, width: 200 }}>
-  <Text style={{ color: 'white' }}>Conteúdo</Text>
+  <Text style={{ color: 'white' }}>Gradiente Fade</Text>
 </GradientView>
 
-// Usando gradiente personalizado
+// Gradiente decorativo
+<GradientView type="sunset" style={{ height: 80, width: 200 }}>
+  <Text style={{ color: 'white' }}>Gradiente Decorativo</Text>
+</GradientView>
+
+// Gradiente com direção pré-configurada
+<GradientView type="vertical-sunset" style={{ height: 80, width: 200 }}>
+  <Text style={{ color: 'white' }}>Vertical Sunset</Text>
+</GradientView>
+
+// Gradiente com 3 cores
+<GradientView type="triple-ocean" style={{ height: 80, width: 200 }}>
+  <Text style={{ color: 'white' }}>Triple Ocean</Text>
+</GradientView>
+
+// Gradiente personalizado com cores customizadas
 <GradientView 
   type="custom"
-  colors={['#FF5733', '#FFC300']}
+  colors={['#FF5733', '#FFC300', '#28A745']}
   style={{ height: 80, width: 200 }}
 >
-  <Text style={{ color: 'white' }}>Conteúdo</Text>
+  <Text style={{ color: 'white' }}>Gradiente Personalizado</Text>
+</GradientView>
+
+// Direção personalizada (sobrescreve pré-configuração)
+<GradientView 
+  type="ocean"
+  start={{ x: 0, y: 0 }}
+  end={{ x: 0, y: 1 }}
+  style={{ height: 80, width: 200 }}
+>
+  <Text style={{ color: 'white' }}>Direção Customizada</Text>
 </GradientView>`}
               </Text>
             </View>
