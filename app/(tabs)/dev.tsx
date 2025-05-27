@@ -288,6 +288,44 @@ const SupabaseDataTable = () => {
   );
 };
 
+// Componente que ajusta automaticamente a cor do texto baseado no estado hover + ativo
+const SmartTextHoverableView = ({ text, ...props }: { text: string } & Omit<React.ComponentProps<typeof HoverableView>, 'children'>) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const { currentTheme } = useTheme();
+  const isDark = currentTheme === 'dark';
+  
+  // Determinar a cor do texto baseada no estado
+  const getTextColor = () => {
+    if (props.isActive && props.activeBackgroundColor && !isHovered) {
+      // Quando ativo com cor de fundo e SEM hover, usar texto branco
+      return 'text-white';
+    } else if (props.isActive && props.activeBackgroundColor && isHovered && !props.disableHoverWhenActive) {
+      // Quando ativo + hover (remove fundo), usar texto primary
+      return isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
+    } else if (props.isActive && !props.activeBackgroundColor) {
+      // Quando ativo sem cor de fundo específica
+      return isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
+    } else {
+      // Estado normal
+      return isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
+    }
+  };
+
+  return (
+    <HoverableView 
+      {...props}
+      onHoverStateChange={(hovered) => {
+        setIsHovered(hovered);
+        if (props.onHoverStateChange) {
+          props.onHoverStateChange(hovered);
+        }
+      }}
+    >
+      <Text className={getTextColor()}>{text}</Text>
+    </HoverableView>
+  );
+};
+
 export default function DevPage() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
@@ -2890,7 +2928,7 @@ showToast({
               hoverTranslateX={8}
               hoverTranslateY={0}
               disableHoverBackground={false}
-              hoverColor={isDark ? 'rgba(137, 44, 220, 0.08)' : 'rgba(137, 44, 220, 0.05)'}
+              hoverColor={isDark ? designColors['hover-dark'] : designColors['hover-light']}
             >
               <View className="flex-row items-center">
                 <Text className={`${textPrimary} mr-xs`}>Movimento horizontal</Text>
@@ -2911,8 +2949,7 @@ showToast({
                   key={item}
                   className="p-md rounded-md m-xs"
                   isActive={activeItem === item}
-                  activeBackgroundColor={activeItem === item ? (isDark ? '#4A6' : colors.primary.main) : undefined}
-                  hoverColor={isDark ? 'rgba(74, 102, 102, 0.15)' : 'rgba(137, 44, 220, 0.1)'}
+                  activeBackgroundColor={activeItem === item ? (isDark ? designColors['primary-dark'] : designColors['primary-light']) : undefined}
                   disableHoverWhenActive={true}
                   onPress={() => setActiveItem(item)}
                 >
@@ -2931,8 +2968,8 @@ showToast({
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Cores personalizadas</Text>
             <HoverableView 
               className="p-md rounded-md"
-              hoverColor={isDark ? 'rgba(22, 163, 74, 0.25)' : 'rgba(22, 163, 74, 0.15)'}
-              backgroundColor={isDark ? 'rgba(22, 163, 74, 0.15)' : 'rgba(22, 163, 74, 0.05)'}
+              hoverColor={isDark ? designColors['success-bg-dark'] : designColors['success-bg-light']}
+              backgroundColor={isDark ? designColors['success-bg-dark'] : designColors['success-bg-light']}
             >
               <Text className={`${textPrimary}`}>Cores personalizadas para hover</Text>
             </HoverableView>
@@ -2947,7 +2984,7 @@ showToast({
             <HoverableView 
               className="p-md rounded-md border border-divider-light"
               disableAnimation={true}
-              hoverColor={isDark ? 'rgba(0, 0, 0, 0.06)' : 'rgba(0, 0, 0, 0.04)'}
+              hoverColor={isDark ? designColors['hover-dark'] : designColors['hover-light']}
             >
               <Text className={`${textPrimary}`}>Mesmo que o básico, mas sem animação</Text>
             </HoverableView>
@@ -2962,28 +2999,24 @@ showToast({
             <View className="flex-row flex-wrap">
               <View className="mr-md mb-md flex-1">
                 <Text className={`text-body-sm ${textSecondary} mb-xs`}>Com disableHoverWhenActive=true:</Text>
-                <HoverableView 
-                  className="p-md rounded-md border border-gray-300 dark:border-gray-700"
+                <SmartTextHoverableView 
+                  className="p-md rounded-md"
                   isActive={true}
-                  activeBackgroundColor={isDark ? '#4A6' : colors.primary.main}
-                  hoverColor={isDark ? 'rgba(74, 102, 102, 0.15)' : 'rgba(137, 44, 220, 0.1)'}
+                  activeBackgroundColor={isDark ? designColors['primary-dark'] : designColors['primary-light']}
                   disableHoverWhenActive={true}
-                >
-                  <Text className="text-white">Item ativo sem efeito hover</Text>
-                </HoverableView>
+                  text="Item ativo sem efeito hover"
+                />
               </View>
               
               <View className="mr-md mb-md flex-1">
                 <Text className={`text-body-sm ${textSecondary} mb-xs`}>Com disableHoverWhenActive=false:</Text>
-                <HoverableView 
-                  className="p-md rounded-md border border-gray-300 dark:border-gray-700"
+                <SmartTextHoverableView 
+                  className="p-md rounded-md"
                   isActive={true}
-                  activeBackgroundColor={isDark ? '#4A6' : colors.primary.main}
-                  hoverColor={isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(137, 44, 220, 0.2)'}
+                  activeBackgroundColor={isDark ? designColors['primary-dark'] : designColors['primary-light']}
                   disableHoverWhenActive={false}
-                >
-                  <Text className="text-white">Item ativo com efeito hover</Text>
-                </HoverableView>
+                  text="Item ativo com efeito hover"
+                />
               </View>
             </View>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
@@ -4842,29 +4875,27 @@ return (
                         <HoverableView
                           key={component.id}
                           onPress={() => setActiveComponent(component.id as 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer')}
-                          className={`flex-row items-center py-xs px-xs my-[2px] rounded-md ${
-                            isComponentActive
-                              ? isDark
-                                ? 'bg-primary-dark/10'
-                                : 'bg-primary-light/10'
-                              : ''
-                          }`}
+                          className={`flex-row items-center py-xs px-xs my-[2px] rounded-md`}
+                          style={isComponentActive ? {
+                            borderWidth: 1,
+                            borderColor: isDark 
+                              ? `${designColors['primary-dark']}30` 
+                              : `${designColors['primary-light']}30`
+                          } : {}}
                           isActive={isComponentActive}
-                          hoverScale={1.02}
-                          hoverTranslateX={2}
                           animationDuration={150}
-                          activeColor={isDark ? 'rgba(74, 111, 165, 0.1)' : 'rgba(137, 44, 220, 0.1)'}
-                          hoverColor={isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'}
+                          activeBackgroundColor={undefined}
+                          hoverColor={isDark ? designColors['hover-dark'] : designColors['hover-light']}
                         >
                           <View
                             className={`w-8 h-8 rounded-md mr-sm items-center justify-center ${
                               isComponentActive
                                 ? isDark 
-                                  ? 'bg-primary-dark/20' 
-                                  : 'bg-primary-light/20'
+                                  ? 'bg-bg-tertiary-dark' 
+                                  : 'bg-bg-tertiary-light'
                                 : isDark 
-                                  ? 'bg-gray-700' 
-                                  : 'bg-gray-200'
+                                  ? 'bg-bg-tertiary-dark' 
+                                  : 'bg-bg-tertiary-light'
                             }`}
                           >
                             {renderIcon(component.icon)}

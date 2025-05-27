@@ -84,7 +84,7 @@ export const HoverableView = React.forwardRef<View, HoverableViewProps>(({
   const defaultColors = {
     background: backgroundColor || 'transparent',
     hover: hoverColor || (isDark ? colors['hover-dark'] : colors['hover-light']),
-    active: activeColor || (isDark ? colors['active-dark'] : colors['active-light']),
+    active: activeColor || (isDark ? colors['primary-dark'] : colors['primary-light']),
   };
 
   // Manipulação direta do DOM para elementos desabilitados na web
@@ -184,7 +184,9 @@ export const HoverableView = React.forwardRef<View, HoverableViewProps>(({
 
   // Estilo para hover
   const hoverStyle: any = {
-    backgroundColor: !disableHoverBackground ? defaultColors.hover : baseStyle.backgroundColor,
+    backgroundColor: !disableHoverBackground ? 
+      (isActive && activeBackgroundColor ? 'transparent' : defaultColors.hover) : 
+      baseStyle.backgroundColor,
     transform: !disableAnimation ? getHoverTransform() : undefined,
   };
 
@@ -195,7 +197,7 @@ export const HoverableView = React.forwardRef<View, HoverableViewProps>(({
 
   // Estilo para estado ativo
   const activeStyle: any = {
-    backgroundColor: activeBackgroundColor || defaultColors.active,
+    backgroundColor: activeBackgroundColor || 'transparent',
   };
 
   // Adicionar elevação/sombra para mobile
