@@ -2968,13 +2968,13 @@ showToast({
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Cores personalizadas</Text>
             <HoverableView 
               className="p-md rounded-md"
+              backgroundColor={isDark ? designColors['info-bg-dark'] : designColors['info-bg-light']}
               hoverColor={isDark ? designColors['success-bg-dark'] : designColors['success-bg-light']}
-              backgroundColor={isDark ? designColors['success-bg-dark'] : designColors['success-bg-light']}
             >
-              <Text className={`${textPrimary}`}>Cores personalizadas para hover</Text>
+              <Text className={isDark ? 'text-info-text-dark' : 'text-info-text-light'}>Cores personalizadas para hover</Text>
             </HoverableView>
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              É possível definir cores personalizadas para os estados normal e hover.
+              Estado normal: azul (info) → Hover: verde (success). Demonstra cores personalizadas diferentes.
             </Text>
           </View>
           
