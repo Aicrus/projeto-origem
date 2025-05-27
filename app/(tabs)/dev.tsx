@@ -3820,12 +3820,12 @@ const renderBackdrop = () => {
         <Text className={`text-body-md ${textSecondary} mb-lg`}>
           Testando o novo componente DropdownMenu com 4 opções fixas.
         </Text>
-        
+
         {/* Teste do novo DropdownMenu */}
         <View className={`${bgSecondary} rounded-lg p-md`}>
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>
             Novo DropdownMenu
-          </Text>
+              </Text>
           
           <DropdownMenu
             buttonText="Open"

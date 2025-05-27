@@ -16,6 +16,20 @@ import { colors } from '../../../designer-system/tokens/colors';
  * 
  * O componente é responsivo e funciona em todas as plataformas (iOS, Android, Web)
  * com posicionamento inteligente e tema claro/escuro automático.
+ * 
+ * @example
+ * // Uso básico
+ * <DropdownMenu 
+ *   buttonText="Menu" 
+ *   onOptionSelect={(optionId) => console.log(optionId)} 
+ * />
+ * 
+ * // Com largura customizada do submenu (útil para mobile)
+ * <DropdownMenu 
+ *   buttonText="Menu" 
+ *   submenuWidth={100} // Submenu mais estreito para mobile
+ *   onOptionSelect={(optionId) => console.log(optionId)} 
+ * />
  */
 
 export interface DropdownMenuOption {
@@ -52,6 +66,8 @@ export interface DropdownMenuProps {
   onOpen?: () => void;
   /** Callback quando o menu fecha */
   onClose?: () => void;
+  /** Largura do submenu (especialmente útil para mobile) */
+  submenuWidth?: number;
 }
 
 // Função para obter as cores do theme
@@ -74,7 +90,8 @@ const SubmenuComponent = ({
   onSelect, 
   onClose, 
   isDark, 
-  position 
+  position,
+  submenuWidth 
 }: {
   visible: boolean;
   options: SubmenuOption[];
@@ -82,6 +99,7 @@ const SubmenuComponent = ({
   onClose: () => void;
   isDark: boolean;
   position: { x: number; y: number };
+  submenuWidth?: number;
 }) => {
   const submenuRef = useRef<any>(null);
   const themeColors = getThemeColors(isDark);
@@ -104,6 +122,15 @@ const SubmenuComponent = ({
 
   if (!visible) return null;
 
+  // Calcular largura baseada na plataforma e propriedade customizada
+  const getSubmenuWidth = () => {
+    if (submenuWidth) {
+      return submenuWidth;
+    }
+    // Largura padrão: menor no mobile, maior na web
+    return Platform.OS === 'web' ? 140 : 120;
+  };
+
   const submenuStyle = StyleSheet.create({
     container: {
       position: 'absolute',
@@ -116,7 +143,7 @@ const SubmenuComponent = ({
       shadowOpacity: isDark ? 0.25 : 0.08,
       shadowRadius: 6,
       overflow: 'hidden',
-      minWidth: 140,
+      width: getSubmenuWidth(),
       zIndex: 2147483648,
     },
     item: {
@@ -133,6 +160,7 @@ const SubmenuComponent = ({
       color: themeColors['text-primary'],
       fontWeight: '400',
       marginLeft: 8,
+      flexShrink: 1, // Permite que o texto se ajuste à largura disponível
     }
   });
 
@@ -144,7 +172,7 @@ const SubmenuComponent = ({
 
   // Componente de item do submenu com hover
   const SubmenuItem = ({ option, index }: { option: SubmenuOption; index: number }) => {
-    const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
     return (
       <View key={option.id}>
@@ -260,7 +288,10 @@ const MenuOptionItem = ({
   };
 
   const handlePress = () => {
+    console.log('🖱️ handlePress chamado para:', option.id, 'Platform:', Platform.OS, 'hasSubmenu:', !!option.hasSubmenu);
+    
     if (option.hasSubmenu && Platform.OS !== 'web') {
+      console.log('📱 Mobile: Abrindo submenu para:', option.id);
       // No mobile, toggle submenu no clique
       if (onSubmenuToggle && itemRef.current) {
         itemRef.current.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
@@ -271,14 +302,17 @@ const MenuOptionItem = ({
         });
       }
     } else if (!option.hasSubmenu && Platform.OS !== 'web') {
+      console.log('📱 Mobile: Fechando submenu e executando ação para:', option.id, 'onSubmenuToggle:', !!onSubmenuToggle);
       // No mobile: Se não tem submenu, fechar qualquer submenu aberto E executar a ação
       if (onSubmenuToggle) {
         onSubmenuToggle(option, { x: 0, y: 0 }); // Isso vai fechar submenu E executar ação
       } else {
+        console.log('⚠️ Fallback: executando diretamente para:', option.id);
         // Fallback: se não tem onSubmenuToggle, executa diretamente
         onSelect(option);
       }
     } else if (!option.hasSubmenu) {
+      console.log('🌐 Web: executando ação para:', option.id);
       // Web: executa ação normal
       onSelect(option);
     }
@@ -342,6 +376,7 @@ const WebDropdownMenu = ({
   isDark,
   position,
   maxHeight,
+  submenuWidth,
 }: {
   visible: boolean;
   options: DropdownMenuOption[];
@@ -350,6 +385,7 @@ const WebDropdownMenu = ({
   isDark: boolean;
   position: any;
   maxHeight: number;
+  submenuWidth?: number;
 }) => {
   const optionsRef = useRef<any>(null);
   const themeColors = getThemeColors(isDark);
@@ -392,7 +428,7 @@ const WebDropdownMenu = ({
       setSubmenuPosition(pos);
       setSubmenuVisible(true);
       setActiveSubmenuOption(option.id);
-    } else {
+      } else {
       // Se a opção não tem submenu, fechar qualquer submenu aberto
       setSubmenuVisible(false);
       setActiveSubmenuOption(null);
@@ -542,11 +578,11 @@ const WebDropdownMenu = ({
           <MenuOptionItem
             key={option.id}
             option={option}
-            onSelect={handleItemSelect}
-            isDark={isDark}
-          />
+                onSelect={handleItemSelect}
+                isDark={isDark}
+              />
         ))}
-      </View>
+          </View>
       
       {/* Submenu */}
       <SubmenuComponent
@@ -556,6 +592,7 @@ const WebDropdownMenu = ({
         onClose={handleSubmenuClose}
         isDark={isDark}
         position={submenuPosition}
+        submenuWidth={submenuWidth}
       />
     </>
   );
@@ -576,6 +613,7 @@ const MobileDropdownMenu = ({
   isDark,
   maxHeight,
   position,
+  submenuWidth,
 }: {
   visible: boolean;
   options: DropdownMenuOption[];
@@ -584,6 +622,7 @@ const MobileDropdownMenu = ({
   isDark: boolean;
   maxHeight: number;
   position: any;
+  submenuWidth?: number;
 }) => {
   const themeColors = getThemeColors(isDark);
   
@@ -601,11 +640,15 @@ const MobileDropdownMenu = ({
   };
 
   const handleSubmenuToggle = (option: DropdownMenuOption, pos: { x: number; y: number }) => {
+    console.log('🔍 handleSubmenuToggle chamado para:', option.id, 'hasSubmenu:', !!option.submenuOptions);
+    
     if (option.submenuOptions) {
+      console.log('✅ Abrindo submenu para:', option.id);
       setSubmenuOptions(option.submenuOptions);
       setSubmenuPosition(pos);
       setSubmenuVisible(true);
     } else {
+      console.log('🎯 Fechando submenu e executando ação para:', option.id);
       // Se a opção não tem submenu, fechar qualquer submenu aberto E executar a ação
       setSubmenuVisible(false);
       // Executar a ação da opção clicada
@@ -714,8 +757,8 @@ const MobileDropdownMenu = ({
                     backgroundColor: themeColors['divider'],
                     marginVertical: 4,
                   }} />
-                )}
-              </View>
+              )}
+            </View>
             ))}
             
             {/* Separador se houver opções separadas */}
@@ -728,8 +771,8 @@ const MobileDropdownMenu = ({
               <MenuOptionItem
                 key={option.id}
                 option={option}
-                onSelect={handleItemSelect}
-                isDark={isDark}
+                    onSelect={handleItemSelect}
+                    isDark={isDark}
                 onSubmenuToggle={handleSubmenuToggle}
               />
             ))}
@@ -756,8 +799,9 @@ const MobileDropdownMenu = ({
               onClose={handleSubmenuClose}
               isDark={isDark}
               position={submenuPosition}
+              submenuWidth={submenuWidth}
             />
-          </Pressable>
+      </Pressable>
         </Modal>
       )}
     </Modal>
@@ -772,6 +816,7 @@ export const DropdownMenu = ({
   zIndex = 9999,
   onOpen,
   onClose,
+  submenuWidth,
 }: DropdownMenuProps) => {
   const { isMobile } = useResponsive();
   const [isOpen, setIsOpen] = useState(false);
@@ -998,9 +1043,9 @@ export const DropdownMenu = ({
                 openDown: false
               });
             }
-          });
+            });
+          }
         }
-      }
       setIsOpen(!isOpen);
     }
   };
@@ -1033,7 +1078,7 @@ export const DropdownMenu = ({
       fontWeight: '400',
     },
   });
-  
+
   return (
     <View style={{ position: 'relative' }}>
       <TouchableOpacity
@@ -1047,7 +1092,7 @@ export const DropdownMenu = ({
       >
         <Text style={buttonStyle.text}>
           {buttonText}
-        </Text>
+            </Text>
         
         {isOpen ? (
           <ChevronUp size={14} color={isDark ? '#95A1AC' : '#57636C'} />
@@ -1066,6 +1111,7 @@ export const DropdownMenu = ({
           isDark={isDark}
           maxHeight={maxHeight}
           position={position}
+          submenuWidth={submenuWidth}
         />
       )}
       
@@ -1079,6 +1125,7 @@ export const DropdownMenu = ({
           isDark={isDark}
           position={position}
           maxHeight={maxHeight}
+          submenuWidth={submenuWidth}
         />
       )}
     </View>
