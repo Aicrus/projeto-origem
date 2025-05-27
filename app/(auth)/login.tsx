@@ -12,6 +12,9 @@ import { Button } from '@/components/AicrusComponents/button';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [senhaError, setSenhaError] = useState('');
+  
   const { currentTheme } = useTheme();
   const { width, height } = useWindowDimensions();
   const isDesktopOrTablet = width >= 768;
@@ -21,25 +24,70 @@ export default function Login() {
   const router = useRouter();
   const senhaRef = useRef<any>(null);
 
+  // Função para validar email em tempo real
+  const validateEmail = (email: string) => {
+    if (!email) {
+      setEmailError('Email é obrigatório');
+      return false;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError('Digite um email válido');
+      return false;
+    }
+    
+    setEmailError('');
+    return true;
+  };
+
+  // Função para validar senha em tempo real
+  const validateSenha = (senha: string) => {
+    if (!senha) {
+      setSenhaError('Senha é obrigatória');
+      return false;
+    }
+    
+    if (senha.length < 6) {
+      setSenhaError('Senha deve ter pelo menos 6 caracteres');
+      return false;
+    }
+    
+    setSenhaError('');
+    return true;
+  };
+
+  // Função para lidar com mudança no email
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (text) {
+      validateEmail(text);
+    } else {
+      setEmailError('');
+    }
+  };
+
+  // Função para lidar com mudança na senha
+  const handleSenhaChange = (text: string) => {
+    setSenha(text);
+    if (text) {
+      validateSenha(text);
+    } else {
+      setSenhaError('');
+    }
+  };
+
   const handleLogin = async () => {
     try {
-      // Validação dos campos obrigatórios
-      if (!email || !senha) {
-        showToast({
-          type: 'warning',
-          message: 'Campos obrigatórios',
-          description: 'Por favor, preencha todos os campos.',
-        });
-        return;
-      }
+      // Validar todos os campos
+      const isEmailValid = validateEmail(email);
+      const isSenhaValid = validateSenha(senha);
 
-      // Validação do formato do email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
+      if (!isEmailValid || !isSenhaValid) {
         showToast({
           type: 'warning',
-          message: 'Email inválido',
-          description: 'Por favor, digite um endereço de email válido.',
+          message: 'Campos inválidos',
+          description: 'Por favor, corrija os erros antes de continuar.',
         });
         return;
       }
@@ -107,15 +155,19 @@ export default function Login() {
                 <Input
                   label="Email"
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={handleEmailChange}
                   placeholder="Digite seu email"
                   type="email"
                   keyboardType="email-address"
                   autoCapitalize="none"
                   disabled={isLoading}
-                  onSubmitEditing={() => senhaRef.current?.focus()}
+                  onSubmitEditing={() => {
+                    // Focar no próximo campo (senha) - será implementado via focus automático
+                  }}
                   returnKeyType="next"
                   autoComplete="email"
+                  error={emailError}
+                  onBlur={() => email && validateEmail(email)}
                 />
               </View>
 
@@ -124,13 +176,15 @@ export default function Login() {
                 <Input
                   label="Senha"
                   value={senha}
-                  onChangeText={setSenha}
+                  onChangeText={handleSenhaChange}
                   placeholder="Digite sua senha"
                   type="password"
                   disabled={isLoading}
                   returnKeyType="go"
                   onSubmitEditing={handleLogin}
                   autoComplete="current-password"
+                  error={senhaError}
+                  onBlur={() => senha && validateSenha(senha)}
                 />
               </View>
 

@@ -333,12 +333,23 @@ export const Input = ({
       flex: 1,
       color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
       fontSize: Number(fontSize['body-md'].size.replace('px', '')),
-      lineHeight: Number(fontSize['body-md'].lineHeight.replace('px', '')),
+      lineHeight: Platform.OS === 'web' 
+        ? Number(fontSize['body-md'].lineHeight.replace('px', ''))
+        : Number(fontSize['body-md'].size.replace('px', '')) * 1.2, // Ajuste para nativo
       fontFamily: fontFamily['jakarta-regular'],
-      paddingVertical: Number(spacing['2'].replace('px', '')),
+      paddingVertical: Platform.OS === 'web' 
+        ? Number(spacing['2'].replace('px', ''))
+        : Number(spacing['3'].replace('px', '')), // Mais padding vertical no nativo
       height: multiline ? undefined : Number(spacing['9'].replace('px', '')),
       textAlignVertical: multiline ? 'top' : 'center',
       ...(Platform.OS === 'ios' && multiline ? { paddingTop: Number(spacing['2'].replace('px', '')) } : {}),
+      // Ajustes específicos para o nativo para evitar corte do texto
+      ...(Platform.OS !== 'web' && !multiline ? {
+        includeFontPadding: false, // Remove padding extra no Android
+        textAlignVertical: 'center',
+        paddingTop: 0,
+        paddingBottom: 0,
+      } : {}),
     },
     searchIcon: {
       padding: Number(spacing['0.5'].replace('px', '')),
@@ -907,7 +918,7 @@ export const Input = ({
               keyboardType={getKeyboardType()}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              selectionColor={getThemeColor('primary')}
+              selectionColor={isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}
             />
           </View>
         ) : (
@@ -945,8 +956,8 @@ export const Input = ({
             multiline={multiline}
             numberOfLines={multiline ? numberOfLines : 1}
             testID={testID}
-            // Cor de seleção mais sutil
-            selectionColor={getThemeColor('primary')}
+            // Cor de seleção mais sutil (neutra como na web)
+            selectionColor={isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}
             autoFocus={autoFocus}
             onContentSizeChange={handleContentSizeChange}
             // Para web, adiciona suporte nativo ao input de data HTML5

@@ -15,6 +15,12 @@ export default function Register() {
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   
+  // Estados de erro para validação visual
+  const [nomeError, setNomeError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [senhaError, setSenhaError] = useState('');
+  const [confirmarSenhaError, setConfirmarSenhaError] = useState('');
+  
   // Adicionando as referências para os campos
   const emailRef = useRef<any>(null);
   const senhaRef = useRef<any>(null);
@@ -28,53 +34,122 @@ export default function Register() {
   const isDark = currentTheme === 'dark';
   const isDesktopOrTablet = width >= 768;
 
+  // Funções de validação em tempo real
+  const validateNome = (nome: string) => {
+    if (!nome) {
+      setNomeError('Nome é obrigatório');
+      return false;
+    }
+    
+    if (nome.trim().length < 3) {
+      setNomeError('Nome deve ter pelo menos 3 caracteres');
+      return false;
+    }
+    
+    setNomeError('');
+    return true;
+  };
+
+  const validateEmail = (email: string) => {
+    if (!email) {
+      setEmailError('Email é obrigatório');
+      return false;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError('Digite um email válido');
+      return false;
+    }
+    
+    setEmailError('');
+    return true;
+  };
+
+  const validateSenha = (senha: string) => {
+    if (!senha) {
+      setSenhaError('Senha é obrigatória');
+      return false;
+    }
+    
+    if (senha.length < 6) {
+      setSenhaError('Senha deve ter pelo menos 6 caracteres');
+      return false;
+    }
+    
+    setSenhaError('');
+    return true;
+  };
+
+  const validateConfirmarSenha = (confirmarSenha: string, senhaAtual: string) => {
+    if (!confirmarSenha) {
+      setConfirmarSenhaError('Confirmação de senha é obrigatória');
+      return false;
+    }
+    
+    if (confirmarSenha !== senhaAtual) {
+      setConfirmarSenhaError('As senhas não coincidem');
+      return false;
+    }
+    
+    setConfirmarSenhaError('');
+    return true;
+  };
+
+  // Funções para lidar com mudanças nos campos
+  const handleNomeChange = (text: string) => {
+    setNome(text);
+    if (text) {
+      validateNome(text);
+    } else {
+      setNomeError('');
+    }
+  };
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (text) {
+      validateEmail(text);
+    } else {
+      setEmailError('');
+    }
+  };
+
+  const handleSenhaChange = (text: string) => {
+    setSenha(text);
+    if (text) {
+      validateSenha(text);
+      // Revalidar confirmação de senha se já foi preenchida
+      if (confirmarSenha) {
+        validateConfirmarSenha(confirmarSenha, text);
+      }
+    } else {
+      setSenhaError('');
+    }
+  };
+
+  const handleConfirmarSenhaChange = (text: string) => {
+    setConfirmarSenha(text);
+    if (text) {
+      validateConfirmarSenha(text, senha);
+    } else {
+      setConfirmarSenhaError('');
+    }
+  };
+
   const handleRegister = async () => {
     try {
-      // Validações básicas
-      if (!nome || !email || !senha || !confirmarSenha) {
+      // Validar todos os campos
+      const isNomeValid = validateNome(nome);
+      const isEmailValid = validateEmail(email);
+      const isSenhaValid = validateSenha(senha);
+      const isConfirmarSenhaValid = validateConfirmarSenha(confirmarSenha, senha);
+
+      if (!isNomeValid || !isEmailValid || !isSenhaValid || !isConfirmarSenhaValid) {
         showToast({
           type: 'warning',
-          message: 'Campos obrigatórios',
-          description: 'Por favor, preencha todos os campos.',
-        });
-        return;
-      }
-
-      // Validação do nome
-      if (nome.trim().length < 3) {
-        showToast({
-          type: 'warning',
-          message: 'Nome inválido',
-          description: 'O nome deve ter pelo menos 3 caracteres.',
-        });
-        return;
-      }
-
-      // Validação do email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        showToast({
-          type: 'warning',
-          message: 'Email inválido',
-          description: 'Por favor, digite um endereço de email válido.',
-        });
-        return;
-      }
-
-      if (senha !== confirmarSenha) {
-        showToast({
-          type: 'error',
-          message: 'Senhas diferentes',
-          description: 'As senhas não coincidem.',
-        });
-        return;
-      }
-
-      if (senha.length < 6) {
-        showToast({
-          type: 'warning',
-          message: 'Senha muito curta',
-          description: 'A senha deve ter pelo menos 6 caracteres.',
+          message: 'Campos inválidos',
+          description: 'Por favor, corrija os erros antes de continuar.',
         });
         return;
       }
@@ -159,13 +234,17 @@ export default function Register() {
                 <Input
                   label="Nome completo"
                   value={nome}
-                  onChangeText={setNome}
+                  onChangeText={handleNomeChange}
                   placeholder="Digite seu nome completo"
                   autoCapitalize="words"
                   disabled={isLoading}
                   returnKeyType="next"
-                  onSubmitEditing={() => emailRef.current?.focus()}
+                  onSubmitEditing={() => {
+                    // Navegação para próximo campo
+                  }}
                   autoComplete="name"
+                  error={nomeError}
+                  onBlur={() => nome && validateNome(nome)}
                 />
               </View>
 
@@ -174,15 +253,19 @@ export default function Register() {
                 <Input
                   label="Email"
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={handleEmailChange}
                   placeholder="Digite seu email"
                   type="email"
                   keyboardType="email-address"
                   autoCapitalize="none"
                   disabled={isLoading}
                   returnKeyType="next"
-                  onSubmitEditing={() => senhaRef.current?.focus()}
+                  onSubmitEditing={() => {
+                    // Navegação para próximo campo
+                  }}
                   autoComplete="email"
+                  error={emailError}
+                  onBlur={() => email && validateEmail(email)}
                 />
               </View>
 
@@ -191,13 +274,17 @@ export default function Register() {
                 <Input
                   label="Senha"
                   value={senha}
-                  onChangeText={setSenha}
+                  onChangeText={handleSenhaChange}
                   placeholder="Digite sua senha"
                   type="password"
                   disabled={isLoading}
                   returnKeyType="next"
-                  onSubmitEditing={() => confirmarSenhaRef.current?.focus()}
+                  onSubmitEditing={() => {
+                    // Navegação para próximo campo
+                  }}
                   autoComplete="new-password"
+                  error={senhaError}
+                  onBlur={() => senha && validateSenha(senha)}
                 />
               </View>
 
@@ -206,13 +293,15 @@ export default function Register() {
                 <Input
                   label="Confirmar senha"
                   value={confirmarSenha}
-                  onChangeText={setConfirmarSenha}
+                  onChangeText={handleConfirmarSenhaChange}
                   placeholder="Confirme sua senha"
                   type="password"
                   disabled={isLoading}
                   returnKeyType="go"
                   onSubmitEditing={handleRegister}
                   autoComplete="new-password"
+                  error={confirmarSenhaError}
+                  onBlur={() => confirmarSenha && validateConfirmarSenha(confirmarSenha, senha)}
                 />
               </View>
 
