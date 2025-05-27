@@ -1,91 +1,73 @@
 import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
 
-// Configuração do stagewise
-const stagewiseConfig = {
-  plugins: []
-};
-
-// Singleton pattern para controlar a inicialização do toolbar
-class StagewiseManager {
-  private static instance: StagewiseManager;
-  private initialized = false;
-  private toolbarRoot: any = null;
-
-  static getInstance(): StagewiseManager {
-    if (!StagewiseManager.instance) {
-      StagewiseManager.instance = new StagewiseManager();
-    }
-    return StagewiseManager.instance;
-  }
-
-  async initializeToolbar(): Promise<void> {
-    // Só executar na web durante desenvolvimento
-    if (process.env.NODE_ENV !== 'development' || Platform.OS !== 'web') {
-      return;
-    }
-
-    // Se já foi inicializado, não fazer nada
-    if (this.initialized) {
-      console.log('StagewiseToolbar já inicializado via singleton');
-      return;
-    }
-
-    // Verificar se já existe no DOM
-    const existingElement = document.getElementById('stagewise-toolbar-root');
-    if (existingElement) {
-      console.log('StagewiseToolbar já existe no DOM');
-      this.initialized = true;
-      return;
-    }
-
-    try {
-      // Marcar como inicializado antes de começar
-      this.initialized = true;
-
-      // Importar dinamicamente
-      const { StagewiseToolbar } = await import('@stagewise/toolbar-react');
-      const { createRoot } = await import('react-dom/client');
-
-      // Verificar novamente se não foi criado durante os imports
-      const existingAfterImport = document.getElementById('stagewise-toolbar-root');
-      if (existingAfterImport) {
-        console.log('StagewiseToolbar criado durante import');
-        return;
-      }
-
-      // Criar elemento
-      const toolbarElement = document.createElement('div');
-      toolbarElement.id = 'stagewise-toolbar-root';
-      document.body.appendChild(toolbarElement);
-
-      // Criar root e renderizar
-      this.toolbarRoot = createRoot(toolbarElement);
-      this.toolbarRoot.render(React.createElement(StagewiseToolbar, { config: stagewiseConfig }));
-      
-      console.log('StagewiseToolbar inicializado com sucesso na web');
-    } catch (error) {
-      console.warn('Erro ao inicializar StagewiseToolbar:', error);
-      this.initialized = false;
-    }
-  }
-
-  cleanup(): void {
-    // Não fazer cleanup para manter o toolbar durante toda a sessão
-    // O toolbar deve persistir entre navegações
-  }
-}
-
 export const StagewiseToolbar: React.FC = () => {
-  useEffect(() => {
-    const manager = StagewiseManager.getInstance();
-    manager.initializeToolbar();
+  const [isClient, setIsClient] = useState(false);
 
-    return () => {
-      // Não fazer cleanup para evitar recriações
-    };
+  useEffect(() => {
+    // Marcar que estamos no cliente
+    setIsClient(true);
   }, []);
 
-  // Não renderizar nada no componente principal
+  useEffect(() => {
+    // Só executar se estivermos no cliente, na web e em desenvolvimento
+    if (!isClient || Platform.OS !== 'web' || process.env.NODE_ENV !== 'development') {
+      return;
+    }
+
+    // Verificar se já existe
+    if (document.getElementById('stagewise-toolbar-root')) {
+      return;
+    }
+
+    let mounted = true;
+
+    const initializeToolbar = async () => {
+      try {
+        // Import dinâmico com verificação de erro
+        const [stagewiseModule, reactDomModule] = await Promise.all([
+          import('@stagewise/toolbar-react').catch(() => null),
+          import('react-dom/client').catch(() => null)
+        ]);
+
+        if (!mounted || !stagewiseModule || !reactDomModule) {
+          return;
+        }
+
+        const { StagewiseToolbar } = stagewiseModule;
+        const { createRoot } = reactDomModule;
+
+        // Verificar novamente se não foi criado
+        if (document.getElementById('stagewise-toolbar-root')) {
+          return;
+        }
+
+        // Criar elemento
+        const toolbarElement = document.createElement('div');
+        toolbarElement.id = 'stagewise-toolbar-root';
+        document.body.appendChild(toolbarElement);
+
+        // Criar root e renderizar
+        const root = createRoot(toolbarElement);
+        root.render(React.createElement(StagewiseToolbar, { config: { plugins: [] } }));
+        
+        console.log('StagewiseToolbar inicializado com sucesso');
+      } catch (error) {
+        console.warn('Erro ao inicializar StagewiseToolbar:', error);
+      }
+    };
+
+    initializeToolbar();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isClient]);
+
+  // Não renderizar nada
   return null;
 }; 
+
+function useState(arg0: boolean): [any, any] {
+  throw new Error('Function not implemented.');
+}
