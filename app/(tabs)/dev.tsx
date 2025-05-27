@@ -93,10 +93,8 @@ import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/to
 import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
 import { HoverableView } from '../../components/AicrusComponents/hoverable-view';
 import { GradientView } from '../../components/AicrusComponents/gradient';
-import { NotificationsMenu } from '../../components/AicrusComponents/notifications-menu';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
-import { ProfileMenu } from '../../components/AicrusComponents/profile-menu';
 import { router } from 'expo-router';
 import { PageContainer } from '../../components/AicrusComponents/page-container';
 import { DataTable } from '../../components/AicrusComponents/data-table';
@@ -112,7 +110,7 @@ import { DateInput } from '../../components/AicrusComponents/input/DateInput';
 import { TimeInput } from '../../components/AicrusComponents/input/TimeInput';
 import { Keyboard } from 'react-native';
 import { ActivityIndicator } from 'react-native';
-import { DropdownMenu } from '../../components/AicrusComponents/dropdown-menu';
+import { DropdownMenu, TeamMenu, NotificationsMenu, ProfileMenu } from '../../components/AicrusComponents/dropdown-menu';
 
 // Definir tipos para os componentes disponíveis
 type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | 'sheet' | null;
@@ -3577,10 +3575,20 @@ showToast({
           >
             <View style={{ pointerEvents: 'auto' }}>
               <NotificationsMenu
-                isVisible={true}
+                buttonText="Notifications"
+                onNotificationOptionSelect={(optionId) => {
+                  console.log('Notification option:', optionId);
+                  alert(`Notification option: ${optionId}`);
+                }}
+                onActionSubmenuSelect={(optionId) => {
+                  console.log('Action submenu:', optionId);
+                  alert(`Action submenu: ${optionId}`);
+                }}
+                onOptionSelect={(optionId) => {
+                  console.log('Notifications - Opção selecionada:', optionId);
+                }}
+                onOpen={() => console.log('Notifications menu aberto')}
                 onClose={() => setNotificationsMenuVisible(false)}
-                position={clickPosition}
-                viewAllRoute="/(tabs)/dev"
               />
             </View>
           </View>
@@ -3790,9 +3798,20 @@ const renderBackdrop = () => {
         
         {profileMenuOpen && (
           <ProfileMenu
-            isVisible={profileMenuOpen}
+            buttonText="Profile"
+            onProfileOptionSelect={(optionId) => {
+              console.log('Profile option:', optionId);
+              alert(`Profile option: ${optionId}`);
+            }}
+            onEditSubmenuSelect={(optionId) => {
+              console.log('Edit submenu:', optionId);
+              alert(`Edit submenu: ${optionId}`);
+            }}
+            onOptionSelect={(optionId) => {
+              console.log('Profile - Opção selecionada:', optionId);
+            }}
+            onOpen={() => console.log('Profile menu aberto')}
             onClose={() => setProfileMenuOpen(false)}
-            position={profileButtonPosition}
           />
         )}
       </View>
@@ -3815,62 +3834,93 @@ const renderBackdrop = () => {
     return (
       <View className="p-lg">
         <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
-          Dropdown Menu - Área de Testes
+          Dropdown Menu - Três Menus Disponíveis
         </Text>
         <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          Testando o novo componente DropdownMenu com 4 opções fixas.
+          Testando os três menus específicos: TeamMenu, NotificationsMenu e ProfileMenu.
         </Text>
 
-        {/* Teste do novo DropdownMenu */}
-        <View className={`${bgSecondary} rounded-lg p-md`}>
+        {/* Team Menu */}
+        <View className={`${bgSecondary} rounded-lg p-md mb-md`}>
           <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>
-            Novo DropdownMenu
-              </Text>
+            Team Menu
+          </Text>
           
-          <DropdownMenu
-            buttonText="Open"
-            onOptionSelect={(optionId) => {
-              console.log('Opção selecionada:', optionId);
-              // Aqui você pode adicionar lógica específica para cada opção
-              switch(optionId) {
-                case 'team':
-                  alert('Team selecionado!');
-                  break;
-                case 'invite':
-                  alert('Invite users selecionado!');
-                  break;
-                case 'email':
-                  alert('Email (submenu) selecionado!');
-                  break;
-                case 'message':
-                  alert('Message (submenu) selecionado!');
-                  break;
-                case 'more':
-                  alert('More... (submenu) selecionado!');
-                  break;
-                case 'newteam':
-                  alert('New Team selecionado!');
-                  break;
-                case 'github':
-                  alert('GitHub selecionado!');
-                  break;
-                case 'support':
-                  alert('Support selecionado!');
-                  break;
-                case 'api':
-                  alert('API selecionado!');
-                  break;
-                case 'logout':
-                  alert('Log out selecionado!');
-                  break;
-              }
+          <TeamMenu
+            buttonText="Team"
+            onTeamOptionSelect={(optionId) => {
+              console.log('Team option:', optionId);
+              alert(`Team option: ${optionId}`);
             }}
-            onOpen={() => console.log('Menu aberto')}
-            onClose={() => console.log('Menu fechado')}
+            onInviteSubmenuSelect={(optionId) => {
+              console.log('Invite submenu:', optionId);
+              alert(`Invite submenu: ${optionId}`);
+            }}
+            onOptionSelect={(optionId) => {
+              console.log('Team - Opção selecionada:', optionId);
+            }}
+            onOpen={() => console.log('Team menu aberto')}
+            onClose={() => console.log('Team menu fechado')}
           />
           
           <Text className={`text-body-sm ${textSecondary} mt-md`}>
-            Este menu é idêntico à imagem: My Account com Team, Invite users (com submenu Email, Message, More...), New Team, GitHub, Support, API e Log out separado. No web: hover para mostrar submenu. No mobile: clique para mostrar submenu.
+            Menu de equipe com opções: Team, Invite users (submenu: email, message, more), New Team, GitHub, Support, API e Log out.
+          </Text>
+        </View>
+
+        {/* Notifications Menu */}
+        <View className={`${bgSecondary} rounded-lg p-md mb-md`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>
+            Notifications Menu
+          </Text>
+          
+          <NotificationsMenu
+            buttonText="Notifications"
+            onNotificationOptionSelect={(optionId) => {
+              console.log('Notification option:', optionId);
+              alert(`Notification option: ${optionId}`);
+            }}
+            onActionSubmenuSelect={(optionId) => {
+              console.log('Action submenu:', optionId);
+              alert(`Action submenu: ${optionId}`);
+            }}
+            onOptionSelect={(optionId) => {
+              console.log('Notifications - Opção selecionada:', optionId);
+            }}
+            onOpen={() => console.log('Notifications menu aberto')}
+            onClose={() => setNotificationsMenuVisible(false)}
+          />
+          
+          <Text className={`text-body-sm ${textSecondary} mt-md`}>
+            Menu de notificações com opções: All, Unread, Mentions (submenu: mark_read, delete, more), Settings, Archive e Clear All.
+          </Text>
+        </View>
+
+        {/* Profile Menu */}
+        <View className={`${bgSecondary} rounded-lg p-md`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>
+            Profile Menu
+          </Text>
+          
+          <ProfileMenu
+            buttonText="Profile"
+            onProfileOptionSelect={(optionId) => {
+              console.log('Profile option:', optionId);
+              alert(`Profile option: ${optionId}`);
+            }}
+            onEditSubmenuSelect={(optionId) => {
+              console.log('Edit submenu:', optionId);
+              alert(`Edit submenu: ${optionId}`);
+            }}
+            onOptionSelect={(optionId) => {
+              console.log('Profile - Opção selecionada:', optionId);
+            }}
+            onOpen={() => console.log('Profile menu aberto')}
+            onClose={() => console.log('Profile menu fechado')}
+          />
+          
+          <Text className={`text-body-sm ${textSecondary} mt-md`}>
+            Menu de perfil com opções: View Profile, Edit Profile (submenu: edit_info, change_photo, more), Settings, Security, Billing, Help e Log out.
           </Text>
         </View>
       </View>

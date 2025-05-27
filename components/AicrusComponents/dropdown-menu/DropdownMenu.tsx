@@ -5,55 +5,40 @@ import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { createPortal } from 'react-dom';
 import { colors } from '../../../designer-system/tokens/colors';
+import { DropdownMenuOption, SubmenuOption, BaseDropdownMenuProps } from './types';
 
 /**
  * @component DropdownMenu
- * @description Componente de menu dropdown igual à imagem mostrada com:
- * - My Account (título)
- * - Team, Invite users (com submenu), New Team, GitHub, Support, API
- * - Log out (separado)
- * - Submenu para "Invite users" com Email, Message, More...
- * 
- * O componente é responsivo e funciona em todas as plataformas (iOS, Android, Web)
- * com posicionamento inteligente e tema claro/escuro automático.
+ * @description Componente de menu dropdown genérico e responsivo com suporte a:
+ * - Trigger customizável (botão, ícone, qualquer elemento)
+ * - Submenus
+ * - Tema claro/escuro automático
+ * - Posicionamento inteligente
+ * - Responsividade (iOS, Android, Web)
  * 
  * @example
- * // Uso básico
+ * // Uso básico com botão padrão
  * <DropdownMenu 
  *   buttonText="Menu" 
+ *   options={menuOptions}
  *   onOptionSelect={(optionId) => console.log(optionId)} 
  * />
  * 
- * // Com largura customizada do submenu (útil para mobile)
+ * // Com trigger customizado (ícone)
  * <DropdownMenu 
- *   buttonText="Menu" 
- *   submenuWidth={100} // Submenu mais estreito para mobile
+ *   trigger={<TouchableOpacity><Bell size={20} /></TouchableOpacity>}
+ *   options={menuOptions}
  *   onOptionSelect={(optionId) => console.log(optionId)} 
  * />
  */
 
-export interface DropdownMenuOption {
-  id: 'team' | 'invite' | 'newteam' | 'github' | 'support' | 'api' | 'logout';
-  label: string;
-  icon: React.ReactNode;
-  action: () => void;
-  hasArrow?: boolean;
-  shortcut?: string;
-  isSeparated?: boolean;
-  hasSubmenu?: boolean;
-  submenuOptions?: SubmenuOption[];
-}
-
-export interface SubmenuOption {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  action: () => void;
-}
-
-export interface DropdownMenuProps {
-  /** Texto do botão que abre o menu */
+export interface DropdownMenuProps extends BaseDropdownMenuProps {
+  /** Elemento que vai disparar o menu (botão, ícone, etc.) - opcional */
+  trigger?: React.ReactNode;
+  /** Texto do botão padrão (usado se trigger não for fornecido) */
   buttonText?: string;
+  /** Opções do menu */
+  options: DropdownMenuOption[];
   /** Função chamada quando uma opção é selecionada */
   onOptionSelect?: (optionId: string) => void;
   /** Se o menu está desabilitado */
@@ -68,6 +53,8 @@ export interface DropdownMenuProps {
   onClose?: () => void;
   /** Largura do submenu (especialmente útil para mobile) */
   submenuWidth?: number;
+  /** Título do menu (opcional) */
+  title?: string;
 }
 
 // Função para obter as cores do theme
@@ -809,7 +796,9 @@ const MobileDropdownMenu = ({
 };
 
 export const DropdownMenu = ({
+  trigger,
   buttonText = 'Open',
+  options,
   onOptionSelect,
   disabled = false,
   maxHeight = 400,
@@ -817,6 +806,7 @@ export const DropdownMenu = ({
   onOpen,
   onClose,
   submenuWidth,
+  title,
 }: DropdownMenuProps) => {
   const { isMobile } = useResponsive();
   const [isOpen, setIsOpen] = useState(false);
@@ -833,110 +823,6 @@ export const DropdownMenu = ({
     bottom?: number;
     openDown?: boolean;
   }>({ top: 0, left: 0, width: 0 });
-  
-  // Opções do submenu para "Invite users"
-  const inviteSubmenuOptions: SubmenuOption[] = [
-    {
-      id: 'email',
-      label: 'Email',
-      icon: <Mail size={16} color={themeColors['text-primary']} />,
-      action: () => {
-        console.log('Email submenu selecionado');
-        onOptionSelect?.('email');
-      }
-    },
-    {
-      id: 'message',
-      label: 'Message',
-      icon: <MessageSquare size={16} color={themeColors['text-primary']} />,
-      action: () => {
-        console.log('Message submenu selecionado');
-        onOptionSelect?.('message');
-      }
-    },
-    {
-      id: 'more',
-      label: 'More...',
-      icon: <MoreHorizontal size={16} color={themeColors['text-primary']} />,
-      action: () => {
-        console.log('More submenu selecionado');
-        onOptionSelect?.('more');
-      }
-    }
-  ];
-  
-  // Opções do menu igual à imagem
-  const menuOptions: DropdownMenuOption[] = [
-    {
-      id: 'team',
-      label: 'Team',
-      icon: <Users size={16} color={themeColors['text-primary']} />,
-      action: () => {
-        console.log('Team selecionado');
-        onOptionSelect?.('team');
-      }
-    },
-    {
-      id: 'invite',
-      label: 'Invite users',
-      icon: <UserPlus size={16} color={themeColors['text-primary']} />,
-      hasArrow: true,
-      hasSubmenu: true,
-      submenuOptions: inviteSubmenuOptions,
-      action: () => {
-        console.log('Invite users selecionado');
-        onOptionSelect?.('invite');
-      }
-    },
-    {
-      id: 'newteam',
-      label: 'New Team',
-      icon: <Plus size={16} color={themeColors['text-primary']} />,
-      shortcut: '⌘+T',
-      action: () => {
-        console.log('New Team selecionado');
-        onOptionSelect?.('newteam');
-      }
-    },
-    {
-      id: 'github',
-      label: 'GitHub',
-      icon: <Github size={16} color={themeColors['text-primary']} />,
-      action: () => {
-        console.log('GitHub selecionado');
-        onOptionSelect?.('github');
-      }
-    },
-    {
-      id: 'support',
-      label: 'Support',
-      icon: <HelpCircle size={16} color={themeColors['text-primary']} />,
-      action: () => {
-        console.log('Support selecionado');
-        onOptionSelect?.('support');
-      }
-    },
-    {
-      id: 'api',
-      label: 'API',
-      icon: <Cloud size={16} color={themeColors['text-primary']} />,
-      action: () => {
-        console.log('API selecionado');
-        onOptionSelect?.('api');
-      }
-    },
-    {
-      id: 'logout',
-      label: 'Log out',
-      icon: <LogOut size={16} color={themeColors['text-primary']} />,
-      shortcut: '⇧⌘Q',
-      isSeparated: true,
-      action: () => {
-        console.log('Log out selecionado');
-        onOptionSelect?.('logout');
-      }
-    }
-  ];
   
   // Calcular posição quando abrir
   useEffect(() => {
@@ -1061,7 +947,7 @@ export const DropdownMenu = ({
   const buttonStyle = StyleSheet.create({
     container: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'center',
       alignItems: 'center',
       paddingVertical: 8,
       paddingHorizontal: 16,
@@ -1076,36 +962,44 @@ export const DropdownMenu = ({
       fontSize: 14,
       color: isDark ? '#FFFFFF' : '#14181B',
       fontWeight: '400',
+      textAlign: 'center',
     },
   });
 
   return (
     <View style={{ position: 'relative' }}>
-      <TouchableOpacity
-        ref={selectRef}
-        onPress={handleToggleDropdown}
-        style={[
-          buttonStyle.container,
-          disabled ? { opacity: 0.5 } : {}
-        ]}
-        disabled={disabled}
-      >
-        <Text style={buttonStyle.text}>
-          {buttonText}
-            </Text>
-        
-        {isOpen ? (
-          <ChevronUp size={14} color={isDark ? '#95A1AC' : '#57636C'} />
-        ) : (
-          <ChevronDown size={14} color={isDark ? '#95A1AC' : '#57636C'} />
-        )}
-      </TouchableOpacity>
+      {trigger ? (
+        // Trigger customizado
+        <TouchableOpacity
+          ref={selectRef}
+          onPress={handleToggleDropdown}
+          disabled={disabled}
+          style={disabled ? { opacity: 0.5 } : {}}
+        >
+          {trigger}
+        </TouchableOpacity>
+      ) : (
+        // Botão padrão - apenas texto centralizado
+        <TouchableOpacity
+          ref={selectRef}
+          onPress={handleToggleDropdown}
+          style={[
+            buttonStyle.container,
+            disabled ? { opacity: 0.5 } : {}
+          ]}
+          disabled={disabled}
+        >
+          <Text style={buttonStyle.text}>
+            {buttonText}
+          </Text>
+        </TouchableOpacity>
+      )}
       
       {/* Dropdown no mobile */}
       {Platform.OS !== 'web' && (
         <MobileDropdownMenu
           visible={isOpen}
-          options={menuOptions}
+          options={options}
           onSelect={handleOptionSelect}
           onClose={handleClose}
           isDark={isDark}
@@ -1119,7 +1013,7 @@ export const DropdownMenu = ({
       {Platform.OS === 'web' && (
         <WebDropdownMenu
           visible={isOpen}
-          options={menuOptions}
+          options={options}
           onSelect={handleOptionSelect}
           onClose={handleClose}
           isDark={isDark}
