@@ -112,6 +112,7 @@ import { DateInput } from '../../components/AicrusComponents/input/DateInput';
 import { TimeInput } from '../../components/AicrusComponents/input/TimeInput';
 import { Keyboard } from 'react-native';
 import { ActivityIndicator } from 'react-native';
+import { DropdownMenu } from '../../components/AicrusComponents/dropdown-menu';
 
 // Definir tipos para os componentes disponíveis
 type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | 'sheet' | null;
@@ -3811,271 +3812,67 @@ const renderBackdrop = () => {
 
   // Função para renderizar os Dropdown Menus (NotificationsMenu e ProfileMenu)
   const renderDropdownMenuComponent = () => {
-    // Função para capturar a posição e abrir o menu de notificações
-    const handleNotificationsOpen = () => {
-      if (notificationsButtonRef.current && Platform.OS === 'web') {
-        // @ts-ignore - API DOM específica para web
-        const rect = notificationsButtonRef.current.getBoundingClientRect?.();
-        if (rect) {
-          setNotificationsPosition({
-            x: rect.right,
-            y: rect.bottom
-          });
-        }
-      }
-      setNotificationsVisible(true);
-    };
-
-    // Função para capturar a posição e abrir o menu de perfil
-    const handleProfileOpen = () => {
-      if (profileCardButtonRef.current && Platform.OS === 'web') {
-        // @ts-ignore - API DOM específica para web
-        const rect = profileCardButtonRef.current.getBoundingClientRect?.();
-        if (rect) {
-          // Obter dimensões da janela
-          const windowWidth = window.innerWidth;
-          
-          // Posicionando no meio da tela
-          setProfilePosition({
-            x: windowWidth / 2, // Centro da tela horizontalmente
-            y: rect.bottom
-          });
-        }
-      }
-      setProfileVisible(true);
-    };
-
-    // Backdrop para fechar menus quando clicado fora
-    const renderBackdrop = () => {
-      if (notificationsVisible || profileVisible) {
-        return (
-          <Pressable
-            style={{
-              position: Platform.OS === 'web' ? 'fixed' : 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'transparent',
-              zIndex: 2000,
-            }}
-            onPress={() => {
-              setNotificationsVisible(false);
-              setProfileVisible(false);
-            }}
-          />
-        );
-      }
-      return null;
-    };
-
     return (
       <View className="p-lg">
         <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
-          Componentes de Dropdown Menu
+          Dropdown Menu - Área de Testes
         </Text>
         <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          Esta seção demonstra os componentes NotificationsMenu e ProfileMenu integrados como menus dropdown de interface.
+          Testando o novo componente DropdownMenu com 4 opções fixas.
         </Text>
-
-        <View className={`flex-row flex-wrap`}>
-          {/* Card do NotificationsMenu */}
-          <View className={`${bgSecondary} rounded-lg p-md mb-lg mr-lg flex-1 min-w-[300px]`}>
-            <View className="flex-row items-center mb-sm">
-              <View className={`w-8 h-8 rounded-md items-center justify-center ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'} mr-sm`}>
-                <Bell size={18} color={isDark ? '#FFFFFF' : '#57636C'} strokeWidth={1.5} />
-              </View>
-              <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary}`}>
-                Menu de Notificações
-              </Text>
-            </View>
-            
-            <Text className={`text-body-sm ${textSecondary} mb-md`}>
-              Menu de notificações para exibir alertas e informações ao usuário com animações suaves e adaptação automática ao tema.
-            </Text>
-            
-            <View className="mb-md">
-              <View ref={notificationsButtonRef}>
-                <Pressable
-                  onPress={handleNotificationsOpen}
-                  className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
-                >
-                  <Text className="text-white font-jakarta-medium">
-                    Abrir menu de notificações
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-            
-            <View className="flex-row flex-wrap">
-              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
-                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Notificações não lidas</Text>
-                <Text className={`text-body-sm ${textSecondary}`}>Indicadores visuais para itens não lidos.</Text>
-              </View>
-              
-              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
-                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Animação suave</Text>
-                <Text className={`text-body-sm ${textSecondary}`}>Transições com fade e deslizamento.</Text>
-              </View>
-              
-              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
-                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Posicionamento</Text>
-                <Text className={`text-body-sm ${textSecondary}`}>Adjacente ao elemento que o acionou.</Text>
-              </View>
-            </View>
-          </View>
+        
+        {/* Teste do novo DropdownMenu */}
+        <View className={`${bgSecondary} rounded-lg p-md`}>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>
+            Novo DropdownMenu
+          </Text>
           
-          {/* Card do ProfileMenu */}
-          <View className={`${bgSecondary} rounded-lg p-md mb-lg flex-1 min-w-[300px]`}>
-            <View className="flex-row items-center mb-sm">
-              <View className={`w-8 h-8 rounded-md items-center justify-center ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'} mr-sm`}>
-                <Settings size={18} color={isDark ? '#FFFFFF' : '#57636C'} strokeWidth={1.5} />
-              </View>
-              <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary}`}>
-                Menu de Perfil
-              </Text>
-            </View>
-            
-            <Text className={`text-body-sm ${textSecondary} mb-md`}>
-              Menu de perfil que exibe informações do usuário, opções de tema e funcionalidade de logout com interface adaptativa.
-            </Text>
-            
-            <View className="mb-md">
-              <View ref={profileCardButtonRef}>
-                <Pressable
-                  onPress={handleProfileOpen}
-                  className="bg-primary-light dark:bg-primary-dark py-2 px-4 rounded-md"
-                >
-                  <Text className="text-white font-jakarta-medium">
-                    Abrir menu de perfil
-                  </Text>
-                </Pressable>
-              </View>
-            </View>
-            
-            <View className="flex-row flex-wrap">
-              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
-                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Seleção de tema</Text>
-                <Text className={`text-body-sm ${textSecondary}`}>Claro, escuro ou sistema.</Text>
-              </View>
-              
-              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
-                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Dados do perfil</Text>
-                <Text className={`text-body-sm ${textSecondary}`}>Exibe nome e email.</Text>
-              </View>
-              
-              <View className={`mr-md mb-md p-sm rounded-md ${bgTertiary} flex-1 min-w-[130px]`}>
-                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Multiplataforma</Text>
-                <Text className={`text-body-sm ${textSecondary}`}>Funciona em iOS, Android e Web.</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-        
-        {/* Documentação técnica */}
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mt-lg mb-sm`}>
-          Implementação dos Dropdown Menus
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-md`}>
-          Abaixo você encontra a documentação sobre como utilizar os componentes NotificationsMenu e ProfileMenu.
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <Text className="font-mono text-xs" style={{ color: textPrimary.includes('dark') ? '#E5E7EB' : '#374151' }}>
-{`// Importando os componentes
-import { NotificationsMenu } from '@/components/AicrusComponents/notifications-menu';
-import { ProfileMenu } from '@/components/AicrusComponents/profile-menu';
-
-// Estados para controle de visibilidade e posição
-const [menuVisible, setMenuVisible] = useState(false);
-const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
-const buttonRef = useRef<View>(null);
-
-// Função para abrir o menu com posicionamento correto
-const handleOpenMenu = () => {
-  if (buttonRef.current && Platform.OS === 'web') {
-    // @ts-ignore - API DOM específica para web
-    const rect = buttonRef.current.getBoundingClientRect?.();
-    if (rect) {
-      setMenuPosition({
-        x: rect.right,
-        y: rect.bottom
-      });
-    }
-  }
-  setMenuVisible(true);
-};
-
-// Renderização do componente
-return (
-  <>
-    <View ref={buttonRef}>
-      <Pressable onPress={handleOpenMenu}>
-        <Text>Abrir Menu</Text>
-      </Pressable>
-    </View>
-    
-    {menuVisible && (
-      <NotificationsMenu
-        // ou <ProfileMenu
-        isVisible={menuVisible}
-        onClose={() => setMenuVisible(false)}
-        position={menuPosition}
-      />
-    )}
-  </>
-);`}
+          <DropdownMenu
+            buttonText="Open"
+            onOptionSelect={(optionId) => {
+              console.log('Opção selecionada:', optionId);
+              // Aqui você pode adicionar lógica específica para cada opção
+              switch(optionId) {
+                case 'team':
+                  alert('Team selecionado!');
+                  break;
+                case 'invite':
+                  alert('Invite users selecionado!');
+                  break;
+                case 'email':
+                  alert('Email (submenu) selecionado!');
+                  break;
+                case 'message':
+                  alert('Message (submenu) selecionado!');
+                  break;
+                case 'more':
+                  alert('More... (submenu) selecionado!');
+                  break;
+                case 'newteam':
+                  alert('New Team selecionado!');
+                  break;
+                case 'github':
+                  alert('GitHub selecionado!');
+                  break;
+                case 'support':
+                  alert('Support selecionado!');
+                  break;
+                case 'api':
+                  alert('API selecionado!');
+                  break;
+                case 'logout':
+                  alert('Log out selecionado!');
+                  break;
+              }
+            }}
+            onOpen={() => console.log('Menu aberto')}
+            onClose={() => console.log('Menu fechado')}
+          />
+          
+          <Text className={`text-body-sm ${textSecondary} mt-md`}>
+            Este menu é idêntico à imagem: My Account com Team, Invite users (com submenu Email, Message, More...), New Team, GitHub, Support, API e Log out separado. No web: hover para mostrar submenu. No mobile: clique para mostrar submenu.
           </Text>
         </View>
-        
-        {/* Renderizar o backdrop e os menus */}
-        {renderBackdrop()}
-        
-        {notificationsVisible && (
-          <View 
-            style={Platform.OS === 'web' ? {
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 3000,
-              pointerEvents: 'none'
-            } : null}
-          >
-            <View style={{ pointerEvents: 'auto' }}>
-              <NotificationsMenu
-                isVisible={true}
-                onClose={() => setNotificationsVisible(false)}
-                position={notificationsPosition}
-              />
-            </View>
-          </View>
-        )}
-        
-        {profileVisible && (
-          <View 
-            style={Platform.OS === 'web' ? {
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 3000,
-              pointerEvents: 'none'
-            } : null}
-          >
-            <View style={{ pointerEvents: 'auto' }}>
-              <ProfileMenu
-                isVisible={profileVisible}
-                onClose={() => setProfileVisible(false)}
-                position={profilePosition}
-              />
-            </View>
-          </View>
-        )}
       </View>
     );
   };
