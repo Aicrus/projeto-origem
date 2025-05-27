@@ -49,7 +49,7 @@ export interface HoverableViewProps extends PressableProps {
  * - Adapta-se automaticamente a temas claros e escuros
  * - Pode desativar efeitos de hover em itens ativos (disableHoverWhenActive)
  */
-export function HoverableView({
+export const HoverableView = React.forwardRef<View, HoverableViewProps>(({
   children,
   isActive = false,
   activeBackgroundColor,
@@ -72,7 +72,7 @@ export function HoverableView({
   onHoverStateChange,
   disabled,
   ...props
-}: HoverableViewProps) {
+}, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
@@ -227,7 +227,7 @@ export function HoverableView({
   if (disabled && allowHoverWhenDisabled && Platform.OS === 'web') {
     return (
       <View 
-        ref={viewRef}
+        ref={ref || viewRef}
         className={className}
         style={{
           ...finalStyle,
@@ -242,7 +242,7 @@ export function HoverableView({
   // Comportamento normal para outros casos
   return (
     <Pressable
-      ref={viewRef}
+      ref={ref || viewRef}
       className={className}
       onHoverIn={handleHoverIn}
       onHoverOut={handleHoverOut}
@@ -253,4 +253,6 @@ export function HoverableView({
       {children}
     </Pressable>
   );
-} 
+});
+
+HoverableView.displayName = 'HoverableView';
