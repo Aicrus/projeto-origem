@@ -8,7 +8,7 @@
 export const colors = {
   // ===== TEMA CLARO =====
   // Cores primárias - Tema Claro
-  'primary-light': '#ffb703',
+  'primary-light': '#687789',
   'primary-light-hover': '#3D5C8C',
   'primary-light-active': '#345078',
   

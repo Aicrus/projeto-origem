@@ -157,7 +157,7 @@ export const Button = ({
   const { isMobile } = useResponsive();
   
   // Determina se o botão tem texto ou apenas ícone
-  const hasText = !isIconOnly && React.isValidElement(children);
+  const hasText = !isIconOnly && children;
   
   // Função para obter a cor baseada no modo do tema
   const getThemeColor = (colorBase: string) => {
@@ -236,9 +236,9 @@ export const Button = ({
       fontStyle: getFontStyle('body-sm'),
       fontFamily: fontFamily['jakarta-regular'],
       iconSize: Number(spacing['3'].replace('px', '')),
-      borderRadius: Number(getBorderRadius(borderRadius || 'sm').replace('px', '')),
+      borderRadius: Number(getBorderRadius(borderRadius || 'xs').replace('px', '')),
       iconButtonDimension: Number(spacing['6'].replace('px', '')),
-      spacing: Number(spacing['2.5'].replace('px', '')),
+      spacing: Number(spacing['3'].replace('px', '')), // 12px - equilibrado
     },
     sm: {
       height: isIconOnly ? Number(spacing['8'].replace('px', '')) : Number(spacing['9'].replace('px', '')),
@@ -246,9 +246,9 @@ export const Button = ({
       fontStyle: getFontStyle('body-md'),
       fontFamily: fontFamily['jakarta-regular'],
       iconSize: Number(spacing['3.5'].replace('px', '')),
-      borderRadius: Number(getBorderRadius(borderRadius || 'md').replace('px', '')),
+      borderRadius: Number(getBorderRadius(borderRadius || 'sm').replace('px', '')),
       iconButtonDimension: Number(spacing['8'].replace('px', '')),
-      spacing: Number(spacing['3'].replace('px', '')),
+      spacing: Number(spacing['3.5'].replace('px', '')), // 14px - equilibrado
     },
     md: {
       height: isIconOnly ? Number(spacing['10'].replace('px', '')) : 42,
@@ -256,9 +256,9 @@ export const Button = ({
       fontStyle: getFontStyle('body-lg'),
       fontFamily: fontFamily['jakarta-regular'],
       iconSize: Number(spacing['4'].replace('px', '')),
-      borderRadius: Number(getBorderRadius(borderRadius || 'lg').replace('px', '')),
+      borderRadius: Number(getBorderRadius(borderRadius || 'md').replace('px', '')),
       iconButtonDimension: Number(spacing['10'].replace('px', '')),
-      spacing: Number(spacing['4'].replace('px', '')),
+      spacing: Number(spacing['4'].replace('px', '')), // 16px - equilibrado
     },
     lg: {
       height: isIconOnly ? Number(spacing['12'].replace('px', '')) : Number(spacing['14'].replace('px', '')),
@@ -266,9 +266,9 @@ export const Button = ({
       fontStyle: getFontStyle('subtitle-md'),
       fontFamily: fontFamily['jakarta-regular'],
       iconSize: Number(spacing['5'].replace('px', '')),
-      borderRadius: Number(getBorderRadius(borderRadius || 'xl').replace('px', '')),
+      borderRadius: Number(getBorderRadius(borderRadius || 'lg').replace('px', '')),
       iconButtonDimension: Number(spacing['12'].replace('px', '')),
-      spacing: Number(spacing['5'].replace('px', '')),
+      spacing: Number(spacing['5'].replace('px', '')), // 20px - equilibrado
     },
   };
   
@@ -334,7 +334,19 @@ export const Button = ({
       
       styleElement.textContent = `
         .${buttonClass}:hover:not(:disabled) {
-          background-color: ${hoverColor || colorScheme[variant].backgroundHover};
+          position: relative;
+        }
+        
+        .${buttonClass}:hover:not(:disabled)::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.05);
+          border-radius: inherit;
+          pointer-events: none;
           transition: background-color 0.2s ease;
         }
         
@@ -345,6 +357,7 @@ export const Button = ({
         
         .${buttonClass}:active:not(:disabled) {
           transform: scale(0.98);
+          transition: transform 0.1s ease;
         }
       `;
       
@@ -380,7 +393,7 @@ export const Button = ({
                 color: colorScheme[variant].text,
                 fontSize: Number(fontStyle.size.replace('px', '')),
                 fontWeight: fontStyle.fontWeight as TextStyle['fontWeight'],
-                marginLeft: 6,
+                marginLeft: sizeConfig.spacing,
               }}
             >
               {loadingText}
@@ -392,7 +405,11 @@ export const Button = ({
 
     return (
       <>
-        {leftIcon && <View style={{ marginRight: hasText ? sizeConfig.spacing : 0 }}>{leftIcon}</View>}
+        {leftIcon && (
+          <View style={{ marginRight: hasText ? sizeConfig.spacing : 0 }}>
+            {leftIcon}
+          </View>
+        )}
         {!isIconOnly && (
           <Text
             style={{
@@ -400,14 +417,16 @@ export const Button = ({
               color: colorScheme[variant].text,
               fontSize: Number(fontStyle.size.replace('px', '')),
               fontWeight: fontStyle.fontWeight as TextStyle['fontWeight'],
-              marginLeft: leftIcon ? 0 : 0,
-              marginRight: rightIcon ? 0 : 0,
             }}
           >
             {children}
           </Text>
         )}
-        {rightIcon && <View style={{ marginLeft: hasText ? sizeConfig.spacing : 0 }}>{rightIcon}</View>}
+        {rightIcon && (
+          <View style={{ marginLeft: hasText ? sizeConfig.spacing : 0 }}>
+            {rightIcon}
+          </View>
+        )}
       </>
     );
   };

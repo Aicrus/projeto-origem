@@ -615,8 +615,8 @@ export const Input = ({
       style.textContent = `
         /* Estilos para o input */
         [data-input-container="true"]:hover:not([data-disabled="true"]) {
-          border-color: ${getThemeColor('primary')};
-          transition: all 0.2s ease;
+          opacity: 0.8;
+          transition: opacity 0.2s ease;
         }
         
         /* Estilo para os ícones */
@@ -643,13 +643,21 @@ export const Input = ({
         }
         
         /* Estilo para controles numéricos */
+        [data-input-number-control] {
+          transition: all 0.2s ease;
+        }
+        
         [data-input-number-control]:hover:not(:disabled) {
           background-color: ${getThemeColor('divider')};
           cursor: pointer;
+          opacity: 0.8;
+          transition: all 0.2s ease;
         }
         
         [data-input-number-control]:active:not(:disabled) {
           background-color: ${getThemeColor('primary')};
+          transform: scale(0.98);
+          transition: all 0.1s ease;
         }
         
         /* Estilos para o input numérico nativo do HTML5 */

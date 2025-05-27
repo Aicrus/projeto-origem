@@ -1419,41 +1419,46 @@ export default function DevPage() {
             </Text>
           </View>
           
-          {/* Botão Login com Email com ícone */}
+          {/* Seção com Exemplo prático e Botão com loading lado a lado */}
           <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Exemplo prático</Text>
-            <View className="mb-sm">
-              <Button 
-                variant="primary" 
-                leftIcon={<Mail size={16} strokeWidth={1.5} color="#FFFFFF" />}
-                onPress={() => {}}
-                fullWidth
-                size="md"
-              >
-                Login with Email
-              </Button>
+            <View className={`flex-row ${isMobile ? 'flex-col' : ''} gap-md`}>
+              {/* Exemplo prático */}
+              <View className={`${isMobile ? 'mb-md' : 'flex-1'}`}>
+                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Exemplo prático</Text>
+                <View className="mb-sm">
+                  <Button 
+                    variant="primary" 
+                    leftIcon={<Mail size={16} strokeWidth={1.5} color="#FFFFFF" />}
+                    onPress={() => {}}
+                    fullWidth
+                    size="md"
+                  >
+                    Login with Email
+                  </Button>
+                </View>
+                <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+                  Botão de login com largura total e ícone, ilustrando um caso de uso comum.
+                </Text>
+              </View>
+              
+              {/* Botão de loading */}
+              <View className={`${isMobile ? '' : 'flex-1'}`}>
+                <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Botão com loading</Text>
+                <View className="mb-sm">
+                  <Button 
+                    variant="primary" 
+                    onPress={() => {}}
+                    loading
+                    loadingText="Please wait"
+                  >
+                    Please wait
+                  </Button>
+                </View>
+                <Text className={`text-body-sm ${textSecondary} mt-xs`}>
+                  Botão em estado de carregamento com texto informativo para o usuário.
+                </Text>
+              </View>
             </View>
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Botão de login com largura total e ícone, ilustrando um caso de uso comum.
-            </Text>
-          </View>
-          
-          {/* Botão de loading */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Botão com loading</Text>
-            <View className="mb-sm">
-              <Button 
-                variant="primary" 
-                onPress={() => {}}
-                loading
-                loadingText="Please wait"
-              >
-                Please wait
-              </Button>
-            </View>
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Botão em estado de carregamento com texto informativo para o usuário.
-            </Text>
           </View>
         </View>
         
