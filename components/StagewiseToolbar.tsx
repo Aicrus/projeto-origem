@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
 export const StagewiseToolbar: React.FC = () => {
@@ -66,8 +66,4 @@ export const StagewiseToolbar: React.FC = () => {
 
   // Não renderizar nada
   return null;
-}; 
-
-function useState(arg0: boolean): [any, any] {
-  throw new Error('Function not implemented.');
-}
+};
