@@ -118,48 +118,28 @@ export default function Home() {
 
   // Função para calcular o estilo flexbox baseado no layout responsivo
   const getTopCardsStyle = () => {
-    if (isMobile) {
-      // Para mobile: permite quebra de linha (2x2)
-      return {
-        flexDirection: 'row' as const,
-        flexWrap: 'wrap' as const,
-        justifyContent: 'space-between' as const,
-        gap: 16,
-        marginBottom: 16,
-      };
-    }
-    
-    // Para tablet e desktop: uma linha só
     return {
       flexDirection: 'row' as const,
+      flexWrap: isMobile ? 'wrap' as const : 'nowrap' as const,
       gap: 16,
       marginBottom: 16,
     };
   };
 
   const getCardStyle = (cardIndex: number, isTopCard: boolean) => {
-    if (isTopCard && isMobile) {
-      // Para mobile: 2 cards por linha (compatível web e nativo)
-      return Platform.OS === 'web' 
-        ? { 
-            flex: 1,
-            minWidth: '48%'
-          }
-        : {
-            flex: 1,
-            maxWidth: '48%',
-            minWidth: '45%'
-          };
+    if (isTopCard) {
+      return {
+        flex: 1,
+        ...(isMobile ? { minWidth: '45%' } : {})
+      };
     }
-    
-    // Para tablet e desktop: compartilham igualmente o espaço
     return { flex: 1 };
   };
 
   const renderContent = () => {
     return (
       <View style={styles.contentContainer}>
-        {/* Cards superiores - Layout responsivo: mobile 2x2, tablet/desktop 1x4 */}
+        {/* Cards superiores - Layout Dashboard 4x2 */}
         <View style={getTopCardsStyle()}>
           {stats.map((stat, index) => (
             <StatCard
@@ -177,14 +157,11 @@ export default function Home() {
         </View>
 
         {/* Cards inferiores - 2 cards responsivos */}
-        <View style={[
-          styles.bottomSection,
-          {
-            flexDirection: isMobile ? 'column' : 'row',
-            gap: 16,
-            flex: 1,
-          }
-        ]}>
+        <View style={{
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: 16,
+          flex: 1,
+        }}>
           {/* Card inferior 1 */}
           <View 
             className={`${cardBg} rounded-lg p-4`} 
