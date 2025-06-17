@@ -17,9 +17,9 @@ import {
   breakpoints as designBreakpoints,
   responsiveSpacing as designResponsiveSpacing
 } from '../../design-system';
-import { Input } from '../../components/inputs/Input';
-import { Select } from '../../components/dropdowns/Select';
-import { Accordion, AccordionGroup } from '../../components/accordions/Accordion';
+import { Input } from '@/components/inputs/Input';
+import { Select } from '@/components/dropdowns/Select';
+import { Accordion, AccordionGroup } from '@/components/accordions/Accordion';
 
 // Função para obter as cores do tailwind.config.js
 const getTailwindConfig = () => {
@@ -87,33 +87,33 @@ const colors = {
   },
 };
 
-import { Button } from '../../components/buttons/Button';
+import { Button } from '@/components/buttons/Button';
 import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette, Layout, ArrowUpDown, MoreHorizontal } from 'lucide-react-native';
-import { Toast, ToastPositionLabels } from '../../components/toasts/Toast';
-import { ThemeSelector } from '../../components/theme/ThemeSelector';
-import { HoverableView } from '../../components/effects/HoverableView';
-import { GradientView } from '../../components/effects/GradientView';
+import { Toast, ToastPositionLabels } from '@/components/toasts/Toast';
+import { ThemeSelector } from '@/components/theme/ThemeSelector';
+import { HoverableView } from '@/components/effects/HoverableView';
+import { GradientView } from '@/components/effects/GradientView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
 import { router } from 'expo-router';
-import { PageContainer } from '../../components/layout/PageContainer';
-import { DataTable } from '../../components/tables/DataTable';
-import { Checkbox } from '../../components/checkboxes/Checkbox';
+import { PageContainer } from '@/components/layout/PageContainer';
+import { DataTable } from '@/components/tables/DataTable';
+import { Checkbox } from '@/components/checkboxes/Checkbox';
 import { ColumnDef } from '@tanstack/react-table';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '@/lib/supabase';
-import Sheet from '../../components/sheets/Sheet';
-import type { SheetPosition } from '../../components/sheets/Sheet';
-import { DateInput } from '../../components/inputs/DateInput';
-import { TimeInput } from '../../components/inputs/TimeInput';
+import Sheet from '@/components/sheets/Sheet';
+import type { SheetPosition } from '@/components/sheets/Sheet';
+import { DateInput } from '@/components/inputs/DateInput';
+import { TimeInput } from '@/components/inputs/TimeInput';
 import { Keyboard } from 'react-native';
 import { ActivityIndicator } from 'react-native';
-import { DropdownMenu } from '../../components/dropdowns/DropdownMenu';
-import { TeamMenu } from '../../components/menus/TeamMenu';
-import { NotificationsMenu } from '../../components/menus/NotificationsMenu';
-import { ProfileMenu } from '../../components/menus/ProfileMenu';
+import { DropdownMenu } from '@/components/dropdowns/DropdownMenu';
+import { TeamMenu } from '@/components/menus/TeamMenu';
+import { NotificationsMenu } from '@/components/menus/NotificationsMenu';
+import { ProfileMenu } from '@/components/menus/ProfileMenu';
 
 // Definir tipos para os componentes disponíveis
 type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | 'sheet' | null;
@@ -3235,7 +3235,7 @@ showToast({
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-xs`}>Exemplo de uso</Text>
             <View className={`bg-bg-tertiary-light dark:bg-bg-tertiary-dark p-sm rounded-md mb-sm`}>
               <Text className={`text-mono-sm font-mono-regular text-text-primary-light dark:text-text-primary-dark`}>
-                {`import { GradientView } from '@/components/AicrusComponents/gradient';
+                {`import { GradientView } from '@/components/effects/GradientView';
 
 // Gradiente fade (cor forte para suave)
 <GradientView type="primary-fade" style={{ height: 80, width: 200 }}>
@@ -5364,7 +5364,7 @@ const SheetExampleContent: React.FC = () => {
       <View className={`bg-bg-tertiary-${isDark ? 'dark' : 'light'} rounded-lg p-md mb-lg`}>
         <Text className={`text-mono-md font-mono-regular ${textPrimary}`}>
 {`// Importar o componente
-import { Sheet } from 'components/AicrusComponents';
+import Sheet from '@/components/sheets/Sheet';
 
 // Estado para controlar a visibilidade
 const [isOpen, setIsOpen] = useState(false);
