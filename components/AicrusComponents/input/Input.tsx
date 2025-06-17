@@ -3,11 +3,11 @@ import { StyleSheet, View, TextInput, Text, TouchableOpacity, Platform, Keyboard
 import { Eye, EyeOff, Search, X, Calendar, Plus, Minus, Clock, ChevronUp, ChevronDown } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { colors, ColorType } from '../../../designer-system/tokens/colors';
-import { spacing } from '../../../designer-system/tokens/spacing';
-import { borderRadius, getBorderRadius } from '../../../designer-system/tokens/borders';
-import { fontSize, fontFamily } from '../../../designer-system/tokens/typography';
-import { opacity, getOpacity } from '../../../designer-system/tokens/effects';
+import { colors, ColorType } from '../../../design-system/tokens/colors';
+import { spacing } from '../../../design-system/tokens/spacing';
+import { borderRadius, getBorderRadius } from '../../../design-system/tokens/borders';
+import { fontSize, fontFamily } from '../../../design-system/tokens/typography';
+import { opacity, getOpacity } from '../../../design-system/tokens/effects';
 
 /**
  * @component Input

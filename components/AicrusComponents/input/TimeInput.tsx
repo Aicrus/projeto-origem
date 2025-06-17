@@ -3,7 +3,7 @@ import { Platform, Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Di
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input, InputProps } from './Input';
 import { useTheme } from '../../../hooks/DesignSystemContext';
-import { colors } from '../../../designer-system/tokens/colors';
+import { colors } from '../../../design-system/tokens/colors';
 
 /**
  * @component TimeInput

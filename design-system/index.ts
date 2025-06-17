@@ -2,7 +2,7 @@
  * SISTEMA DE DESIGN - TOKENS
  * ------------------------------
  * Exporta todos os tokens do sistema de design de forma unificada.
- * Isso permite importar tudo de um único lugar: import { colors, spacing, etc } from '@/designer-system'
+ * Isso permite importar tudo de um único lugar: import { colors, spacing, etc } from '@/design-system'
  */
 
 // Importa todos os tokens

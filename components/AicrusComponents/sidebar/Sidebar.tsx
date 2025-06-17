@@ -27,7 +27,7 @@ import { useTheme } from '../../../hooks/DesignSystemContext';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { GradientView } from '../gradient/GradientView';
 import { useAuth } from '../../../contexts/auth';
-import { colors } from '../../../designer-system/tokens/colors';
+import { colors } from '../../../design-system/tokens/colors';
 
 // Constante para z-index
 const Z_INDEX = {

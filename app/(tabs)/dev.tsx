@@ -16,7 +16,7 @@ import {
   fontSize as designFontSize,
   breakpoints as designBreakpoints,
   responsiveSpacing as designResponsiveSpacing
-} from '../../designer-system';
+} from '../../design-system';
 import { Input } from '../../components/AicrusComponents/input';
 import { Select } from '../../components/AicrusComponents/select';
 import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';

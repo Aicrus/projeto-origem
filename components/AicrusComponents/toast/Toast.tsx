@@ -16,7 +16,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Portal } from '@gorhom/portal';
 import { useTheme } from '../../../hooks/DesignSystemContext';
 import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from 'lucide-react-native';
-import { colors } from '../../../designer-system/tokens/colors';
+import { colors } from '../../../design-system/tokens/colors';
 
 /**
  * @component Toast

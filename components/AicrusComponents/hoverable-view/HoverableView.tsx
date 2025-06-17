@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Pressable, View, ViewStyle, PressableProps, Platform, StyleSheet } from 'react-native';
 import { useTheme } from '@/hooks/DesignSystemContext';
-import { colors } from '../../../designer-system/tokens/colors';
+import { colors } from '../../../design-system/tokens/colors';
 
 export interface HoverableViewProps extends PressableProps {
   children: React.ReactNode;

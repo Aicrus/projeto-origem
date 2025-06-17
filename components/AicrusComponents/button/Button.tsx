@@ -12,10 +12,10 @@ import {
 } from 'react-native';
 import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { colors, ColorType, getColorByMode } from '../../../designer-system/tokens/colors';
-import { spacing } from '../../../designer-system/tokens/spacing';
-import { borderRadius, BorderRadiusType, getBorderRadius } from '../../../designer-system/tokens/borders';
-import { fontSize, fontFamily, FontSizeType, getFontStyle } from '../../../designer-system/tokens/typography';
+import { colors, ColorType, getColorByMode } from '../../../design-system/tokens/colors';
+import { spacing } from '../../../design-system/tokens/spacing';
+import { borderRadius, BorderRadiusType, getBorderRadius } from '../../../design-system/tokens/borders';
+import { fontSize, fontFamily, FontSizeType, getFontStyle } from '../../../design-system/tokens/typography';
 
 /**
  * @component Button

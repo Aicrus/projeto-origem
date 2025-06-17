@@ -3,11 +3,11 @@ import { useColorScheme as useDeviceColorScheme, Appearance } from 'react-native
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Importar tokens diretamente do design system
-import { colors } from '../designer-system/tokens/colors';
-import { spacing } from '../designer-system/tokens/spacing';
-import { fontSize as fontSizes, fontFamily } from '../designer-system/tokens/typography';
-import { borderRadius } from '../designer-system/tokens/borders';
-import { boxShadow, opacity, zIndex, transitionDuration } from '../designer-system/tokens/effects';
+import { colors } from '../design-system/tokens/colors';
+import { spacing } from '../design-system/tokens/spacing';
+import { fontSize as fontSizes, fontFamily } from '../design-system/tokens/typography';
+import { borderRadius } from '../design-system/tokens/borders';
+import { boxShadow, opacity, zIndex, transitionDuration } from '../design-system/tokens/effects';
 
 // Tipos básicos mantidos
 export type ThemeMode = 'light' | 'dark' | 'system';

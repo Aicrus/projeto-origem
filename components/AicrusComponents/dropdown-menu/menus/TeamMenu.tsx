@@ -3,7 +3,7 @@ import { Users, UserPlus, Plus, Github, HelpCircle, Cloud, LogOut, Mail, Message
 import { DropdownMenu } from '../DropdownMenu';
 import { DropdownMenuOption, SubmenuOption } from '../types';
 import { useTheme } from '../../../../hooks/DesignSystemContext';
-import { colors } from '../../../../designer-system/tokens/colors';
+import { colors } from '../../../../design-system/tokens/colors';
 
 export interface TeamMenuProps {
   /** Elemento que vai disparar o menu (botão, ícone, etc.) - opcional */

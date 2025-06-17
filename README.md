@@ -253,7 +253,7 @@ O projeto utiliza um **sistema de design completo e inovador** que combina o mel
 
 ```mermaid
 graph TD
-    A[designer-system/tokens/] --> B[tailwind.config.js]
+    A[design-system/tokens/] --> B[tailwind.config.js]
     A --> C[useDesignSystem Hook]
     B --> D[Classes Tailwind]
     C --> E[Valores JavaScript/TypeScript]
@@ -265,7 +265,7 @@ graph TD
 ### 📁 **Estrutura dos Tokens**
 
 ```
-designer-system/
+design-system/
 ├── index.ts              # Exportações centralizadas
 └── tokens/
     ├── colors.ts         # 🎨 Todas as cores (light/dark)
@@ -356,7 +356,7 @@ isSystem // boolean - true se estiver seguindo o sistema
 Para alterar qualquer aspecto visual do projeto:
 
 #### **1. 🎨 Alterando Cores**
-Edite `designer-system/tokens/colors.ts`:
+Edite `design-system/tokens/colors.ts`:
 ```typescript
 export const colors = {
   // Cores primárias
@@ -375,7 +375,7 @@ export const colors = {
 ```
 
 #### **2. 📏 Alterando Espaçamentos**
-Edite `designer-system/tokens/spacing.ts`:
+Edite `design-system/tokens/spacing.ts`:
 ```typescript
 export const spacing = {
   'xs': '8px',    // Espaçamento extra pequeno
@@ -388,7 +388,7 @@ export const spacing = {
 ```
 
 #### **3. 🔤 Alterando Tipografia**
-Edite `designer-system/tokens/typography.ts`:
+Edite `design-system/tokens/typography.ts`:
 ```typescript
 export const fontSize = {
   'headline-lg': {
@@ -407,7 +407,7 @@ export const fontSize = {
 
 ### ⚡ **Mudanças Instantâneas**
 
-Quando você altera qualquer token em `designer-system/tokens/`:
+Quando você altera qualquer token em `design-system/tokens/`:
 
 ✅ **Classes Tailwind** são atualizadas automaticamente  
 ✅ **Hook useDesignSystem** reflete as mudanças  
@@ -473,7 +473,7 @@ const { currentBreakpoint, isMobile, isTablet, isDesktop } = useDesignSystem();
 
 O projeto utiliza o NativeWind (Tailwind para React Native) para estilização. As definições de cores, espaçamento, tipografia e sombras estão no arquivo `tailwind.config.js`, mas são **importadas automaticamente** dos tokens do Design System.
 
-**⚠️ Importante**: Nunca edite o `tailwind.config.js` diretamente. Sempre altere os tokens em `designer-system/tokens/` para garantir sincronização.
+**⚠️ Importante**: Nunca edite o `tailwind.config.js` diretamente. Sempre altere os tokens em `design-system/tokens/` para garantir sincronização.
 
 ### 🔤 **Configuração de Fontes**
 
@@ -502,7 +502,7 @@ const [fontsLoaded] = useFonts({
 
 #### **2. 📁 Fontes Personalizadas**
 1. Adicione arquivos `.ttf` ou `.otf` em `assets/fonts/`
-2. Configure no `designer-system/tokens/typography.ts`
+2. Configure no `design-system/tokens/typography.ts`
 3. O sistema sincroniza automaticamente com o Tailwind
 
 ### 📈 **SEO e Meta Tags**
@@ -590,7 +590,7 @@ import { ThemeSelector } from '@/components/AicrusComponents/theme-selector/Them
   /head.tsx         # Configurações de SEO e meta tags
 
 🎨 Design System e Componentes
-/designer-system    # 🚀 SISTEMA DE DESIGN UNIFICADO
+/design-system    # 🚀 SISTEMA DE DESIGN UNIFICADO
   /index.ts         # Exportações centralizadas
   /tokens/          # Tokens do design system
     /colors.ts      # 🎨 Todas as cores (light/dark)

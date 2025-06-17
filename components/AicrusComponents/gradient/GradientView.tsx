@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ViewStyle, StyleSheet, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../../hooks/DesignSystemContext';
-import { colors, getColorByMode } from '../../../designer-system/tokens/colors';
+import { colors, getColorByMode } from '../../../design-system/tokens/colors';
 
 export type GradientType = 
   | 'primary' | 'secondary' | 'tertiary' 

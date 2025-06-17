@@ -6,7 +6,7 @@ import {
   isTabletWidth, 
   isDesktopWidth,
   getCurrentBreakpoint
-} from '../designer-system';
+} from '../design-system';
 
 /**
  * Obtém breakpoint inicial baseado no user agent ou dimensões da janela

@@ -1,9 +1,9 @@
-const { colors } = require('./designer-system/tokens/colors');
-const { spacing } = require('./designer-system/tokens/spacing');
-const { fontSize, fontFamily } = require('./designer-system/tokens/typography');
-const { borderRadius } = require('./designer-system/tokens/borders');
-const { boxShadow, opacity, zIndex, transitionDuration } = require('./designer-system/tokens/effects');
-const { breakpoints } = require('./designer-system/tokens/breakpoints');
+const { colors } = require('./design-system/tokens/colors');
+const { spacing } = require('./design-system/tokens/spacing');
+const { fontSize, fontFamily } = require('./design-system/tokens/typography');
+const { borderRadius } = require('./design-system/tokens/borders');
+const { boxShadow, opacity, zIndex, transitionDuration } = require('./design-system/tokens/effects');
+const { breakpoints } = require('./design-system/tokens/breakpoints');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {

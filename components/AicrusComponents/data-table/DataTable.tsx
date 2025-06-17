@@ -32,7 +32,7 @@ import { Button } from '../button';
 import { ArrowUpDown, ChevronDown, MoreHorizontal, AlertCircle } from 'lucide-react-native';
 import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
-import { colors, ColorType } from '../../../designer-system/tokens/colors';
+import { colors, ColorType } from '../../../design-system/tokens/colors';
 import { HoverableView } from '../hoverable-view/HoverableView';
 import { createPortal } from 'react-dom';
 import { SupabaseClient } from '@supabase/supabase-js';

@@ -4,7 +4,7 @@ import { ChevronUp, ChevronDown, Users, UserPlus, Plus, Github, HelpCircle, Clou
 import { useTheme } from '../../../hooks/DesignSystemContext';
 import { useResponsive } from '../../../hooks/useResponsive';
 import { createPortal } from 'react-dom';
-import { colors } from '../../../designer-system/tokens/colors';
+import { colors } from '../../../design-system/tokens/colors';
 import { DropdownMenuOption, SubmenuOption, BaseDropdownMenuProps } from './types';
 
 /**

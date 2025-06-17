@@ -3,7 +3,7 @@ import { Bell, Mail, MessageSquare, Settings, Archive, Trash2, MoreHorizontal } 
 import { DropdownMenu } from '../DropdownMenu';
 import { DropdownMenuOption, SubmenuOption } from '../types';
 import { useTheme } from '../../../../hooks/DesignSystemContext';
-import { colors } from '../../../../designer-system/tokens/colors';
+import { colors } from '../../../../design-system/tokens/colors';
 
 export interface NotificationsMenuProps {
   /** Elemento que vai disparar o menu (botão, ícone, etc.) - opcional */
