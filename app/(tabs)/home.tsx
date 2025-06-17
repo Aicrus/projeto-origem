@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { View, StyleSheet, Platform, ScrollView, Text, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useTheme } from '../../hooks/DesignSystemContext';
-import { Header } from '../../components/AicrusComponents/header';
-import { Sidebar } from '../../components/AicrusComponents/sidebar';
-import { PageContainer } from '../../components/AicrusComponents/page-container';
+import { Header } from '../../components/headers/Header';
+import { Sidebar } from '../../components/navigation/Sidebar';
+import { PageContainer } from '../../components/layout/PageContainer';
 import { Portal } from '@gorhom/portal';
 import { useResponsive } from '../../hooks/useResponsive';
 import { Building2, Users, ClipboardList, AlertTriangle } from 'lucide-react-native';

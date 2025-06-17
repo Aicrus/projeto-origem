@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { Platform, StyleSheet } from 'react-native';
-import { Toast, ToastPosition, ToastType } from '@/components/AicrusComponents/toast';
+import { Toast, ToastPosition, ToastType } from '@/components/toasts/Toast';
 
 interface ToastContextData {
   showToast: (params: ShowToastParams) => void;

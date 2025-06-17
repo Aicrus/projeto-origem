@@ -17,9 +17,9 @@ import {
   breakpoints as designBreakpoints,
   responsiveSpacing as designResponsiveSpacing
 } from '../../design-system';
-import { Input } from '../../components/AicrusComponents/input';
-import { Select } from '../../components/AicrusComponents/select';
-import { Accordion, AccordionGroup } from '../../components/AicrusComponents/accordion';
+import { Input } from '../../components/inputs/Input';
+import { Select } from '../../components/dropdowns/Select';
+import { Accordion, AccordionGroup } from '../../components/accordions/Accordion';
 
 // Função para obter as cores do tailwind.config.js
 const getTailwindConfig = () => {
@@ -87,205 +87,42 @@ const colors = {
   },
 };
 
-import { Button } from '../../components/AicrusComponents/button';
+import { Button } from '../../components/buttons/Button';
 import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette, Layout, ArrowUpDown, MoreHorizontal } from 'lucide-react-native';
-import { Toast, ToastPositionLabels } from '../../components/AicrusComponents/toast';
-import { ThemeSelector } from '../../components/AicrusComponents/theme-selector';
-import { HoverableView } from '../../components/AicrusComponents/hoverable-view';
-import { GradientView } from '../../components/AicrusComponents/gradient';
+import { Toast, ToastPositionLabels } from '../../components/toasts/Toast';
+import { ThemeSelector } from '../../components/theme/ThemeSelector';
+import { HoverableView } from '../../components/effects/HoverableView';
+import { GradientView } from '../../components/effects/GradientView';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from 'expo-router';
 import { router } from 'expo-router';
-import { PageContainer } from '../../components/AicrusComponents/page-container';
-import { DataTable } from '../../components/AicrusComponents/data-table';
-import { Checkbox } from '../../components/AicrusComponents/checkbox';
+import { PageContainer } from '../../components/layout/PageContainer';
+import { DataTable } from '../../components/tables/DataTable';
+import { Checkbox } from '../../components/checkboxes/Checkbox';
 import { ColumnDef } from '@tanstack/react-table';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '@/lib/supabase';
-import { Sheet } from 'components/AicrusComponents';
-import type { SheetPosition } from 'components/AicrusComponents/sheet/Sheet';
-import { DateInput } from '../../components/AicrusComponents/input/DateInput';
-import { TimeInput } from '../../components/AicrusComponents/input/TimeInput';
+import Sheet from '../../components/sheets/Sheet';
+import type { SheetPosition } from '../../components/sheets/Sheet';
+import { DateInput } from '../../components/inputs/DateInput';
+import { TimeInput } from '../../components/inputs/TimeInput';
 import { Keyboard } from 'react-native';
 import { ActivityIndicator } from 'react-native';
-import { DropdownMenu, TeamMenu, NotificationsMenu, ProfileMenu } from '../../components/AicrusComponents/dropdown-menu';
+import { DropdownMenu } from '../../components/dropdowns/DropdownMenu';
+import { TeamMenu } from '../../components/menus/TeamMenu';
+import { NotificationsMenu } from '../../components/menus/NotificationsMenu';
+import { ProfileMenu } from '../../components/menus/ProfileMenu';
 
 // Definir tipos para os componentes disponíveis
 type ComponentType = 'input' | 'select' | 'accordion' | 'button' | 'designSystem' | 'toast' | 'themeSelector' | 'hoverableView' | 'gradientView' | 'dropdownMenu' | 'pageContainer' | 'dataTable' | 'sheet' | null;
 
-// Tipo para os usuários do Supabase
-type UserAicrusAcademy = {
-  id: string;
-  created_at: string;
-  nome: string;
-  email: string;
-  idCustomerAsaas?: string;
-};
+// Exemplo de DataTable com configuração Supabase simplificada
+// O DataTable agora gera as colunas automaticamente com base nos dados retornados
 
-// Componente separado para a tabela Supabase
-const SupabaseDataTable = () => {
-  const { currentTheme } = useTheme();
-  const isDark = currentTheme === 'dark';
-  const textPrimary = isDark ? 'text-text-primary-dark' : 'text-text-primary-light';
-  const textSecondary = isDark ? 'text-text-secondary-dark' : 'text-text-secondary-light';
-  
-  // Definição das colunas para o Supabase
-  const supabaseColumns: ColumnDef<UserAicrusAcademy>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Selecionar todos"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Selecionar linha"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "id",
-      header: ({ column }) => {
-        return (
-          <TouchableOpacity
-            className="flex-row items-center gap-1"
-            onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            <Text className={`${textPrimary} font-jakarta-medium`}>ID</Text>
-            <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
-          </TouchableOpacity>
-        );
-      },
-      cell: ({ row }) => (
-        <View>
-          <Text className={`${textPrimary} font-jakarta-regular`}>{row.getValue("id")}</Text>
-        </View>
-      ),
-      meta: {
-        headerText: 'ID'
-      }
-    },
-    {
-      accessorKey: "created_at",
-      header: ({ column }) => {
-        return (
-          <TouchableOpacity
-            className="flex-row items-center gap-1"
-            onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            <Text className={`${textPrimary} font-jakarta-medium`}>Criado em</Text>
-            <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
-          </TouchableOpacity>
-        );
-      },
-      cell: ({ row }) => {
-        // Formatar a data para exibição
-        const date = new Date(row.getValue("created_at"));
-        const formatted = date.toLocaleString('pt-BR');
-        
-        return (
-          <View>
-            <Text className={`${textPrimary} font-jakarta-regular`}>{formatted}</Text>
-          </View>
-        );
-      },
-      meta: {
-        headerText: 'Criado em'
-      }
-    },
-    {
-      accessorKey: "nome",
-      header: ({ column }) => {
-        return (
-          <TouchableOpacity
-            className="flex-row items-center gap-1"
-            onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            <Text className={`${textPrimary} font-jakarta-medium`}>Nome</Text>
-            <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
-          </TouchableOpacity>
-        );
-      },
-      cell: ({ row }) => (
-        <View>
-          <Text className={`${textPrimary} font-jakarta-regular`}>{row.getValue("nome")}</Text>
-        </View>
-      ),
-      meta: {
-        headerText: 'Nome'
-      }
-    },
-    {
-      accessorKey: "email",
-      header: ({ column }) => {
-        return (
-          <TouchableOpacity
-            className="flex-row items-center gap-1"
-            onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            <Text className={`${textPrimary} font-jakarta-medium`}>Email</Text>
-            <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
-          </TouchableOpacity>
-        );
-      },
-      cell: ({ row }) => (
-        <View>
-          <Text className={`lowercase ${textPrimary} font-jakarta-regular`}>{row.getValue("email")}</Text>
-        </View>
-      ),
-      meta: {
-        headerText: 'Email'
-      }
-    },
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: () => (
-        <View className="items-center justify-center">
-          <TouchableOpacity className="p-1">
-            <MoreHorizontal size={16} color={isDark ? '#E5E7EB' : '#374151'} />
-          </TouchableOpacity>
-        </View>
-      ),
-    },
-  ];
-
-  // Usar o DataTable com configuração Supabase, deixando o componente cuidar dos estados
-  return (
-    <DataTable 
-      columns={supabaseColumns}
-      supabaseConfig={{
-        client: supabase,
-        table: 'usersAicrusAcademy',
-        select: 'id, created_at, nome, email, idCustomerAsaas',
-        orderBy: { column: 'created_at', ascending: false }
-      }}
-      enableRowSelection
-      enableSorting
-      enableFiltering
-      enablePagination
-      searchPlaceholder="Filtrar por nome ou email..."
-      hoverableRowProps={{
-        hoverScale: 1,
-        hoverTranslateY: 0,
-        animationDuration: 150,
-        disableHoverBackground: false
-      }}
-    />
-  );
-};
+// Exemplo de DataTable com configuração Supabase simplificada
+// Agora toda a lógica está dentro do próprio componente DataTable
 
 // Componente que ajusta automaticamente a cor do texto baseado no estado hover + ativo
 const SmartTextHoverableView = ({ text, ...props }: { text: string } & Omit<React.ComponentProps<typeof HoverableView>, 'children'>) => {
@@ -359,7 +196,7 @@ export default function DevPage() {
   const [selectSupabaseNome, setSelectSupabaseNome] = useState('');
   
   // Estado para armazenar usuários do Supabase para Select
-  const [supabaseUsersForSelect, setSupabaseUsersForSelect] = useState<UserAicrusAcademy[]>([]);
+  const [supabaseUsersForSelect, setSupabaseUsersForSelect] = useState<any[]>([]);
   
   // Converter usuários do Supabase para o formato de opções do Select (usando o campo nome)
   const supabaseNomeOptions = useMemo(() => {
@@ -3575,20 +3412,11 @@ showToast({
           >
             <View style={{ pointerEvents: 'auto' }}>
               <NotificationsMenu
-                buttonText="Notifications"
-                onNotificationOptionSelect={(optionId) => {
-                  console.log('Notification option:', optionId);
-                  alert(`Notification option: ${optionId}`);
-                }}
-                onActionSubmenuSelect={(optionId) => {
-                  console.log('Action submenu:', optionId);
-                  alert(`Action submenu: ${optionId}`);
-                }}
-                onOptionSelect={(optionId) => {
-                  console.log('Notifications - Opção selecionada:', optionId);
-                }}
-                onOpen={() => console.log('Notifications menu aberto')}
+                isVisible={true}
                 onClose={() => setNotificationsMenuVisible(false)}
+                title="Notificações"
+                subtitle="Últimas atualizações"
+                position={{ x: 100, y: 100 }}
               />
             </View>
           </View>
@@ -3798,20 +3626,9 @@ const renderBackdrop = () => {
         
         {profileMenuOpen && (
           <ProfileMenu
-            buttonText="Profile"
-            onProfileOptionSelect={(optionId) => {
-              console.log('Profile option:', optionId);
-              alert(`Profile option: ${optionId}`);
-            }}
-            onEditSubmenuSelect={(optionId) => {
-              console.log('Edit submenu:', optionId);
-              alert(`Edit submenu: ${optionId}`);
-            }}
-            onOptionSelect={(optionId) => {
-              console.log('Profile - Opção selecionada:', optionId);
-            }}
-            onOpen={() => console.log('Profile menu aberto')}
+            isVisible={true}
             onClose={() => setProfileMenuOpen(false)}
+            position={profileButtonPosition}
           />
         )}
       </View>
@@ -3875,20 +3692,10 @@ const renderBackdrop = () => {
           </Text>
           
           <NotificationsMenu
-            buttonText="Notifications"
-            onNotificationOptionSelect={(optionId) => {
-              console.log('Notification option:', optionId);
-              alert(`Notification option: ${optionId}`);
-            }}
-            onActionSubmenuSelect={(optionId) => {
-              console.log('Action submenu:', optionId);
-              alert(`Action submenu: ${optionId}`);
-            }}
-            onOptionSelect={(optionId) => {
-              console.log('Notifications - Opção selecionada:', optionId);
-            }}
-            onOpen={() => console.log('Notifications menu aberto')}
+            isVisible={true}
             onClose={() => setNotificationsMenuVisible(false)}
+            title="Menu de Notificações"
+            subtitle="Demonstração do componente"
           />
           
           <Text className={`text-body-sm ${textSecondary} mt-md`}>
@@ -3903,19 +3710,7 @@ const renderBackdrop = () => {
           </Text>
           
           <ProfileMenu
-            buttonText="Profile"
-            onProfileOptionSelect={(optionId) => {
-              console.log('Profile option:', optionId);
-              alert(`Profile option: ${optionId}`);
-            }}
-            onEditSubmenuSelect={(optionId) => {
-              console.log('Edit submenu:', optionId);
-              alert(`Edit submenu: ${optionId}`);
-            }}
-            onOptionSelect={(optionId) => {
-              console.log('Profile - Opção selecionada:', optionId);
-            }}
-            onOpen={() => console.log('Profile menu aberto')}
+            isVisible={true}
             onClose={() => console.log('Profile menu fechado')}
           />
           
@@ -4513,7 +4308,134 @@ const renderBackdrop = () => {
             </Text>
           </View>
           
-          <SupabaseDataTable />
+          <DataTable 
+            columns={[
+              {
+                id: "select",
+                header: ({ table }) => (
+                  <Checkbox
+                    checked={
+                      table.getIsAllPageRowsSelected() ||
+                      (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    aria-label="Selecionar todos"
+                  />
+                ),
+                cell: ({ row }) => (
+                  <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Selecionar linha"
+                  />
+                ),
+                enableSorting: false,
+                enableHiding: false,
+              },
+              {
+                accessorKey: "id",
+                header: ({ column }) => (
+                  <TouchableOpacity
+                    className="flex-row items-center gap-1"
+                    onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                  >
+                    <Text className={textPrimary}>ID</Text>
+                    <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+                  </TouchableOpacity>
+                ),
+                cell: ({ row }) => (
+                  <Text className={textPrimary}>{row.getValue("id")}</Text>
+                ),
+                meta: {
+                  headerText: 'ID'
+                }
+              },
+              {
+                accessorKey: "created_at",
+                header: ({ column }) => (
+                  <TouchableOpacity
+                    className="flex-row items-center gap-1"
+                    onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                  >
+                    <Text className={textPrimary}>Criado em</Text>
+                    <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+                  </TouchableOpacity>
+                ),
+                cell: ({ row }) => {
+                  const date = new Date(row.getValue("created_at"));
+                  const formatted = date.toLocaleString('pt-BR');
+                  return <Text className={textPrimary}>{formatted}</Text>;
+                },
+                meta: {
+                  headerText: 'Criado em'
+                }
+              },
+              {
+                accessorKey: "nome",
+                header: ({ column }) => (
+                  <TouchableOpacity
+                    className="flex-row items-center gap-1"
+                    onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                  >
+                    <Text className={textPrimary}>Nome</Text>
+                    <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+                  </TouchableOpacity>
+                ),
+                cell: ({ row }) => (
+                  <Text className={textPrimary}>{row.getValue("nome")}</Text>
+                ),
+                meta: {
+                  headerText: 'Nome'
+                }
+              },
+              {
+                accessorKey: "email",
+                header: ({ column }) => (
+                  <TouchableOpacity
+                    className="flex-row items-center gap-1"
+                    onPress={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                  >
+                    <Text className={textPrimary}>Email</Text>
+                    <ArrowUpDown size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+                  </TouchableOpacity>
+                ),
+                cell: ({ row }) => (
+                  <Text className={`lowercase ${textPrimary}`}>{row.getValue("email")}</Text>
+                ),
+                meta: {
+                  headerText: 'Email'
+                }
+              },
+              {
+                id: "actions",
+                enableHiding: false,
+                cell: () => (
+                  <View className="items-center justify-center">
+                    <TouchableOpacity className="p-1">
+                      <MoreHorizontal size={16} color={isDark ? '#E5E7EB' : '#374151'} />
+                    </TouchableOpacity>
+                  </View>
+                ),
+              },
+            ]}
+            supabaseConfig={{
+              client: supabase,
+              table: 'usersAicrusAcademy',
+              select: 'id, created_at, nome, email', // Removido idCustomerAsaas como exemplo
+              orderBy: { column: 'created_at', ascending: false }
+            }}
+            enableRowSelection
+            enableSorting
+            enableFiltering
+            enablePagination
+            searchPlaceholder="Filtrar por nome ou email..."
+            hoverableRowProps={{
+              hoverScale: 1,
+              hoverTranslateY: 0,
+              animationDuration: 150,
+              disableHoverBackground: false
+            }}
+          />
         </View>
 
         <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>

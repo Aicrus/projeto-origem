@@ -5,8 +5,8 @@ import { useTheme } from '@/hooks/DesignSystemContext';
 import { useWindowDimensions } from 'react-native';
 import { useAuth } from '@/contexts/auth';
 import { useToast } from '@/hooks/useToast';
-import { Input } from '@/components/AicrusComponents/input';
-import { Button } from '@/components/AicrusComponents/button';
+import { Input } from '@/components/inputs/Input';
+import { Button } from '@/components/buttons/Button';
 import { UserRound } from 'lucide-react-native';
 
 export default function Register() {

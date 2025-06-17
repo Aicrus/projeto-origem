@@ -6,8 +6,8 @@ import { useWindowDimensions } from 'react-native';
 import { useAuth } from '@/contexts/auth';
 import { useToast } from '@/hooks/useToast';
 import { Mail } from 'lucide-react-native';
-import { Input } from '@/components/AicrusComponents/input';
-import { Button } from '@/components/AicrusComponents/button';
+import { Input } from '@/components/inputs/Input';
+import { Button } from '@/components/buttons/Button';
 
 export default function Login() {
   const [email, setEmail] = useState('');
