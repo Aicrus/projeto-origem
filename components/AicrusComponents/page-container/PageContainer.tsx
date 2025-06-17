@@ -107,7 +107,7 @@ interface PageContainerProps {
 
   /**
    * Altura do header em pixels
-   * @default 64
+   * @default 64 (mobile/tablet), 75 (desktop)
    */
   headerHeight?: number;
 }
@@ -163,12 +163,15 @@ export function PageContainer({
   headerHeight = 64 
 }: PageContainerProps) {
   const { isMobile, isTablet, isDesktop } = useResponsive();
+  
+  // Altura responsiva do header - maior para desktop
+  const responsiveHeaderHeight = isDesktop ? 75 : headerHeight;
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
 
   // Ajustes de layout baseados no dispositivo e configuração
   const effectiveSidebarWidth = (!isMobile && withSidebar) ? sidebarWidth : 0;
-  const effectiveHeaderHeight = withHeader ? (isMobile ? 0 : headerHeight) : 0;
+  const effectiveHeaderHeight = withHeader ? (isMobile ? 0 : responsiveHeaderHeight) : 0;
   const maxContentWidth = isDesktop ? 1200 : isTablet ? 800 : '100%';
 
   // Estilos do container principal seguindo o Design System

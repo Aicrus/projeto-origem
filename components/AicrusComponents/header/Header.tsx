@@ -100,7 +100,7 @@ export function Header({
 }: HeaderProps) {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  const { isMobile } = useResponsive();
+  const { isMobile, isDesktop } = useResponsive();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isNotificationsMenuOpen, setIsNotificationsMenuOpen] = useState(false);
@@ -112,6 +112,9 @@ export function Header({
   // Definir cores conforme o tema
   const bgColor = isDark ? colors['bg-primary-dark'] : colors['bg-secondary-light'];
   const borderColor = isDark ? colors['divider-dark'] : colors['divider-light'];
+  
+  // Altura responsiva do header - maior para desktop
+  const headerHeight = isDesktop ? 75 : 64;
 
   // Fechar menus quando a tela for redimensionada
   useEffect(() => {
@@ -401,7 +404,7 @@ export function Header({
           top: 0,
           right: 0,
           left: sidebarWidth,
-          height: 64,
+          height: headerHeight,
           zIndex: Z_INDEX.HEADER,
         }
       ]}>
@@ -411,6 +414,7 @@ export function Header({
             backgroundColor: bgColor,
             borderBottomColor: borderColor,
             width: '100%', // Garantir que ocupe toda a largura disponível
+            height: headerHeight,
           }
         ]}>
           <View style={styles.container}>
@@ -510,7 +514,7 @@ const styles = StyleSheet.create({
     zIndex: Z_INDEX.HEADER,
   },
   header: {
-    height: 64,
+    height: 64, // Altura padrão - sobrescrita por prop quando necessário
     borderBottomWidth: 1,
     ...(Platform.OS === 'web' && {
       boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
