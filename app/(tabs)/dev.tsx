@@ -4233,7 +4233,11 @@ const renderBackdrop = () => {
           Data Table
         </Text>
         <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          Componente de tabela de dados que suporta ordenação, filtros, seleção, paginação e efeitos de hover.
+          Componente de tabela de dados com integração Supabase opcional. Suporta ordenação, filtros, seleção, paginação e efeitos de hover.
+          {'\n\n'}• <Text className={`font-medium ${textPrimary}`}>Colunas obrigatórias</Text>: Você define quais colunas mostrar e como formatá-las
+          {'\n'}• <Text className={`font-medium ${textPrimary}`}>Dados locais ou Supabase</Text>: Funciona com array de dados ou conexão direta ao Supabase
+          {'\n'}• <Text className={`font-medium ${textPrimary}`}>Tratamento de erros</Text>: Mostra mensagens apropriadas quando Supabase falha
+          {'\n'}• <Text className={`font-medium ${textPrimary}`}>Scroll automático</Text>: Ativa scroll horizontal quando conteúdo não cabe na tela
         </Text>
 
         {/* Exemplo Básico - Seleção apenas com Checkbox */}
@@ -4292,19 +4296,21 @@ const renderBackdrop = () => {
         {/* Exemplo com dados do Supabase */}
         <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
           <Text className={`text-subtitle-md font-jakarta-medium ${textPrimary} mb-2`}>
-            Exemplo 3: Dados Dinâmicos do Supabase
+            Exemplo 3: Integração com Supabase
           </Text>
           <Text className={`text-body-sm ${textSecondary} mb-4`}>
-            Este exemplo demonstra a tabela conectada à tabela 'usersAicrusAcademy' do Supabase com colunas personalizadas.
-            Observe que você pode personalizar os nomes exibidos no cabeçalho (e no dropdown de colunas) usando as propriedades:
+            Conecta diretamente à tabela 'usersAicrusAcademy' do Supabase. Você controla:
+            {'\n'}• <Text className={`font-medium ${textPrimary}`}>Quais campos buscar</Text>: Via 'select' (ex: apenas id, nome, email)
+            {'\n'}• <Text className={`font-medium ${textPrimary}`}>Como mostrar</Text>: Customizar nome da coluna e formatação
+            {'\n'}• <Text className={`font-medium ${textPrimary}`}>Tratamento de erro</Text>: Se tabela não existir, mostra mensagem apropriada
           </Text>
 
           <View className="mb-4 border border-gray-200 dark:border-gray-700 p-3 rounded-md">
             <Text className={`text-mono-sm ${textPrimary}`}>
-              {`// Configuração nas colunas:`}
+              {`// Exemplo de customização:`}
             </Text>
             <Text className={`text-mono-sm ${textPrimary} mt-1`}>
-              {`{\n  accessorKey: "created_at", // Nome original do campo no Supabase\n  header: () => <Text>Criado em</Text>, // Texto personalizado no cabeçalho\n  meta: {\n    headerText: 'Criado em' // Texto usado no dropdown de colunas\n  }\n}`}
+              {`{\n  accessorKey: "created_at", // Campo original\n  header: () => <Text>Criado em</Text>, // Nome customizado\n  cell: ({ row }) => formatDate(row.getValue("created_at")), // Formatação\n  meta: { headerText: 'Criado em' } // Nome no dropdown\n}`}
             </Text>
           </View>
           
@@ -4436,6 +4442,41 @@ const renderBackdrop = () => {
               disableHoverBackground: false
             }}
           />
+        </View>
+
+        {/* Seção de Funcionalidades */}
+        <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
+          <Text className={`text-subtitle-md font-jakarta-medium ${textPrimary} mb-2`}>
+            Como Usar o DataTable
+          </Text>
+          
+          <Text className={`text-body-sm font-medium ${textPrimary} mb-2`}>
+            1. Com dados locais:
+          </Text>
+          <View className="mb-4 border border-gray-200 dark:border-gray-700 p-3 rounded-md">
+            <Text className={`text-mono-sm ${textPrimary}`}>
+              {`<DataTable \n  data={meusDados} \n  columns={minhasColunas}\n  enableSorting\n  enableFiltering\n/>`}
+            </Text>
+          </View>
+
+          <Text className={`text-body-sm font-medium ${textPrimary} mb-2`}>
+            2. Com Supabase:
+          </Text>
+          <View className="mb-4 border border-gray-200 dark:border-gray-700 p-3 rounded-md">
+            <Text className={`text-mono-sm ${textPrimary}`}>
+              {`<DataTable \n  columns={minhasColunas} // OBRIGATÓRIO\n  supabaseConfig={{\n    client: supabase,\n    table: 'usuarios',\n    select: 'id, nome, email', // Só os campos que quer\n    orderBy: { column: 'created_at', ascending: false }\n  }}\n/>`}
+            </Text>
+          </View>
+
+          <Text className={`text-body-sm font-medium ${textPrimary} mb-2`}>
+            ⚠️ Pontos importantes:
+          </Text>
+          <Text className={`text-body-sm ${textSecondary} mb-4`}>
+            • <Text className={`font-medium ${textPrimary}`}>Colunas são obrigatórias</Text>: Sempre defina o array 'columns'
+            {'\n'}• <Text className={`font-medium ${textPrimary}`}>Escolha os campos</Text>: Use 'select' para trazer só o que precisa
+            {'\n'}• <Text className={`font-medium ${textPrimary}`}>Erros automáticos</Text>: Se tabela não existir, mostra mensagem de erro
+            {'\n'}• <Text className={`font-medium ${textPrimary}`}>Scroll responsivo</Text>: Ativa automaticamente quando conteúdo não cabe
+          </Text>
         </View>
 
         <View className={`p-5 rounded-lg mb-6 ${bgSecondary}`}>
