@@ -502,39 +502,36 @@ export default function DevPage() {
           {/* Input de data */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input de data</Text>
-            <DateInput
+            <Input
               value={inputData}
               onChangeText={setInputData}
               placeholder="dd/mm/aaaa"
               label="Data"
-              minDate={new Date(1900, 0, 1)}
-              maxDate={new Date(2100, 11, 31)}
-              initialDate={new Date()}
+              type="date"
+              mask="date"
             />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Input de data com máscara dd/mm/aaaa e seletor de data para todas as plataformas.
               {Platform.OS === 'web' 
-                ? ' Na web, usa o calendário nativo HTML5 estilizado com as cores do tema.' 
-                : ' No iOS e Android, abre um seletor de data com controles para confirmação.'}
+                ? ' Na web, usa calendário personalizado elegante integrado ao componente.' 
+                : ' No iOS e Android, abre um seletor de data nativo do sistema.'}
             </Text>
           </View>
           
           {/* Input de hora */}
           <View className="mb-lg">
             <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input de hora</Text>
-            <TimeInput
+            <Input
               value={inputHora}
               onChangeText={setInputHora}
               placeholder="HH:MM"
               label="Hora"
-              is24Hour={true}
-              minuteInterval={1}
-              initialTime={new Date()}
+              type="time"
             />
             <Text className={`text-body-sm ${textSecondary} mt-xs`}>
               Input de hora com máscara HH:MM e seletor de hora para todas as plataformas.
               {Platform.OS === 'web' 
-                ? ' Na web, usa o seletor de hora nativo HTML5 com tema personalizado.' 
+                ? ' Na web, usa seletor de hora personalizado elegante com controles visuais.' 
                 : ' No iOS e Android, abre um seletor de hora nativo com controles de confirmação.'}
             </Text>
           </View>

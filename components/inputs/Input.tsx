@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, TextInput, Text, TouchableOpacity, Platform, Keyboard, PanResponder, GestureResponderEvent, PanResponderGestureState } from 'react-native';
-import { Eye, EyeOff, Search, X, Calendar, Plus, Minus, Clock, ChevronUp, ChevronDown } from 'lucide-react-native';
+import { StyleSheet, View, TextInput, Text, TouchableOpacity, Platform, Keyboard, PanResponder, GestureResponderEvent, PanResponderGestureState, Modal, ScrollView } from 'react-native';
+import { Eye, EyeOff, Search, X, Calendar, Plus, Minus, Clock, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../../hooks/DesignSystemContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { colors, ColorType } from '../../design-system/tokens/colors';
@@ -83,7 +83,7 @@ export interface InputProps {
   /** Tipo de input - determina o comportamento e ícones */
   type?: 'text' | 'password' | 'search' | 'number' | 'email' | 'date' | 'time';
   /** Máscara aplicada ao texto digitado */
-  mask?: 'cpf' | 'cnpj' | 'phone' | 'date' | 'cep' | 'currency' | 'none';
+  mask?: 'cpf' | 'cnpj' | 'phone' | 'date' | 'time' | 'cep' | 'currency' | 'none';
   /** Número máximo de caracteres permitidos */
   maxLength?: number;
   /** Como capitalizar o texto automaticamente */
@@ -218,6 +218,15 @@ export const Input = ({
   // Ref para armazenar a posição inicial do toque para redimensionamento
   const touchStartY = useRef(0);
   
+  // Estados para calendário personalizado (web)
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarDate, setCalendarDate] = useState(new Date());
+  
+  // Estados para seletor de hora personalizado (web)
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedHour, setSelectedHour] = useState(12);
+  const [selectedMinute, setSelectedMinute] = useState(0);
+  
   // Função para desabilitar o scroll do componente pai durante o redimensionamento
   const disableParentScroll = () => {
     if (setScrollEnabled && !isWeb) {
@@ -326,7 +335,7 @@ export const Input = ({
         : isFocused
           ? isDark ? colors['primary-dark'] : colors['primary-light']
           : isDark ? colors['divider-dark'] : colors['divider-light'],
-      minHeight: Number(spacing['10'].replace('px', '')), // Aumentado de spacing-9 para spacing-10
+      minHeight: Number(spacing['9'].replace('px', '')), // Voltando para spacing-9 (era spacing-9, aumentei para 10, agora volta para 9)
       paddingHorizontal: Number(spacing['3'].replace('px', '')),
       // Sombra sutil para dar profundidade (similar ao shadcn)
       shadowColor: isDark ? '#000000' : '#000000',
@@ -349,7 +358,7 @@ export const Input = ({
       paddingVertical: Platform.OS === 'web' 
         ? Number(spacing['2.5'].replace('px', ''))
         : Number(spacing['3.5'].replace('px', '')), // Mais padding para altura maior
-      height: multiline ? undefined : Number(spacing['10'].replace('px', '')), // Ajustado para nova altura
+      height: multiline ? undefined : Number(spacing['9'].replace('px', '')), // Voltando para spacing-9
       textAlignVertical: multiline ? 'top' : 'center',
       ...(Platform.OS === 'ios' && multiline ? { paddingTop: Number(spacing['2.5'].replace('px', '')) } : {}),
       // Ajustes específicos para o nativo para evitar corte do texto
@@ -481,6 +490,13 @@ export const Input = ({
         // Formata para moeda brasileira
         return `R$ ${number.toFixed(2).replace('.', ',')}`;
         
+      case 'time':
+        // Remove caracteres não numéricos
+        text = text.replace(/\D/g, '');
+        // Aplica máscara de hora: HH:MM
+        text = text.replace(/(\d{2})(\d{0,2})/, '$1:$2');
+        return text.substring(0, 5);
+        
       default:
         return text;
     }
@@ -489,7 +505,10 @@ export const Input = ({
   // Função para lidar com mudança de texto
   const handleChangeText = (text: string) => {
     // Se for tipo data, define automaticamente a máscara de data
-    const activeMask = type === 'date' && mask === 'none' ? 'date' : mask;
+    // Se for tipo time, define automaticamente a máscara de time
+    let activeMask = mask;
+    if (type === 'date' && mask === 'none') activeMask = 'date';
+    if (type === 'time' && mask === 'none') activeMask = 'time';
     
     if (activeMask !== 'none') {
       // Aplica máscara se necessário
@@ -535,8 +554,21 @@ export const Input = ({
   const handleCalendarPress = () => {
     if (onCalendarPress) {
       onCalendarPress();
+    } else if (isWeb && type === 'date') {
+      // Para web, abrimos o calendário personalizado
+      setShowCalendar(true);
+      // Inicializa com a data atual do input ou hoje
+      if (value) {
+        const dateParts = value.split('/');
+        if (dateParts.length === 3) {
+          const day = parseInt(dateParts[0]);
+          const month = parseInt(dateParts[1]) - 1;
+          const year = parseInt(dateParts[2]);
+          setCalendarDate(new Date(year, month, day));
+        }
+      }
     } else if (isWeb) {
-      // No ambiente web, podemos acionar o input de data nativo se estiver usando type="date"
+      // Fallback para input nativo
       inputRef.current?.focus();
     }
   };
@@ -545,6 +577,28 @@ export const Input = ({
   const focusNumberInput = () => {
     if (isWeb && type === 'number' && nativeNumberInputRef.current) {
       nativeNumberInputRef.current.focus();
+    }
+  };
+  
+  // Função para abrir o seletor de hora personalizado
+  const handleTimePress = () => {
+    if (onTimePress) {
+      onTimePress();
+    } else if (isWeb && type === 'time') {
+      // Para web, abrimos o seletor personalizado
+      setShowTimePicker(true);
+      // Inicializa com a hora atual do input ou agora
+      if (value) {
+        const timeParts = value.split(':');
+        if (timeParts.length === 2) {
+          setSelectedHour(parseInt(timeParts[0]));
+          setSelectedMinute(parseInt(timeParts[1]));
+        }
+      } else {
+        const now = new Date();
+        setSelectedHour(now.getHours());
+        setSelectedMinute(now.getMinutes());
+      }
     }
   };
   
@@ -596,7 +650,7 @@ export const Input = ({
     if (keyboardType !== 'default') return keyboardType;
     
     // Definir tipo de teclado com base no mask ou type
-    if (mask === 'cpf' || mask === 'cnpj' || mask === 'phone' || mask === 'date' || mask === 'cep' || mask === 'currency' || type === 'date') {
+    if (mask === 'cpf' || mask === 'cnpj' || mask === 'phone' || mask === 'date' || mask === 'time' || mask === 'cep' || mask === 'currency' || type === 'date' || type === 'time') {
       return 'numeric';
     }
     
@@ -884,6 +938,33 @@ export const Input = ({
     }
   }, [multiline]);
 
+  // Funções auxiliares para o calendário
+  const getDaysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+  
+  const getFirstDayOfMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+  };
+  
+  const formatDateValue = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+  
+  const formatTimeValue = (hour: number, minute: number) => {
+    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+  };
+  
+  const monthNames = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
+  
+  const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
   return (
     <View style={[containerStyle.container, style]}>
       {label && (
@@ -1057,10 +1138,10 @@ export const Input = ({
           </TouchableOpacity>
         )}
         
-        {/* Ícone de relógio para input tipo hora */}
+        {        /* Ícone de relógio para input tipo hora */}
         {type === 'time' && (
           <TouchableOpacity 
-            onPress={onTimePress}
+            onPress={handleTimePress}
             style={containerStyle.iconContainer}
             {...(isWeb ? { 'data-input-icon': 'true' } : {})}
             disabled={disabled}
@@ -1223,6 +1304,425 @@ export const Input = ({
       {/* Mensagem de erro */}
       {error && (
         <Text style={containerStyle.errorText}>{error}</Text>
+      )}
+      
+      {/* Calendário personalizado para web */}
+      {isWeb && showCalendar && (
+        <Modal
+          visible={showCalendar}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowCalendar(false)}
+        >
+          <TouchableOpacity 
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            activeOpacity={1}
+            onPress={() => setShowCalendar(false)}
+          >
+            <TouchableOpacity 
+              style={{
+                backgroundColor: isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'],
+                borderRadius: Number(getBorderRadius('lg').replace('px', '')),
+                padding: Number(spacing['4'].replace('px', '')),
+                width: 320,
+                maxWidth: '90%',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 8,
+              }}
+              activeOpacity={1}
+            >
+              {/* Header do calendário */}
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: Number(spacing['4'].replace('px', '')),
+              }}>
+                <TouchableOpacity
+                  onPress={() => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() - 1, 1))}
+                  style={{
+                    padding: Number(spacing['2'].replace('px', '')),
+                    borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                  }}
+                >
+                  <ChevronLeft size={20} color={getThemeColor('text-primary')} />
+                </TouchableOpacity>
+                
+                <Text style={{
+                  fontSize: Number(fontSize['subtitle-md'].size.replace('px', '')),
+                  fontFamily: fontFamily['jakarta-bold'],
+                  color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+                }}>
+                  {monthNames[calendarDate.getMonth()]} {calendarDate.getFullYear()}
+                </Text>
+                
+                <TouchableOpacity
+                  onPress={() => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 1))}
+                  style={{
+                    padding: Number(spacing['2'].replace('px', '')),
+                    borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                  }}
+                >
+                  <ChevronRight size={20} color={getThemeColor('text-primary')} />
+                </TouchableOpacity>
+              </View>
+              
+              {/* Dias da semana */}
+              <View style={{
+                flexDirection: 'row',
+                marginBottom: Number(spacing['2'].replace('px', '')),
+              }}>
+                {dayNames.map((day) => (
+                  <View key={day} style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    paddingVertical: Number(spacing['2'].replace('px', '')),
+                  }}>
+                    <Text style={{
+                      fontSize: Number(fontSize['body-sm'].size.replace('px', '')),
+                      fontFamily: fontFamily['jakarta-medium'],
+                      color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+                    }}>
+                      {day}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+              
+              {/* Grid de dias */}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                {Array.from({ length: getFirstDayOfMonth(calendarDate) }, (_, i) => (
+                  <View key={`empty-${i}`} style={{ width: '14.28%', height: 40 }} />
+                ))}
+                
+                {Array.from({ length: getDaysInMonth(calendarDate) }, (_, i) => {
+                  const day = i + 1;
+                  const currentDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day);
+                  const isToday = new Date().toDateString() === currentDate.toDateString();
+                  const isSelected = value === formatDateValue(currentDate);
+                  
+                  return (
+                    <TouchableOpacity
+                      key={day}
+                      style={{
+                        width: '14.28%',
+                        height: 40,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                        backgroundColor: isSelected 
+                          ? (isDark ? colors['primary-dark'] : colors['primary-light'])
+                          : isToday
+                          ? (isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'])
+                          : 'transparent',
+                      }}
+                      onPress={() => {
+                        const selectedDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), day);
+                        onChangeText(formatDateValue(selectedDate));
+                        setShowCalendar(false);
+                      }}
+                    >
+                      <Text style={{
+                        fontSize: Number(fontSize['body-md'].size.replace('px', '')),
+                        fontFamily: fontFamily['jakarta-regular'],
+                        color: isSelected
+                          ? '#FFFFFF'
+                          : isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+                      }}>
+                        {day}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              
+              {/* Botões de ação */}
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                marginTop: Number(spacing['4'].replace('px', '')),
+                gap: Number(spacing['2'].replace('px', '')),
+              }}>
+                <TouchableOpacity
+                  onPress={() => setShowCalendar(false)}
+                  style={{
+                    paddingHorizontal: Number(spacing['4'].replace('px', '')),
+                    paddingVertical: Number(spacing['2'].replace('px', '')),
+                    borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                  }}
+                >
+                  <Text style={{
+                    fontSize: Number(fontSize['body-md'].size.replace('px', '')),
+                    fontFamily: fontFamily['jakarta-medium'],
+                    color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+                  }}>
+                    Cancelar
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  onPress={() => {
+                    onChangeText(formatDateValue(new Date()));
+                    setShowCalendar(false);
+                  }}
+                  style={{
+                    paddingHorizontal: Number(spacing['4'].replace('px', '')),
+                    paddingVertical: Number(spacing['2'].replace('px', '')),
+                    borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                    backgroundColor: isDark ? colors['primary-dark'] : colors['primary-light'],
+                  }}
+                >
+                  <Text style={{
+                    fontSize: Number(fontSize['body-md'].size.replace('px', '')),
+                    fontFamily: fontFamily['jakarta-medium'],
+                    color: '#FFFFFF',
+                  }}>
+                    Hoje
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </Modal>
+      )}
+      
+      {/* Seletor de hora personalizado para web */}
+      {isWeb && showTimePicker && (
+        <Modal
+          visible={showTimePicker}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowTimePicker(false)}
+        >
+          <TouchableOpacity 
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            activeOpacity={1}
+            onPress={() => setShowTimePicker(false)}
+          >
+            <TouchableOpacity 
+              style={{
+                backgroundColor: isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'],
+                borderRadius: Number(getBorderRadius('lg').replace('px', '')),
+                padding: Number(spacing['6'].replace('px', '')),
+                width: 280,
+                maxWidth: '90%',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 8,
+              }}
+              activeOpacity={1}
+            >
+              {/* Header */}
+              <Text style={{
+                fontSize: Number(fontSize['subtitle-md'].size.replace('px', '')),
+                fontFamily: fontFamily['jakarta-bold'],
+                color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+                textAlign: 'center',
+                marginBottom: Number(spacing['6'].replace('px', '')),
+              }}>
+                Selecionar Hora
+              </Text>
+              
+              {/* Display da hora */}
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: Number(spacing['6'].replace('px', '')),
+              }}>
+                <Text style={{
+                  fontSize: 48,
+                  fontFamily: fontFamily['jakarta-bold'],
+                  color: isDark ? colors['primary-dark'] : colors['primary-light'],
+                  textAlign: 'center',
+                }}>
+                  {formatTimeValue(selectedHour, selectedMinute)}
+                </Text>
+              </View>
+              
+              {/* Controles de hora e minuto */}
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: Number(spacing['6'].replace('px', '')),
+              }}>
+                {/* Controle de hora */}
+                <View style={{ alignItems: 'center', flex: 1 }}>
+                  <Text style={{
+                    fontSize: Number(fontSize['body-sm'].size.replace('px', '')),
+                    fontFamily: fontFamily['jakarta-medium'],
+                    color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+                    marginBottom: Number(spacing['2'].replace('px', '')),
+                  }}>
+                    Hora
+                  </Text>
+                  
+                  <View style={{ alignItems: 'center' }}>
+                    <TouchableOpacity
+                      onPress={() => setSelectedHour(selectedHour === 23 ? 0 : selectedHour + 1)}
+                      style={{
+                        padding: Number(spacing['2'].replace('px', '')),
+                        borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                        backgroundColor: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+                        marginBottom: Number(spacing['2'].replace('px', '')),
+                      }}
+                    >
+                      <ChevronUp size={20} color={getThemeColor('text-primary')} />
+                    </TouchableOpacity>
+                    
+                    <Text style={{
+                      fontSize: Number(fontSize['headline-sm'].size.replace('px', '')),
+                      fontFamily: fontFamily['jakarta-bold'],
+                      color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+                      minWidth: 40,
+                      textAlign: 'center',
+                    }}>
+                      {selectedHour.toString().padStart(2, '0')}
+                    </Text>
+                    
+                    <TouchableOpacity
+                      onPress={() => setSelectedHour(selectedHour === 0 ? 23 : selectedHour - 1)}
+                      style={{
+                        padding: Number(spacing['2'].replace('px', '')),
+                        borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                        backgroundColor: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+                        marginTop: Number(spacing['2'].replace('px', '')),
+                      }}
+                    >
+                      <ChevronDown size={20} color={getThemeColor('text-primary')} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                
+                {/* Separador */}
+                <View style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingHorizontal: Number(spacing['4'].replace('px', '')),
+                }}>
+                  <Text style={{
+                    fontSize: Number(fontSize['headline-md'].size.replace('px', '')),
+                    fontFamily: fontFamily['jakarta-bold'],
+                    color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+                  }}>
+                    :
+                  </Text>
+                </View>
+                
+                {/* Controle de minuto */}
+                <View style={{ alignItems: 'center', flex: 1 }}>
+                  <Text style={{
+                    fontSize: Number(fontSize['body-sm'].size.replace('px', '')),
+                    fontFamily: fontFamily['jakarta-medium'],
+                    color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+                    marginBottom: Number(spacing['2'].replace('px', '')),
+                  }}>
+                    Minuto
+                  </Text>
+                  
+                  <View style={{ alignItems: 'center' }}>
+                    <TouchableOpacity
+                      onPress={() => setSelectedMinute(selectedMinute === 59 ? 0 : selectedMinute + 1)}
+                      style={{
+                        padding: Number(spacing['2'].replace('px', '')),
+                        borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                        backgroundColor: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+                        marginBottom: Number(spacing['2'].replace('px', '')),
+                      }}
+                    >
+                      <ChevronUp size={20} color={getThemeColor('text-primary')} />
+                    </TouchableOpacity>
+                    
+                    <Text style={{
+                      fontSize: Number(fontSize['headline-sm'].size.replace('px', '')),
+                      fontFamily: fontFamily['jakarta-bold'],
+                      color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+                      minWidth: 40,
+                      textAlign: 'center',
+                    }}>
+                      {selectedMinute.toString().padStart(2, '0')}
+                    </Text>
+                    
+                    <TouchableOpacity
+                      onPress={() => setSelectedMinute(selectedMinute === 0 ? 59 : selectedMinute - 1)}
+                      style={{
+                        padding: Number(spacing['2'].replace('px', '')),
+                        borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                        backgroundColor: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+                        marginTop: Number(spacing['2'].replace('px', '')),
+                      }}
+                    >
+                      <ChevronDown size={20} color={getThemeColor('text-primary')} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+              
+              {/* Botões de ação */}
+              <View style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                gap: Number(spacing['3'].replace('px', '')),
+              }}>
+                <TouchableOpacity
+                  onPress={() => setShowTimePicker(false)}
+                  style={{
+                    flex: 1,
+                    paddingVertical: Number(spacing['3'].replace('px', '')),
+                    borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                    backgroundColor: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+                  }}
+                >
+                  <Text style={{
+                    fontSize: Number(fontSize['body-md'].size.replace('px', '')),
+                    fontFamily: fontFamily['jakarta-medium'],
+                    color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+                    textAlign: 'center',
+                  }}>
+                    Cancelar
+                  </Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  onPress={() => {
+                    onChangeText(formatTimeValue(selectedHour, selectedMinute));
+                    setShowTimePicker(false);
+                  }}
+                  style={{
+                    flex: 1,
+                    paddingVertical: Number(spacing['3'].replace('px', '')),
+                    borderRadius: Number(getBorderRadius('md').replace('px', '')),
+                    backgroundColor: isDark ? colors['primary-dark'] : colors['primary-light'],
+                  }}
+                >
+                  <Text style={{
+                    fontSize: Number(fontSize['body-md'].size.replace('px', '')),
+                    fontFamily: fontFamily['jakarta-medium'],
+                    color: '#FFFFFF',
+                    textAlign: 'center',
+                  }}>
+                    Confirmar
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </Modal>
       )}
     </View>
   );
