@@ -5,7 +5,38 @@
  * Inclui sombras, opacidade, z-index e transições.
  */
 
-// Sistema de Sombras
+// Sistema de Sombras Inteligente
+// SEMPRE usa cores escuras em ambos os temas (claro e escuro)
+export const shadows = {
+  // Sombras Universais (sempre escuras)
+  'input': {
+    color: '#000000', // Sempre preto
+    light: '0 1px 2px rgba(0, 0, 0, 0.05)', // Tema claro - mais sutil
+    dark: '0 1px 2px rgba(0, 0, 0, 0.2)',   // Tema escuro - mais intensa
+  },
+  'card': {
+    color: '#000000',
+    light: '0 2px 5px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04)',
+    dark: '0 2px 5px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
+  },
+  'button': {
+    color: '#000000',
+    light: '0 1px 3px rgba(0, 0, 0, 0.1)',
+    dark: '0 1px 3px rgba(0, 0, 0, 0.4)',
+  },
+  'modal': {
+    color: '#000000',
+    light: '0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)',
+    dark: '0 20px 25px rgba(0, 0, 0, 0.4), 0 10px 10px rgba(0, 0, 0, 0.2)',
+  },
+  'dropdown': {
+    color: '#000000',
+    light: '0 2px 5px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.07)',
+    dark: '0 2px 5px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2)',
+  },
+} as const;
+
+// Sistema de Sombras Legado (para compatibilidade)
 export const boxShadow = {
   // 1. Direção da Sombra
   // Indica de onde vem a luz e para onde vai a sombra
@@ -91,13 +122,23 @@ export const transitionDuration = {
 } as const;
 
 // Tipos para facilitar o uso
+export type ShadowType = keyof typeof shadows;
 export type BoxShadowType = keyof typeof boxShadow;
 export type OpacityType = keyof typeof opacity;
 export type ZIndexType = keyof typeof zIndex;
 export type TransitionDurationType = keyof typeof transitionDuration;
 
-// Funções utilitárias
-export function getShadow(type: BoxShadowType): string {
+// Funções utilitárias para sombras inteligentes
+export function getShadow(type: ShadowType, theme: 'light' | 'dark' = 'light'): string {
+  return shadows[type][theme];
+}
+
+export function getShadowColor(type: ShadowType): string {
+  return shadows[type].color;
+}
+
+// Funções legadas para compatibilidade
+export function getBoxShadow(type: BoxShadowType): string {
   return boxShadow[type];
 }
 
@@ -115,7 +156,13 @@ export function getTransitionDuration(value: TransitionDurationType): string {
 
 // Funções de conveniência para diferentes tipos de efeitos
 export const effects = {
-  shadow: (type: BoxShadowType) => ({ boxShadow: boxShadow[type] }),
+  // Sistema novo de sombras inteligentes
+  shadow: (type: ShadowType, theme: 'light' | 'dark' = 'light') => ({ 
+    boxShadow: shadows[type][theme], 
+    shadowColor: shadows[type].color 
+  }),
+  // Sistema legado
+  boxShadow: (type: BoxShadowType) => ({ boxShadow: boxShadow[type] }),
   opacity: (value: OpacityType) => ({ opacity: opacity[value] }),
   zIndex: (value: ZIndexType) => ({ zIndex: zIndex[value] }),
   transition: (duration: TransitionDurationType) => ({ 

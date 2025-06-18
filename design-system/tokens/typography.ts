@@ -46,7 +46,7 @@ export const fontSize = {
   // Label - Rótulos
   'label-lg': { size: '16px', lineHeight: '24px', fontWeight: '600' },
   'label-md': { size: '14px', lineHeight: '20px', fontWeight: '600' },
-  'label-sm': { size: '12px', lineHeight: '16px', fontWeight: '600' },
+  'label-sm': { size: '13px', lineHeight: '17px', fontWeight: '600' },
   
   // Body - Texto de corpo
   'body-lg': { size: '16px', lineHeight: '24px', fontWeight: '400' },

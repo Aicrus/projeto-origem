@@ -10,7 +10,7 @@ import { colors } from './tokens/colors';
 import { fontFamily, fontSize } from './tokens/typography';
 import { spacing } from './tokens/spacing';
 import { borderRadius } from './tokens/borders';
-import { boxShadow, opacity, zIndex, transitionDuration } from './tokens/effects';
+import { boxShadow, shadows, opacity, zIndex, transitionDuration } from './tokens/effects';
 import { breakpoints, responsiveSpacing } from './tokens/breakpoints';
 
 // Exporta todos os tokens
@@ -29,6 +29,7 @@ export const designSystem = {
   spacing,
   borderRadius,
   boxShadow,
+  shadows, // Novo sistema de sombras inteligentes
   opacity,
   zIndex,
   transitionDuration,
@@ -76,6 +77,7 @@ export const theme = {
   spacing,
   borderRadius,
   boxShadow,
+  shadows, // Novo sistema de sombras inteligentes
   opacity,
   zIndex,
   transitionDuration,

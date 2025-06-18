@@ -1,5 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Platform, Keyboard, PanResponder, GestureResponderEvent, PanResponderGestureState, Modal, ScrollView } from 'react-native';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withTiming, 
+  withSpring,
+  interpolate,
+  Easing
+} from 'react-native-reanimated';
 import { Eye, EyeOff, Search, X, Calendar, Plus, Minus, Clock, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../../hooks/DesignSystemContext';
 import { useResponsive } from '../../hooks/useResponsive';
@@ -7,7 +15,7 @@ import { colors, ColorType } from '../../design-system/tokens/colors';
 import { spacing } from '../../design-system/tokens/spacing';
 import { borderRadius, getBorderRadius } from '../../design-system/tokens/borders';
 import { fontSize, fontFamily } from '../../design-system/tokens/typography';
-import { opacity, getOpacity } from '../../design-system/tokens/effects';
+import { opacity, getOpacity, shadows, getShadow, getShadowColor } from '../../design-system/tokens/effects';
 
 /**
  * @component Input
@@ -17,17 +25,36 @@ import { opacity, getOpacity } from '../../design-system/tokens/effects';
  * - Tema claro/escuro automático
  * - Responsividade
  * - Estados: erro, desabilitado, foco
+ * - Três variações de label: acima, sem label, flutuante
  * - Acessibilidade e personalização
  * 
  * Exemplos de uso:
  * 
  * ```tsx
- * // Input simples
+ * // Input com label acima (padrão)
  * <Input 
  *   value={texto} 
  *   onChangeText={setTexto} 
  *   label="Nome" 
  *   placeholder="Digite seu nome" 
+ *   labelVariant="above"
+ * />
+ * 
+ * // Input sem label
+ * <Input 
+ *   value={texto} 
+ *   onChangeText={setTexto} 
+ *   placeholder="Digite seu nome"
+ *   labelVariant="none"
+ * />
+ * 
+ * // Input com label flutuante (Material Design)
+ * <Input 
+ *   value={texto} 
+ *   onChangeText={setTexto} 
+ *   label="Nome" 
+ *   labelVariant="floating"
+ *   containerBackgroundColor={corDoContainerPai} // Opcional - detecta automaticamente do tema se não fornecido
  * />
  * 
  * // Input com máscara de CPF
@@ -76,6 +103,10 @@ export interface InputProps {
   placeholder?: string;
   /** Rótulo exibido acima do input */
   label?: string;
+  /** Variação do label: 'above' (padrão), 'none' (sem label), 'floating' (Material Design) */
+  labelVariant?: 'above' | 'none' | 'floating';
+  /** Cor de fundo do container onde o Input está posicionado (opcional - detecta automaticamente do tema se não fornecido. Necessária apenas quando o fundo for diferente do padrão do tema) */
+  containerBackgroundColor?: string;
   /** Mensagem de erro exibida abaixo do input */
   error?: string;
   /** Se o input está desabilitado */
@@ -147,6 +178,8 @@ export const Input = ({
   onChangeText,
   placeholder = '',
   label,
+  labelVariant = 'above',
+  containerBackgroundColor,
   error,
   disabled = false,
   type = 'text',
@@ -189,6 +222,12 @@ export const Input = ({
   // Estado para controlar altura do input (para multiline)
   const [inputHeight, setInputHeight] = useState<number | undefined>(undefined);
   
+  // Animação para o label flutuante usando react-native-reanimated
+  const labelAnimation = useSharedValue(value || isFocused ? 1 : 0);
+  
+  // Verificar se o label deve estar "flutuando" (em cima)
+  const shouldFloat = (value && value.length > 0) || isFocused;
+  
   // Referência ao input nativo para web
   const inputRef = useRef<TextInput>(null);
   
@@ -226,6 +265,72 @@ export const Input = ({
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedHour, setSelectedHour] = useState(12);
   const [selectedMinute, setSelectedMinute] = useState(0);
+  
+  // Função para detectar se uma cor é clara ou escura
+  const isLightColor = (color: string): boolean => {
+    if (!color) return true; // Default para claro se não tiver cor
+    
+    // Remove # se existir
+    color = color.replace('#', '');
+    
+    // Converte RGB/RGBA para valores numéricos
+    let r: number, g: number, b: number;
+    
+    if (color.length === 3) {
+      // Formato #RGB
+      r = parseInt(color[0] + color[0], 16);
+      g = parseInt(color[1] + color[1], 16);
+      b = parseInt(color[2] + color[2], 16);
+    } else if (color.length === 6) {
+      // Formato #RRGGBB
+      r = parseInt(color.substr(0, 2), 16);
+      g = parseInt(color.substr(2, 2), 16);
+      b = parseInt(color.substr(4, 2), 16);
+    } else if (color.startsWith('rgb')) {
+      // Formato rgb() ou rgba()
+      const matches = color.match(/\d+/g);
+      if (matches && matches.length >= 3) {
+        r = parseInt(matches[0]);
+        g = parseInt(matches[1]);
+        b = parseInt(matches[2]);
+      } else {
+        return true; // Default para claro
+      }
+    } else {
+      return true; // Default para claro se formato não reconhecido
+    }
+    
+    // Fórmula para calcular luminância
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    // Retorna true se a cor for clara (luminância > 0.5)
+    return luminance > 0.5;
+  };
+
+  // Função para obter a cor do texto baseada no fundo (para label flutuante)
+  const getTextColorForFloating = (): string => {
+    // Se temos containerBackgroundColor definido, usar ele para determinar a cor
+    if (containerBackgroundColor) {
+      return isLightColor(containerBackgroundColor) 
+      ? (colors['text-primary-light']) 
+      : (colors['text-primary-dark']);
+    }
+    
+    // Se não, usar o sistema de cores do tema
+    return isDark ? colors['text-primary-dark'] : colors['text-primary-light'];
+  };
+
+  // Função para obter a cor de fundo dinâmica do label flutuante
+  const getFloatingLabelBackground = (): string => {
+    // Sempre usar a cor de fundo do design system (sem hardcode)
+    // Se containerBackgroundColor foi passado, usar ele; senão, usar a cor do tema
+    if (containerBackgroundColor) {
+      return containerBackgroundColor;
+    }
+    
+    // Usar a cor de fundo do container baseada no tema do design system
+    return isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'];
+  };
   
   // Função para desabilitar o scroll do componente pai durante o redimensionamento
   const disableParentScroll = () => {
@@ -318,6 +423,14 @@ export const Input = ({
     })
   ).current;
   
+  // Configurações compartilhadas para garantir consistência absoluta
+  const sharedPlaceholderConfig = {
+    fontSize: 13,
+    fontFamily: fontFamily['jakarta-regular'],
+    lineHeight: Platform.OS === 'web' ? 19 : 13 * 1.3,
+    color: isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']
+  };
+
   // Estilo do container do input
   const containerStyle = StyleSheet.create({
     container: {
@@ -335,30 +448,29 @@ export const Input = ({
         : isFocused
           ? isDark ? colors['primary-dark'] : colors['primary-light']
           : isDark ? colors['divider-dark'] : colors['divider-light'],
-      minHeight: Number(spacing['9'].replace('px', '')), // Voltando para spacing-9 (era spacing-9, aumentei para 10, agora volta para 9)
+      minHeight: Number(spacing['9'].replace('px', '')),
       paddingHorizontal: Number(spacing['3'].replace('px', '')),
-      // Sombra sutil para dar profundidade (similar ao shadcn)
-      shadowColor: isDark ? '#000000' : '#000000',
+      // Sombra inteligente do design system (sempre escura)
+      shadowColor: getShadowColor('input'),
       shadowOffset: {
         width: 0,
         height: 1,
       },
-      shadowOpacity: isDark ? 0.3 : 0.05,
+      shadowOpacity: isDark ? 0.2 : 0.05, // Mais intensa no escuro
       shadowRadius: 2,
       elevation: 1,
     },
+
     inputStyle: {
       flex: 1,
       color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
-      fontSize: Number(fontSize['body-md'].size.replace('px', '')),
-      lineHeight: Platform.OS === 'web' 
-        ? Number(fontSize['body-md'].lineHeight.replace('px', ''))
-        : Number(fontSize['body-md'].size.replace('px', '')) * 1.3, // Aumentado para melhor proporção
-      fontFamily: fontFamily['jakarta-regular'],
+      fontSize: sharedPlaceholderConfig.fontSize, // Exato mesmo tamanho
+      lineHeight: sharedPlaceholderConfig.lineHeight, // Exato mesmo lineHeight  
+      fontFamily: sharedPlaceholderConfig.fontFamily, // Exato mesmo peso
       paddingVertical: Platform.OS === 'web' 
         ? Number(spacing['2.5'].replace('px', ''))
         : Number(spacing['3.5'].replace('px', '')), // Mais padding para altura maior
-      height: multiline ? undefined : Number(spacing['9'].replace('px', '')), // Voltando para spacing-9
+      height: multiline ? undefined : Number(spacing['9'].replace('px', '')),
       textAlignVertical: multiline ? 'top' : 'center',
       ...(Platform.OS === 'ios' && multiline ? { paddingTop: Number(spacing['2.5'].replace('px', '')) } : {}),
       // Ajustes específicos para o nativo para evitar corte do texto
@@ -369,28 +481,50 @@ export const Input = ({
         paddingBottom: 0,
       } : {}),
     },
+
     searchIcon: {
-      padding: Number(spacing['1'].replace('px', '')), // Aumentado para melhor proporção
-      marginRight: Number(spacing['2'].replace('px', '')), // Aumentado
-      marginLeft: -2, // Ajustado para novo tamanho
+      padding: Number(spacing['1'].replace('px', '')),
+      marginRight: Number(spacing['2'].replace('px', '')),
+      marginLeft: -2,
     },
     iconContainer: {
-      padding: Number(spacing['1.5'].replace('px', '')), // Aumentado para melhor área de toque
-      borderRadius: Number(getBorderRadius('sm').replace('px', '')), // Adiciona border radius nos ícones
+      padding: Number(spacing['1.5'].replace('px', '')),
+      borderRadius: Number(getBorderRadius('sm').replace('px', '')),
     },
+    // Label acima (padrão)
     labelStyle: {
-      fontSize: Number(fontSize['label-sm'].size.replace('px', '')),
-      lineHeight: Number(fontSize['label-sm'].lineHeight.replace('px', '')),
-      fontFamily: fontFamily['jakarta-medium'],
-      marginBottom: Number(spacing['1.5'].replace('px', '')), // Aumentado para melhor espaçamento
-      color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'], // Mudado para primary para maior contraste
+      fontSize: Number(fontSize['label-sm'].size.replace('px', '')), // 13px
+      lineHeight: Number(fontSize['label-sm'].lineHeight.replace('px', '')), // 17px
+      fontFamily: fontFamily['jakarta-semibold'], // Peso 600 - fontWeight: '600'
+      marginBottom: Number(spacing['1.5'].replace('px', '')),
+      color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'], // text-primary-light/dark
+    },
+    // Label flutuante
+    floatingLabel: {
+      position: 'absolute',
+      left: Number(spacing['3'].replace('px', '')),
+      // Calcular posição inicial considerando o line-height do label para ficar alinhado
+      top: (() => {
+        const lineHeightOffset = (Number(fontSize['label-sm'].lineHeight.replace('px', '')) - Number(fontSize['label-sm'].size.replace('px', ''))) / 2;
+        
+        return Platform.OS === 'web' 
+          ? Number(spacing['2.5'].replace('px', '')) + 2 - lineHeightOffset
+          : Number(spacing['3.5'].replace('px', '')) + 1 - lineHeightOffset;
+      })(),
+      backgroundColor: 'transparent',
+      paddingHorizontal: 0, // Sem padding inicial - só quando flutuando
+      // EXATAMENTE o mesmo estilo do placeholder (usando configuração compartilhada)
+      fontSize: sharedPlaceholderConfig.fontSize, // Exato mesmo tamanho (13px)
+      fontFamily: sharedPlaceholderConfig.fontFamily, // Exato mesmo peso (jakarta-regular)
+      lineHeight: sharedPlaceholderConfig.lineHeight, // Exato mesmo lineHeight
+      zIndex: 1,
     },
     errorText: {
       fontSize: Number(fontSize['body-sm'].size.replace('px', '')),
       lineHeight: Number(fontSize['body-sm'].lineHeight.replace('px', '')),
       fontFamily: fontFamily['jakarta-regular'],
       color: isDark ? colors['error-text-dark'] : colors['error-text-light'],
-      marginTop: Number(spacing['1'].replace('px', '')), // Aumentado para melhor espaçamento
+      marginTop: Number(spacing['1'].replace('px', '')),
     },
     numberControlsContainer: {
       position: 'absolute',
@@ -526,12 +660,30 @@ export const Input = ({
   // Lidar com foco
   const handleFocus = () => {
     setIsFocused(true);
+    
+    // Animar label para posição flutuante se for o tipo floating
+    if (labelVariant === 'floating') {
+      labelAnimation.value = withTiming(1, {
+        duration: 200,
+        easing: Easing.bezier(0.4, 0, 0.2, 1),
+      });
+    }
+    
     onFocus && onFocus();
   };
   
   // Lidar com perda de foco
   const handleBlur = () => {
     setIsFocused(false);
+    
+    // Animar label de volta se não houver valor e for o tipo floating
+    if (labelVariant === 'floating' && !value) {
+      labelAnimation.value = withTiming(0, {
+        duration: 200,
+        easing: Easing.bezier(0.4, 0, 0.2, 1),
+      });
+    }
+    
     onBlur && onBlur();
   };
   
@@ -822,8 +974,8 @@ export const Input = ({
           height: 18px;
           display: flex;
           justify-content: center;
-          align-items: center;
-          z-index: 10;
+          alignItems: 'center';
+          zIndex: 10;
           pointer-events: auto;
           cursor: nw-resize;
         }
@@ -831,6 +983,60 @@ export const Input = ({
         /* Não esconda o redimensionador nativo, apenas estilize o nosso ícone por cima */
         textarea::-webkit-resizer {
           background-color: transparent;
+        }
+        
+        /* Efeito notched para label flutuante na web */
+        [data-label-variant="floating"]:focus-within {
+          border-top: none;
+        }
+        
+        [data-label-variant="floating"]:focus-within::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: calc(100% - ${Number(spacing['3'].replace('px', '')) - 2}px);
+          height: 1.5px;
+          background-color: ${isDark ? colors['primary-dark'] : colors['primary-light']};
+          z-index: 1;
+        }
+        
+        [data-label-variant="floating"]:focus-within::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: calc(${Number(spacing['3'].replace('px', '')) - 2}px + var(--label-width, 80px));
+          right: 0;
+          height: 1.5px;
+          background-color: ${isDark ? colors['primary-dark'] : colors['primary-light']};
+          z-index: 1;
+        }
+        
+        /* Versão para quando há valor no input mas não está em foco */
+        [data-label-variant="floating"][data-has-value="true"] {
+          border-top: none;
+        }
+        
+        [data-label-variant="floating"][data-has-value="true"]::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: calc(100% - ${Number(spacing['3'].replace('px', '')) - 2}px);
+          height: 1px;
+          background-color: ${isDark ? colors['divider-dark'] : colors['divider-light']};
+          z-index: 1;
+        }
+        
+        [data-label-variant="floating"][data-has-value="true"]::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: calc(${Number(spacing['3'].replace('px', '')) - 2}px + var(--label-width, 80px));
+          right: 0;
+          height: 1px;
+          background-color: ${isDark ? colors['divider-dark'] : colors['divider-light']};
+          z-index: 1;
         }
       `;
       document.head.appendChild(style);
@@ -937,6 +1143,44 @@ export const Input = ({
       });
     }
   }, [multiline]);
+  
+  // Efeito para controlar a animação do label baseada no valor (apenas para floating)
+  useEffect(() => {
+    if (labelVariant === 'floating') {
+      if (value.length > 0 || isFocused) {
+        labelAnimation.value = withTiming(1, {
+          duration: 200,
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
+        });
+      } else {
+        labelAnimation.value = withTiming(0, {
+          duration: 200,
+          easing: Easing.bezier(0.4, 0, 0.2, 1),
+        });
+      }
+    }
+  }, [value, isFocused, labelVariant]);
+
+  // Estilo animado para o label flutuante
+  const animatedLabelStyle = useAnimatedStyle(() => {
+    'worklet';
+    // Calcular a posição inicial considerando o line-height do label
+    const lineHeightOffset = (Number(fontSize['label-sm'].lineHeight.replace('px', '')) - Number(fontSize['label-sm'].size.replace('px', ''))) / 2;
+    
+    const initialTop = Platform.OS === 'web' 
+      ? Number(spacing['2.5'].replace('px', '')) + 2 - lineHeightOffset
+      : Number(spacing['3.5'].replace('px', '')) + 1 - lineHeightOffset;
+    
+    const labelSize = sharedPlaceholderConfig.fontSize; // EXATO mesmo tamanho do placeholder quando dentro
+    const floatingLabelSize = Number(fontSize['label-sm'].size.replace('px', '')); // 13px quando flutuando
+    
+    return {
+      top: interpolate(labelAnimation.value, [0, 1], [initialTop, -10]), // Da posição inicial ajustada para cima
+      fontSize: interpolate(labelAnimation.value, [0, 1], [labelSize, floatingLabelSize]), // De 13px para 13px (mantém o tamanho)
+      // Removido opacity para manter mesma intensidade do placeholder
+      // opacity: interpolate(labelAnimation.value, [0, 1], [0.6, 1]),
+    };
+  });
 
   // Funções auxiliares para o calendário
   const getDaysInMonth = (date: Date) => {
@@ -967,66 +1211,100 @@ export const Input = ({
 
   return (
     <View style={[containerStyle.container, style]}>
-      {label && (
+      {/* Label acima (variant="above") */}
+      {label && labelVariant === 'above' && (
         <Text style={containerStyle.labelStyle}>{label}</Text>
       )}
       
-      <View 
-        style={[
-          containerStyle.inputContainer, 
-          disabled ? { 
-            opacity: 0.6, 
-            backgroundColor: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'] // Fundo mais sutil quando desabilitado
-          } : {},
-          type === 'number' && showNumberControls && !isWeb ? { paddingRight: 32 } : {},
-          multiline && { minHeight: minHeight },
-          !isWeb && multiline && resizable ? { height: nativeInputHeight } : {},
-          multiline ? { alignItems: 'flex-start' } : {}
-        ]}
-        {...(isWeb ? {
-          'data-input-container': 'true',
-          'data-disabled': disabled ? 'true' : 'false',
-          'data-multiline': multiline ? 'true' : 'false',
-          ...(type === 'number' ? { 'data-number-input-container': 'true' } : {})
-        } : {})}
-        onLayout={() => {
-          if (multiline && inputRef.current && Platform.OS !== 'web') {
-            inputRef.current.setNativeProps({
-              style: { textAlignVertical: 'top' }
-            });
-          }
-        }}
-      >
-        {/* Ícone de pesquisa para type="search" */}
-        {type === 'search' && (
-          <View style={containerStyle.searchIcon}>
-            <Search 
-              size={16} 
-              color={getThemeColor('text-secondary')} 
+      {/* Container do input com label flutuante ou normal */}
+      <View style={{ position: 'relative' }}>
+        {/* Label flutuante animado (variant="floating") */}
+        {label && labelVariant === 'floating' && (
+          <Animated.Text
+            style={[
+              containerStyle.floatingLabel,
+              animatedLabelStyle,
+              {
+                // Cor do texto: Label flutuante inteligente
+                color: shouldFloat 
+                  ? (isDark ? colors['text-primary-dark'] : colors['text-primary-light']) // text-primary quando flutuando (novo padrão)
+                  : (isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']), // EXATA mesma cor do placeholder quando não flutuando (perfeito como estava)
+                // Adiciona cor de fundo quando flutuando para criar efeito notched
+                backgroundColor: shouldFloat ? getFloatingLabelBackground() : 'transparent',
+                paddingHorizontal: shouldFloat ? 4 : 0,
+              }
+            ]}
+            {...(isWeb ? { 
+              'data-floating-label': 'true',
+              'data-floating': shouldFloat ? 'true' : 'false'
+            } : {})}
+          >
+            {label}
+          </Animated.Text>
+        )}
+
+
+        
+        <View 
+          style={[
+            containerStyle.inputContainer,
+            disabled ? { 
+              opacity: 0.6, 
+              backgroundColor: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light']
+            } : {},
+            type === 'number' && showNumberControls && !isWeb ? { paddingRight: 32 } : {},
+            multiline && { minHeight: minHeight },
+            !isWeb && multiline && resizable ? { height: nativeInputHeight } : {},
+            multiline ? { alignItems: 'flex-start' } : {},
+            // Para label flutuante, fazer o fundo transparente quando necessário
+            labelVariant === 'floating' && containerBackgroundColor ? { backgroundColor: 'transparent' } : {}
+          ]}
+          {...(isWeb ? {
+            'data-input-container': 'true',
+            'data-disabled': disabled ? 'true' : 'false',
+            'data-multiline': multiline ? 'true' : 'false',
+            'data-label-variant': labelVariant,
+            'data-has-value': value.length > 0 ? 'true' : 'false',
+            ...(type === 'number' ? { 'data-number-input-container': 'true' } : {})
+          } : {})}
+          onLayout={() => {
+            if (multiline && inputRef.current && Platform.OS !== 'web') {
+              inputRef.current.setNativeProps({
+                style: { textAlignVertical: 'top' }
+              });
+            }
+          }}
+        >
+          {/* Ícone de pesquisa para type="search" */}
+          {type === 'search' && (
+            <View style={containerStyle.searchIcon}>
+              <Search 
+                size={16} 
+                color={getThemeColor('text-secondary')} 
+              />
+            </View>
+          )}
+          
+          {/* Input numérico nativo HTML5 para web */}
+          {isWeb && type === 'number' && showNumberControls && (
+            <input
+              ref={nativeNumberInputRef}
+              type="number"
+              className="native-number-input"
+              onChange={handleWebNativeNumberChange}
+              value={value || ''}
+              min={min}
+              max={max}
+              step={step}
+              disabled={disabled}
+              placeholder={labelVariant === 'floating' ? '' : placeholder}
             />
-          </View>
-        )}
-        
-        {/* Input numérico nativo HTML5 para web */}
-        {isWeb && type === 'number' && showNumberControls && (
-          <input
-            ref={nativeNumberInputRef}
-            type="number"
-            className="native-number-input"
-            onChange={handleWebNativeNumberChange}
-            value={value || ''}
-            min={min}
-            max={max}
-            step={step}
-            disabled={disabled}
-            placeholder={placeholder}
-          />
-        )}
-        
-        {/* Texto original mascarado para type="number" no web */}
-        {isWeb && type === 'number' && showNumberControls ? (
-          <View style={{ opacity: 0, height: 0, width: 0, overflow: 'hidden' }}>
-            <TextInput
+          )}
+          
+          {/* Texto original mascarado para type="number" no web */}
+          {isWeb && type === 'number' && showNumberControls ? (
+            <View style={{ opacity: 0, height: 0, width: 0, overflow: 'hidden' }}>
+                          <TextInput
               ref={inputRef}
               style={[
                 containerStyle.inputStyle, 
@@ -1035,17 +1313,17 @@ export const Input = ({
               ]}
               value={value}
               onChangeText={handleChangeText}
-              placeholder={placeholder}
-              placeholderTextColor={getThemeColor('text-secondary')}
+              placeholder={labelVariant === 'floating' ? '' : placeholder}
+              placeholderTextColor={sharedPlaceholderConfig.color}
               editable={!disabled}
               keyboardType={getKeyboardType()}
               onFocus={handleFocus}
               onBlur={handleBlur}
               selectionColor={isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}
             />
-          </View>
-        ) : (
-                      <TextInput
+            </View>
+          ) : (
+            <TextInput
               ref={inputRef}
               style={[
                 containerStyle.inputStyle, 
@@ -1062,40 +1340,40 @@ export const Input = ({
               ]}
               value={value}
               onChangeText={handleChangeText}
-              placeholder={placeholder}
-              placeholderTextColor={isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']} // Mudado para tertiary para ficar mais sutil
-            editable={!disabled}
-            secureTextEntry={type === 'password' && !passwordVisible}
-            keyboardType={getKeyboardType()}
-            autoCapitalize={autoCapitalize}
-            autoCorrect={autoCorrect}
-            // @ts-ignore - Para compatibilidade web
-            autoComplete={autoComplete || (type === 'date' ? 'bday' : undefined)}
-            returnKeyType={returnKeyType}
-            onSubmitEditing={onSubmitEditing}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            maxLength={maxLength}
-            multiline={multiline}
-            numberOfLines={multiline ? numberOfLines : 1}
-            testID={testID}
-                          // Cor de seleção elegante baseada na cor primária
+              placeholder={labelVariant === 'floating' ? '' : placeholder}
+              placeholderTextColor={sharedPlaceholderConfig.color}
+              editable={!disabled}
+              secureTextEntry={type === 'password' && !passwordVisible}
+              keyboardType={getKeyboardType()}
+              autoCapitalize={autoCapitalize}
+              autoCorrect={autoCorrect}
+              // @ts-ignore - Para compatibilidade web
+              autoComplete={autoComplete || (type === 'date' ? 'bday' : undefined)}
+              returnKeyType={returnKeyType}
+              onSubmitEditing={onSubmitEditing}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              maxLength={maxLength}
+              multiline={multiline}
+              numberOfLines={multiline ? numberOfLines : 1}
+              testID={testID}
+              // Cor de seleção elegante baseada na cor primária
               selectionColor={isDark ? colors['primary-dark'] + '60' : colors['primary-light'] + '60'}
-            autoFocus={autoFocus}
-            onContentSizeChange={handleContentSizeChange}
-            // Para web, adiciona suporte nativo ao input de data HTML5
-            {...(isWeb && type === 'date' ? { 
-              type: 'text', // Mantemos como text para usar nossa máscara customizada
-              inputMode: 'numeric'
-            } : {})}
-            // Para web, adiciona suporte à redimensionamento
-            {...(isWeb && multiline && resizable ? {
-              className: 'resizable'
-            } : {})}
-            // Garante que o texto comece no topo - IMPORTANTE: esta propriedade precisa ser definida por último
-            textAlignVertical={multiline ? 'top' : 'center'}
-          />
-        )}
+              autoFocus={autoFocus}
+              onContentSizeChange={handleContentSizeChange}
+              // Para web, adiciona suporte nativo ao input de data HTML5
+              {...(isWeb && type === 'date' ? { 
+                type: 'text', // Mantemos como text para usar nossa máscara customizada
+                inputMode: 'numeric'
+              } : {})}
+              // Para web, adiciona suporte à redimensionamento
+              {...(isWeb && multiline && resizable ? {
+                className: 'resizable'
+              } : {})}
+              // Garante que o texto comece no topo - IMPORTANTE: esta propriedade precisa ser definida por último
+              textAlignVertical={multiline ? 'top' : 'center'}
+            />
+          )}
         
         {/* Ícone personalizado à direita */}
         {rightIcon && (
@@ -1138,7 +1416,7 @@ export const Input = ({
           </TouchableOpacity>
         )}
         
-        {        /* Ícone de relógio para input tipo hora */}
+        {/* Ícone de relógio para input tipo hora */}
         {type === 'time' && (
           <TouchableOpacity 
             onPress={handleTimePress}
@@ -1299,6 +1577,7 @@ export const Input = ({
             </View>
           </View>
         )}
+        </View>
       </View>
       
       {/* Mensagem de erro */}
@@ -1317,7 +1596,7 @@ export const Input = ({
           <TouchableOpacity 
             style={{
               flex: 1,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              backgroundColor: isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)', // Overlay do modal
               justifyContent: 'center',
               alignItems: 'center',
             }}
@@ -1331,9 +1610,9 @@ export const Input = ({
                 padding: Number(spacing['4'].replace('px', '')),
                 width: 320,
                 maxWidth: '90%',
-                shadowColor: '#000',
+                shadowColor: getShadowColor('modal'),
                 shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
+                shadowOpacity: isDark ? 0.4 : 0.1, // Inteligente baseado no tema
                 shadowRadius: 8,
                 elevation: 8,
               }}
@@ -1434,7 +1713,7 @@ export const Input = ({
                         fontSize: Number(fontSize['body-md'].size.replace('px', '')),
                         fontFamily: fontFamily['jakarta-regular'],
                         color: isSelected
-                          ? '#FFFFFF'
+                          ? colors['text-primary-dark'] // Branco para texto selecionado
                           : isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
                       }}>
                         {day}
@@ -1483,7 +1762,7 @@ export const Input = ({
                   <Text style={{
                     fontSize: Number(fontSize['body-md'].size.replace('px', '')),
                     fontFamily: fontFamily['jakarta-medium'],
-                    color: '#FFFFFF',
+                    color: colors['text-primary-dark'], // Branco para botão
                   }}>
                     Hoje
                   </Text>
@@ -1505,7 +1784,7 @@ export const Input = ({
           <TouchableOpacity 
             style={{
               flex: 1,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              backgroundColor: isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)', // Overlay do modal
               justifyContent: 'center',
               alignItems: 'center',
             }}
@@ -1519,9 +1798,9 @@ export const Input = ({
                 padding: Number(spacing['6'].replace('px', '')),
                 width: 280,
                 maxWidth: '90%',
-                shadowColor: '#000',
+                shadowColor: getShadowColor('modal'),
                 shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
+                shadowOpacity: isDark ? 0.4 : 0.1, // Inteligente baseado no tema
                 shadowRadius: 8,
                 elevation: 8,
               }}
@@ -1713,7 +1992,7 @@ export const Input = ({
                   <Text style={{
                     fontSize: Number(fontSize['body-md'].size.replace('px', '')),
                     fontFamily: fontFamily['jakarta-medium'],
-                    color: '#FFFFFF',
+                    color: colors['text-primary-dark'], // Branco para botão
                     textAlign: 'center',
                   }}>
                     Confirmar

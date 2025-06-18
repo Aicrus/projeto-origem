@@ -9,6 +9,7 @@ import {
   spacing as designSpacing, 
   borderRadius as designBorderRadius,
   boxShadow as designBoxShadow,
+  shadows as designShadows,
   opacity as designOpacity,
   zIndex as designZIndex,
   transitionDuration as designTransitionDuration,
@@ -187,6 +188,11 @@ export default function DevPage() {
   const [inputHora, setInputHora] = useState('');
   const [inputNumerico, setInputNumerico] = useState('0');
   const [inputRedimensionavel, setInputRedimensionavel] = useState('');
+  
+  // Estados para os três tipos de label
+  const [inputLabelAcima, setInputLabelAcima] = useState('');
+  const [inputSemLabel, setInputSemLabel] = useState('');
+  const [inputLabelFlutuante, setInputLabelFlutuante] = useState('');
   
   // Estados separados para cada exemplo de Select
   const [selectBasico, setSelectBasico] = useState('');
@@ -420,7 +426,66 @@ export default function DevPage() {
         </Text>
         
         <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Variações de Label:</Text>
+          
+          {/* Seção destacada para os três tipos de label */}
+          <View className={`${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'} rounded-lg p-md mb-lg border ${isDark ? 'border-divider-dark' : 'border-divider-light'}`}>
+            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-md`}>Três estilos de exibição do label</Text>
+            
+            {/* Label acima (padrão) */}
+            <View className="mb-md">
+              <Text className={`text-label-sm font-jakarta-medium ${textSecondary} mb-xs`}>1. Label Acima (Padrão)</Text>
+              <Input
+                value={inputLabelAcima}
+                onChangeText={setInputLabelAcima}
+                placeholder="Digite seu nome"
+                label="Nome completo"
+                labelVariant="above"
+              />
+              <Text className={`text-body-xs ${textSecondary} mt-xs`}>
+                O label fica posicionado acima do input (comportamento padrão).
+              </Text>
+            </View>
+            
+            {/* Sem label */}
+            <View className="mb-md">
+              <Text className={`text-label-sm font-jakarta-medium ${textSecondary} mb-xs`}>2. Sem Label</Text>
+              <Input
+                value={inputSemLabel}
+                onChangeText={setInputSemLabel}
+                placeholder="Digite apenas com placeholder"
+                labelVariant="none"
+              />
+              <Text className={`text-body-xs ${textSecondary} mt-xs`}>
+                Apenas o placeholder é exibido, sem label visível.
+              </Text>
+            </View>
+            
+            {/* Label flutuante */}
+            <View className="mb-md">
+              <Text className={`text-label-sm font-jakarta-medium ${textSecondary} mb-xs`}>3. Label Flutuante</Text>
+              <Input
+                value={inputLabelFlutuante}
+                onChangeText={setInputLabelFlutuante}
+                label="Email"
+                labelVariant="floating"
+              />
+              <Text className={`text-body-xs ${textSecondary} mt-xs`}>
+                O label começa dentro do input e "flutua" para cima quando há foco ou valor. 
+                Efeito elegante com transição suave.
+              </Text>
+            </View>
+
+                                    <View className={`mt-sm p-xs rounded-md ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}>
+              <Text className={`text-body-xs ${textSecondary}`}>
+                <Text className="font-jakarta-bold">Nota importante:</Text> O label flutuante detecta automaticamente a cor de fundo do tema atual.
+                A prop `containerBackgroundColor` só é necessária quando o Input estiver dentro de um container com cor de fundo diferente 
+                do padrão do tema (ex: dentro de um card colorido, modal com fundo customizado, etc).
+              </Text>
+            </View>
+          </View>
+          
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Outros Exemplos:</Text>
           
           {/* Input básico */}
           <View className="mb-lg">
@@ -586,6 +651,309 @@ export default function DevPage() {
                 facilitando a operação em dispositivos móveis. Define `minHeight` e `maxHeight` para controlar 
                 os limites de altura, e use `setScrollEnabled` em ScrollViews que contenham este componente.
               </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Seção de Especificações de Design */}
+        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
+          Especificações de Design
+        </Text>
+        <Text className={`text-body-md ${textSecondary} mb-md`}>
+          Todas as configurações do Input seguem rigorosamente o design system. Nenhuma cor ou tipografia é hardcoded.
+          O Input sempre fica contido dentro de um container, seja uma tela, um card, um modal ou qualquer outro componente pai.
+        </Text>
+        
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          {/* Container e Background */}
+          <View className="mb-lg">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>Container e Background</Text>
+            
+                         <View className="mb-sm">
+               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Cor de fundo do input:</Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Tema claro: `bg-primary-light` (token do design system)
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Tema escuro: `bg-primary-dark` (token do design system)
+               </Text>
+             </View>
+             
+             <View className="mb-sm">
+               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Bordas:</Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Normal: `divider-light/dark` (token do design system)
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Foco: `primary-light/dark` (token do design system)
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Erro: `error-border-light/dark` (token do design system)
+               </Text>
+             </View>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Border radius:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>• `rounded-md` (6px) - do design system</Text>
+            </View>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Altura mínima:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>• `spacing-9` (36px) - do design system</Text>
+            </View>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Padding interno:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>• Horizontal: `spacing-3` (12px)</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>• Vertical: `spacing-2.5` (10px) web / `spacing-3.5` (14px) nativo</Text>
+            </View>
+          </View>
+          
+          {/* Tipografia */}
+          <View className="mb-lg">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>Tipografia</Text>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Texto do input:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Tamanho: `body-md` (14px) - `fontSize.body-md.size`
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Linha: `body-md` (20px) - `fontSize.body-md.lineHeight`  
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Peso: Regular - `fontFamily.jakarta-regular`
+              </Text>
+                             <Text className={`text-body-sm ${textSecondary}`}>
+                 • Cor: `text-primary-light/dark` (token do design system)
+               </Text>
+             </View>
+             
+             <View className="mb-sm">
+               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Placeholder:</Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Tamanho: 13px - otimizado para melhor legibilidade
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Peso: Regular - `fontFamily.jakarta-regular`
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Cor: `text-tertiary-light/dark` (token do design system)
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • <Text className="font-jakarta-bold">IMPORTANTE:</Text> Todos os placeholders (básico, sem label, flutuante) usam EXATAMENTE a mesma configuração
+               </Text>
+             </View>
+             
+             <View className="mb-sm">
+               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Label acima (padrão):</Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Tamanho: `label-sm` (13px) - `fontSize.label-sm.size`
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Linha: `label-sm` (17px) - `fontSize.label-sm.lineHeight`
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Peso: Semibold (600) - `fontFamily.jakarta-semibold`
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Cor: `text-primary-light/dark` (token do design system)
+               </Text>
+             </View>
+             
+             <View className="mb-sm">
+               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Label flutuante:</Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • <Text className="font-jakarta-medium">Dentro do input:</Text> 100% idêntico ao placeholder (perfeito como estava)
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                   - Tamanho: 13px - otimizado para melhor legibilidade
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                   - Peso: Regular - `fontFamily.jakarta-regular`
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                   - Cor: `text-tertiary-light/dark` (token do design system)
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                   - <Text className="font-jakarta-bold">GARANTIA:</Text> Usa configuração compartilhada - impossível diferir
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • <Text className="font-jakarta-medium">Flutuando (ativo):</Text> 
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                   - Tamanho: 13px - `fontSize.label-sm.size` (mantém tamanho padrão)
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                   - Peso: Semibold (600) - `fontFamily.jakarta-semibold` (padrão para labels)
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                   - Cor: `text-primary-light/dark` (cor primária quando flutuando)
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                   - Background: cor do container para efeito "notched"
+               </Text>
+             </View>
+             
+             <View className="mb-sm">
+               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Mensagem de erro:</Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Tamanho: `body-sm` (12px) - `fontSize.body-sm.size`
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Linha: `body-sm` (18px) - `fontSize.body-sm.lineHeight`
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Peso: Regular - `fontFamily.jakarta-regular`
+               </Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • Cor: `error-text-light/dark` (token do design system)
+               </Text>
+             </View>
+          </View>
+          
+          {/* Sombras */}
+          <View className="mb-lg">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>🧠 Sistema de Sombras Inteligente</Text>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Sombra padrão do input:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Tipo: `input` (do sistema de sombras inteligentes)
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Cor: `#000000` (sempre escura)
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Tema claro: `0 1px 2px rgba(0, 0, 0, 0.05)` + shadowOpacity 0.05
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Tema escuro: `0 1px 2px rgba(0, 0, 0, 0.2)` + shadowOpacity 0.2
+              </Text>
+            </View>
+            
+            <View className={`p-sm rounded-md mb-sm ${isDark ? 'bg-primary-dark/10' : 'bg-primary-light/10'} border border-primary-light/dark`}>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                <Text className="font-jakarta-bold">💡 Inteligência:</Text> As sombras são sempre escuras em ambos os temas, 
+                mas com intensidades diferentes para criar a aparência correta em cada modo.
+              </Text>
+            </View>
+          </View>
+          
+          {/* Configuração Padronizada dos Labels */}
+          <View className="mb-lg">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>🎯 Configuração Padronizada dos Labels</Text>
+            
+            <View className={`p-sm rounded-md mb-sm ${isDark ? 'bg-success-bg-dark' : 'bg-success-bg-light'} border border-success-border-light/dark`}>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                <Text className="font-jakarta-bold">✅ NOVO PADRÃO:</Text> Todos os labels agora seguem uma configuração unificada e consistente.
+              </Text>
+            </View>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Configuração universal:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Tamanho: `label-sm` (13px) - `fontSize.label-sm.size`
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Linha: `label-sm` (17px) - `fontSize.label-sm.lineHeight` 
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Peso: Semibold (600) - `fontFamily.jakarta-semibold`
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Cor: `text-primary-light/dark` (token do design system)
+              </Text>
+            </View>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Aplicação:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Label acima (padrão): ✅ Configuração aplicada
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Label flutuante (quando ativo): ✅ Configuração aplicada
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Label flutuante (dentro): Mantém cor do placeholder (perfeito como estava)
+              </Text>
+            </View>
+            
+            <View className={`p-sm rounded-md mb-sm ${isDark ? 'bg-info-bg-dark' : 'bg-info-bg-light'} border border-info-border-light/dark`}>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                <Text className="font-jakarta-bold">💡 Benefício:</Text> Consistência visual perfeita entre todos os tipos de label, 
+                facilitando manutenção e garantindo uniformidade no design.
+              </Text>
+            </View>
+          </View>
+          
+          {/* Estados e Interações */}
+          <View className="mb-lg">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>Estados e Interações</Text>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Efeitos de hover (web):</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Box shadow: `0 2px 8px rgba(0, 0, 0, 0.1)`
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Transição: `0.2s ease-in-out`
+              </Text>
+            </View>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Foco:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Ring: `2px` com cor primária + 40% opacidade
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Borda: muda para cor primária
+              </Text>
+            </View>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Disabled:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Opacidade: 60%
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Background: `bg-tertiary-light/dark`
+              </Text>
+            </View>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Seleção de texto:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • Cor: primária com 60% opacidade
+              </Text>
+            </View>
+          </View>
+          
+          {/* Ícones */}
+          <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>Ícones</Text>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Tamanho padrão:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>• 16px (Lucide React Native)</Text>
+            </View>
+            
+                         <View className="mb-sm">
+               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Cor:</Text>
+               <Text className={`text-body-sm ${textSecondary}`}>
+                 • `text-secondary-light/dark` (token do design system)
+               </Text>
+             </View>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Padding:</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>• `spacing-1.5` (6px)</Text>
+            </View>
+            
+            <View className="mb-sm">
+              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Hover (web):</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>• Background: `bg-secondary-light/dark`</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>• Border radius: `rounded-sm` (4px)</Text>
             </View>
           </View>
         </View>
@@ -1647,7 +2015,7 @@ export default function DevPage() {
                 <Text className={`text-body-sm ${textSecondary}`}>De none até full</Text>
               </View>
               <View className="flex-1 min-w-[200px]">
-                <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Efeitos: {Object.keys(designBoxShadow).length + Object.keys(designOpacity).length + Object.keys(designZIndex).length + Object.keys(designTransitionDuration).length}</Text>
+                <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Efeitos: {Object.keys(designBoxShadow).length + Object.keys(designShadows).length + Object.keys(designOpacity).length + Object.keys(designZIndex).length + Object.keys(designTransitionDuration).length}</Text>
                 <Text className={`text-body-sm ${textSecondary}`}>Sombras, opacidade, z-index, transições</Text>
               </View>
             </View>
@@ -2165,6 +2533,109 @@ export default function DevPage() {
                   bgColor={bgTertiary} 
                 />
               ))}
+            </View>
+          </View>
+          
+          {/* Seção de Sombras Inteligentes (NOVO SISTEMA) */}
+          <SectionTitle title="🧠 Sombras Inteligentes" textColor={textPrimary} />
+          
+          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
+            <Text className={`text-body-md ${textSecondary} mb-md`}>
+              🎯 <Text className="font-jakarta-bold">Novo Sistema de Sombras:</Text> Sempre escuras em ambos os temas! 
+              Total: {Object.keys(designShadows).length} tipos inteligentes
+            </Text>
+            
+            <View className={`p-sm rounded-md mb-md ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}>
+              <Text className={`text-body-sm ${textSecondary} mb-xs`}>
+                <Text className="font-jakarta-bold">💡 Conceito:</Text> As sombras são sempre escuras (#000000) mas 
+                com intensidades diferentes para cada tema:
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • <Text className="font-jakarta-bold">Tema claro:</Text> Sombras mais sutis (menor opacidade)
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+                • <Text className="font-jakarta-bold">Tema escuro:</Text> Sombras mais intensas (maior opacidade)
+              </Text>
+            </View>
+
+            <View className="grid grid-cols-1 md:grid-cols-2 gap-md">
+              {Object.entries(designShadows).map(([name, shadowConfig]) => (
+                <View 
+                  key={name}
+                  className={`${bgTertiary} rounded-md p-md border border-divider-light/dark`}
+                >
+                  <Text className={`text-label-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+                    {name}
+                  </Text>
+                  
+                  {/* Demonstração visual da sombra */}
+                  <View className="mb-sm">
+                    <View 
+                      style={{
+                        width: '100%',
+                        height: 60,
+                        backgroundColor: isDark ? designColors['bg-primary-dark'] : designColors['bg-primary-light'],
+                        borderRadius: 8,
+                        shadowColor: shadowConfig.color,
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: isDark ? 0.3 : 0.1,
+                        shadowRadius: 4,
+                        elevation: 4,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text className={`text-body-sm ${textSecondary}`}>
+                        Exemplo visual
+                      </Text>
+                    </View>
+                  </View>
+                  
+                  {/* Informações técnicas */}
+                  <View className="space-y-1">
+                    <Text className={`text-body-xs ${textSecondary}`}>
+                      <Text className="font-jakarta-medium">Cor:</Text> {shadowConfig.color}
+                    </Text>
+                    <Text className={`text-body-xs ${textSecondary}`}>
+                      <Text className="font-jakarta-medium">Claro:</Text> {shadowConfig.light}
+                    </Text>
+                    <Text className={`text-body-xs ${textSecondary}`}>
+                      <Text className="font-jakarta-medium">Escuro:</Text> {shadowConfig.dark}
+                    </Text>
+                  </View>
+                  
+                  {/* Botão para copiar */}
+                  <View className="mt-sm">
+                    <TouchableOpacity
+                      onPress={() => {
+                        const code = `getShadow('${name}', '${isDark ? 'dark' : 'light'}')`;
+                        // Aqui você pode implementar a lógica de cópia
+                        console.log('Copiado:', code);
+                      }}
+                      className={`p-2 rounded-md ${isDark ? 'bg-bg-secondary-dark' : 'bg-bg-secondary-light'}`}
+                    >
+                      <Text className={`text-body-xs ${textSecondary} text-center`}>
+                        Copiar código
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </View>
+            
+            <View className={`mt-md p-sm rounded-md ${isDark ? 'bg-primary-dark/10' : 'bg-primary-light/10'} border border-primary-light/dark`}>
+              <Text className={`text-body-sm ${textSecondary} mb-xs`}>
+                <Text className="font-jakarta-bold">🚀 Como usar:</Text>
+              </Text>
+              <Text className={`text-body-xs font-mono ${textSecondary}`}>
+                {`import { getShadow, getShadowColor } from '@/design-system/tokens/effects';`}
+              </Text>
+              <Text className={`text-body-xs font-mono ${textSecondary}`}>
+                {`shadowColor: getShadowColor('input'), // Sempre #000000`}
+              </Text>
+              <Text className={`text-body-xs font-mono ${textSecondary}`}>
+                {`boxShadow: getShadow('input', '${isDark ? 'dark' : 'light'}'), // Intensidade automática`}
+              </Text>
             </View>
           </View>
           
