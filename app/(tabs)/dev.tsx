@@ -1004,7 +1004,7 @@ export default function DevPage() {
             flex: examplesPerRow === 1 ? undefined : 1, 
             width: examplesPerRow === 1 ? '100%' : undefined
           }}>
-            <View className={`${bgSecondary} rounded-xl ${cardSpacing} border border-divider-light dark:border-divider-dark/30`}>
+            <View className={`${bgSecondary} rounded-xl ${cardSpacing}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] + '20' : designColors['divider-light'] }}>
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
@@ -1043,7 +1043,7 @@ export default function DevPage() {
             flex: examplesPerRow === 1 ? undefined : 1, 
             width: examplesPerRow === 1 ? '100%' : undefined
           }}>
-            <View className={`${bgSecondary} rounded-xl ${cardSpacing} border border-divider-light dark:border-divider-dark/30`}>
+            <View className={`${bgSecondary} rounded-xl ${cardSpacing}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] + '20' : designColors['divider-light'] }}>
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
@@ -1088,7 +1088,7 @@ export default function DevPage() {
             flex: examplesPerRow === 1 ? undefined : 1, 
             width: examplesPerRow === 1 ? '100%' : undefined
           }}>
-            <View className={`${bgSecondary} rounded-xl ${cardSpacing} border border-divider-light dark:border-divider-dark/30`}>
+            <View className={`${bgSecondary} rounded-xl ${cardSpacing}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] + '20' : designColors['divider-light'] }}>
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
@@ -1127,7 +1127,7 @@ export default function DevPage() {
             flex: examplesPerRow === 1 ? undefined : 1, 
             width: examplesPerRow === 1 ? '100%' : undefined
           }}>
-            <View className={`${bgSecondary} rounded-xl ${cardSpacing} border border-divider-light dark:border-divider-dark/30`}>
+            <View className={`${bgSecondary} rounded-xl ${cardSpacing}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] + '20' : designColors['divider-light'] }}>
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-error-icon-light dark:bg-error-icon-dark rounded-full mr-sm" />
