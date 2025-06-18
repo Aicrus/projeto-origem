@@ -892,19 +892,62 @@ export const Input = ({
           transition: all 0.1s ease;
         }
         
-        /* Estilos nativos para input number - SIMPLIFICADOS */
+        /* Estilos para o input numérico nativo do HTML5 */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+          opacity: 1;
+          height: 38px;
+          position: absolute;
+          top: 0;
+          right: 0;
+          cursor: pointer;
+        }
+        
+        /* Cor normal para os elementos do número (igual aos outros inputs) */
         input[type="number"] {
           color: ${isDark ? colors['text-primary-dark'] : colors['text-primary-light']};
         }
         
-        /* Controles nativos do sistema operacional */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-          opacity: 1;
-          cursor: pointer;
+        /* Hack para aplicar cores neutras no spinner */
+        :root {
+          accent-color: ${isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']} !important;
+          --number-spinner-color: ${isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']} !important;
         }
         
-
+        /* Adiciona suporte a cores neutras no spinner */
+        @supports (accent-color: ${isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']}) {
+          input[type="number"] {
+            accent-color: ${isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']};
+          }
+        }
+        
+        /* Estilos específicos para tema escuro */
+        ${isDark ? `
+          input[type="number"]::-webkit-inner-spin-button {
+            filter: invert(0.8);
+          }
+        ` : ''}
+        
+        /* Container para o input number nativo */
+        [data-number-input-container] {
+          position: relative;
+        }
+        
+        .native-number-input {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          opacity: 1;
+          background: transparent;
+          border: none;
+          color: ${isDark ? colors['text-primary-dark'] : colors['text-primary-light']};
+          font-size: 14px;
+          padding: 8px 25px 8px 12px;
+          z-index: 1;
+          border-radius: 6px;
+        }
         
         /* Estilos para input redimensionável */
         textarea.resizable {
@@ -1000,16 +1043,22 @@ export const Input = ({
       
       // Adicionando prevenção de scroll quando o cursor estiver sobre o input numérico
       const handleWheel = (e: WheelEvent) => {
-        // Verifica se o alvo do evento é um input do tipo number
+        // Verifica se o alvo do evento é um input do tipo number ou está dentro de um container de input number
         const target = e.target as HTMLElement;
         const isNumberInput = target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'number';
+        const isInNumberInputContainer = target.closest('[data-number-input-container]') !== null;
         
-        if (isNumberInput) {
+        if (isNumberInput || isInNumberInputContainer) {
           // Previne o scroll da página
           e.preventDefault();
           
-          // Usa o input diretamente
-          const inputElement = target as HTMLInputElement;
+          // Encontra o input numérico
+          let inputElement: HTMLInputElement | null = null;
+          if (isNumberInput) {
+            inputElement = target as HTMLInputElement;
+          } else if (isInNumberInputContainer) {
+            inputElement = target.closest('[data-number-input-container]')?.querySelector('input[type="number"]') || null;
+          }
           
           if (inputElement) {
             // Obtém os valores atuais
@@ -1215,7 +1264,8 @@ export const Input = ({
             'data-disabled': disabled ? 'true' : 'false',
             'data-multiline': multiline ? 'true' : 'false',
             'data-label-variant': labelVariant,
-            'data-has-value': value.length > 0 ? 'true' : 'false'
+            'data-has-value': value.length > 0 ? 'true' : 'false',
+            ...(type === 'number' ? { 'data-number-input-container': 'true' } : {})
           } : {})}
           onLayout={() => {
             if (multiline && inputRef.current && Platform.OS !== 'web') {
@@ -1235,24 +1285,12 @@ export const Input = ({
             </View>
           )}
           
-          {/* Input numérico nativo HTML5 para web - SIMPLIFICADO */}
-          {isWeb && type === 'number' && showNumberControls ? (
+          {/* Input numérico nativo HTML5 para web */}
+          {isWeb && type === 'number' && showNumberControls && (
             <input
               ref={nativeNumberInputRef}
               type="number"
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none',
-                background: 'transparent',
-                color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
-                fontSize: `${sharedPlaceholderConfig.fontSize}px`,
-                fontFamily: sharedPlaceholderConfig.fontFamily,
-                lineHeight: `${sharedPlaceholderConfig.lineHeight}px`,
-                padding: `${Platform.OS === 'web' ? Number(spacing['2.5'].replace('px', '')) : Number(spacing['3.5'].replace('px', ''))}px ${Number(spacing['3'].replace('px', ''))}px`,
-                outline: 'none',
-                textAlign: 'left',
-              }}
+              className="native-number-input"
               onChange={handleWebNativeNumberChange}
               onFocus={handleFocus}
               onBlur={handleBlur}
@@ -1263,6 +1301,29 @@ export const Input = ({
               disabled={disabled}
               placeholder={labelVariant === 'floating' ? '' : placeholder}
             />
+          )}
+          
+          {/* Texto original mascarado para type="number" no web */}
+          {isWeb && type === 'number' && showNumberControls ? (
+            <View style={{ opacity: 0, height: 0, width: 0, overflow: 'hidden' }}>
+                          <TextInput
+              ref={inputRef}
+              style={[
+                containerStyle.inputStyle, 
+                inputStyle,
+                { height: multiline ? inputHeight : undefined }
+              ]}
+              value={value}
+              onChangeText={handleChangeText}
+              placeholder={labelVariant === 'floating' ? '' : placeholder}
+              placeholderTextColor={sharedPlaceholderConfig.color}
+              editable={!disabled}
+              keyboardType={getKeyboardType()}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              selectionColor={isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}
+            />
+            </View>
           ) : (
             <TextInput
               ref={inputRef}
