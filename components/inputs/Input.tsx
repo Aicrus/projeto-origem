@@ -320,14 +320,23 @@ export const Input = ({
       alignItems: 'center',
       borderWidth: 1,
       borderRadius: Number(getBorderRadius('md').replace('px', '')),
-      backgroundColor: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+      backgroundColor: isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'],
       borderColor: error 
         ? isDark ? colors['error-border-dark'] : colors['error-border-light']
         : isFocused
           ? isDark ? colors['primary-dark'] : colors['primary-light']
           : isDark ? colors['divider-dark'] : colors['divider-light'],
-      minHeight: Number(spacing['9'].replace('px', '')),
+      minHeight: Number(spacing['10'].replace('px', '')), // Aumentado de spacing-9 para spacing-10
       paddingHorizontal: Number(spacing['3'].replace('px', '')),
+      // Sombra sutil para dar profundidade (similar ao shadcn)
+      shadowColor: isDark ? '#000000' : '#000000',
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      },
+      shadowOpacity: isDark ? 0.3 : 0.05,
+      shadowRadius: 2,
+      elevation: 1,
     },
     inputStyle: {
       flex: 1,
@@ -335,14 +344,14 @@ export const Input = ({
       fontSize: Number(fontSize['body-md'].size.replace('px', '')),
       lineHeight: Platform.OS === 'web' 
         ? Number(fontSize['body-md'].lineHeight.replace('px', ''))
-        : Number(fontSize['body-md'].size.replace('px', '')) * 1.2, // Ajuste para nativo
+        : Number(fontSize['body-md'].size.replace('px', '')) * 1.3, // Aumentado para melhor proporção
       fontFamily: fontFamily['jakarta-regular'],
       paddingVertical: Platform.OS === 'web' 
-        ? Number(spacing['2'].replace('px', ''))
-        : Number(spacing['3'].replace('px', '')), // Mais padding vertical no nativo
-      height: multiline ? undefined : Number(spacing['9'].replace('px', '')),
+        ? Number(spacing['2.5'].replace('px', ''))
+        : Number(spacing['3.5'].replace('px', '')), // Mais padding para altura maior
+      height: multiline ? undefined : Number(spacing['10'].replace('px', '')), // Ajustado para nova altura
       textAlignVertical: multiline ? 'top' : 'center',
-      ...(Platform.OS === 'ios' && multiline ? { paddingTop: Number(spacing['2'].replace('px', '')) } : {}),
+      ...(Platform.OS === 'ios' && multiline ? { paddingTop: Number(spacing['2.5'].replace('px', '')) } : {}),
       // Ajustes específicos para o nativo para evitar corte do texto
       ...(Platform.OS !== 'web' && !multiline ? {
         includeFontPadding: false, // Remove padding extra no Android
@@ -352,26 +361,27 @@ export const Input = ({
       } : {}),
     },
     searchIcon: {
-      padding: Number(spacing['0.5'].replace('px', '')),
-      marginRight: Number(spacing['1'].replace('px', '')),
-      marginLeft: -4, // Valor fixo para manter o alinhamento
+      padding: Number(spacing['1'].replace('px', '')), // Aumentado para melhor proporção
+      marginRight: Number(spacing['2'].replace('px', '')), // Aumentado
+      marginLeft: -2, // Ajustado para novo tamanho
     },
     iconContainer: {
-      padding: Number(spacing['1'].replace('px', '')),
+      padding: Number(spacing['1.5'].replace('px', '')), // Aumentado para melhor área de toque
+      borderRadius: Number(getBorderRadius('sm').replace('px', '')), // Adiciona border radius nos ícones
     },
     labelStyle: {
       fontSize: Number(fontSize['label-sm'].size.replace('px', '')),
       lineHeight: Number(fontSize['label-sm'].lineHeight.replace('px', '')),
       fontFamily: fontFamily['jakarta-medium'],
-      marginBottom: Number(spacing['1'].replace('px', '')),
-      color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+      marginBottom: Number(spacing['1.5'].replace('px', '')), // Aumentado para melhor espaçamento
+      color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'], // Mudado para primary para maior contraste
     },
     errorText: {
       fontSize: Number(fontSize['body-sm'].size.replace('px', '')),
       lineHeight: Number(fontSize['body-sm'].lineHeight.replace('px', '')),
       fontFamily: fontFamily['jakarta-regular'],
       color: isDark ? colors['error-text-dark'] : colors['error-text-light'],
-      marginTop: Number(spacing['0.5'].replace('px', '')),
+      marginTop: Number(spacing['1'].replace('px', '')), // Aumentado para melhor espaçamento
     },
     numberControlsContainer: {
       position: 'absolute',
@@ -614,15 +624,31 @@ export const Input = ({
       const style = document.createElement('style');
       style.textContent = `
         /* Estilos para o input */
+        [data-input-container="true"] {
+          transition: all 0.2s ease-in-out;
+        }
+        
         [data-input-container="true"]:hover:not([data-disabled="true"]) {
-          opacity: 0.8;
-          transition: opacity 0.2s ease;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          border-color: ${isDark ? colors['primary-dark'] : colors['primary-light']};
+          transition: all 0.2s ease-in-out;
+        }
+        
+        [data-input-container="true"]:focus-within {
+          box-shadow: 0 0 0 2px ${isDark ? colors['primary-dark'] + '40' : colors['primary-light'] + '40'};
+          transition: all 0.2s ease-in-out;
         }
         
         /* Estilo para os ícones */
+        [data-input-icon="true"] {
+          transition: all 0.2s ease;
+          border-radius: 4px;
+        }
+        
         [data-input-icon="true"]:hover {
-          opacity: 0.8;
+          background-color: ${isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light']};
           cursor: pointer;
+          transition: all 0.2s ease;
         }
         
         /* Remover highlight/seleção azul padrão nos navegadores */
@@ -867,7 +893,10 @@ export const Input = ({
       <View 
         style={[
           containerStyle.inputContainer, 
-          disabled ? { opacity: 0.5 } : {},
+          disabled ? { 
+            opacity: 0.6, 
+            backgroundColor: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'] // Fundo mais sutil quando desabilitado
+          } : {},
           type === 'number' && showNumberControls && !isWeb ? { paddingRight: 32 } : {},
           multiline && { minHeight: minHeight },
           !isWeb && multiline && resizable ? { height: nativeInputHeight } : {},
@@ -935,25 +964,25 @@ export const Input = ({
             />
           </View>
         ) : (
-          <TextInput
-            ref={inputRef}
-            style={[
-              containerStyle.inputStyle, 
-              inputStyle,
-              { height: multiline ? inputHeight : undefined },
-              // Adiciona estilos para redimensionamento se necessário
-              isWeb && multiline && resizable ? {
-                minHeight: minHeight,
-                maxHeight: maxHeight,
-                height: 'auto'
-              } : {},
-              // Garante que o texto comece no topo em inputs multilinhas
-              multiline ? { textAlignVertical: 'top' } : {}
-            ]}
-            value={value}
-            onChangeText={handleChangeText}
-            placeholder={placeholder}
-            placeholderTextColor={getThemeColor('text-secondary')}
+                      <TextInput
+              ref={inputRef}
+              style={[
+                containerStyle.inputStyle, 
+                inputStyle,
+                { height: multiline ? inputHeight : undefined },
+                // Adiciona estilos para redimensionamento se necessário
+                isWeb && multiline && resizable ? {
+                  minHeight: minHeight,
+                  maxHeight: maxHeight,
+                  height: 'auto'
+                } : {},
+                // Garante que o texto comece no topo em inputs multilinhas
+                multiline ? { textAlignVertical: 'top' } : {}
+              ]}
+              value={value}
+              onChangeText={handleChangeText}
+              placeholder={placeholder}
+              placeholderTextColor={isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']} // Mudado para tertiary para ficar mais sutil
             editable={!disabled}
             secureTextEntry={type === 'password' && !passwordVisible}
             keyboardType={getKeyboardType()}
@@ -969,8 +998,8 @@ export const Input = ({
             multiline={multiline}
             numberOfLines={multiline ? numberOfLines : 1}
             testID={testID}
-            // Cor de seleção mais sutil (neutra como na web)
-            selectionColor={isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'}
+                          // Cor de seleção elegante baseada na cor primária
+              selectionColor={isDark ? colors['primary-dark'] + '60' : colors['primary-light'] + '60'}
             autoFocus={autoFocus}
             onContentSizeChange={handleContentSizeChange}
             // Para web, adiciona suporte nativo ao input de data HTML5
