@@ -19,7 +19,7 @@ import {
 } from '../../design-system';
 import { Input } from '@/components/inputs/Input';
 import { Select } from '@/components/dropdowns/Select';
-import { Accordion, AccordionGroup } from '@/components/accordions/Accordion';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent, FAQAccordion, SettingsAccordion, InfoAccordion } from '@/components/accordions/Accordion';
 
 // Função para obter as cores do tailwind.config.js
 const getTailwindConfig = () => {
@@ -172,8 +172,7 @@ export default function DevPage() {
   const [toastClosable, setToastClosable] = useState(false);
   const [toastProgressBar, setToastProgressBar] = useState(true);
   const { width } = useWindowDimensions();
-  const { currentBreakpoint } = useResponsive();
-  const isMobile = width < 768;
+  const { currentBreakpoint, isMobile, isTablet, isDesktop, responsive } = useResponsive();
   
   // HoverableView estados de exemplo
   const [activeItem, setActiveItem] = useState<number | null>(null);
@@ -913,245 +912,360 @@ export default function DevPage() {
   
   // Função para renderizar o componente Accordion e seus exemplos
   const renderAccordionComponent = () => {
+    // Layout responsivo otimizado para todos os breakpoints
+    const containerPadding = responsive({
+      mobile: 'p-md',
+      tablet: 'p-md', 
+      desktop: 'p-lg',
+      default: 'p-md'
+    });
+
+    const headerSpacing = responsive({
+      mobile: 'mb-md',
+      tablet: 'mb-md',
+      desktop: 'mb-lg',
+      default: 'mb-md'
+    });
+
+    const cardSpacing = responsive({
+      mobile: 'p-sm',
+      tablet: 'p-sm',
+      desktop: 'p-md',
+      default: 'p-sm'
+    });
+
+    // Tipografia usando tokens do design system
+    const titleSize = responsive({
+      mobile: 'text-lg',      // title-md
+      tablet: 'text-xl',      // title-lg  
+      desktop: 'text-2xl',    // headline-sm
+      default: 'text-lg'
+    });
+
+    const examplesPerRow = responsive({
+      mobile: 1,
+      tablet: 2,
+      desktop: 2,
+      default: 1
+    });
+
+    const gapSize = responsive({
+      mobile: 8,
+      tablet: 12,
+      desktop: 16,
+      default: 8
+    });
+
     return (
-      <View className="p-lg">
-        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
-          Componente Accordion
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          O Accordion é um componente expansível que permite ocultar e mostrar conteúdo conforme
-          necessário, economizando espaço na interface e melhorando a organização da informação.
-          Oferece uma experiência consistente em todas as plataformas.
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+      <View className={containerPadding}>
+        {/* Header Section */}
+        <View className={headerSpacing}>
+          <View className="flex-row items-center mb-xs">
+            <View className="w-1 h-8 bg-primary-light dark:bg-primary-dark rounded-full mr-sm" />
+            <Text className={`${titleSize} font-jakarta-semibold ${textPrimary}`}>
+              Accordion
+            </Text>
+          </View>
+          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+            Componente expansível moderno com <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">animações 60fps</Text>, cores do design system e pré-configurações elegantes.
+          </Text>
           
-          {/* FAQ como na imagem - diretamente visível */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>FAQ - Perguntas Frequentes</Text>
-            <View>
-              <AccordionGroup>
-                <Accordion
-                  title="É acessível?"
-                  content="Sim, o componente Accordion é totalmente acessível, compatível com leitores de tela e navegável por teclado. Ele segue as melhores práticas de acessibilidade WCAG."
-                  bordered={true}
-                  showOutline={false}
-                  showSeparator={true}
-                  separatorSpacing={12}
-                  id="accessible"
-                  animationDuration={350}
-                />
-                <Accordion
-                  title="É estilizado?"
-                  content="Sim, o Accordion é altamente estilizável. Você pode personalizar completamente a aparência do cabeçalho, conteúdo, ícones e animações usando as propriedades style, headerStyle e contentStyle."
-                  bordered={true}
-                  showOutline={false}
-                  showSeparator={true}
-                  separatorSpacing={12}
-                  id="styled"
-                  animationDuration={350}
-                />
-                <Accordion
-                  title="É animado?"
-                  content="Sim, o Accordion possui animações suaves e otimizadas para expandir e colapsar o conteúdo. As animações são adaptadas para cada plataforma, garantindo a melhor experiência possível."
-                  bordered={true}
-                  showOutline={false}
-                  showSeparator={true}
-                  separatorSpacing={12}
-                  id="animated"
-                  animationDuration={350}
-                />
-              </AccordionGroup>
+          {/* Quick Stats - Responsivo */}
+          <View 
+            className={responsive({ mobile: "flex-col", tablet: "flex-row items-center", desktop: "flex-row items-center", default: "flex-col" })}
+            style={{ 
+              gap: responsive({ mobile: 6, tablet: 12, desktop: 16, default: 6 }),
+              marginTop: 4
+            }}
+          >
+            <View className="flex-row items-center">
+              <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-xs" />
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>3 pré-configurações</Text>
             </View>
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Grupo de accordions em estilo minimalista sem contorno externo com linhas divisórias entre todos os itens.
-            </Text>
+            <View className="flex-row items-center">
+              <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-xs" />
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>TypeScript</Text>
+            </View>
+            <View className="flex-row items-center">
+              <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-xs" />
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>60fps</Text>
+            </View>
           </View>
-          
-          {/* Accordion básico */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Accordion básico</Text>
-            <Accordion
-              title="Clique para expandir"
-              content="Este é o conteúdo do accordion básico. O componente oferece uma forma elegante de ocultar conteúdo que pode ser expandido quando necessário."
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Accordion simples com título e conteúdo como texto.
-            </Text>
-          </View>
-          
-          {/* Accordion com conteúdo personalizado */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Accordion com conteúdo personalizado</Text>
-            <Accordion
-              title="Conteúdo personalizado"
-              defaultOpen={true}
-            >
-              <View className="p-xs">
-                <Text className={`text-body-md ${textPrimary} mb-sm`}>
-                  Este accordion contém elementos personalizados.
-                </Text>
-                <View className={`${bgTertiary} p-sm rounded-md mb-sm`}>
-                  <Text className={`text-body-sm ${textSecondary}`}>
-                    Você pode incluir qualquer componente React Native aqui.
+        </View>
+        
+        {/* Primeira linha de exemplos - FAQ e Settings */}
+        <View style={{
+          flexDirection: examplesPerRow === 1 ? 'column' : 'row',
+          gap: gapSize,
+          marginBottom: gapSize
+        }}>
+          {/* FAQ Example */}
+          <View style={{ 
+            flex: examplesPerRow === 1 ? undefined : 1, 
+            width: examplesPerRow === 1 ? '100%' : undefined
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${cardSpacing} border border-divider-light dark:border-divider-dark/30`}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    FAQ
                   </Text>
                 </View>
-                <Pressable 
-                  className={`px-md py-sm rounded-md bg-primary-light dark:bg-primary-dark items-center`}
-                >
-                  <Text className={`text-label-sm font-jakarta-semibold text-white`}>Botão de Exemplo</Text>
-                </Pressable>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Apenas uma resposta visível • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">type="single"</Text>
+                </Text>
               </View>
-            </Accordion>
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Accordion com conteúdo personalizado usando elementos React Native.
-            </Text>
+              
+              <FAQAccordion>
+                <AccordionItem value="q1">
+                  <AccordionTrigger>Como implementar autenticação segura?</AccordionTrigger>
+                  <AccordionContent>
+                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                      Implementação biométrica com <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">Touch ID e Face ID</Text> no iOS, <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">BiometricPrompt API</Text> no Android. Inclui fallbacks seguros e criptografia AES-256.
+                    </Text>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="q2">
+                  <AccordionTrigger>Estratégia de cache offline?</AccordionTrigger>
+                  <AccordionContent>
+                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                      Arquitetura <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">cache-first</Text> com AsyncStorage, SQLite e Redux Persist. Sincronização inteligente em background.
+                    </Text>
+                  </AccordionContent>
+                </AccordionItem>
+              </FAQAccordion>
+            </View>
+          </View>
+
+          {/* Settings Example */}
+          <View style={{ 
+            flex: examplesPerRow === 1 ? undefined : 1, 
+            width: examplesPerRow === 1 ? '100%' : undefined
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${cardSpacing} border border-divider-light dark:border-divider-dark/30`}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Settings
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Múltiplas seções abertas • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">type="multiple"</Text>
+                </Text>
+              </View>
+              
+              <SettingsAccordion>
+                <AccordionItem value="account">
+                  <AccordionTrigger>Configurações de Conta</AccordionTrigger>
+                  <AccordionContent>
+                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                      Perfil, <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">notificações push</Text>, autenticação 2FA e backup automático de dados.
+                    </Text>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="privacy">
+                  <AccordionTrigger>Privacidade e Segurança</AccordionTrigger>
+                  <AccordionContent>
+                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                      Controle de <Text className="text-error-icon-light dark:text-error-icon-dark font-jakarta-medium">visibilidade</Text>, bloqueio biométrico e gestão de sessões ativas.
+                    </Text>
+                  </AccordionContent>
+                </AccordionItem>
+              </SettingsAccordion>
+            </View>
+          </View>
+        </View>
+
+        {/* Segunda linha de exemplos - Info e Code */}
+        <View style={{
+          flexDirection: examplesPerRow === 1 ? 'column' : 'row',
+          gap: gapSize
+        }}>
+          {/* Info Example */}
+          <View style={{ 
+            flex: examplesPerRow === 1 ? undefined : 1, 
+            width: examplesPerRow === 1 ? '100%' : undefined
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${cardSpacing} border border-divider-light dark:border-divider-dark/30`}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Info
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Sempre uma seção aberta • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">collapsible={false}</Text>
+                </Text>
+              </View>
+              
+              <InfoAccordion defaultOpen="tech">
+                <AccordionItem value="tech">
+                  <AccordionTrigger>Especificações Técnicas</AccordionTrigger>
+                  <AccordionContent>
+                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                      <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">React Native Reanimated 3</Text> a 60fps. TypeScript strict mode. Suporte Web, iOS e Android. <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">WCAG 2.1 AA</Text> compliant.
+                    </Text>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="usage">
+                  <AccordionTrigger>Como Implementar</AccordionTrigger>
+                  <AccordionContent>
+                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                      Importe <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">FAQAccordion</Text>, <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">SettingsAccordion</Text> ou <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">InfoAccordion</Text>. Design system automático.
+                    </Text>
+                  </AccordionContent>
+                </AccordionItem>
+              </InfoAccordion>
+            </View>
+          </View>
+
+          {/* Code Example Card */}
+          <View style={{ 
+            flex: examplesPerRow === 1 ? undefined : 1, 
+            width: examplesPerRow === 1 ? '100%' : undefined
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${cardSpacing} border border-divider-light dark:border-divider-dark/30`}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-error-icon-light dark:bg-error-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Exemplo de Código
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Implementação rápida e limpa
+                </Text>
+              </View>
+              
+              <View className={`${bgTertiary} rounded-lg ${responsive({ mobile: 'p-xs', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`}>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} font-mono leading-relaxed ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 16 }) }}>
+                  <Text className="text-info-icon-light dark:text-info-icon-dark">import</Text> {'{'}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark"> FAQAccordion </Text>
+                  {'}'} <Text className="text-info-icon-light dark:text-info-icon-dark">from</Text> <Text className="text-success-icon-light dark:text-success-icon-dark">'@/components'</Text>
+                  {'\n\n'}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'<FAQAccordion>'}</Text>
+                  {'\n  '}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'<AccordionItem'}</Text> <Text className="text-warning-icon-light dark:text-warning-icon-dark">value</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">"item-1"</Text><Text className="text-error-icon-light dark:text-error-icon-dark">{'>'}</Text>
+                  {'\n    '}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'<AccordionTrigger>'}</Text>
+                  {'\n      '}Título
+                  {'\n    '}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'</AccordionTrigger>'}</Text>
+                  {'\n    '}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'<AccordionContent>'}</Text>
+                  {'\n      '}Conteúdo
+                  {'\n    '}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'</AccordionContent>'}</Text>
+                  {'\n  '}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'</AccordionItem>'}</Text>
+                  {'\n'}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'</FAQAccordion>'}</Text>
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
         
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Características
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-md`}>
-          O Accordion oferece uma série de recursos para facilitar a navegação em conteúdos extensos:
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Animações suaves</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Transições animadas para expandir e colapsar o conteúdo</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tema adaptativo</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Adapta-se automaticamente a temas claros e escuros</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Personalização</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Cabeçalho e conteúdo personalizáveis</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Responsividade</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Funciona igualmente bem em dispositivos móveis e desktop</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Estrutura aninhada</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Suporte para accordions dentro de accordions</Text>
-          </View>
-        </View>
-        
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Propriedades
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          O componente Accordion possui diversas propriedades para personalização:
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>title</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Título do accordion (string)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>content</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Conteúdo de texto simples (string)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>children</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Componentes React Native para conteúdo personalizado</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>defaultOpen</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Se o accordion deve iniciar aberto (boolean)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>separatorSpacing</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Espaçamento da linha divisória em pixels (number)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>customHeader</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Função para renderizar um cabeçalho personalizado</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>onToggle</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Callback chamado ao abrir ou fechar</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>bordered</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Se deve mostrar borda ao redor do accordion</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>showOutline</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Se deve mostrar o contorno/borda externa (boolean)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>showSeparator</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Se deve mostrar a linha divisória quando expandido (boolean)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>animationDuration</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Duração da animação em milissegundos (number)</Text>
-          </View>
-          
-          <Text className={`text-body-sm ${textSecondary} mt-md`}>
-            E outras propriedades para personalização completa do componente...
+        {/* Quick Usage Guide - Espaçamento consistente */}
+        <View 
+          className={`${bgSecondary} rounded-xl ${cardSpacing} mb-md border-l-4 border-primary-light dark:border-primary-dark`}
+          style={{ marginTop: gapSize }}
+        >
+          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary} mb-xs`}>
+            💡 Como funciona?
+          </Text>
+          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+            Clique nos <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">títulos acima</Text> para expandir/recolher o conteúdo. Cada exemplo demonstra um comportamento diferente: <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">FAQ</Text> (apenas um aberto), <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">Settings</Text> (vários abertos), <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">Info</Text> (sempre um aberto).
           </Text>
         </View>
 
-        {/* Adicionar seção de AccordionGroup */}
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          AccordionGroup
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          O componente AccordionGroup permite agrupar múltiplos accordions e garantir que apenas um esteja aberto por vez:
-        </Text>
-
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Uso</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>
-              Envolva vários accordions com o componente AccordionGroup para criar comportamento de grupo.
+        {/* Recursos e API - Espaçamento consistente */}
+        <View style={{ marginTop: gapSize }}>
+          <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-lg', default: 'text-base' })} font-jakarta-medium ${textPrimary} mb-md`}>
+            Recursos
+          </Text>
+          
+          <View style={{
+            flexDirection: responsive({ mobile: 'column', tablet: 'row', desktop: 'row', default: 'column' }),
+            gap: gapSize,
+            marginBottom: gapSize
+          }}>
+            <View className={`${bgSecondary} rounded-lg ${cardSpacing} flex-1 border border-success-icon-light/20 dark:border-success-icon-dark/20`}>
+              <View className="flex-row items-center mb-xs">
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-lg', default: 'text-sm' })} mr-xs`}>⚡</Text>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>React Native Reanimated 3</Text>
+              </View>
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Animações 60fps no thread nativo</Text>
+            </View>
+            
+            <View className={`${bgSecondary} rounded-lg ${cardSpacing} flex-1 border border-info-icon-light/20 dark:border-info-icon-dark/20`}>
+              <View className="flex-row items-center mb-xs">
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-lg', default: 'text-sm' })} mr-xs`}>🔷</Text>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>TypeScript</Text>
+              </View>
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Tipagem completa e IntelliSense</Text>
+            </View>
+            
+            <View className={`${bgSecondary} rounded-lg ${cardSpacing} flex-1 border border-warning-icon-light/20 dark:border-warning-icon-dark/20`}>
+              <View className="flex-row items-center mb-xs">
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-lg', default: 'text-sm' })} mr-xs`}>🌓</Text>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>Tema Automático</Text>
+              </View>
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Cores adaptativas light/dark</Text>
+            </View>
+          </View>
+          
+          <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-lg', default: 'text-base' })} font-jakarta-medium ${textPrimary} mb-md`}>
+            API Principal
+          </Text>
+          
+          <View className={`${bgSecondary} rounded-lg ${cardSpacing} mb-md`}>
+            <View className="mb-sm">
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>type: <Text className="text-primary-light dark:text-primary-dark">"single" | "multiple"</Text></Text>
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Controla quantos items podem estar abertos</Text>
+            </View>
+            
+            <View className="mb-sm">
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>collapsible: <Text className="text-primary-light dark:text-primary-dark">boolean</Text></Text>
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Permite fechar todos os items (apenas type="single")</Text>
+            </View>
+            
+            <View className="mb-sm">
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>defaultValue: <Text className="text-primary-light dark:text-primary-dark">string | string[]</Text></Text>
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Items que iniciam abertos</Text>
+            </View>
+            
+            <View className="mb-0">
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>children: <Text className="text-primary-light dark:text-primary-dark">ReactNode</Text></Text>
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>AccordionItem {'>'}  AccordionTrigger + AccordionContent</Text>
+            </View>
+          </View>
+          
+          <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-lg', default: 'text-base' })} font-jakarta-medium ${textPrimary} mb-md`}>
+            Pré-configurações
+          </Text>
+          
+          <View className={`${bgSecondary} rounded-lg ${cardSpacing} mb-md`}>
+            <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-sm`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 18 }) }}>
+              <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">FAQAccordion</Text> - type="single" + collapsible • 
+              <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium"> SettingsAccordion</Text> - type="multiple" • 
+              <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium"> InfoAccordion</Text> - type="single" sem collapsible
             </Text>
           </View>
           
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Benefícios</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>
-              • Melhora a experiência do usuário evitando múltiplos conteúdos abertos
-              • Ideal para FAQs e menus de navegação
-              • Gerencia automaticamente o estado de abertura/fechamento
-            </Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Propriedades</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>
-              • children: Os componentes Accordion a serem agrupados
-              • defaultOpenId: ID do accordion que deve iniciar aberto
-            </Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Exemplo de código</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>
-              {`<AccordionGroup defaultOpenId="section1">
-  <Accordion id="section1" title="Seção 1" content="Conteúdo 1" />
-  <Accordion id="section2" title="Seção 2" content="Conteúdo 2" />
-</AccordionGroup>`}
+          {/* Pro Tip - Espaçamento consistente */}
+          <View className={`${bgTertiary} rounded-lg ${cardSpacing} border-l-2 border-success-icon-light dark:border-success-icon-dark`}>
+            <View className="flex-row items-center mb-xs">
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} mr-xs`}>🚀</Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium text-success-icon-light dark:text-success-icon-dark`}>
+                Dica Pro
+              </Text>
+            </View>
+            <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+              Use <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">defaultValue</Text> para controlar quais items iniciam abertos. Perfeito para destacar informações importantes ou guiar a experiência do usuário.
             </Text>
           </View>
         </View>

@@ -8,6 +8,7 @@ import { Portal } from '@gorhom/portal';
 import { useResponsive } from '../../hooks/useResponsive';
 import { Building2, Users, ClipboardList, AlertTriangle } from 'lucide-react-native';
 import { breakpoints as BREAKPOINTS } from '../../design-system';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/accordions/Accordion';
 
 export default function Home() {
   const { currentTheme } = useTheme();
@@ -162,16 +163,35 @@ export default function Home() {
           gap: 16,
           flex: 1,
         }}>
-          {/* Card inferior 1 */}
+          {/* Card inferior 1 - Placeholder */}
           <View 
             className={`${cardBg} rounded-lg p-4`} 
             style={{ flex: 1 }} 
-          />
-          {/* Card inferior 2 */}
+          >
+            <Text style={[styles.chartTitle, { color: isDark ? '#F1F5F9' : '#1E293B', marginBottom: 16 }]}>
+              Área de Conteúdo
+            </Text>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={[styles.statSubtitle, { color: isDark ? '#94A3B8' : '#64748B', textAlign: 'center' }]}>
+                Espaço disponível para conteúdo personalizado
+              </Text>
+            </View>
+          </View>
+          
+          {/* Card inferior 2 - Placeholder */}
           <View 
             className={`${cardBg} rounded-lg p-4`} 
             style={{ flex: 1 }} 
-          />
+          >
+            <Text style={[styles.chartTitle, { color: isDark ? '#F1F5F9' : '#1E293B', marginBottom: 16 }]}>
+              Área de Conteúdo
+            </Text>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={[styles.statSubtitle, { color: isDark ? '#94A3B8' : '#64748B', textAlign: 'center' }]}>
+                Espaço disponível para conteúdo personalizado
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
     );
