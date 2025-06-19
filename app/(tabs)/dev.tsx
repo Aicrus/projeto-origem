@@ -892,197 +892,305 @@ export default function DevPage() {
   // Função para renderizar o componente Select e seus exemplos
   const renderSelectComponent = () => {
     return (
-      <View className="p-lg">
-        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
-          Componente Select
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          O Select é um componente de seleção dropdown altamente personalizável que oferece
-          uma experiência unificada em todas as plataformas (iOS, Android, Web), adaptando-se 
-          às convenções de cada plataforma.
-        </Text>
+      <ScrollView 
+        className="p-lg" 
+        contentContainerStyle={{ paddingBottom: 60 }} // Adiciona espaço extra ao final
+        showsVerticalScrollIndicator={true}
+      >
+
         
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Exemplos:</Text>
+        {/* Layout responsivo otimizado para todos os breakpoints */}
+            <View className="mb-md">
+          <View className="flex-row items-center mb-xs">
+            <View className="w-1 h-8 bg-primary-light dark:bg-primary-dark rounded-full mr-sm" />
+            <Text className={`${responsive({ mobile: 'text-lg', tablet: 'text-xl', desktop: 'text-2xl', default: 'text-lg' })} font-jakarta-semibold ${textPrimary}`}>
+              Select
+              </Text>
+            </View>
+          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+            Componente dropdown inteligente com <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">posicionamento automático</Text>, busca avançada e integração direta com Supabase.
+              </Text>
           
-          {/* Select básico */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Select básico</Text>
+          {/* Quick Stats - Responsivo */}
+          <View 
+            className={responsive({ mobile: "flex-col", tablet: "flex-row items-center", desktop: "flex-row items-center", default: "flex-col" })}
+            style={{ 
+              gap: responsive({ mobile: 6, tablet: 12, desktop: 16, default: 6 }),
+              marginTop: 4
+            }}
+          >
+            <View className="flex-row items-center">
+              <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-xs" />
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>Seleção única/múltipla</Text>
+            </View>
+            <View className="flex-row items-center">
+              <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-xs" />
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>Busca inteligente</Text>
+            </View>
+            <View className="flex-row items-center">
+              <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-xs" />
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>Integração Supabase</Text>
+            </View>
+          </View>
+            </View>
+            
+        {/* Primeira linha de exemplos - Básico e Busca */}
+        <View style={{
+          flexDirection: responsive({ mobile: 'column', tablet: 'row', desktop: 'row', default: 'column' }),
+          gap: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 }),
+          marginBottom: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 })
+        }}>
+          {/* Select Básico */}
+          <View style={{ 
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+            <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Seleção Básica
+              </Text>
+            </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Interface intuitiva • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Animações suaves</Text>
+              </Text>
+          </View>
+          
+              <View style={{ gap: responsive({ mobile: 8, tablet: 10, desktop: 12, default: 8 }) }}>
             <Select
               options={selectOptions}
               value={selectBasico}
               setValue={setSelectBasico}
-              placeholder="Selecione uma opção"
-              label="Select básico"
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Select simples com seleção única e animações suaves.
-            </Text>
-          </View>
-          
-          {/* Select com busca */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Select com busca</Text>
+                  placeholder="Selecione uma cidade"
+                  label="Cidade de origem"
+                />
             <Select
               options={selectOptions}
               value={selectBusca}
               setValue={setSelectBusca}
-              placeholder="Pesquise e selecione"
-              label="Select com busca"
-              searchable
+              placeholder="Digite para pesquisar"
+              label="Busca inteligente"
+              searchable={true}
             />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Inclui campo de busca para filtrar opções em listas grandes. Digite qualquer parte do 
-              texto (exemplo: "3", "São", "Rio", "Teste") para encontrar correspondências.
+              </View>
+            </View>
+          </View>
+
+          {/* Select Múltiplo */}
+          <View style={{ 
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Seleção Múltipla
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Múltiplas opções • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Contagem automática</Text>
             </Text>
           </View>
           
-          {/* Select múltiplo */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Select múltiplo</Text>
+              <View style={{ gap: responsive({ mobile: 8, tablet: 10, desktop: 12, default: 8 }) }}>
             <Select
               options={selectOptions}
               value={multiSelect}
               setValue={setMultiSelect as any}
-              placeholder="Selecione várias opções"
-              label="Select múltiplo"
+              placeholder="Selecione várias cidades"
+              label="Destinos favoritos"
               multiple={true}
               searchable={true}
             />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Permite selecionar múltiplos itens com contagem e gerenciamento automático.
-              Também inclui campo de pesquisa para facilitar a seleção em listas grandes.
+            
+            {multiSelect.length > 0 && (
+              <View className={`${bgTertiary} rounded-md p-xs`}>
+                <Text className={`text-body-xs ${textSecondary}`}>
+                  <Text className="font-jakarta-bold">Selecionados:</Text> {multiSelect.length} {multiSelect.length === 1 ? 'item' : 'itens'}
+                </Text>
+              </View>
+            )}
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Segunda linha - Integração Supabase e Código */}
+        <View style={{
+          flexDirection: responsive({ mobile: 'column', tablet: 'row', desktop: 'row', default: 'column' }),
+          gap: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 })
+        }}>
+          {/* Integração Supabase */}
+          <View style={{ 
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Integração Direta
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Conecta direto ao Supabase • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Zero configuração</Text>
             </Text>
           </View>
           
-          {/* Select com dados do Supabase (nome) */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Select com Supabase (integração direta)</Text>
+              <View style={{ gap: responsive({ mobile: 8, tablet: 10, desktop: 12, default: 8 }) }}>
             <Select
               value={selectSupabaseNome}
               setValue={setSelectSupabaseNome}
-              placeholder="Selecione um nome"
-              label="Nome do usuário"
+              placeholder="Carregando usuários..."
+              label="Usuário da Academia"
               searchable={true}
               supabaseTable="usersAicrusAcademy"
               supabaseColumn="nome"
               supabaseOrderBy="nome"
               supabaseAscending={true}
             />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Este exemplo demonstra a nova integração direta com o Supabase. Basta passar as propriedades:
-              <Text className="font-jakarta-bold"> supabaseTable</Text> (nome da tabela) e 
-              <Text className="font-jakarta-bold"> supabaseColumn</Text> (nome da coluna a ser usada).
-              Opcionalmente, você pode especificar <Text className="font-jakarta-bold">supabaseOrderBy</Text> e
-              <Text className="font-jakarta-bold"> supabaseAscending</Text> para controlar a ordenação dos dados.
-            </Text>
+            
+            <View className={`${bgTertiary} rounded-md p-xs`}>
+              <Text className={`text-body-xs ${textSecondary}`}>
+                <Text className="font-jakarta-bold">Dica:</Text> Dados carregados automaticamente da tabela Supabase. Busca funciona em tempo real.
+              </Text>
+            </View>
+              </View>
+            </View>
           </View>
-        </View>
-        
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Características
+
+          {/* Código de Exemplo */}
+          <View style={{ 
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-error-icon-light dark:bg-error-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Implementação Rápida
         </Text>
-        <Text className={`text-body-md ${textSecondary} mb-md`}>
-          O Select se adapta inteligentemente ao ambiente:
-        </Text>
-        
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  API simples e intuitiva
+               </Text>
+             </View>
+             
+              <View className={`${bgTertiary} rounded-lg ${responsive({ mobile: 'p-xs', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`}>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} font-mono leading-relaxed ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 16 }) }}>
+                  <Text className="text-info-icon-light dark:text-info-icon-dark">import</Text> {'{'}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark"> Select </Text>
+                  {'}'} <Text className="text-info-icon-light dark:text-info-icon-dark">from</Text> <Text className="text-success-icon-light dark:text-success-icon-dark">'@/components'</Text>
+                  {'\n\n'}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'<Select'}</Text>
+                  {'\n  '}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark">options</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">{'{cities}'}</Text>
+                  {'\n  '}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark">value</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">{'{selectedCity}'}</Text>
+                  {'\n  '}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark">setValue</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">{'{setSelectedCity}'}</Text>
+                  {'\n  '}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark">searchable</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">{'{true}'}</Text>
+                  {'\n  '}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark">multiple</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">{'{false}'}</Text>
+                  {'\n'}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'/>'}</Text>
+               </Text>
+             </View>
+            </View>
+            </View>
+          </View>
+          
+        {/* Quick Usage Guide - Espaçamento consistente */}
+        <View 
+          className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })} mb-md border-l-4 border-primary-light dark:border-primary-dark`}
+          style={{ marginTop: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 }) }}
+        >
+          <View className="flex-row items-center mb-xs">
+            <Lightbulb size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs" />
+            <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+              Como funciona?
+              </Text>
+            </View>
+          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+            Teste os <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">selects acima</Text> para ver diferentes funcionalidades. <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">Busca</Text> filtra em tempo real, <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">múltipla seleção</Text> conta automaticamente, <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">Supabase</Text> carrega dados direto do banco.
+              </Text>
+          </View>
+          
+
+
+        {/* Recursos e API */}
         <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Posicionamento inteligente</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Abre para cima ou para baixo dependendo do espaço disponível</Text>
+          <View className="flex-row items-center mb-sm">
+            <View className={`w-1 h-6 ${isDark ? 'bg-primary-dark' : 'bg-primary-light'} rounded-full mr-sm`} />
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary}`}>
+              Recursos e API
+              </Text>
+            </View>
+            
+          <View className="mb-md">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-xs`}>Funcionalidades principais</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Seleção única/múltipla</Text> - Flexibilidade total
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Busca inteligente</Text> - Ignora acentos e maiúsculas
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Posicionamento automático</Text> - Abre para cima/baixo
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Interface adaptativa</Text> - Modal no mobile, dropdown na web
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Integração Supabase</Text> - Conecta direto ao banco
+              </Text>
+            </View>
+            
+          <View className="mb-md">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-xs`}>Props principais</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">options</Text> - Array de {'{value, label}'}
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">value/setValue</Text> - Estado controlado
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">multiple</Text> - Seleção múltipla
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">searchable</Text> - Campo de busca
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">disabled</Text> - Estado desabilitado
+              </Text>
+            </View>
+            
+            <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-xs`}>Integração Supabase</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">supabaseTable</Text> - Nome da tabela
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">supabaseColumn</Text> - Coluna para valor/label
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">supabaseOrderBy</Text> - Coluna para ordenação
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">supabaseAscending</Text> - Ordem crescente/decrescente
+              </Text>
+            </View>
           </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Interface por plataforma</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Modal em dispositivos móveis e dropdown flutuante na web</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Busca avançada</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Pesquisa em qualquer parte do texto, ignora acentos, maiúsculas e minúsculas</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Estilo consistente</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Segue o tema da aplicação com transições suaves</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Acessibilidade</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Suporte para navegação por teclado e leitores de tela</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Animações otimizadas</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Transições suaves com desempenho otimizado</Text>
-          </View>
-        </View>
-        
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Propriedades
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          O componente Select possui diversas propriedades para personalização:
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>options</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Array de opções com {'{ value, label }'} (obrigatório)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>value</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Valor selecionado - string ou array[string] (obrigatório)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>setValue</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Função para atualizar o valor (obrigatório)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>placeholder</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Texto exibido quando nada está selecionado</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>multiple</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Permite selecionar múltiplos itens</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>searchable</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Adiciona campo de busca nas opções</Text>
-          </View>
-          
-          <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mt-lg mb-sm`}>Integração com Supabase</Text>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>supabaseTable</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Nome da tabela no Supabase (obrigatório para uso com Supabase)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>supabaseColumn</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Nome da coluna que será usada como valor/label (obrigatório para uso com Supabase)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>supabaseOrderBy</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Coluna para ordenação (opcional, usa supabaseColumn se não especificado)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>supabaseAscending</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Define se a ordenação é ascendente (opcional, padrão: true)</Text>
-          </View>
-          
-          <Text className={`text-body-sm ${textSecondary} mt-md`}>
-            E muitas outras propriedades para personalização completa...
-          </Text>
-        </View>
-      </View>
+
+
+      </ScrollView>
     );
   };
   
