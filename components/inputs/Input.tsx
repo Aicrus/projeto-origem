@@ -511,9 +511,9 @@ export const Input = ({
   
   // Configurações compartilhadas para garantir consistência absoluta
   const sharedPlaceholderConfig = {
-    fontSize: 13,
+    fontSize: Platform.OS === 'web' ? 13 : 14, // +1 no nativo como solicitado
     fontFamily: fontFamily['jakarta-regular'],
-    lineHeight: 19, // Padronizado 19px para web e nativo (mesma experiência)
+    lineHeight: Platform.OS === 'web' ? 19 : 20, // Ajustar lineHeight proporcionalmente no nativo
     color: isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']
   };
 

@@ -10,6 +10,7 @@ import { colors } from '../../design-system/tokens/colors';
 import { spacing } from '../../design-system/tokens/spacing';
 import { borderRadius, getBorderRadius } from '../../design-system/tokens/borders';
 import { fontSize, fontFamily } from '../../design-system/tokens/typography';
+import { getShadowColor } from '../../design-system/tokens/effects';
 
 /**
  * @component Select
@@ -118,7 +119,7 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: 8,
+      paddingVertical: 12, // Espaçamento igual em ambas as plataformas (como ficou bom no nativo)
       paddingHorizontal: 12,
       borderBottomWidth: 1,
       borderBottomColor: themeColors['divider'],
@@ -129,7 +130,8 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
             : 'transparent')
     },
     itemText: {
-      fontSize: 14,
+      fontSize: 14, // 14px em ambas as plataformas
+      fontFamily: fontFamily['jakarta-regular'],
       color: selected 
         ? themeColors['primary']
         : themeColors['text-primary'],
@@ -401,31 +403,34 @@ const WebDropdownOptions = ({
     }
   };
   
-  // Estilos do dropdown
+  // Estilos do dropdown (usando design system)
   const dropdownStyle = StyleSheet.create({
     container: {
-      backgroundColor: isDark ? '#14181B' : '#FFFFFF',
-      borderColor: isDark ? '#262D34' : '#E0E3E7',
+      backgroundColor: isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'],
+      borderColor: isDark ? colors['divider-dark'] : colors['divider-light'],
       borderWidth: 1,
-      borderRadius: 6,
-      shadowColor: '#000',
+      borderRadius: Number(getBorderRadius('md').replace('px', '')),
+      shadowColor: getShadowColor('input'),
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: isDark ? 0.2 : 0.08,
       shadowRadius: 6,
+      elevation: 3,
     },
     searchContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       borderBottomWidth: 1,
-      borderBottomColor: isDark ? '#262D34' : '#E0E3E7',
-      paddingHorizontal: 8,
-      paddingVertical: 6,
+      borderBottomColor: isDark ? colors['divider-dark'] : colors['divider-light'],
+      paddingHorizontal: Number(spacing['2'].replace('px', '')),
+      paddingVertical: Number(spacing['1.5'].replace('px', '')),
     },
     searchInput: Platform.select({
       web: {
         flex: 1,
-        color: isDark ? '#FFFFFF' : '#14181B',
-        fontSize: 14,
+        color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+        fontSize: Platform.OS === 'web' ? 13 : 14, // 13px web / 14px nativo
+        fontFamily: fontFamily['jakarta-regular'], // jakarta-regular
+        lineHeight: Platform.OS === 'web' ? 19 : 20, // 19px web / 20px nativo
         paddingVertical: 4,
         height: 30,
         marginLeft: 4,
@@ -433,8 +438,10 @@ const WebDropdownOptions = ({
       },
       default: {
         flex: 1,
-        color: isDark ? '#FFFFFF' : '#14181B',
-        fontSize: 14,
+        color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+        fontSize: Platform.OS === 'web' ? 13 : 14, // 13px web / 14px nativo
+        fontFamily: fontFamily['jakarta-regular'], // jakarta-regular
+        lineHeight: Platform.OS === 'web' ? 19 : 20, // 19px web / 20px nativo
         paddingVertical: 4,
         height: 30,
         marginLeft: 4,
@@ -481,7 +488,7 @@ const WebDropdownOptions = ({
           <View style={dropdownStyle.searchContainer}>
             <Search 
               size={14} 
-              color={isDark ? '#95A1AC' : '#57636C'} 
+              color={isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']} 
               style={dropdownStyle.searchIcon}
             />
             <TextInput
@@ -489,7 +496,7 @@ const WebDropdownOptions = ({
               value={searchValue}
               onChangeText={handleSearchChange}
               placeholder="Pesquisar..."
-              placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
+              placeholderTextColor={isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']}
               data-search-input="true"
               autoFocus={autoFocus}
               // @ts-ignore - Evento específico para web
@@ -508,7 +515,7 @@ const WebDropdownOptions = ({
               >
                 <X 
                   size={14} 
-                  color={isDark ? '#95A1AC' : '#57636C'} 
+                  color={isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']} 
                 />
               </TouchableOpacity>
             )}
@@ -534,7 +541,7 @@ const WebDropdownOptions = ({
           })
         ) : (
           <View style={{ padding: 12, alignItems: 'center' }}>
-            <Text style={{ color: isDark ? '#95A1AC' : '#57636C' }}>
+            <Text style={{ color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'] }}>
               Nenhum resultado encontrado
             </Text>
           </View>
@@ -710,8 +717,8 @@ const MobileSelectModal = ({
     },
     container: {
       position: 'absolute',
-      backgroundColor: isDark ? '#14181B' : '#FFFFFF',
-      borderColor: isDark ? '#262D34' : '#E0E3E7',
+      backgroundColor: isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'],
+      borderColor: isDark ? colors['divider-dark'] : colors['divider-light'],
       maxHeight: maxHeight || 300,
       width: position?.width || '90%',
       marginHorizontal: 16,
@@ -721,8 +728,8 @@ const MobileSelectModal = ({
         ? { top: position?.top || 100 } // Abre para baixo
         : { bottom: position?.bottom || 100 }), // Abre para cima
       borderWidth: 1,
-      borderRadius: 6,
-      shadowColor: '#000',
+      borderRadius: Number(getBorderRadius('md').replace('px', '')),
+      shadowColor: getShadowColor('input'),
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: isDark ? 0.2 : 0.08,
       shadowRadius: 6,
@@ -736,14 +743,16 @@ const MobileSelectModal = ({
       flexDirection: 'row',
       alignItems: 'center',
       borderBottomWidth: 1,
-      borderBottomColor: isDark ? '#262D34' : '#E0E3E7',
-      paddingHorizontal: 8,
-      paddingVertical: 6,
+      borderBottomColor: isDark ? colors['divider-dark'] : colors['divider-light'],
+      paddingHorizontal: Number(spacing['2'].replace('px', '')),
+      paddingVertical: Number(spacing['1.5'].replace('px', '')),
     },
     searchInput: {
       flex: 1,
-      color: isDark ? '#FFFFFF' : '#14181B',
-      fontSize: 14,
+      color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+      fontSize: Platform.OS === 'web' ? 13 : 14, // 13px web / 14px nativo
+      fontFamily: fontFamily['jakarta-regular'], // jakarta-regular
+      lineHeight: Platform.OS === 'web' ? 19 : 20, // 19px web / 20px nativo
       paddingVertical: 4,
       height: 30, // Mais compacto que o Input padrão
       marginLeft: 4,
@@ -759,8 +768,9 @@ const MobileSelectModal = ({
       alignItems: 'center'
     },
     noResultsText: {
-      color: isDark ? '#95A1AC' : '#57636C',
-      fontSize: 14
+      color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+      fontSize: Platform.OS === 'web' ? 13 : 14, // 13px web / 14px nativo
+      fontFamily: fontFamily['jakarta-regular'],
     }
   });
   
@@ -782,11 +792,11 @@ const MobileSelectModal = ({
           {/* Campo de pesquisa */}
           {searchable && (
             <View style={dropdownStyle.searchContainer}>
-              <Search 
-                size={14} 
-                color={isDark ? '#95A1AC' : '#57636C'} 
-                style={dropdownStyle.searchIcon}
-              />
+                          <Search 
+              size={14} 
+              color={isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']} 
+              style={dropdownStyle.searchIcon}
+            />
               <TextInput
                 style={[
                   dropdownStyle.searchInput,
@@ -797,9 +807,9 @@ const MobileSelectModal = ({
                 ]}
                 value={searchValue}
                 onChangeText={handleSearchChange}
-                placeholder="Pesquisar..."
-                placeholderTextColor={isDark ? '#95A1AC' : '#8B97A2'}
-                data-search-input-mobile="true"
+                              placeholder="Pesquisar..."
+              placeholderTextColor={isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']}
+              data-search-input-mobile="true"
                 autoFocus={autoFocus}
               />
               {searchValue.length > 0 && (
@@ -807,10 +817,10 @@ const MobileSelectModal = ({
                   onPress={handleClearSearch}
                   style={dropdownStyle.clearButton}
                 >
-                  <X 
-                    size={14} 
-                    color={isDark ? '#95A1AC' : '#57636C'} 
-                  />
+                                  <X 
+                  size={14} 
+                  color={isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']} 
+                />
                 </TouchableOpacity>
               )}
             </View>
@@ -896,6 +906,13 @@ export const Select = ({
   
   // Obter cores do theme.ts
   const themeColors = getThemeColors(isDark);
+  
+  // Configurações compartilhadas de tipografia (igual ao Input)
+  const sharedTextConfig = {
+    fontSize: Platform.OS === 'web' ? 13 : 14, // +1 no nativo como solicitado
+    fontFamily: fontFamily['jakarta-regular'],
+    lineHeight: Platform.OS === 'web' ? 19 : 20, // Ajustar lineHeight proporcionalmente no nativo
+  };
   
   // Estado para controlar abertura do dropdown
   const [open, setOpen] = useState(false);
@@ -1195,7 +1212,7 @@ export const Select = ({
   const handleToggleDropdown = () => {
     if (!disabled && !loading) {
       // Calcular a posição para mobile também
-      if (!open) {
+              if (!open) {
         if (Platform.OS !== 'web' && selectRef.current) {
           selectRef.current.measure((x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
             // Verifica o espaço disponível para baixo no mobile
@@ -1203,9 +1220,15 @@ export const Select = ({
             const { height: windowHeight } = require('react-native').Dimensions.get('window');
             const spaceBelow = windowHeight - (pageY + height);
             
-            // Se não houver espaço suficiente embaixo, abre para cima
+            // Margem de segurança para tabs (assumindo que tabs ficam nos últimos 100px da tela)
+            const tabSafetyMargin = 100;
+            const safeSpaceBelow = spaceBelow - tabSafetyMargin;
+            
+            // Se não houver espaço suficiente embaixo OU se estiver muito próximo das tabs, abre para cima
             // Mas apenas se houver espaço suficiente para cima
-            const openDown = superBaseTable || spaceBelow >= maxHeight || pageY < maxHeight;
+            const openDown = superBaseTable || 
+              (safeSpaceBelow >= maxHeight && pageY > maxHeight) || 
+              (spaceBelow >= maxHeight && pageY < maxHeight / 2);
             
             // Espaçamento consistente
             const spacingDown = 3; // Mantido em 3px
@@ -1221,7 +1244,7 @@ export const Select = ({
                 openDown: true
               });
             } else {
-              // Abre para cima - não há espaço suficiente abaixo
+              // Abre para cima - não há espaço suficiente abaixo ou muito próximo das tabs
               setPosition({
                 top: undefined,
                 bottom: windowHeight - pageY + spacingUp,
@@ -1283,25 +1306,58 @@ export const Select = ({
     }
   };
   
-  // Estilos compartilhados para o botão do select
+  // Função para obter a cor de fundo do select (igual ao Input)
+  const getSelectBackgroundColor = (): string => {
+    // Se estiver desabilitado, usar cor específica
+    if (disabled) {
+      return isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'];
+    }
+    
+    // Para todos os selects, usar a mesma cor de fundo do Input
+    return isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'];
+  };
+
+  // Função para obter estilos de borda (igual ao Input)
+  const getSelectBorderStyles = () => {
+    const borderColor = isDark ? colors['divider-dark'] : colors['divider-light'];
+
+    return {
+      borderWidth: 1,
+      borderColor,
+      borderRadius: Number(getBorderRadius('md').replace('px', '')),
+    };
+  };
+
+  // Estilos compartilhados para o botão do select (IDÊNTICO ao Input)
   const selectButtonStyle = StyleSheet.create({
     container: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: 8,
-      paddingHorizontal: 12,
-      borderWidth: 1,
-      borderColor: isDark ? '#262D34' : '#E0E3E7',
-      backgroundColor: isDark ? '#14181B' : '#FFFFFF',
-      borderRadius: 6,
-      minHeight: 38
+      ...getSelectBorderStyles(), // Mesmas bordas do Input
+      backgroundColor: getSelectBackgroundColor(), // Mesma cor de fundo do Input
+      minHeight: Platform.OS === 'web' 
+        ? Number(spacing['10'].replace('px', '')) // 40px na web
+        : Number(spacing['12'].replace('px', '')), // 48px no nativo (igual ao Input)
+      paddingHorizontal: Number(spacing['3'].replace('px', '')), // 12px (igual ao Input)
+      // Mesma sombra do Input
+      shadowColor: getShadowColor('input'),
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      },
+      shadowOpacity: isDark ? 0.2 : 0.05,
+      shadowRadius: 2,
+      elevation: 1,
     },
     text: {
-      fontSize: 14,
+      fontSize: Platform.OS === 'web' ? 13 : 14, // 13px web / 14px nativo (igual ao Input)
+      fontFamily: fontFamily['jakarta-regular'], // jakarta-regular (igual ao Input)
+      lineHeight: Platform.OS === 'web' ? 19 : 20, // 19px web / 20px nativo (igual ao Input)
       color: value && (multiple ? (value as string[]).length > 0 : true)
-        ? (isDark ? '#FFFFFF' : '#14181B')
-        : (isDark ? '#95A1AC' : '#8B97A2')
+        ? (isDark ? colors['text-primary-dark'] : colors['text-primary-light']) // Mesma cor do Input
+        : (isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']), // Mesma cor do placeholder
+      flex: 1, // Para não quebrar o layout com textos longos
     },
     loadingContainer: {
       flexDirection: 'row',
@@ -1313,12 +1369,14 @@ export const Select = ({
       borderRadius: 8,
       borderWidth: 2,
       borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
-      borderTopColor: isDark ? '#4A6' : themeColors['primary'],
+      borderTopColor: isDark ? colors['primary-dark'] : colors['primary-light'],
       marginRight: 8
     },
     errorText: {
-      fontSize: 12,
-      color: isDark ? '#F87171' : '#DC2626',
+      fontSize: Number(fontSize['body-sm'].size.replace('px', '')),
+      lineHeight: Number(fontSize['body-sm'].lineHeight.replace('px', '')),
+      fontFamily: fontFamily['jakarta-regular'],
+      color: isDark ? colors['error-icon-dark'] : colors['error-icon-light'],
       marginTop: 4
     }
   });
@@ -1354,10 +1412,11 @@ export const Select = ({
     <View style={{ width: '100%', position: 'relative' }}>
       {label && (
         <Text style={{ 
-          fontSize: 12, 
-          marginBottom: 4, 
-          color: isDark ? '#95A1AC' : '#57636C',
-          fontWeight: '500' 
+          fontSize: Number(fontSize['label-sm'].size.replace('px', '')), // 13px (igual ao Input)
+          lineHeight: Number(fontSize['label-sm'].lineHeight.replace('px', '')), // 17px (igual ao Input)
+          fontFamily: fontFamily['jakarta-semibold'], // Peso 600 (igual ao Input)
+          marginBottom: Number(spacing['1.5'].replace('px', '')), // 6px (igual ao Input)
+          color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'], // Mesma cor do Input
         }}>
           {label}
         </Text>
@@ -1369,7 +1428,7 @@ export const Select = ({
         onPress={handleToggleDropdown}
         style={[
           selectButtonStyle.container,
-          disabled || isLoading ? { opacity: 0.5 } : {}
+          disabled || isLoading ? { opacity: 0.6 } : {} // Mesma opacidade do Input quando disabled
         ]}
         disabled={disabled || isLoading}
       >
@@ -1397,9 +1456,9 @@ export const Select = ({
         
         {isLoading ? null : (
           open ? (
-            <ChevronUp size={16} color={isDark ? '#95A1AC' : '#57636C'} />
+            <ChevronUp size={16} color={isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']} />
           ) : (
-            <ChevronDown size={16} color={isDark ? '#95A1AC' : '#57636C'} />
+            <ChevronDown size={16} color={isDark ? colors['text-secondary-dark'] : colors['text-secondary-light']} />
           )
         )}
       </TouchableOpacity>
