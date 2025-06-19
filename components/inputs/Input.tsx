@@ -1221,8 +1221,9 @@ export const Input = ({
     // Calcular a posição inicial considerando o line-height do label
     const lineHeightOffset = (Number(fontSize['label-sm'].lineHeight.replace('px', '')) - Number(fontSize['label-sm'].size.replace('px', ''))) / 2;
     
-    // Padronizado para ambas as plataformas
-    const initialTop = Number(spacing['3'].replace('px', '')) + 1 - lineHeightOffset;
+    // Posição inicial com ajuste sutil para nativo
+    const baseTop = Number(spacing['3'].replace('px', '')) + 1 - lineHeightOffset;
+    const initialTop = Platform.OS === 'web' ? baseTop : baseTop + 2; // +2px no nativo para descer um pouquinho
     
     const labelSize = sharedPlaceholderConfig.fontSize; // EXATO mesmo tamanho do placeholder quando dentro
     const floatingLabelSize = Number(fontSize['label-sm'].size.replace('px', '')); // 13px quando flutuando
