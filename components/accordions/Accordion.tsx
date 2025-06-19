@@ -78,6 +78,7 @@ export const Accordion: React.FC<AccordionProps> = ({
   const toggleItem = (value: string) => {
     if (type === "single") {
       if (openItems.includes(value)) {
+        // Se collapsible=false, não permite fechar o item atual
         setOpenItems(collapsible ? [] : openItems);
       } else {
         setOpenItems([value]);
@@ -162,17 +163,17 @@ export const AccordionTrigger: React.FC<AccordionTriggerProps> = ({
 
   // Tipografia usando tokens do design system - Body-lg como base
   const triggerFontSize = responsive({
-    mobile: 14,      // body-md
+    mobile: 16,      // body-md + 2 (era 14)
     tablet: 15,      // entre body-md e body-lg
     desktop: 16,     // body-lg
-    default: 14
+    default: 16      // nativo + 2 (era 14)
   });
 
   const triggerLineHeight = responsive({
-    mobile: 20,      // body-md line-height
+    mobile: 22,      // body-md line-height + 2 (era 20)
     tablet: 22,      // intermediário
     desktop: 24,     // body-lg line-height
-    default: 20
+    default: 22      // nativo + 2 (era 20)
   });
 
   const triggerFontWeight = responsive({
@@ -251,6 +252,7 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
   const heightProgress = useSharedValue(isOpen ? 1 : 0);
   const opacityProgress = useSharedValue(isOpen ? 1 : 0);
   const [contentHeight, setContentHeight] = useState(0);
+  const [hasLayoutRun, setHasLayoutRun] = useState(false);
   const { responsive } = useResponsive();
 
   // Padding responsivo para o conteúdo
@@ -263,43 +265,48 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
 
   // Tipografia para conteúdo - Body-md como base
   const contentFontSize = responsive({
-    mobile: 12,      // body-sm
+    mobile: 14,      // body-sm + 2 (era 12)
     tablet: 13,      // entre body-sm e body-md
     desktop: 14,     // body-md
-    default: 12
+    default: 14      // nativo + 2 (era 12)
   });
 
   const contentLineHeight = responsive({
-    mobile: 18,      // body-sm line-height
+    mobile: 20,      // body-sm line-height + 2 (era 18)
     tablet: 19,      // intermediário
     desktop: 20,     // body-md line-height
-    default: 18
+    default: 20      // nativo + 2 (era 18)
   });
 
-
-
   React.useEffect(() => {
-    if (isOpen) {
-      heightProgress.value = withSpring(1, ANIMATION_CONFIG.content);
-      opacityProgress.value = withTiming(1, { 
-        duration: ANIMATION_CONFIG.timing.duration / 2,
-        easing: ANIMATION_CONFIG.timing.easing 
-      });
-    } else {
-      heightProgress.value = withTiming(0, ANIMATION_CONFIG.timing);
-      opacityProgress.value = withTiming(0, { 
-        duration: ANIMATION_CONFIG.timing.duration / 3,
-        easing: ANIMATION_CONFIG.timing.easing 
-      });
+    // Só anima se já temos a altura do conteúdo ou se está fechando
+    if (hasLayoutRun || !isOpen) {
+      if (isOpen) {
+        // Para abrir: primeiro define a opacidade, depois a altura
+        opacityProgress.value = withTiming(1, { 
+          duration: ANIMATION_CONFIG.timing.duration / 3,
+          easing: ANIMATION_CONFIG.timing.easing 
+        });
+        heightProgress.value = withSpring(1, ANIMATION_CONFIG.content);
+      } else {
+        // Para fechar: primeiro a altura, depois a opacidade
+        heightProgress.value = withTiming(0, ANIMATION_CONFIG.timing);
+        opacityProgress.value = withTiming(0, { 
+          duration: ANIMATION_CONFIG.timing.duration / 4,
+          easing: ANIMATION_CONFIG.timing.easing 
+        });
+      }
     }
-  }, [isOpen, heightProgress, opacityProgress]);
+  }, [isOpen, heightProgress, opacityProgress, contentHeight, hasLayoutRun]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    // Altura proporcional ao conteúdo real
+    // Usar altura mínima de 100px se contentHeight não estiver disponível
+    const targetHeight = contentHeight > 16 ? contentHeight : 100;
+    
     const height = interpolate(
       heightProgress.value,
       [0, 1],
-      [0, contentHeight || 1] // Usa a altura real do conteúdo
+      [0, targetHeight]
     );
 
     return {
@@ -322,22 +329,42 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
     };
   });
 
+  const handleLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout;
+    
+    // Só atualiza se a altura for significativamente diferente e maior que 16
+    if (height > 16 && Math.abs(contentHeight - height) > 2) {
+      setContentHeight(height);
+      setHasLayoutRun(true);
+    }
+  };
+
+  // Para itens que devem estar abertos inicialmente, renderiza primeiro sem animação
+  // para capturar a altura correta
+  if (isOpen && !hasLayoutRun) {
+    return (
+      <View style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
+        <View 
+          onLayout={handleLayout}
+          style={[{ 
+            paddingHorizontal: 4, 
+            paddingBottom: contentPadding,
+            paddingTop: 4,
+          }, style]}
+        >
+          {children}
+        </View>
+      </View>
+    );
+  }
+
   return (
     <Animated.View style={[{ overflow: 'hidden' }, animatedStyle]}>
-      <Animated.View 
-        style={[animatedContentStyle]}
-        onLayout={(event) => {
-          const { height } = event.nativeEvent.layout;
-          // Sempre atualiza a altura para ser proporcional ao conteúdo
-          if (height > 0) {
-            setContentHeight(height);
-          }
-        }}
-      >
+      <Animated.View style={[animatedContentStyle]}>
         <View style={[{ 
           paddingHorizontal: 4, 
           paddingBottom: contentPadding,
-          paddingTop: 4 // Pequeno espaço no topo
+          paddingTop: 4, // Pequeno espaço no topo
         }, style]}>
           {children}
         </View>
@@ -367,16 +394,16 @@ export const useAccordionTypography = () => {
 
   const triggerStyle = {
     fontSize: responsive({
-      mobile: 14,      // body-md
+      mobile: 16,      // body-md + 2 (era 14)
       tablet: 15,      // entre body-md e body-lg
       desktop: 16,     // body-lg
-      default: 14
+      default: 16      // nativo + 2 (era 14)
     }),
     lineHeight: responsive({
-      mobile: 20,      // body-md line-height
+      mobile: 22,      // body-md line-height + 2 (era 20)
       tablet: 22,      // intermediário
       desktop: 24,     // body-lg line-height
-      default: 20
+      default: 22      // nativo + 2 (era 20)
     }),
     fontWeight: '400' as const,
     color: isDark ? '#FFFFFF' : '#14181B'
@@ -384,16 +411,16 @@ export const useAccordionTypography = () => {
 
   const contentStyle = {
     fontSize: responsive({
-      mobile: 12,      // body-sm
+      mobile: 14,      // body-sm + 2 (era 12)
       tablet: 13,      // entre body-sm e body-md
       desktop: 14,     // body-md
-      default: 12
+      default: 14      // nativo + 2 (era 12)
     }),
     lineHeight: responsive({
-      mobile: 18,      // body-sm line-height
+      mobile: 20,      // body-sm line-height + 2 (era 18)
       tablet: 19,      // intermediário
       desktop: 20,     // body-md line-height
-      default: 18
+      default: 20      // nativo + 2 (era 18)
     }),
     fontWeight: '400' as const,
     color: isDark ? '#95A1AC' : '#57636C'
@@ -437,7 +464,7 @@ export const InfoAccordion: React.FC<{
 }> = ({ 
   children, 
   style,
-  defaultOpen = "info-1"
+  defaultOpen = "tech" // Usar o valor correto que está sendo usado na tela dev
 }) => (
   <Accordion type="single" collapsible={false} defaultValue={defaultOpen} style={style}>
     {children}

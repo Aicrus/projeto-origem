@@ -429,11 +429,11 @@ export default function DevPage() {
             <View className="mb-md">
           <View className="flex-row items-center mb-xs">
             <View className="w-1 h-8 bg-primary-light dark:bg-primary-dark rounded-full mr-sm" />
-            <Text className={`${responsive({ mobile: 'text-lg', tablet: 'text-xl', desktop: 'text-2xl', default: 'text-lg' })} font-jakarta-semibold ${textPrimary}`}>
+            <Text className={`${responsive({ mobile: 'text-xl', tablet: 'text-xl', desktop: 'text-2xl', default: 'text-xl' })} font-jakarta-semibold ${textPrimary}`}>
               Input
               </Text>
             </View>
-          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
             Componente para entrada de texto com <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">validação automática</Text>, máscaras, tipos especiais e design system nativo.
               </Text>
           
@@ -447,15 +447,15 @@ export default function DevPage() {
           >
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>9+ tipos especiais</Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>9+ tipos especiais</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>3 variantes de label</Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>3 variantes de label</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>Auto-validação</Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>Auto-validação</Text>
             </View>
           </View>
             </View>
@@ -475,11 +475,11 @@ export default function DevPage() {
             <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Formulário de Cadastro
               </Text>
             </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Demonstração prática • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Validação automática</Text>
               </Text>
           </View>
@@ -521,11 +521,11 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Tipos Especiais
                   </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Máscaras e controles • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Seletores nativos</Text>
             </Text>
           </View>
@@ -576,11 +576,11 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Variantes e Estados
                   </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Labels, bordas e estados • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Todas as variações</Text>
             </Text>
           </View>
@@ -670,17 +670,17 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-error-icon-light dark:bg-error-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Implementação Rápida
         </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Código limpo e direto
                </Text>
              </View>
              
               <View className={`${bgTertiary} rounded-lg ${responsive({ mobile: 'p-xs', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`}>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} font-mono leading-relaxed ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 16 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} font-mono leading-relaxed ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 16 }) }}>
                   <Text className="text-info-icon-light dark:text-info-icon-dark">import</Text> {'{'}
                   <Text className="text-warning-icon-light dark:text-warning-icon-dark"> Input </Text>
                   {'}'} <Text className="text-info-icon-light dark:text-info-icon-dark">from</Text> <Text className="text-success-icon-light dark:text-success-icon-dark">'@/components'</Text>
@@ -719,11 +719,11 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Texto Redimensionável
               </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Redimensiona verticalmente • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Compatível com todas as plataformas</Text>
                </Text>
              </View>
@@ -762,27 +762,27 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Recursos Avançados
                </Text>
              </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Funcionalidades especiais do design system
                </Text>
              </View>
              
               <View className={`${bgTertiary} rounded-lg ${responsive({ mobile: 'p-xs', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`}>
                 <View style={{ gap: 4 }}>
-                  <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>
                     • <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">Acessibilidade total</Text> com suporte a screen readers
                </Text>
-                  <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>
                     • <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">Adaptação automática</Text> ao tema do sistema
                </Text>
-                  <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>
                     • <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">Responsividade nativa</Text> em todos os breakpoints
                </Text>
-                  <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>
                     • <Text className="text-error-icon-light dark:text-error-icon-dark font-jakarta-medium">Performance otimizada</Text> com animações nativas
                </Text>
                 </View>
@@ -798,11 +798,11 @@ export default function DevPage() {
         >
           <View className="flex-row items-center mb-xs">
             <Lightbulb size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs" />
-            <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+            <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-sm', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
               Como funciona?
               </Text>
             </View>
-          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 18, tablet: 16, desktop: 18, default: 18 }) }}>
             Digite nos <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">campos acima</Text> para testar diferentes funcionalidades. <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">Email</Text> valida automaticamente, <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">CPF</Text> aplica máscara, <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">label flutuante</Text> anima suavemente.
               </Text>
           </View>
@@ -876,10 +876,10 @@ export default function DevPage() {
           <View className="flex-row items-start">
             <Rocket size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs mt-0.5" />
             <View className="flex-1">
-              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-bold ${textPrimary} mb-xs`}>
+              <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-sm', desktop: 'text-base', default: 'text-base' })} font-jakarta-bold ${textPrimary} mb-xs`}>
                 Dica Pro
                </Text>
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 18, tablet: 16, desktop: 18, default: 18 }) }}>
                 Para <Text className="font-jakarta-medium text-primary-light dark:text-primary-dark">data e hora</Text>, use os componentes especializados <Text className="font-jakarta-medium text-info-icon-light dark:text-info-icon-dark">DateInput</Text> e <Text className="font-jakarta-medium text-warning-icon-light dark:text-warning-icon-dark">TimeInput</Text> da pasta <Text className="font-jakarta-medium">@/datepickers</Text> que oferecem calendários nativos. As <Text className="font-jakarta-medium text-info-icon-light dark:text-info-icon-dark">variantes visuais</Text> funcionam com todos os tipos de input.
         </Text>
           </View>
@@ -903,11 +903,11 @@ export default function DevPage() {
             <View className="mb-md">
           <View className="flex-row items-center mb-xs">
             <View className="w-1 h-8 bg-primary-light dark:bg-primary-dark rounded-full mr-sm" />
-            <Text className={`${responsive({ mobile: 'text-lg', tablet: 'text-xl', desktop: 'text-2xl', default: 'text-lg' })} font-jakarta-semibold ${textPrimary}`}>
+            <Text className={`${responsive({ mobile: 'text-xl', tablet: 'text-xl', desktop: 'text-2xl', default: 'text-xl' })} font-jakarta-semibold ${textPrimary}`}>
               Select
               </Text>
             </View>
-          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
             Componente dropdown inteligente com <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">posicionamento automático</Text>, busca avançada e integração direta com Supabase.
               </Text>
           
@@ -921,15 +921,15 @@ export default function DevPage() {
           >
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>Seleção única/múltipla</Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>Seleção única/múltipla</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>Busca inteligente</Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>Busca inteligente</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>Integração Supabase</Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>Integração Supabase</Text>
             </View>
           </View>
             </View>
@@ -949,11 +949,11 @@ export default function DevPage() {
             <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Seleção Básica
               </Text>
             </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Interface intuitiva • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Animações suaves</Text>
               </Text>
           </View>
@@ -987,11 +987,11 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Seleção Múltipla
                   </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Múltiplas opções • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Contagem automática</Text>
             </Text>
           </View>
@@ -1033,11 +1033,11 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Integração Direta
                   </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Conecta direto ao Supabase • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Zero configuração</Text>
             </Text>
           </View>
@@ -1073,17 +1073,17 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-error-icon-light dark:bg-error-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Implementação Rápida
         </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   API simples e intuitiva
                </Text>
              </View>
              
               <View className={`${bgTertiary} rounded-lg ${responsive({ mobile: 'p-xs', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`}>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} font-mono leading-relaxed ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 16 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} font-mono leading-relaxed ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 16 }) }}>
                   <Text className="text-info-icon-light dark:text-info-icon-dark">import</Text> {'{'}
                   <Text className="text-warning-icon-light dark:text-warning-icon-dark"> Select </Text>
                   {'}'} <Text className="text-info-icon-light dark:text-info-icon-dark">from</Text> <Text className="text-success-icon-light dark:text-success-icon-dark">'@/components'</Text>
@@ -1114,11 +1114,11 @@ export default function DevPage() {
         >
           <View className="flex-row items-center mb-xs">
             <Lightbulb size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs" />
-            <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+            <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-sm', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
               Como funciona?
               </Text>
             </View>
-          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
             Teste os <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">selects acima</Text> para ver diferentes funcionalidades. <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">Busca</Text> filtra em tempo real, <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">múltipla seleção</Text> conta automaticamente, <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">Supabase</Text> carrega dados direto do banco.
               </Text>
           </View>
@@ -1186,73 +1186,48 @@ export default function DevPage() {
               <Text className={`text-body-sm ${textSecondary}`}>
               • <Text className="font-jakarta-medium">supabaseAscending</Text> - Ordem crescente/decrescente
               </Text>
-            </View>
+                         </View>
+           </View>
+          
+        
+        {/* Dica Pro */}
+        <View className={`${isDark ? 'bg-success-bg-dark' : 'bg-success-bg-light'} rounded-lg p-md border ${isDark ? 'border-success-border-dark' : 'border-success-border-light'}`} style={{ marginTop: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 }) }}>
+          <View className="flex-row items-start">
+            <Rocket size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs mt-0.5" />
+            <View className="flex-1">
+              <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-sm', desktop: 'text-base', default: 'text-base' })} font-jakarta-bold ${textPrimary} mb-xs`}>
+                Dica Pro
+               </Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+                Para <Text className="font-jakarta-medium text-primary-light dark:text-primary-dark">listas grandes</Text>, combine <Text className="font-jakarta-medium text-info-icon-light dark:text-info-icon-dark">searchable</Text> com <Text className="font-jakarta-medium text-warning-icon-light dark:text-warning-icon-dark">integração Supabase</Text> para carregamento otimizado. Use <Text className="font-jakarta-medium text-success-icon-light dark:text-success-icon-dark">multiple</Text> para seleções complexas e <Text className="font-jakarta-medium text-error-icon-light dark:text-error-icon-dark">disabled</Text> para controle de estado.
+        </Text>
           </View>
+          </View>
+        </View>
 
-
-      </ScrollView>
+       </ScrollView>
     );
   };
   
   // Função para renderizar o componente Accordion e seus exemplos
   const renderAccordionComponent = () => {
-    // Layout responsivo otimizado para todos os breakpoints
-    const containerPadding = responsive({
-      mobile: 'p-md',
-      tablet: 'p-md', 
-      desktop: 'p-lg',
-      default: 'p-md'
-    });
-
-    const headerSpacing = responsive({
-      mobile: 'mb-md',
-      tablet: 'mb-md',
-      desktop: 'mb-lg',
-      default: 'mb-md'
-    });
-
-    const cardSpacing = responsive({
-      mobile: 'p-sm',
-      tablet: 'p-sm',
-      desktop: 'p-md',
-      default: 'p-sm'
-    });
-
-    // Tipografia usando tokens do design system
-    const titleSize = responsive({
-      mobile: 'text-lg',      // title-md
-      tablet: 'text-xl',      // title-lg  
-      desktop: 'text-2xl',    // headline-sm
-      default: 'text-lg'
-    });
-
-    const examplesPerRow = responsive({
-      mobile: 1,
-      tablet: 2,
-      desktop: 2,
-      default: 1
-    });
-
-    const gapSize = responsive({
-      mobile: 8,
-      tablet: 12,
-      desktop: 16,
-      default: 8
-    });
-
     return (
-      <View className={containerPadding}>
-        {/* Header Section */}
-        <View className={headerSpacing}>
+      <ScrollView 
+        className="p-lg" 
+        contentContainerStyle={{ paddingBottom: 60 }} // Adiciona espaço extra ao final
+        showsVerticalScrollIndicator={true}
+      >
+        {/* Layout responsivo otimizado para todos os breakpoints */}
+            <View className="mb-md">
           <View className="flex-row items-center mb-xs">
             <View className="w-1 h-8 bg-primary-light dark:bg-primary-dark rounded-full mr-sm" />
-            <Text className={`${titleSize} font-jakarta-semibold ${textPrimary}`}>
+            <Text className={`${responsive({ mobile: 'text-xl', tablet: 'text-xl', desktop: 'text-2xl', default: 'text-xl' })} font-jakarta-semibold ${textPrimary}`}>
               Accordion
-            </Text>
-          </View>
-          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+              </Text>
+            </View>
+          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
             Componente expansível moderno com <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">animações 60fps</Text>, cores do design system e pré-configurações elegantes.
-          </Text>
+              </Text>
           
           {/* Quick Stats - Responsivo */}
           <View 
@@ -1264,39 +1239,39 @@ export default function DevPage() {
           >
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>3 pré-configurações</Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>3 pré-configurações</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>TypeScript</Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>TypeScript</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>60fps</Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>60fps</Text>
             </View>
           </View>
-        </View>
-        
+            </View>
+            
         {/* Primeira linha de exemplos - FAQ e Settings */}
         <View style={{
-          flexDirection: examplesPerRow === 1 ? 'column' : 'row',
-          gap: gapSize,
-          marginBottom: gapSize
+          flexDirection: responsive({ mobile: 'column', tablet: 'row', desktop: 'row', default: 'column' }),
+          gap: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 }),
+          marginBottom: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 })
         }}>
           {/* FAQ Example */}
           <View style={{ 
-            flex: examplesPerRow === 1 ? undefined : 1, 
-            width: examplesPerRow === 1 ? '100%' : undefined
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
           }}>
-            <View className={`${bgSecondary} rounded-xl ${cardSpacing}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     FAQ
                   </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Apenas uma resposta visível • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">type="single"</Text>
                 </Text>
               </View>
@@ -1305,7 +1280,7 @@ export default function DevPage() {
                 <AccordionItem value="q1">
                   <AccordionTrigger>Como implementar autenticação segura?</AccordionTrigger>
                   <AccordionContent>
-                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                    <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
                       Implementação biométrica com <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">Touch ID e Face ID</Text> no iOS, <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">BiometricPrompt API</Text> no Android. Inclui fallbacks seguros e criptografia AES-256.
                     </Text>
                   </AccordionContent>
@@ -1313,7 +1288,7 @@ export default function DevPage() {
                 <AccordionItem value="q2">
                   <AccordionTrigger>Estratégia de cache offline?</AccordionTrigger>
                   <AccordionContent>
-                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                    <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
                       Arquitetura <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">cache-first</Text> com AsyncStorage, SQLite e Redux Persist. Sincronização inteligente em background.
                     </Text>
                   </AccordionContent>
@@ -1324,18 +1299,18 @@ export default function DevPage() {
 
           {/* Settings Example */}
           <View style={{ 
-            flex: examplesPerRow === 1 ? undefined : 1, 
-            width: examplesPerRow === 1 ? '100%' : undefined
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
           }}>
-            <View className={`${bgSecondary} rounded-xl ${cardSpacing}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Settings
                   </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Múltiplas seções abertas • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">type="multiple"</Text>
                 </Text>
               </View>
@@ -1344,7 +1319,7 @@ export default function DevPage() {
                 <AccordionItem value="account">
                   <AccordionTrigger>Configurações de Conta</AccordionTrigger>
                   <AccordionContent>
-                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                    <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
                       Perfil, <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">notificações push</Text>, autenticação 2FA e backup automático de dados.
                     </Text>
                   </AccordionContent>
@@ -1352,7 +1327,7 @@ export default function DevPage() {
                 <AccordionItem value="privacy">
                   <AccordionTrigger>Privacidade e Segurança</AccordionTrigger>
                   <AccordionContent>
-                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                    <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
                       Controle de <Text className="text-error-icon-light dark:text-error-icon-dark font-jakarta-medium">visibilidade</Text>, bloqueio biométrico e gestão de sessões ativas.
                     </Text>
                   </AccordionContent>
@@ -1364,23 +1339,23 @@ export default function DevPage() {
 
         {/* Segunda linha de exemplos - Info e Code */}
         <View style={{
-          flexDirection: examplesPerRow === 1 ? 'column' : 'row',
-          gap: gapSize
+          flexDirection: responsive({ mobile: 'column', tablet: 'row', desktop: 'row', default: 'column' }),
+          gap: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 })
         }}>
           {/* Info Example */}
           <View style={{ 
-            flex: examplesPerRow === 1 ? undefined : 1, 
-            width: examplesPerRow === 1 ? '100%' : undefined
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
           }}>
-            <View className={`${bgSecondary} rounded-xl ${cardSpacing}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
                     Info
                   </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
                   Sempre uma seção aberta • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">collapsible={false}</Text>
                 </Text>
               </View>
@@ -1389,7 +1364,7 @@ export default function DevPage() {
                 <AccordionItem value="tech">
                   <AccordionTrigger>Especificações Técnicas</AccordionTrigger>
                   <AccordionContent>
-                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                    <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
                       <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">React Native Reanimated 3</Text> a 60fps. TypeScript strict mode. Suporte Web, iOS e Android. <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">WCAG 2.1 AA</Text> compliant.
                     </Text>
                   </AccordionContent>
@@ -1397,7 +1372,7 @@ export default function DevPage() {
                 <AccordionItem value="usage">
                   <AccordionTrigger>Como Implementar</AccordionTrigger>
                   <AccordionContent>
-                    <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+                    <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
                       Importe <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">FAQAccordion</Text>, <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">SettingsAccordion</Text> ou <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">InfoAccordion</Text>. Design system automático.
                     </Text>
                   </AccordionContent>
@@ -1408,24 +1383,24 @@ export default function DevPage() {
 
           {/* Code Example Card */}
           <View style={{ 
-            flex: examplesPerRow === 1 ? undefined : 1, 
-            width: examplesPerRow === 1 ? '100%' : undefined
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
           }}>
-            <View className={`${bgSecondary} rounded-xl ${cardSpacing}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-error-icon-light dark:bg-error-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
-                    Exemplo de Código
+                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                    Implementação Rápida
                   </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
-                  Implementação rápida e limpa
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+                  API simples e intuitiva
                 </Text>
               </View>
               
               <View className={`${bgTertiary} rounded-lg ${responsive({ mobile: 'p-xs', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`}>
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} font-mono leading-relaxed ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 16 }) }}>
+                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} font-mono leading-relaxed ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 16 }) }}>
                   <Text className="text-info-icon-light dark:text-info-icon-dark">import</Text> {'{'}
                   <Text className="text-warning-icon-light dark:text-warning-icon-dark"> FAQAccordion </Text>
                   {'}'} <Text className="text-info-icon-light dark:text-info-icon-dark">from</Text> <Text className="text-success-icon-light dark:text-success-icon-dark">'@/components'</Text>
@@ -1455,108 +1430,98 @@ export default function DevPage() {
         
         {/* Quick Usage Guide - Espaçamento consistente */}
         <View 
-          className={`${bgSecondary} rounded-xl ${cardSpacing} mb-md border-l-4 border-primary-light dark:border-primary-dark`}
-          style={{ marginTop: gapSize }}
+          className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })} mb-md border-l-4 border-primary-light dark:border-primary-dark`}
+          style={{ marginTop: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 }) }}
         >
           <View className="flex-row items-center mb-xs">
             <Lightbulb size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs" />
-            <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+            <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-sm', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
               Como funciona?
           </Text>
           </View>
-          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
             Clique nos <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">títulos acima</Text> para expandir/recolher o conteúdo. Cada exemplo demonstra um comportamento diferente: <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">FAQ</Text> (apenas um aberto), <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">Settings</Text> (vários abertos), <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">Info</Text> (sempre um aberto).
           </Text>
         </View>
 
-        {/* Recursos e API - Espaçamento consistente */}
-        <View style={{ marginTop: gapSize }}>
-          <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-lg', default: 'text-base' })} font-jakarta-medium ${textPrimary} mb-md`}>
-            Recursos
-          </Text>
-          
-          <View style={{
-            flexDirection: responsive({ mobile: 'column', tablet: 'row', desktop: 'row', default: 'column' }),
-            gap: gapSize,
-            marginBottom: gapSize
-          }}>
-            <View className={`${bgSecondary} rounded-lg ${cardSpacing} flex-1 border border-success-icon-light/20 dark:border-success-icon-dark/20`}>
-              <View className="flex-row items-center mb-xs">
-                <Zap size={responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs" />
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>React Native Reanimated 3</Text>
-              </View>
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Animações 60fps no thread nativo</Text>
-            </View>
-            
-            <View className={`${bgSecondary} rounded-lg ${cardSpacing} flex-1 border border-info-icon-light/20 dark:border-info-icon-dark/20`}>
-              <View className="flex-row items-center mb-xs">
-                <Shapes size={responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 })} color={isDark ? '#3B82F6' : '#1D4ED8'} className="mr-xs" />
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>TypeScript</Text>
-              </View>
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Tipagem completa e IntelliSense</Text>
-            </View>
-            
-            <View className={`${bgSecondary} rounded-lg ${cardSpacing} flex-1 border border-warning-icon-light/20 dark:border-warning-icon-dark/20`}>
-              <View className="flex-row items-center mb-xs">
-                <MoonIcon size={responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 })} color={isDark ? '#F59E0B' : '#D97706'} className="mr-xs" />
-                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>Tema Automático</Text>
-              </View>
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Cores adaptativas light/dark</Text>
-            </View>
-          </View>
-          
-          <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-lg', default: 'text-base' })} font-jakarta-medium ${textPrimary} mb-md`}>
-            API Principal
-          </Text>
-          
-          <View className={`${bgSecondary} rounded-lg ${cardSpacing} mb-md`}>
-            <View className="mb-sm">
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>type: <Text className="text-primary-light dark:text-primary-dark">"single" | "multiple"</Text></Text>
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Controla quantos items podem estar abertos</Text>
-            </View>
-            
-            <View className="mb-sm">
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>collapsible: <Text className="text-primary-light dark:text-primary-dark">boolean</Text></Text>
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Permite fechar todos os items (apenas type="single")</Text>
-            </View>
-            
-            <View className="mb-sm">
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>defaultValue: <Text className="text-primary-light dark:text-primary-dark">string | string[]</Text></Text>
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Items que iniciam abertos</Text>
-            </View>
-            
-            <View className="mb-0">
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>children: <Text className="text-primary-light dark:text-primary-dark">ReactNode</Text></Text>
-              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>AccordionItem {'>'}  AccordionTrigger + AccordionContent</Text>
-            </View>
-          </View>
-          
-          <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-lg', default: 'text-base' })} font-jakarta-medium ${textPrimary} mb-md`}>
-            Pré-configurações
-          </Text>
-          
-          <View className={`${bgSecondary} rounded-lg ${cardSpacing} mb-md`}>
-            <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-sm`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 18 }) }}>
-              <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">FAQAccordion</Text> - type="single" + collapsible • 
-              <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium"> SettingsAccordion</Text> - type="multiple" • 
-              <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium"> InfoAccordion</Text> - type="single" sem collapsible
-            </Text>
-          </View>
-          
-          {/* Pro Tip - Espaçamento consistente */}
-          <View className={`${bgTertiary} rounded-lg ${cardSpacing} border-l-2 border-success-icon-light dark:border-success-icon-dark`}>
-            <View className="flex-row items-center mb-xs">
-              <Rocket size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium text-success-icon-light dark:text-success-icon-dark`}>
-                Dica Pro
+        {/* Recursos e API */}
+        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+          <View className="flex-row items-center mb-sm">
+            <View className={`w-1 h-6 ${isDark ? 'bg-primary-dark' : 'bg-primary-light'} rounded-full mr-sm`} />
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary}`}>
+              Recursos e API
               </Text>
             </View>
-            <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
-              Use <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">defaultValue</Text> para controlar quais items iniciam abertos. Perfeito para destacar informações importantes ou guiar a experiência do usuário.
-            </Text>
+            
+          <View className="mb-md">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-xs`}>Funcionalidades principais</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">React Native Reanimated 3</Text> - Animações 60fps nativas
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">TypeScript completo</Text> - Tipagem e IntelliSense
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Tema automático</Text> - Cores adaptativas light/dark
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Pré-configurações</Text> - FAQ, Settings e Info
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Acessibilidade</Text> - WCAG 2.1 AA compliant
+              </Text>
+            </View>
+            
+          <View className="mb-md">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-xs`}>Props principais</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">type</Text> - "single" | "multiple"
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">collapsible</Text> - Permite fechar todos
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">defaultValue</Text> - Items iniciais abertos
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">children</Text> - AccordionItem components
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">onValueChange</Text> - Callback de mudança
+              </Text>
+            </View>
+            
+            <View className="mb-sm">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-xs`}>Pré-configurações disponíveis</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">FAQAccordion</Text> - type="single" + collapsible
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">SettingsAccordion</Text> - type="multiple"
+              </Text>
+              <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">InfoAccordion</Text> - type="single" sem collapsible
+              </Text>
+            </View>
+          </View>
+          
+        
+        {/* Dica Pro */}
+        <View className={`${isDark ? 'bg-success-bg-dark' : 'bg-success-bg-light'} rounded-lg p-md border ${isDark ? 'border-success-border-dark' : 'border-success-border-light'}`} style={{ marginTop: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 }) }}>
+          <View className="flex-row items-start">
+            <Rocket size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs mt-0.5" />
+            <View className="flex-1">
+              <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-sm', desktop: 'text-base', default: 'text-base' })} font-jakarta-bold ${textPrimary} mb-xs`}>
+                Dica Pro
+               </Text>
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+                Use <Text className="font-jakarta-medium text-primary-light dark:text-primary-dark">defaultValue</Text> para controlar quais items iniciam abertos. Combine com <Text className="font-jakarta-medium text-info-icon-light dark:text-info-icon-dark">onValueChange</Text> para criar experiências guiadas. As <Text className="font-jakarta-medium text-success-icon-light dark:text-success-icon-dark">pré-configurações</Text> cobrem 90% dos casos de uso.
+        </Text>
+          </View>
           </View>
         </View>
-      </View>
+
+      </ScrollView>
     );
   };
   
