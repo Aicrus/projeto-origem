@@ -184,8 +184,7 @@ export default function DevPage() {
   const [inputErro, setInputErro] = useState('');
   const [inputBusca, setInputBusca] = useState('');
   const [inputMascara, setInputMascara] = useState('');
-  const [inputData, setInputData] = useState('');
-  const [inputHora, setInputHora] = useState('');
+
   const [inputNumerico, setInputNumerico] = useState('0');
   const [inputRedimensionavel, setInputRedimensionavel] = useState('');
   
@@ -750,430 +749,80 @@ export default function DevPage() {
 
 
 
-        {/* Seção de Especificações de Design */}
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Especificações de Design
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-md`}>
-          Todas as configurações do Input seguem rigorosamente o design system. Nenhuma cor ou tipografia é hardcoded.
-          O Input sempre fica contido dentro de um container, seja uma tela, um card, um modal ou qualquer outro componente pai.
-        </Text>
-        
+        {/* Recursos e API */}
         <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          {/* Container e Background */}
-          <View className="mb-lg">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>Container e Background</Text>
-            
-                         <View className="mb-sm">
-               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Cor de fundo do input:</Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Tema claro: `bg-primary-light` (token do design system)
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Tema escuro: `bg-primary-dark` (token do design system)
-               </Text>
-             </View>
-             
-             <View className="mb-sm">
-               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Bordas:</Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Normal: `divider-light/dark` (token do design system)
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Foco: `primary-light/dark` (token do design system)
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Erro: `error-border-light/dark` (token do design system)
-               </Text>
-             </View>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Border radius:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>• `rounded-md` (6px) - do design system</Text>
-            </View>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Altura mínima:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>• `spacing-9` (36px) - do design system</Text>
-            </View>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Padding interno:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>• Horizontal: `spacing-3` (12px)</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>• Vertical: `spacing-2.5` (10px) web / `spacing-3.5` (14px) nativo</Text>
-            </View>
+          <View className="flex-row items-center mb-sm">
+            <View className={`w-1 h-6 ${isDark ? 'bg-primary-dark' : 'bg-primary-light'} rounded-full mr-sm`} />
+            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary}`}>
+              Recursos e API
+            </Text>
           </View>
           
-          {/* Tipografia */}
-          <View className="mb-lg">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>Tipografia</Text>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Texto do input:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Tamanho: `body-md` (14px) - `fontSize.body-md.size`
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Linha: `body-md` (20px) - `fontSize.body-md.lineHeight`  
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Peso: Regular - `fontFamily.jakarta-regular`
-              </Text>
-                             <Text className={`text-body-sm ${textSecondary}`}>
-                 • Cor: `text-primary-light/dark` (token do design system)
-               </Text>
-             </View>
-             
-             <View className="mb-sm">
-               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Placeholder:</Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Tamanho: 13px - otimizado para melhor legibilidade
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Peso: Regular - `fontFamily.jakarta-regular`
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Cor: `text-tertiary-light/dark` (token do design system)
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • <Text className="font-jakarta-bold">IMPORTANTE:</Text> Todos os placeholders (básico, sem label, flutuante) usam EXATAMENTE a mesma configuração
-               </Text>
-             </View>
-             
-             <View className="mb-sm">
-               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Label acima (padrão):</Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Tamanho: `label-sm` (13px) - `fontSize.label-sm.size`
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Linha: `label-sm` (17px) - `fontSize.label-sm.lineHeight`
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Peso: Semibold (600) - `fontFamily.jakarta-semibold`
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Cor: `text-primary-light/dark` (token do design system)
-               </Text>
-             </View>
-             
-             <View className="mb-sm">
-               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Label flutuante:</Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • <Text className="font-jakarta-medium">Dentro do input:</Text> 100% idêntico ao placeholder (perfeito como estava)
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                   - Tamanho: 13px - otimizado para melhor legibilidade
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                   - Peso: Regular - `fontFamily.jakarta-regular`
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                   - Cor: `text-tertiary-light/dark` (token do design system)
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                   - <Text className="font-jakarta-bold">GARANTIA:</Text> Usa configuração compartilhada - impossível diferir
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • <Text className="font-jakarta-medium">Flutuando (ativo):</Text> 
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                   - Tamanho: 13px - `fontSize.label-sm.size` (mantém tamanho padrão)
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                   - Peso: Semibold (600) - `fontFamily.jakarta-semibold` (padrão para labels)
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                   - Cor: `text-primary-light/dark` (cor primária quando flutuando)
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                   - Background: cor do container para efeito "notched"
-               </Text>
-             </View>
-             
-             <View className="mb-sm">
-               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Mensagem de erro:</Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Tamanho: `body-sm` (12px) - `fontSize.body-sm.size`
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Linha: `body-sm` (18px) - `fontSize.body-sm.lineHeight`
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Peso: Regular - `fontFamily.jakarta-regular`
-               </Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • Cor: `error-text-light/dark` (token do design system)
-               </Text>
-             </View>
+          <View className="mb-md">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-xs`}>Tipos suportados</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">text</Text> - Texto simples
+            </Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">password</Text> - Senha com toggle de visibilidade
+            </Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">search</Text> - Busca com ícone e botão limpar
+            </Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">number</Text> - Numérico com controles opcionais
+            </Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">email</Text> - Email com validação automática
+            </Text>
           </View>
           
-          {/* Sombras */}
-          <View className="mb-lg">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>🧠 Sistema de Sombras Inteligente</Text>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Sombra padrão do input:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Tipo: `input` (do sistema de sombras inteligentes)
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Cor: `#000000` (sempre escura)
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Tema claro: `0 1px 2px rgba(0, 0, 0, 0.05)` + shadowOpacity 0.05
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Tema escuro: `0 1px 2px rgba(0, 0, 0, 0.2)` + shadowOpacity 0.2
-              </Text>
-            </View>
-            
-            <View className={`p-sm rounded-md mb-sm ${isDark ? 'bg-primary-dark/10' : 'bg-primary-light/10'} border border-primary-light/dark`}>
-                              <View className="flex-row items-start mb-xs">
-                  <Lightbulb size={14} color={isDark ? '#10B981' : '#059669'} style={{ marginRight: 4, marginTop: 1 }} />
-                  <Text className={`text-body-sm ${textSecondary}`}>
-                    <Text className="font-jakarta-bold">Inteligência:</Text> As sombras são sempre escuras em ambos os temas, 
-                    mas com intensidades diferentes para criar a aparência correta em cada modo.
-                  </Text>
-                </View>
-            </View>
+          <View className="mb-md">
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-xs`}>Máscaras disponíveis</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">cpf</Text> - 000.000.000-00
+            </Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">cnpj</Text> - 00.000.000/0000-00
+            </Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">phone</Text> - (00) 00000-0000
+            </Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">cep</Text> - 00000-000
+            </Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">currency</Text> - R$ 0.000,00
+            </Text>
           </View>
           
-          {/* Configuração Padronizada dos Labels */}
-          <View className="mb-lg">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>🎯 Configuração Padronizada dos Labels</Text>
-            
-            <View className={`p-sm rounded-md mb-sm ${isDark ? 'bg-success-bg-dark' : 'bg-success-bg-light'} border border-success-border-light/dark`}>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                <Text className="font-jakarta-bold">✅ NOVO PADRÃO:</Text> Todos os labels agora seguem uma configuração unificada e consistente.
-              </Text>
-            </View>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Configuração universal:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Tamanho: `label-sm` (13px) - `fontSize.label-sm.size`
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Linha: `label-sm` (17px) - `fontSize.label-sm.lineHeight` 
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Peso: Semibold (600) - `fontFamily.jakarta-semibold`
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Cor: `text-primary-light/dark` (token do design system)
-              </Text>
-            </View>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Aplicação:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Label acima (padrão): ✅ Configuração aplicada
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Label flutuante (quando ativo): ✅ Configuração aplicada
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Label flutuante (dentro): Mantém cor do placeholder (perfeito como estava)
-              </Text>
-            </View>
-            
-            <View className={`p-sm rounded-md mb-sm ${isDark ? 'bg-info-bg-dark' : 'bg-info-bg-light'} border border-info-border-light/dark`}>
-                              <View className="flex-row items-start mb-xs">
-                  <Lightbulb size={14} color={isDark ? '#10B981' : '#059669'} style={{ marginRight: 4, marginTop: 1 }} />
-                  <Text className={`text-body-sm ${textSecondary}`}>
-                    <Text className="font-jakarta-bold">Benefício:</Text> Consistência visual perfeita entre todos os tipos de label, 
-                    facilitando manutenção e garantindo uniformidade no design.
-                  </Text>
-                </View>
-            </View>
-          </View>
-          
-          {/* Estados e Interações */}
-          <View className="mb-lg">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>Estados e Interações</Text>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Efeitos de hover (web):</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Box shadow: `0 2px 8px rgba(0, 0, 0, 0.1)`
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Transição: `0.2s ease-in-out`
-              </Text>
-            </View>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Foco:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Ring: `2px` com cor primária + 40% opacidade
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Borda: muda para cor primária
-              </Text>
-            </View>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Disabled:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Opacidade: 60%
-              </Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Background: `bg-tertiary-light/dark`
-              </Text>
-            </View>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Seleção de texto:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                • Cor: primária com 60% opacidade
-              </Text>
-            </View>
-          </View>
-          
-          {/* Ícones */}
           <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-sm`}>Ícones</Text>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Tamanho padrão:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>• 16px (Lucide React Native)</Text>
-            </View>
-            
-                         <View className="mb-sm">
-               <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Cor:</Text>
-               <Text className={`text-body-sm ${textSecondary}`}>
-                 • `text-secondary-light/dark` (token do design system)
-               </Text>
-             </View>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Padding:</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>• `spacing-1.5` (6px)</Text>
-            </View>
-            
-            <View className="mb-sm">
-              <Text className={`text-label-sm font-jakarta-medium ${textPrimary}`}>Hover (web):</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>• Background: `bg-secondary-light/dark`</Text>
-              <Text className={`text-body-sm ${textSecondary}`}>• Border radius: `rounded-sm` (4px)</Text>
-            </View>
+            <Text className={`text-label-md font-jakarta-bold ${textPrimary} mb-xs`}>Variantes de label</Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Padrão</Text> - Label acima do campo
+            </Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Sem label</Text> - Apenas placeholder
+            </Text>
+            <Text className={`text-body-sm ${textSecondary}`}>
+              • <Text className="font-jakarta-medium">Flutuante</Text> - Label que anima para cima
+            </Text>
           </View>
         </View>
-        
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Características
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-md`}>
-          O Input é totalmente adaptável às necessidades do seu projeto:
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Tema adaptativo</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Alterna automaticamente entre temas claro e escuro</Text>
+
+        {/* Dica Pro */}
+        <View className={`${isDark ? 'bg-success-bg-dark' : 'bg-success-bg-light'} rounded-lg p-md border ${isDark ? 'border-success-border-dark' : 'border-success-border-light'}`}>
+          <View className="flex-row items-start">
+            <Rocket size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs mt-0.5" />
+            <View className="flex-1">
+              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-bold ${textPrimary} mb-xs`}>
+                Dica Pro
+              </Text>
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+                Para <Text className="font-jakarta-medium text-primary-light dark:text-primary-dark">data e hora</Text>, use os componentes especializados <Text className="font-jakarta-medium text-info-icon-light dark:text-info-icon-dark">DateInput</Text> e <Text className="font-jakarta-medium text-warning-icon-light dark:text-warning-icon-dark">TimeInput</Text> da pasta <Text className="font-jakarta-medium">@/datepickers</Text> que oferecem calendários nativos.
+              </Text>
+            </View>
           </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Responsividade</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Comportamento consistente entre desktop e dispositivos móveis</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Acessibilidade</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Compatível com leitores de tela e navegação por teclado</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Personalização</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Estilo totalmente customizável via props</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>Multiformato</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Suporta diversos tipos de entrada e formatação</Text>
-          </View>
-        </View>
-        
-        <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
-          Propriedades
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          O componente Input possui diversas propriedades para personalização:
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>value</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Valor atual do input (obrigatório)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>onChangeText</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Função chamada quando o valor muda (obrigatório)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>placeholder</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Texto exibido quando o input está vazio</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>label</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Rótulo exibido acima do input</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>type</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Tipo de input: 'text', 'password', 'search', 'number', 'email', 'date', 'time'</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>mask</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Máscara: 'cpf', 'cnpj', 'phone', 'date', 'cep', 'currency', 'none'</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>min</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Valor mínimo para input numérico (type="number")</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>max</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Valor máximo para input numérico (type="number")</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>step</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Incremento/decremento para input numérico (type="number")</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>showNumberControls</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Mostra botões de incremento/decremento (type="number")</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>resizable</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Permite redimensionar o campo verticalmente (funciona em todas as plataformas quando multiline=true)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>minHeight</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Altura mínima para inputs redimensionáveis (padrão: 38px)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>maxHeight</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Altura máxima para inputs redimensionáveis (padrão: 200px)</Text>
-          </View>
-          
-          <View className="mb-sm">
-            <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>setScrollEnabled</Text>
-            <Text className={`text-body-sm ${textSecondary}`}>Função para controlar o scroll do container pai durante o redimensionamento (recomendado para ScrollViews)</Text>
-          </View>
-          
-          <Text className={`text-body-sm ${textSecondary} mt-md`}>
-            E muitas outras propriedades para personalização completa...
-          </Text>
         </View>
       </ScrollView>
     );

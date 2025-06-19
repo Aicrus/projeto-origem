@@ -5,17 +5,33 @@ const path = require('path');
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
 
-// Configurações adicionais para resolver problemas com o Supabase e outros módulos
-config.resolver.extraNodeModules = {
-  ...config.resolver.extraNodeModules,
-  // Cria um mock vazio para o metro-runtime
-  'metro-runtime': path.resolve(__dirname, 'node_modules/react-native'),
-  // Mock para o node-fetch
-  '@supabase/node-fetch': path.resolve(__dirname, 'node_modules/react-native'),
+// Configurações para resolver problemas com imports dinâmicos no SDK 53
+config.resolver.resolverMainFields = ['browser', 'module', 'main'];
+config.resolver.sourceExts = [...config.resolver.sourceExts, 'mjs', 'cjs'];
+
+// Configurar aliases para resolver problemas com Supabase
+config.resolver.alias = {
+  ...config.resolver.alias,
+  '@supabase/node-fetch': path.resolve(__dirname, 'lib/mocks/node-fetch.js'),
+  // Adicionar aliases específicos para resolver problemas com asyncRequire
+  'metro-runtime/src/modules/asyncRequire': path.resolve(__dirname, 'lib/mocks/asyncRequire.js'),
+  'metro-runtime/src/modules/asyncRequire.js': path.resolve(__dirname, 'lib/mocks/asyncRequire.js'),
 };
 
-// Instruir o Metro a ignorar a importação dinâmica de módulos do node no ambiente móvel/web
-config.resolver.sourceExts = [...config.resolver.sourceExts, 'mjs', 'cjs'];
+// Configurar blacklist para evitar imports problemáticos
+config.resolver.blacklistRE = /metro-runtime\/src\/modules\/asyncRequire\.js$/;
+
+// Configurar platform-specific overrides
+config.resolver.platforms = ['native', 'ios', 'android', 'web'];
+
+// Adicionar configuração de módulos ignorados
+config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
+
+// Configurações de transformação para melhor compatibilidade
+config.transformer = {
+  ...config.transformer,
+  unstable_allowRequireContext: true,
+};
 
 // Aplicar a configuração do NativeWind
 module.exports = withNativeWind(config, {

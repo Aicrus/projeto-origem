@@ -26,6 +26,40 @@ export function applyPolyfills() {
     global.navigator.product = 'ReactNative';
   }
 
+  // Patch específico para resolver problemas com imports dinâmicos no Metro
+  // @ts-ignore
+  global.__importDefault = (mod: any) => mod?.default || mod;
+  
+  // @ts-ignore  
+  global.__importStar = (mod: any) => mod;
+
+  // Patch para fetch e polyfills necessários para Supabase
+  if (Platform.OS !== 'web') {
+    // @ts-ignore
+    if (!global.fetch) {
+      // @ts-ignore
+      global.fetch = fetch;
+    }
+    
+    // @ts-ignore
+    if (!global.Headers) {
+      // @ts-ignore
+      global.Headers = Headers;
+    }
+    
+    // @ts-ignore
+    if (!global.Request) {
+      // @ts-ignore
+      global.Request = Request;
+    }
+    
+    // @ts-ignore
+    if (!global.Response) {
+      // @ts-ignore
+      global.Response = Response;
+    }
+  }
+
   // Patch para o módulo asyncRequire que está causando o erro
   if (typeof window !== 'undefined') {
     // @ts-ignore
