@@ -193,6 +193,14 @@ export default function DevPage() {
   const [inputSemLabel, setInputSemLabel] = useState('');
   const [inputLabelFlutuante, setInputLabelFlutuante] = useState('');
   
+  // Estados para as novas variantes visuais
+  const [inputOutline, setInputOutline] = useState('');
+  const [inputUnderline, setInputUnderline] = useState('');
+  const [inputNone, setInputNone] = useState('');
+  const [inputAffix, setInputAffix] = useState('50');
+  const [inputTransparente, setInputTransparente] = useState('');
+  
+  // Estados separados para cada exemplo de Select
   // Estados separados para cada exemplo de Select
   const [selectBasico, setSelectBasico] = useState('');
   const [selectBusca, setSelectBusca] = useState('');
@@ -491,7 +499,7 @@ export default function DevPage() {
               label="Email"
               type="email"
               keyboardType="email-address"
-                  error={inputErro.length > 0 && !isValidEmail(inputErro) ? "Email inválido" : ""}
+                  error={inputErro.length > 0 && !isValidEmail(inputErro) ? "Não parece um e-mail válido" : ""}
             />
                 <Input
                   value={inputSenha}
@@ -569,11 +577,11 @@ export default function DevPage() {
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
                   <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
-                    Variantes de Label
+                    Variantes e Estados
                   </Text>
                 </View>
                 <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
-                  3 estilos diferentes • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Flutuante animado</Text>
+                  Labels, bordas e estados • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Todas as variações</Text>
             </Text>
           </View>
           
@@ -596,6 +604,58 @@ export default function DevPage() {
                   onChangeText={setInputLabelFlutuante}
                   label="Email corporativo"
                   labelVariant="floating"
+                />
+                
+                {/* Separador visual */}
+                <View className={`h-px ${isDark ? 'bg-divider-dark' : 'bg-divider-light'} my-xs`} />
+                
+                {/* Variantes visuais */}
+                <Input
+                  value={inputOutline}
+                  onChangeText={setInputOutline}
+                  placeholder="Borda completa (padrão)"
+                  label="Input Outline"
+                  variant="outline"
+                />
+                <Input
+                  value={inputUnderline}
+                  onChangeText={setInputUnderline}
+                  placeholder="Apenas linha embaixo"
+                  label="Input Underline"
+                  variant="underline"
+                />
+                <Input
+                  value={inputNone}
+                  onChangeText={setInputNone}
+                  placeholder="Sem borda"
+                  label="Input None"
+                  variant="none"
+                />
+                
+                {/* Separador visual */}
+                <View className={`h-px ${isDark ? 'bg-divider-dark' : 'bg-divider-light'} my-xs`} />
+                
+                {/* Estados especiais */}
+                <Input
+                  value="Campo desabilitado (não editável)"
+                  onChangeText={() => {}} // Função vazia para não permitir edição
+                  label="Campo Desabilitado"
+                  disabled={true}
+                />
+                <Input
+                  value={inputAffix}
+                  onChangeText={setInputAffix}
+                  placeholder="Digite o peso"
+                  label="Peso corporal"
+                  type="number"
+                  rightAffix="kg"
+                />
+                <Input
+                  value={inputTransparente}
+                  onChangeText={setInputTransparente}
+                  placeholder="Sem cor de fundo"
+                  label="Input Transparente"
+                  transparent={true}
                 />
             </View>
           </View>
@@ -810,8 +870,9 @@ export default function DevPage() {
             </View>
           </View>
           
+        
         {/* Dica Pro */}
-        <View className={`${isDark ? 'bg-success-bg-dark' : 'bg-success-bg-light'} rounded-lg p-md border ${isDark ? 'border-success-border-dark' : 'border-success-border-light'}`}>
+        <View className={`${isDark ? 'bg-success-bg-dark' : 'bg-success-bg-light'} rounded-lg p-md border ${isDark ? 'border-success-border-dark' : 'border-success-border-light'}`} style={{ marginTop: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 }) }}>
           <View className="flex-row items-start">
             <Rocket size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs mt-0.5" />
             <View className="flex-1">
@@ -819,7 +880,7 @@ export default function DevPage() {
                 Dica Pro
                </Text>
               <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
-                Para <Text className="font-jakarta-medium text-primary-light dark:text-primary-dark">data e hora</Text>, use os componentes especializados <Text className="font-jakarta-medium text-info-icon-light dark:text-info-icon-dark">DateInput</Text> e <Text className="font-jakarta-medium text-warning-icon-light dark:text-warning-icon-dark">TimeInput</Text> da pasta <Text className="font-jakarta-medium">@/datepickers</Text> que oferecem calendários nativos.
+                Para <Text className="font-jakarta-medium text-primary-light dark:text-primary-dark">data e hora</Text>, use os componentes especializados <Text className="font-jakarta-medium text-info-icon-light dark:text-info-icon-dark">DateInput</Text> e <Text className="font-jakarta-medium text-warning-icon-light dark:text-warning-icon-dark">TimeInput</Text> da pasta <Text className="font-jakarta-medium">@/datepickers</Text> que oferecem calendários nativos. As <Text className="font-jakarta-medium text-info-icon-light dark:text-info-icon-dark">variantes visuais</Text> funcionam com todos os tipos de input.
         </Text>
           </View>
           </View>

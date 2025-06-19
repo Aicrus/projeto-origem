@@ -8,7 +8,7 @@ import Animated, {
   interpolate,
   Easing
 } from 'react-native-reanimated';
-import { Eye, EyeOff, Search, X, Plus, Minus, ChevronUp, ChevronDown } from 'lucide-react-native';
+import { Eye, EyeOff, Search, X, Plus, Minus, ChevronUp, ChevronDown, AlertCircle } from 'lucide-react-native';
 import { useTheme } from '../../hooks/DesignSystemContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { colors, ColorType } from '../../design-system/tokens/colors';
@@ -26,7 +26,9 @@ import { opacity, getOpacity, shadows, getShadow, getShadowColor } from '../../d
  * - Responsividade
  * - Estados: erro, desabilitado, foco
  * - Três variações de label: acima, sem label, flutuante
+ * - Três variações visuais: outline, underline, none
  * - Label flutuante: sempre transparente + padding automático para evitar sobreposição
+ * - Affix: texto/ícone no final do input (funcionalidade avançada)
  * - Acessibilidade e personalização
  * 
  * Exemplos de uso:
@@ -83,6 +85,40 @@ import { opacity, getOpacity, shadows, getShadow, getShadowColor } from '../../d
  *   onClear={() => setBusca('')} 
  * />
  * 
+ * // Input com variante underline
+ * <Input 
+ *   value={texto} 
+ *   onChangeText={setTexto} 
+ *   label="Email" 
+ *   variant="underline"
+ *   type="email"
+ * />
+ * 
+ * // Input sem borda (variant="none")
+ * <Input 
+ *   value={texto} 
+ *   onChangeText={setTexto} 
+ *   placeholder="Digite algo..." 
+ *   variant="none"
+ * />
+ * 
+ * // Input com affix (texto no final)
+ * <Input 
+ *   value={peso} 
+ *   onChangeText={setPeso} 
+ *   label="Peso" 
+ *   rightAffix="kg"
+ *   type="number"
+ * />
+ * 
+ * // Input desabilitado
+ * <Input 
+ *   value="Campo desabilitado" 
+ *   onChangeText={() => {}} 
+ *   label="Status" 
+ *   disabled={true}
+ * />
+ * 
 
  * ```
  */
@@ -98,7 +134,11 @@ export interface InputProps {
   label?: string;
   /** Variação do label: 'above' (padrão), 'none' (sem label), 'floating' (Material Design) */
   labelVariant?: 'above' | 'none' | 'floating';
-  /** Cor de fundo do container onde o Input está posicionado (opcional - detecta automaticamente do tema se não fornecido. Usado para o background do label flutuante criar efeito notched) */
+  /** Variação visual do input: 'outline' (borda completa), 'underline' (só embaixo), 'none' (sem borda) */
+  variant?: 'outline' | 'underline' | 'none';
+  /** Se o input deve ter background transparente (sem cor de fundo) */
+  transparent?: boolean;
+  /** Cor de fundo do container onde o Input está posicionado (opcional - por padrão usa a mesma cor do input. Usado para o background do label flutuante criar efeito notched) */
   containerBackgroundColor?: string;
   /** Mensagem de erro exibida abaixo do input */
   error?: string;
@@ -132,6 +172,13 @@ export interface InputProps {
   numberOfLines?: number;
   /** Função chamada quando o botão de limpar é pressionado */
   onClear?: () => void;
+
+  /** Texto ou componente a ser exibido no final do input (affix) */
+  rightAffix?: string | React.ReactNode;
+  /** Função chamada quando o affix é pressionado */
+  onRightAffixPress?: () => void;
+  /** Estilo personalizado para o texto do affix */
+  rightAffixStyle?: any;
 
   /** Componente de ícone personalizado para exibir à direita do input */
   rightIcon?: React.ComponentType;
@@ -170,6 +217,8 @@ export const Input = ({
   placeholder = '',
   label,
   labelVariant = 'above',
+  variant = 'outline',
+  transparent = false,
   containerBackgroundColor,
   error,
   disabled = false,
@@ -188,6 +237,9 @@ export const Input = ({
   numberOfLines = 1,
   onClear,
 
+  rightAffix,
+  onRightAffixPress,
+  rightAffixStyle,
   rightIcon,
   onRightIconPress,
   testID,
@@ -303,28 +355,67 @@ export const Input = ({
     return isDark ? colors['text-primary-dark'] : colors['text-primary-light'];
   };
 
-  // Função para obter a cor de fundo dinâmica do label flutuante
+  // Função para obter a cor de fundo dinâmica do label flutuante (sempre igual ao input)
   const getFloatingLabelBackground = (): string => {
-    // Detecção automática inteligente da cor de fundo
-    // 1. Se containerBackgroundColor foi passado explicitamente, usar ele
-    if (containerBackgroundColor) {
-      return containerBackgroundColor;
-    }
-    
-    // 2. Detectar automaticamente a cor de fundo do container pai baseada no tema
-    // Para a maioria dos casos, usar a cor de fundo secundária (onde geralmente ficam os inputs)
-    return isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'];
+    // Sempre usar a mesma cor de fundo do input para consistência visual
+    return getInputBackgroundColor();
   };
 
-  // Função para obter a cor de fundo do input (sempre transparente para label flutuante)
+  // Função para obter a cor de fundo do input
   const getInputBackgroundColor = (): string => {
-    // Se for label flutuante, sempre transparente (desde o início)
-    if (labelVariant === 'floating') {
+    // Se transparent=true, sempre transparente
+    if (transparent) {
       return 'transparent';
     }
     
-    // Caso contrário, usar a cor padrão do input
+    // Se estiver desabilitado, usar cor específica
+    if (disabled) {
+      return isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'];
+    }
+    
+    // Para todos os inputs, usar a mesma cor de fundo
+    // Usando bg-primary que é a cor padrão dos inputs
     return isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'];
+  };
+
+  // Função para obter estilos baseados na variante
+  const getVariantStyles = () => {
+    const borderColor = error 
+      ? isDark ? colors['error-border-dark'] : colors['error-border-light']
+      : isFocused
+        ? isDark ? colors['primary-dark'] : colors['primary-light']
+        : isDark ? colors['divider-dark'] : colors['divider-light'];
+
+    switch (variant) {
+      case 'outline':
+        return {
+          borderWidth: 1,
+          borderColor,
+          borderRadius: Number(getBorderRadius('md').replace('px', '')),
+        };
+      
+      case 'underline':
+        return {
+          borderWidth: 0,
+          borderBottomWidth: 2,
+          borderBottomColor: borderColor,
+          borderRadius: 0,
+        };
+      
+      case 'none':
+        return {
+          borderWidth: 0,
+          borderColor: 'transparent',
+          borderRadius: Number(getBorderRadius('md').replace('px', '')),
+        };
+      
+      default:
+        return {
+          borderWidth: 1,
+          borderColor,
+          borderRadius: Number(getBorderRadius('md').replace('px', '')),
+        };
+    }
   };
   
   // Função para desabilitar o scroll do componente pai durante o redimensionamento
@@ -422,7 +513,7 @@ export const Input = ({
   const sharedPlaceholderConfig = {
     fontSize: 13,
     fontFamily: fontFamily['jakarta-regular'],
-    lineHeight: Platform.OS === 'web' ? 19 : 13 * 1.3,
+    lineHeight: 19, // Padronizado 19px para web e nativo (mesma experiência)
     color: isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']
   };
 
@@ -437,15 +528,11 @@ export const Input = ({
     inputContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      borderWidth: 1,
-      borderRadius: Number(getBorderRadius('md').replace('px', '')),
-      backgroundColor: getInputBackgroundColor(), // Transparente quando label flutuante
-      borderColor: error 
-        ? isDark ? colors['error-border-dark'] : colors['error-border-light']
-        : isFocused
-          ? isDark ? colors['primary-dark'] : colors['primary-light']
-          : isDark ? colors['divider-dark'] : colors['divider-light'],
-      minHeight: Number(spacing['9'].replace('px', '')),
+      ...getVariantStyles(), // Aplicar estilos da variante
+      backgroundColor: getInputBackgroundColor(), // Cor de fundo baseada na prop transparent
+      minHeight: Platform.OS === 'web' 
+        ? Number(spacing['10'].replace('px', '')) // 40px na web
+        : Number(spacing['12'].replace('px', '')), // 48px no nativo (bom como está)
       paddingHorizontal: Number(spacing['3'].replace('px', '')),
       // Sombra inteligente do design system (sempre escura)
       shadowColor: getShadowColor('input'),
@@ -462,21 +549,26 @@ export const Input = ({
       flex: 1,
       color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
       fontSize: sharedPlaceholderConfig.fontSize, // Exato mesmo tamanho
-      lineHeight: sharedPlaceholderConfig.lineHeight, // Exato mesmo lineHeight  
       fontFamily: sharedPlaceholderConfig.fontFamily, // Exato mesmo peso
-      paddingVertical: Platform.OS === 'web' 
-        ? Number(spacing['2.5'].replace('px', ''))
-        : Number(spacing['3.5'].replace('px', '')), // Mais padding para altura maior
-      height: multiline ? undefined : Number(spacing['9'].replace('px', '')),
+      // Configuração unificada com ajustes específicos por plataforma
+      paddingVertical: Number(spacing['3'].replace('px', '')), // 12px para ambos
+      height: multiline ? undefined : Platform.OS === 'web'
+        ? Number(spacing['10'].replace('px', '')) // 40px na web
+        : Number(spacing['12'].replace('px', '')), // 48px no nativo
       textAlignVertical: multiline ? 'top' : 'center',
-      ...(Platform.OS === 'ios' && multiline ? { paddingTop: Number(spacing['2.5'].replace('px', '')) } : {}),
-      // Ajustes específicos para o nativo para evitar corte do texto
-      ...(Platform.OS !== 'web' && !multiline ? {
+      // Ajustes específicos para nativo
+      ...(Platform.OS !== 'web' ? {
         includeFontPadding: false, // Remove padding extra no Android
-        textAlignVertical: 'center',
-        paddingTop: 0,
-        paddingBottom: 0,
-      } : {}),
+        // Ajuste de lineHeight para evitar corte no Android
+        lineHeight: Platform.OS === 'android' ? 16 : sharedPlaceholderConfig.lineHeight,
+        // Ajuste sutil para centralizar melhor o texto
+        paddingTop: Number(spacing['3'].replace('px', '')) - 2, // 10px (2px menos)
+        paddingBottom: Number(spacing['3'].replace('px', '')) + 2, // 14px (2px mais)
+      } : {
+        // Web mantém configuração padrão
+        lineHeight: sharedPlaceholderConfig.lineHeight,
+      }),
+      ...(Platform.OS === 'ios' && multiline ? { paddingTop: Number(spacing['2.5'].replace('px', '')) } : {}),
     },
 
     searchIcon: {
@@ -504,9 +596,8 @@ export const Input = ({
       top: (() => {
         const lineHeightOffset = (Number(fontSize['label-sm'].lineHeight.replace('px', '')) - Number(fontSize['label-sm'].size.replace('px', ''))) / 2;
         
-        return Platform.OS === 'web' 
-          ? Number(spacing['2.5'].replace('px', '')) + 2 - lineHeightOffset
-          : Number(spacing['3.5'].replace('px', '')) + 1 - lineHeightOffset;
+        // Padronizado para ambas as plataformas
+        return Number(spacing['3'].replace('px', '')) + 1 - lineHeightOffset;
       })(),
       backgroundColor: 'transparent',
       paddingHorizontal: 0, // Sem padding inicial - só quando flutuando
@@ -515,13 +606,16 @@ export const Input = ({
       fontFamily: sharedPlaceholderConfig.fontFamily, // Exato mesmo peso (jakarta-regular)
       lineHeight: sharedPlaceholderConfig.lineHeight, // Exato mesmo lineHeight
       zIndex: 1,
+      // CORREÇÃO: Permite clique através do label (não bloqueia o TextInput)
+      // Web usa pointerEvents, nativo usa uma abordagem diferente
+      ...(Platform.OS === 'web' ? { pointerEvents: 'none' } : {}),
     },
     errorText: {
       fontSize: Number(fontSize['body-sm'].size.replace('px', '')),
       lineHeight: Number(fontSize['body-sm'].lineHeight.replace('px', '')),
       fontFamily: fontFamily['jakarta-regular'],
-      color: isDark ? colors['error-text-dark'] : colors['error-text-light'],
-      marginTop: Number(spacing['1'].replace('px', '')),
+      color: isDark ? colors['error-icon-dark'] : colors['error-icon-light'], // Mesma cor do ícone
+      flex: 1, // Para ocupar o espaço restante ao lado do ícone
     },
     numberControlsContainer: {
       position: 'absolute',
@@ -637,6 +731,12 @@ export const Input = ({
   
   // Lidar com foco
   const handleFocus = () => {
+    // Se estiver desabilitado, não permitir foco
+    if (disabled) {
+      inputRef.current?.blur(); // Remove o foco imediatamente
+      return;
+    }
+    
     setIsFocused(true);
     
     // Animar label para posição flutuante se for o tipo floating
@@ -777,7 +877,7 @@ export const Input = ({
           transition: all 0.2s ease-in-out;
         }
         
-        [data-input-container="true"]:focus-within {
+        [data-input-container="true"]:focus-within:not([data-disabled="true"]) {
           box-shadow: 0 0 0 2px ${isDark ? colors['primary-dark'] + '40' : colors['primary-light'] + '40'};
           transition: all 0.2s ease-in-out;
         }
@@ -809,6 +909,23 @@ export const Input = ({
         textarea::selection {
           background-color: rgba(128, 128, 128, 0.2) !important;
           color: inherit !important;
+        }
+        
+        /* Prevenir seleção em inputs desabilitados */
+        input:disabled,
+        textarea:disabled {
+          -webkit-user-select: none !important;
+          -moz-user-select: none !important;
+          -ms-user-select: none !important;
+          user-select: none !important;
+          pointer-events: none !important;
+          cursor: not-allowed !important;
+        }
+        
+        [data-input-container="true"][data-disabled="true"] {
+          pointer-events: none !important;
+          cursor: not-allowed !important;
+          opacity: 0.6 !important;
         }
         
         /* Estilo para controles numéricos */
@@ -1104,9 +1221,8 @@ export const Input = ({
     // Calcular a posição inicial considerando o line-height do label
     const lineHeightOffset = (Number(fontSize['label-sm'].lineHeight.replace('px', '')) - Number(fontSize['label-sm'].size.replace('px', ''))) / 2;
     
-    const initialTop = Platform.OS === 'web' 
-      ? Number(spacing['2.5'].replace('px', '')) + 2 - lineHeightOffset
-      : Number(spacing['3.5'].replace('px', '')) + 1 - lineHeightOffset;
+    // Padronizado para ambas as plataformas
+    const initialTop = Number(spacing['3'].replace('px', '')) + 1 - lineHeightOffset;
     
     const labelSize = sharedPlaceholderConfig.fontSize; // EXATO mesmo tamanho do placeholder quando dentro
     const floatingLabelSize = Number(fontSize['label-sm'].size.replace('px', '')); // 13px quando flutuando
@@ -1133,27 +1249,50 @@ export const Input = ({
       <View style={{ position: 'relative' }}>
         {/* Label flutuante animado (variant="floating") */}
         {label && labelVariant === 'floating' && (
-          <Animated.Text
-            style={[
-              containerStyle.floatingLabel,
-              animatedLabelStyle,
-              {
-                // Cor do texto: Label flutuante inteligente
-                color: shouldFloat 
-                  ? (isDark ? colors['text-primary-dark'] : colors['text-primary-light']) // text-primary quando flutuando (novo padrão)
-                  : (isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']), // EXATA mesma cor do placeholder quando não flutuando (perfeito como estava)
-                // Adiciona cor de fundo quando flutuando para criar efeito notched
-                backgroundColor: shouldFloat ? getFloatingLabelBackground() : 'transparent',
-                paddingHorizontal: shouldFloat ? 4 : 0,
-              }
-            ]}
-            {...(isWeb ? { 
-              'data-floating-label': 'true',
-              'data-floating': shouldFloat ? 'true' : 'false'
-            } : {})}
-          >
-            {label}
-          </Animated.Text>
+          <>
+            <Animated.Text
+              style={[
+                containerStyle.floatingLabel,
+                animatedLabelStyle,
+                {
+                  // Cor do texto: Label flutuante inteligente
+                  color: shouldFloat 
+                    ? (isDark ? colors['text-primary-dark'] : colors['text-primary-light']) // text-primary quando flutuando (novo padrão)
+                    : (isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']), // EXATA mesma cor do placeholder quando não flutuando (perfeito como estava)
+                  // Adiciona cor de fundo quando flutuando para criar efeito notched
+                  backgroundColor: shouldFloat ? getFloatingLabelBackground() : 'transparent',
+                  paddingHorizontal: shouldFloat ? 4 : 0,
+                }
+              ]}
+              {...(isWeb ? { 
+                'data-floating-label': 'true',
+                'data-floating': shouldFloat ? 'true' : 'false'
+              } : {})}
+            >
+              {label}
+            </Animated.Text>
+            
+            {/* TouchableOpacity invisível para capturar cliques no nativo */}
+            {Platform.OS !== 'web' && (
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  backgroundColor: 'transparent',
+                  zIndex: 2, // Acima do label
+                }}
+                onPress={() => {
+                  if (inputRef.current) {
+                    inputRef.current.focus();
+                  }
+                }}
+                activeOpacity={1} // Sem feedback visual
+              />
+            )}
+          </>
         )}
 
 
@@ -1161,10 +1300,7 @@ export const Input = ({
         <View 
           style={[
             containerStyle.inputContainer,
-            disabled ? { 
-              opacity: 0.6, 
-              backgroundColor: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light']
-            } : {},
+            disabled ? { opacity: 0.6 } : {},
             type === 'number' && showNumberControls && !isWeb ? { paddingRight: 32 } : {},
             multiline && { minHeight: minHeight },
             !isWeb && multiline && resizable ? { height: nativeInputHeight } : {},
@@ -1293,6 +1429,36 @@ export const Input = ({
             disabled={disabled}
           >
             {React.createElement(rightIcon)}
+          </TouchableOpacity>
+        )}
+        
+        {/* Right Affix (texto/componente no final) */}
+        {rightAffix && (
+          <TouchableOpacity 
+            onPress={onRightAffixPress}
+            style={[
+              {
+                paddingHorizontal: Number(spacing['2'].replace('px', '')),
+                justifyContent: 'center',
+                alignItems: 'center',
+              },
+              rightAffixStyle
+            ]}
+            {...(isWeb ? { 'data-input-affix': 'true' } : {})}
+            disabled={disabled || !onRightAffixPress}
+            activeOpacity={onRightAffixPress ? 0.6 : 1}
+          >
+            {typeof rightAffix === 'string' ? (
+              <Text style={{
+                fontSize: Number(fontSize['body-sm'].size.replace('px', '')),
+                fontFamily: fontFamily['jakarta-medium'],
+                color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+              }}>
+                {rightAffix}
+              </Text>
+            ) : (
+              rightAffix
+            )}
           </TouchableOpacity>
         )}
         
@@ -1463,7 +1629,18 @@ export const Input = ({
       
       {/* Mensagem de erro */}
       {error && (
-        <Text style={containerStyle.errorText}>{error}</Text>
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginTop: Number(spacing['1'].replace('px', '')),
+        }}>
+          <AlertCircle 
+            size={14} 
+            color={isDark ? colors['error-icon-dark'] : colors['error-icon-light']}
+            style={{ marginRight: Number(spacing['1'].replace('px', '')) }}
+          />
+          <Text style={containerStyle.errorText}>{error}</Text>
+        </View>
       )}
       
 
