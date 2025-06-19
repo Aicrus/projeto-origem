@@ -366,7 +366,15 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
   return (
     <Animated.View style={[{ overflow: 'hidden' }, animatedStyle]}>
       <Animated.View 
-        style={[animatedContentStyle]}
+        style={[
+          animatedContentStyle,
+          // No nativo, força posição absoluta durante a animação para evitar re-layout
+          Platform.OS !== 'web' && isOpen && contentHeight > 0 ? {
+            position: 'absolute',
+            width: '100%',
+            height: contentHeight
+          } : {}
+        ]}
         onLayout={(event) => {
           const { height } = event.nativeEvent.layout;
           // Na web, sempre atualiza a altura para ser proporcional ao conteúdo
