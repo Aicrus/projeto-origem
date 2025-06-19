@@ -1,5 +1,5 @@
 import React, { useState, ReactNode } from 'react';
-import { View, Text, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
+import { View, Text, TouchableOpacity, ViewStyle, TextStyle, Platform } from 'react-native';
 import { ChevronDown } from 'lucide-react-native';
 import Animated, { 
   useSharedValue, 
@@ -252,7 +252,6 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
   const heightProgress = useSharedValue(isOpen ? 1 : 0);
   const opacityProgress = useSharedValue(isOpen ? 1 : 0);
   const [contentHeight, setContentHeight] = useState(0);
-  const [hasLayoutRun, setHasLayoutRun] = useState(false);
   const { responsive } = useResponsive();
 
   // Padding responsivo para o conteúdo
@@ -279,25 +278,20 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
   });
 
   React.useEffect(() => {
-    // Só anima se já temos a altura do conteúdo ou se está fechando
-    if (hasLayoutRun || !isOpen) {
-      if (isOpen) {
-        // Para abrir: primeiro define a opacidade, depois a altura
-        opacityProgress.value = withTiming(1, { 
-          duration: ANIMATION_CONFIG.timing.duration / 3,
-          easing: ANIMATION_CONFIG.timing.easing 
-        });
-        heightProgress.value = withSpring(1, ANIMATION_CONFIG.content);
-      } else {
-        // Para fechar: primeiro a altura, depois a opacidade
-        heightProgress.value = withTiming(0, ANIMATION_CONFIG.timing);
-        opacityProgress.value = withTiming(0, { 
-          duration: ANIMATION_CONFIG.timing.duration / 4,
-          easing: ANIMATION_CONFIG.timing.easing 
-        });
-      }
+    if (isOpen) {
+      heightProgress.value = withSpring(1, ANIMATION_CONFIG.content);
+      opacityProgress.value = withTiming(1, { 
+        duration: ANIMATION_CONFIG.timing.duration / 2,
+        easing: ANIMATION_CONFIG.timing.easing 
+      });
+    } else {
+      heightProgress.value = withTiming(0, ANIMATION_CONFIG.timing);
+      opacityProgress.value = withTiming(0, { 
+        duration: ANIMATION_CONFIG.timing.duration / 3,
+        easing: ANIMATION_CONFIG.timing.easing 
+      });
     }
-  }, [isOpen, heightProgress, opacityProgress, contentHeight, hasLayoutRun]);
+  }, [isOpen, heightProgress, opacityProgress]);
 
   const animatedStyle = useAnimatedStyle(() => {
     // Usar altura mínima de 100px se contentHeight não estiver disponível
@@ -329,42 +323,24 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
     };
   });
 
-  const handleLayout = (event: any) => {
-    const { height } = event.nativeEvent.layout;
-    
-    // Só atualiza se a altura for significativamente diferente e maior que 16
-    if (height > 16 && Math.abs(contentHeight - height) > 2) {
-      setContentHeight(height);
-      setHasLayoutRun(true);
-    }
-  };
 
-  // Para itens que devem estar abertos inicialmente, renderiza primeiro sem animação
-  // para capturar a altura correta
-  if (isOpen && !hasLayoutRun) {
-    return (
-      <View style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
-        <View 
-          onLayout={handleLayout}
-          style={[{ 
-            paddingHorizontal: 4, 
-            paddingBottom: contentPadding,
-            paddingTop: 4,
-          }, style]}
-        >
-          {children}
-        </View>
-      </View>
-    );
-  }
 
   return (
     <Animated.View style={[{ overflow: 'hidden' }, animatedStyle]}>
-      <Animated.View style={[animatedContentStyle]}>
+      <Animated.View 
+        style={[animatedContentStyle]}
+        onLayout={(event) => {
+          const { height } = event.nativeEvent.layout;
+          // Sempre atualiza a altura para ser proporcional ao conteúdo
+          if (height > 0) {
+            setContentHeight(height);
+          }
+        }}
+      >
         <View style={[{ 
           paddingHorizontal: 4, 
           paddingBottom: contentPadding,
-          paddingTop: 4, // Pequeno espaço no topo
+          paddingTop: 4 // Pequeno espaço no topo
         }, style]}>
           {children}
         </View>

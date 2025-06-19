@@ -888,7 +888,7 @@ export const Select = ({
   supabaseOrderBy,
   supabaseAscending = true,
 }: SelectProps) => {
-  const { isMobile } = useResponsive();
+  const { isMobile, responsive } = useResponsive();
   const [isOpen, setIsOpen] = useState(false);
   const [internalOptions, setInternalOptions] = useState<DropdownOption[]>(options);
   
@@ -907,11 +907,21 @@ export const Select = ({
   // Obter cores do theme.ts
   const themeColors = getThemeColors(isDark);
   
-  // Configurações compartilhadas de tipografia (igual ao Input)
+  // Configurações compartilhadas de tipografia - Otimizada para todos os breakpoints
   const sharedTextConfig = {
-    fontSize: Platform.OS === 'web' ? 13 : 14, // +1 no nativo como solicitado
+    fontSize: responsive({
+      mobile: 13,      // body-sm + 1 (balanceado)
+      tablet: 13,      // consistente
+      desktop: 13,     // body-sm + 1 (web mantém menor)
+      default: 14      // nativo + 1 como solicitado
+    }),
     fontFamily: fontFamily['jakarta-regular'],
-    lineHeight: Platform.OS === 'web' ? 19 : 20, // Ajustar lineHeight proporcionalmente no nativo
+    lineHeight: responsive({
+      mobile: 19,      // proporção 1.46 (boa legibilidade)
+      tablet: 19,      // consistente
+      desktop: 19,     // body-sm + 1 line-height
+      default: 20      // nativo proporcionalmente ajustado
+    }),
   };
   
   // Estado para controlar abertura do dropdown

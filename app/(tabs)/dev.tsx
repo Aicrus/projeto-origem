@@ -1006,14 +1006,6 @@ export default function DevPage() {
               multiple={true}
               searchable={true}
             />
-            
-            {multiSelect.length > 0 && (
-              <View className={`${bgTertiary} rounded-md p-xs`}>
-                <Text className={`text-body-xs ${textSecondary}`}>
-                  <Text className="font-jakarta-bold">Selecionados:</Text> {multiSelect.length} {multiSelect.length === 1 ? 'item' : 'itens'}
-                </Text>
-              </View>
-            )}
               </View>
             </View>
           </View>

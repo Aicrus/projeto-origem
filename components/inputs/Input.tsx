@@ -288,7 +288,7 @@ export const Input = ({
   };
   
   // Responsividade
-  const { isMobile } = useResponsive();
+  const { isMobile, responsive } = useResponsive();
   
   // Verificar se estamos na plataforma web
   const isWeb = Platform.OS === 'web';
@@ -511,9 +511,19 @@ export const Input = ({
   
   // Configurações compartilhadas para garantir consistência absoluta
   const sharedPlaceholderConfig = {
-    fontSize: Platform.OS === 'web' ? 13 : 14, // +1 no nativo como solicitado
+    fontSize: responsive({
+      mobile: 13,      // body-sm + 1 (balanceado)
+      tablet: 13,      // consistente
+      desktop: 13,     // body-sm + 1 (web mantém menor)
+      default: 14      // nativo + 1 como solicitado
+    }),
     fontFamily: fontFamily['jakarta-regular'],
-    lineHeight: Platform.OS === 'web' ? 19 : 20, // Ajustar lineHeight proporcionalmente no nativo
+    lineHeight: responsive({
+      mobile: 19,      // proporção 1.46 (boa legibilidade)
+      tablet: 19,      // consistente
+      desktop: 19,     // body-sm + 1 line-height
+      default: 20      // nativo proporcionalmente ajustado
+    }),
     color: isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']
   };
 
