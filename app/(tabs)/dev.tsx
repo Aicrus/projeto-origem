@@ -107,8 +107,8 @@ import { StatusBar } from 'expo-status-bar';
 import { supabase } from '@/lib/supabase';
 import Sheet from '@/components/sheets/Sheet';
 import type { SheetPosition } from '@/components/sheets/Sheet';
-import { DateInput } from '@/components/inputs/DateInput';
-import { TimeInput } from '@/components/inputs/TimeInput';
+import { DateInput } from '@/components/datepickers/DateInput';
+import { TimeInput } from '@/components/datepickers/TimeInput';
 import { Keyboard } from 'react-native';
 import { ActivityIndicator } from 'react-native';
 import { DropdownMenu } from '@/components/dropdowns/DropdownMenu';
@@ -416,244 +416,339 @@ export default function DevPage() {
         contentContainerStyle={{ paddingBottom: 60 }} // Adiciona espaço extra ao final
         showsVerticalScrollIndicator={true}
       >
-        <Text className={`text-headline-sm font-jakarta-bold ${textPrimary} mb-sm`}>
-          Componente Input
-        </Text>
-        <Text className={`text-body-md ${textSecondary} mb-lg`}>
-          O Input é um componente altamente personalizável para entrada de texto, que suporta
-          vários tipos de entrada, máscaras, estados e estilos. Mantém a mesma experiência 
-          consistente entre plataformas (iOS, Android, Web).
-        </Text>
-        
-        <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-lg`}>Variações de Label:</Text>
-          
-          {/* Seção destacada para os três tipos de label */}
-          <View className={`${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'} rounded-lg p-md mb-lg border ${isDark ? 'border-divider-dark' : 'border-divider-light'}`}>
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-md`}>Três estilos de exibição do label</Text>
-            
-            {/* Label acima (padrão) */}
-            <View className="mb-md">
-              <Text className={`text-label-sm font-jakarta-medium ${textSecondary} mb-xs`}>1. Label Acima (Padrão)</Text>
-              <Input
-                value={inputLabelAcima}
-                onChangeText={setInputLabelAcima}
-                placeholder="Digite seu nome"
-                label="Nome completo"
-                labelVariant="above"
-              />
-              <Text className={`text-body-xs ${textSecondary} mt-xs`}>
-                O label fica posicionado acima do input (comportamento padrão).
-              </Text>
-            </View>
-            
-            {/* Sem label */}
-            <View className="mb-md">
-              <Text className={`text-label-sm font-jakarta-medium ${textSecondary} mb-xs`}>2. Sem Label</Text>
-              <Input
-                value={inputSemLabel}
-                onChangeText={setInputSemLabel}
-                placeholder="Digite apenas com placeholder"
-                labelVariant="none"
-              />
-              <Text className={`text-body-xs ${textSecondary} mt-xs`}>
-                Apenas o placeholder é exibido, sem label visível.
-              </Text>
-            </View>
-            
-            {/* Label flutuante */}
-            <View className="mb-md">
-              <Text className={`text-label-sm font-jakarta-medium ${textSecondary} mb-xs`}>3. Label Flutuante</Text>
-              <Input
-                value={inputLabelFlutuante}
-                onChangeText={setInputLabelFlutuante}
-                label="Email"
-                labelVariant="floating"
-              />
-              <Text className={`text-body-xs ${textSecondary} mt-xs`}>
-                O label começa dentro do input e "flutua" para cima quando há foco ou valor. 
-                Efeito elegante com transição suave.
-              </Text>
-            </View>
 
-                                    <View className={`mt-sm p-xs rounded-md ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}>
-              <Text className={`text-body-xs ${textSecondary}`}>
-                <Text className="font-jakarta-bold">Nota importante:</Text> O label flutuante detecta automaticamente a cor de fundo do tema atual.
-                A prop `containerBackgroundColor` só é necessária quando o Input estiver dentro de um container com cor de fundo diferente 
-                do padrão do tema (ex: dentro de um card colorido, modal com fundo customizado, etc).
-              </Text>
+        
+        {/* Layout responsivo otimizado para todos os breakpoints */}
+        <View className="mb-md">
+          <View className="flex-row items-center mb-xs">
+            <View className="w-1 h-8 bg-primary-light dark:bg-primary-dark rounded-full mr-sm" />
+            <Text className={`${responsive({ mobile: 'text-lg', tablet: 'text-xl', desktop: 'text-2xl', default: 'text-lg' })} font-jakarta-semibold ${textPrimary}`}>
+              Input
+            </Text>
+          </View>
+          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 18, desktop: 20, default: 16 }) }}>
+            Componente para entrada de texto com <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">validação automática</Text>, máscaras, tipos especiais e design system nativo.
+          </Text>
+          
+          {/* Quick Stats - Responsivo */}
+          <View 
+            className={responsive({ mobile: "flex-col", tablet: "flex-row items-center", desktop: "flex-row items-center", default: "flex-col" })}
+            style={{ 
+              gap: responsive({ mobile: 6, tablet: 12, desktop: 16, default: 6 }),
+              marginTop: 4
+            }}
+          >
+            <View className="flex-row items-center">
+              <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-xs" />
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>9+ tipos especiais</Text>
             </View>
-          </View>
-          
-          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Outros Exemplos:</Text>
-          
-          {/* Input básico */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input básico</Text>
-            <Input
-              value={inputBasico}
-              onChangeText={setInputBasico}
-              placeholder="Digite aqui"
-              label="Input básico"
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Input simples com label, placeholder e foco estilizado.
-            </Text>
-          </View>
-          
-          {/* Input com senha */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input de senha</Text>
-            <Input
-              value={inputSenha}
-              onChangeText={setInputSenha}
-              placeholder="Digite sua senha"
-              label="Senha"
-              type="password"
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Inclui ícone de mostrar/ocultar senha e proteção do conteúdo.
-            </Text>
-          </View>
-          
-          {/* Input com erro */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input com validação de email</Text>
-            <Input
-              value={inputErro}
-              onChangeText={setInputErro}
-              placeholder="seu@email.com"
-              label="Email"
-              error={inputErro.length > 0 && !isValidEmail(inputErro) ? "Por favor, insira um email válido" : ""}
-              type="email"
-              keyboardType="email-address"
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Validação de email automática com feedback visual de erro.
-            </Text>
-          </View>
-          
-          {/* Input de busca */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input de busca</Text>
-            <Input
-              value={inputBusca}
-              onChangeText={setInputBusca}
-              placeholder="Pesquisar..."
-              type="search"
-              onClear={() => setInputBusca('')}
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Inclui ícone de busca e botão de limpar quando houver texto.
-            </Text>
-          </View>
-          
-          {/* Input com máscara */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input com máscara (CPF)</Text>
-            <Input
-              value={inputMascara}
-              onChangeText={setInputMascara}
-              placeholder="000.000.000-00"
-              label="CPF"
-              mask="cpf"
-              keyboardType="numeric"
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Formata automaticamente entradas numéricas no padrão de CPF: 000.000.000-00.
-            </Text>
-          </View>
-          
-          {/* Input de data */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input de data</Text>
-            <Input
-              value={inputData}
-              onChangeText={setInputData}
-              placeholder="dd/mm/aaaa"
-              label="Data"
-              type="date"
-              mask="date"
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Input de data com máscara dd/mm/aaaa e seletor de data para todas as plataformas.
-              {Platform.OS === 'web' 
-                ? ' Na web, usa calendário personalizado elegante integrado ao componente.' 
-                : ' No iOS e Android, abre um seletor de data nativo do sistema.'}
-            </Text>
-          </View>
-          
-          {/* Input de hora */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input de hora</Text>
-            <Input
-              value={inputHora}
-              onChangeText={setInputHora}
-              placeholder="HH:MM"
-              label="Hora"
-              type="time"
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Input de hora com máscara HH:MM e seletor de hora para todas as plataformas.
-              {Platform.OS === 'web' 
-                ? ' Na web, usa seletor de hora personalizado elegante com controles visuais.' 
-                : ' No iOS e Android, abre um seletor de hora nativo com controles de confirmação.'}
-            </Text>
-          </View>
-          
-          {/* Input numérico com controles */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input numérico com controles</Text>
-            <Input
-              value={inputNumerico}
-              onChangeText={setInputNumerico}
-              type="number"
-              label="Quantidade"
-              placeholder="0"
-              keyboardType="numeric"
-              min={0}
-              step={1}
-              showNumberControls={true}
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Input numérico com botões de incremento e decremento. Sem limite máximo definido.
-              {Platform.OS === 'web' 
-                ? ' No navegador, utiliza input tipo number nativo do HTML5.' 
-                : ' Em dispositivos móveis, implementa controles personalizados.'}
-            </Text>
-          </View>
-          
-          {/* Input redimensionável */}
-          <View className="mb-lg">
-            <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>Input redimensionável</Text>
-            <Input
-              value={inputRedimensionavel}
-              onChangeText={setInputRedimensionavel}
-              placeholder="Digite um texto longo aqui... Este input permite redimensionamento vertical."
-              label="Texto redimensionável"
-              multiline={true}
-              numberOfLines={3}
-              resizable={true}
-              minHeight={80}
-              maxHeight={300}
-              setScrollEnabled={handleScrollEnabled}
-            />
-            <Text className={`text-body-sm ${textSecondary} mt-xs`}>
-              Input multilinhas que pode ser redimensionado verticalmente pelo usuário.
-              Funciona perfeitamente em todas as plataformas (web, iOS e Android).
-              {Platform.OS !== 'web' 
-                ? ' No ambiente nativo, toque e arraste o indicador no canto inferior direito.' 
-                : ' No navegador, use o indicador no canto inferior direito ou a área de redimensionamento padrão.'}
-            </Text>
-            <View className={`mt-sm p-xs rounded-md ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}>
-              <Text className={`text-body-xs ${textSecondary}`}>
-                <Text className="font-jakarta-bold">Dica:</Text> O componente bloqueia automaticamente o scroll durante o redimensionamento, 
-                facilitando a operação em dispositivos móveis. Define `minHeight` e `maxHeight` para controlar 
-                os limites de altura, e use `setScrollEnabled` em ScrollViews que contenham este componente.
-              </Text>
+            <View className="flex-row items-center">
+              <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-xs" />
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>3 variantes de label</Text>
+            </View>
+            <View className="flex-row items-center">
+              <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-xs" />
+              <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>Auto-validação</Text>
             </View>
           </View>
         </View>
+        
+        {/* Primeira linha de exemplos - Formulário e Tipos */}
+        <View style={{
+          flexDirection: responsive({ mobile: 'column', tablet: 'row', desktop: 'row', default: 'column' }),
+          gap: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 }),
+          marginBottom: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 })
+        }}>
+          {/* Formulário de Cadastro */}
+          <View style={{ 
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Formulário de Cadastro
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Demonstração prática • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Validação automática</Text>
+                </Text>
+              </View>
+              
+              <View style={{ gap: responsive({ mobile: 8, tablet: 10, desktop: 12, default: 8 }) }}>
+                <Input
+                  value={inputBasico}
+                  onChangeText={setInputBasico}
+                  placeholder="Seu nome completo"
+                  label="Nome"
+                  labelVariant="above"
+                />
+                <Input
+                  value={inputErro}
+                  onChangeText={setInputErro}
+                  placeholder="seu@email.com"
+                  label="Email"
+                  type="email"
+                  keyboardType="email-address"
+                  error={inputErro.length > 0 && !isValidEmail(inputErro) ? "Email inválido" : ""}
+                />
+                <Input
+                  value={inputSenha}
+                  onChangeText={setInputSenha}
+                  placeholder="Mínimo 8 caracteres"
+                  label="Senha"
+                  type="password"
+                />
+              </View>
+            </View>
+          </View>
+
+          {/* Tipos Especiais */}
+          <View style={{ 
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Tipos Especiais
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Máscaras e controles • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Seletores nativos</Text>
+                </Text>
+              </View>
+              
+              <View style={{ gap: responsive({ mobile: 8, tablet: 10, desktop: 12, default: 8 }) }}>
+                <Input
+                  value={inputBusca}
+                  onChangeText={setInputBusca}
+                  placeholder="Buscar produtos..."
+                  type="search"
+                  onClear={() => setInputBusca('')}
+                />
+                <Input
+                  value={inputMascara}
+                  onChangeText={setInputMascara}
+                  placeholder="000.000.000-00"
+                  label="CPF"
+                  mask="cpf"
+                  keyboardType="numeric"
+                />
+                <Input
+                  value={inputNumerico}
+                  onChangeText={setInputNumerico}
+                  type="number"
+                  label="Quantidade"
+                  placeholder="0"
+                  keyboardType="numeric"
+                  min={0}
+                  step={1}
+                  showNumberControls={true}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Segunda linha - Variantes de Label e Código */}
+        <View style={{
+          flexDirection: responsive({ mobile: 'column', tablet: 'row', desktop: 'row', default: 'column' }),
+          gap: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 })
+        }}>
+          {/* Variantes de Label */}
+          <View style={{ 
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Variantes de Label
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  3 estilos diferentes • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Flutuante animado</Text>
+                </Text>
+              </View>
+              
+              <View style={{ gap: responsive({ mobile: 8, tablet: 10, desktop: 12, default: 8 }) }}>
+                <Input
+                  value={inputLabelAcima}
+                  onChangeText={setInputLabelAcima}
+                  placeholder="Label acima (padrão)"
+                  label="Nome completo"
+                  labelVariant="above"
+                />
+                <Input
+                  value={inputSemLabel}
+                  onChangeText={setInputSemLabel}
+                  placeholder="Sem label, apenas placeholder"
+                  labelVariant="none"
+                />
+                <Input
+                  value={inputLabelFlutuante}
+                  onChangeText={setInputLabelFlutuante}
+                  label="Email corporativo"
+                  labelVariant="floating"
+                />
+              </View>
+            </View>
+          </View>
+
+          {/* Código de Exemplo */}
+          <View style={{ 
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-error-icon-light dark:bg-error-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Implementação Rápida
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Código limpo e direto
+                </Text>
+              </View>
+              
+              <View className={`${bgTertiary} rounded-lg ${responsive({ mobile: 'p-xs', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`}>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} font-mono leading-relaxed ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 16 }) }}>
+                  <Text className="text-info-icon-light dark:text-info-icon-dark">import</Text> {'{'}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark"> Input </Text>
+                  {'}'} <Text className="text-info-icon-light dark:text-info-icon-dark">from</Text> <Text className="text-success-icon-light dark:text-success-icon-dark">'@/components'</Text>
+                  {'\n\n'}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'<Input'}</Text>
+                  {'\n  '}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark">value</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">{'{email}'}</Text>
+                  {'\n  '}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark">onChangeText</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">{'{setEmail}'}</Text>
+                  {'\n  '}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark">label</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">"Email"</Text>
+                  {'\n  '}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark">type</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">"email"</Text>
+                  {'\n  '}
+                  <Text className="text-warning-icon-light dark:text-warning-icon-dark">error</Text>=<Text className="text-success-icon-light dark:text-success-icon-dark">{'{!isValid && "Email inválido"}'}</Text>
+                  {'\n'}
+                  <Text className="text-error-icon-light dark:text-error-icon-dark">{'/>'}</Text>
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Terceira linha - Texto Redimensionável */}
+        <View style={{
+          flexDirection: responsive({ mobile: 'column', tablet: 'row', desktop: 'row', default: 'column' }),
+          gap: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 }),
+          marginTop: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 })
+        }}>
+          {/* Texto Redimensionável */}
+          <View style={{ 
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Texto Redimensionável
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Redimensiona verticalmente • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Compatível com todas as plataformas</Text>
+                </Text>
+              </View>
+              
+              <View style={{ gap: responsive({ mobile: 8, tablet: 10, desktop: 12, default: 8 }) }}>
+                <Input
+                  value={inputRedimensionavel}
+                  onChangeText={setInputRedimensionavel}
+                  placeholder="Digite um texto longo aqui... Este input permite redimensionamento vertical."
+                  label="Texto redimensionável"
+                  multiline={true}
+                  numberOfLines={3}
+                  resizable={true}
+                  minHeight={80}
+                  maxHeight={300}
+                  setScrollEnabled={handleScrollEnabled}
+                />
+                <View className={`${bgTertiary} rounded-md p-xs`}>
+                  <Text className={`text-body-xs ${textSecondary}`}>
+                    <Text className="font-jakarta-bold">Dica:</Text> Arraste o indicador no canto inferior direito para redimensionar.
+                    {Platform.OS !== 'web' 
+                      ? ' No ambiente nativo, funciona com gestos nativos.' 
+                      : ' No navegador, use a área de redimensionamento padrão ou o indicador customizado.'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Recursos Avançados */}
+          <View style={{ 
+            flex: responsive({ mobile: undefined, tablet: 1, desktop: 1, default: undefined }), 
+            width: responsive({ mobile: '100%', tablet: undefined, desktop: undefined, default: '100%' })
+          }}>
+            <View className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`} style={{ borderWidth: 1, borderColor: isDark ? designColors['divider-dark'] : designColors['divider-light'] }}>
+              <View className="mb-md">
+                <View className="flex-row items-center mb-xs">
+                  <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
+                  <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+                    Recursos Avançados
+                  </Text>
+                </View>
+                <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 }) }}>
+                  Funcionalidades especiais do design system
+                </Text>
+              </View>
+              
+              <View className={`${bgTertiary} rounded-lg ${responsive({ mobile: 'p-xs', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })}`}>
+                <View style={{ gap: 4 }}>
+                  <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>
+                    • <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">Acessibilidade total</Text> com suporte a screen readers
+                  </Text>
+                  <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>
+                    • <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">Adaptação automática</Text> ao tema do sistema
+                  </Text>
+                  <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>
+                    • <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">Responsividade nativa</Text> em todos os breakpoints
+                  </Text>
+                  <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`}>
+                    • <Text className="text-error-icon-light dark:text-error-icon-dark font-jakarta-medium">Performance otimizada</Text> com animações nativas
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+        
+        {/* Quick Usage Guide - Espaçamento consistente */}
+        <View 
+          className={`${bgSecondary} rounded-xl ${responsive({ mobile: 'p-sm', tablet: 'p-sm', desktop: 'p-md', default: 'p-sm' })} mb-md border-l-4 border-primary-light dark:border-primary-dark`}
+          style={{ marginTop: responsive({ mobile: 8, tablet: 12, desktop: 16, default: 8 }) }}
+        >
+          <View className="flex-row items-center mb-xs">
+            <Lightbulb size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs" />
+            <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+              Como funciona?
+            </Text>
+          </View>
+          <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+            Digite nos <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">campos acima</Text> para testar diferentes funcionalidades. <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">Email</Text> valida automaticamente, <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">CPF</Text> aplica máscara, <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">label flutuante</Text> anima suavemente.
+          </Text>
+        </View>
+
+
 
         {/* Seção de Especificações de Design */}
         <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>
