@@ -42,35 +42,8 @@ export interface ProfileMenuProps {
   position?: { x: number, y: number };
 }
 
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'primary-light': '#892CDC',
-      'primary-dark': '#C87e22',
-      'primary-light-hover': '#3D5C8C',
-      'primary-dark-hover': '#5B80B6',
-      'primary-light-active': '#345078',
-      'primary-dark-active': '#6C91C7',
-      'bg-secondary-light': '#FFFFFF',
-      'bg-secondary-dark': '#14181B',
-      'divider-light': '#E0E3E7',
-      'divider-dark': '#262D34',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-      'text-secondary-light': '#57636C',
-      'text-secondary-dark': '#95A1AC',
-      'text-tertiary-light': '#8B97A2',
-      'text-tertiary-dark': '#6B7280',
-    };
-  }
-};
+// Importar cores diretamente do design system (mais confiável)
+import { colors } from '../../design-system/tokens/colors';
 
 export function ProfileMenu({ 
   isVisible, 
@@ -87,19 +60,16 @@ export function ProfileMenu({
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateYAnim = useRef(new Animated.Value(10)).current;
   
-  // Obtém as cores do tailwind.config.js
-  const twColors = getTailwindConfig();
-
-  // Mapeamento de cores dinâmico
+  // Mapeamento de cores dinâmico usando o design system
   const themeColors = {
-    'primary': isDark ? twColors['primary-dark'] : twColors['primary-light'],
-    'primary-hover': isDark ? twColors['primary-dark-hover'] : twColors['primary-light-hover'],
-    'primary-active': isDark ? twColors['primary-dark-active'] : twColors['primary-light-active'],
-    'bg-secondary': isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
-    'divider': isDark ? twColors['divider-dark'] : twColors['divider-light'],
-    'text-primary': isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
-    'text-secondary': isDark ? twColors['text-secondary-dark'] : twColors['text-secondary-light'],
-    'text-tertiary': isDark ? twColors['text-tertiary-dark'] : twColors['text-tertiary-light'],
+    'primary': isDark ? colors['primary-dark'] : colors['primary-light'],
+    'primary-hover': isDark ? colors['primary-dark-hover'] : colors['primary-light-hover'],
+    'primary-active': isDark ? colors['primary-dark-active'] : colors['primary-light-active'],
+    'bg-secondary': isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+    'divider': isDark ? colors['divider-dark'] : colors['divider-light'],
+    'text-primary': isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+    'text-secondary': isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
+    'text-tertiary': isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light'],
   };
 
   // Executa animação quando a visibilidade muda

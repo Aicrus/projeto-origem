@@ -1,28 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated, Dimensions, Platform, SafeAreaView, KeyboardAvoidingView } from 'react-native';
 import { useTheme } from '../../hooks/DesignSystemContext';
-
-// Função para obter as cores do tailwind.config.js
-const getTailwindConfig = () => {
-  try {
-    // Importando dinamicamente o tailwind.config.js
-    const tailwindConfig = require('../../../tailwind.config.js');
-    return tailwindConfig.theme.extend.colors;
-  } catch (error) {
-    // Fallback para valores padrão caso não consiga importar
-    console.error('Erro ao carregar tailwind.config.js:', error);
-    return {
-      'bg-primary-light': '#F7F8FA',
-      'bg-secondary-light': '#FFFFFF',
-      'bg-primary-dark': '#1C1E26',
-      'bg-secondary-dark': '#14181B',
-      'text-primary-light': '#14181B',
-      'text-primary-dark': '#FFFFFF',
-      'text-secondary-light': '#57636C',
-      'text-secondary-dark': '#95A1AC',
-    };
-  }
-};
+import { colors } from '../../design-system/tokens/colors';
 
 export type SheetPosition = 'top' | 'right' | 'bottom' | 'left';
 
@@ -93,8 +72,7 @@ const Sheet: React.FC<SheetProps> = ({
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   
-  // Obtém as cores do tailwind.config.js
-  const twColors = getTailwindConfig();
+  // Usando cores diretamente do design system
   
   // Valores de padding para diferentes plataformas
   const webPadding = 20;
@@ -299,11 +277,11 @@ const Sheet: React.FC<SheetProps> = ({
   // Obtenha as cores baseadas no tema atual
   const getThemeColors = () => {
     return {
-      background: isDark ? twColors['bg-secondary-dark'] : twColors['bg-secondary-light'],
-      text: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
-      closeButtonBackground: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
-      closeButtonText: isDark ? twColors['text-primary-dark'] : twColors['text-primary-light'],
-      contentBackground: isDark ? twColors['bg-tertiary-dark'] : twColors['bg-tertiary-light'],
+      background: isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'],
+      text: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+      closeButtonBackground: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'],
+      closeButtonText: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
+      contentBackground: isDark ? colors['bg-tertiary-dark'] : colors['bg-tertiary-light'],
     };
   };
 

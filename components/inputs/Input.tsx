@@ -26,6 +26,7 @@ import { opacity, getOpacity, shadows, getShadow, getShadowColor } from '../../d
  * - Responsividade
  * - Estados: erro, desabilitado, foco
  * - Três variações de label: acima, sem label, flutuante
+ * - Label flutuante: sempre transparente + padding automático para evitar sobreposição
  * - Acessibilidade e personalização
  * 
  * Exemplos de uso:
@@ -48,13 +49,13 @@ import { opacity, getOpacity, shadows, getShadow, getShadowColor } from '../../d
  *   labelVariant="none"
  * />
  * 
- * // Input com label flutuante (Material Design)
+ * // Input com label flutuante (Material Design) - Sempre transparente + padding automático
  * <Input 
  *   value={texto} 
  *   onChangeText={setTexto} 
  *   label="Nome" 
  *   labelVariant="floating"
- *   containerBackgroundColor={corDoContainerPai} // Opcional - detecta automaticamente do tema se não fornecido
+ *   containerBackgroundColor={corDoContainerPai} // Opcional - detecta automaticamente se não fornecido
  * />
  * 
  * // Input com máscara de CPF
@@ -97,7 +98,7 @@ export interface InputProps {
   label?: string;
   /** Variação do label: 'above' (padrão), 'none' (sem label), 'floating' (Material Design) */
   labelVariant?: 'above' | 'none' | 'floating';
-  /** Cor de fundo do container onde o Input está posicionado (opcional - detecta automaticamente do tema se não fornecido. Necessária apenas quando o fundo for diferente do padrão do tema) */
+  /** Cor de fundo do container onde o Input está posicionado (opcional - detecta automaticamente do tema se não fornecido. Usado para o background do label flutuante criar efeito notched) */
   containerBackgroundColor?: string;
   /** Mensagem de erro exibida abaixo do input */
   error?: string;
@@ -246,7 +247,7 @@ export const Input = ({
   // Ref para armazenar a posição inicial do toque para redimensionamento
   const touchStartY = useRef(0);
   
-
+  
   
   // Função para detectar se uma cor é clara ou escura
   const isLightColor = (color: string): boolean => {
@@ -304,13 +305,25 @@ export const Input = ({
 
   // Função para obter a cor de fundo dinâmica do label flutuante
   const getFloatingLabelBackground = (): string => {
-    // Sempre usar a cor de fundo do design system (sem hardcode)
-    // Se containerBackgroundColor foi passado, usar ele; senão, usar a cor do tema
+    // Detecção automática inteligente da cor de fundo
+    // 1. Se containerBackgroundColor foi passado explicitamente, usar ele
     if (containerBackgroundColor) {
       return containerBackgroundColor;
     }
     
-    // Usar a cor de fundo do container baseada no tema do design system
+    // 2. Detectar automaticamente a cor de fundo do container pai baseada no tema
+    // Para a maioria dos casos, usar a cor de fundo secundária (onde geralmente ficam os inputs)
+    return isDark ? colors['bg-secondary-dark'] : colors['bg-secondary-light'];
+  };
+
+  // Função para obter a cor de fundo do input (sempre transparente para label flutuante)
+  const getInputBackgroundColor = (): string => {
+    // Se for label flutuante, sempre transparente (desde o início)
+    if (labelVariant === 'floating') {
+      return 'transparent';
+    }
+    
+    // Caso contrário, usar a cor padrão do input
     return isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'];
   };
   
@@ -418,13 +431,15 @@ export const Input = ({
     container: {
       width: '100%',
       marginBottom: error ? Number(spacing['1'].replace('px', '')) : 0,
+      // Padding extra no topo para label flutuante (evita sobreposição)
+      paddingTop: labelVariant === 'floating' ? Number(spacing['2'].replace('px', '')) : 0,
     },
     inputContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       borderWidth: 1,
       borderRadius: Number(getBorderRadius('md').replace('px', '')),
-      backgroundColor: isDark ? colors['bg-primary-dark'] : colors['bg-primary-light'],
+      backgroundColor: getInputBackgroundColor(), // Transparente quando label flutuante
       borderColor: error 
         ? isDark ? colors['error-border-dark'] : colors['error-border-light']
         : isFocused
@@ -580,7 +595,7 @@ export const Input = ({
         }
         return text.substring(0, 15);
         
-
+        
       case 'cep':
         // Remove caracteres não numéricos
         text = text.replace(/\D/g, '');
@@ -599,7 +614,7 @@ export const Input = ({
         // Formata para moeda brasileira
         return `R$ ${number.toFixed(2).replace('.', ',')}`;
         
-
+        
       default:
         return text;
     }
@@ -1153,9 +1168,7 @@ export const Input = ({
             type === 'number' && showNumberControls && !isWeb ? { paddingRight: 32 } : {},
             multiline && { minHeight: minHeight },
             !isWeb && multiline && resizable ? { height: nativeInputHeight } : {},
-            multiline ? { alignItems: 'flex-start' } : {},
-            // Para label flutuante, fazer o fundo transparente quando necessário
-            labelVariant === 'floating' && containerBackgroundColor ? { backgroundColor: 'transparent' } : {}
+            multiline ? { alignItems: 'flex-start' } : {}
           ]}
           {...(isWeb ? {
             'data-input-container': 'true',
