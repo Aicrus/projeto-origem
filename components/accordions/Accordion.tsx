@@ -252,6 +252,7 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
   const heightProgress = useSharedValue(isOpen ? 1 : 0);
   const opacityProgress = useSharedValue(isOpen ? 1 : 0);
   const [contentHeight, setContentHeight] = useState(0);
+  const [hasInitialHeight, setHasInitialHeight] = useState(false);
   const { responsive } = useResponsive();
 
   // Padding responsivo para o conteúdo
@@ -278,20 +279,33 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
   });
 
   React.useEffect(() => {
-    if (isOpen) {
-      heightProgress.value = withSpring(1, ANIMATION_CONFIG.content);
-      opacityProgress.value = withTiming(1, { 
-        duration: ANIMATION_CONFIG.timing.duration / 2,
-        easing: ANIMATION_CONFIG.timing.easing 
-      });
-    } else {
-      heightProgress.value = withTiming(0, ANIMATION_CONFIG.timing);
-      opacityProgress.value = withTiming(0, { 
-        duration: ANIMATION_CONFIG.timing.duration / 3,
-        easing: ANIMATION_CONFIG.timing.easing 
-      });
+    // No nativo, só anima depois de ter a altura inicial
+    // Na web, anima imediatamente
+    const shouldAnimate = Platform.OS === 'web' || hasInitialHeight;
+    
+    if (shouldAnimate) {
+      if (isOpen) {
+        heightProgress.value = withSpring(1, ANIMATION_CONFIG.content);
+        opacityProgress.value = withTiming(1, { 
+          duration: ANIMATION_CONFIG.timing.duration / 2,
+          easing: ANIMATION_CONFIG.timing.easing 
+        });
+      } else {
+        heightProgress.value = withTiming(0, ANIMATION_CONFIG.timing);
+        opacityProgress.value = withTiming(0, { 
+          duration: ANIMATION_CONFIG.timing.duration / 3,
+          easing: ANIMATION_CONFIG.timing.easing 
+        });
+        
+        // No nativo, reset o estado quando fecha para medir novamente na próxima abertura
+        if (Platform.OS !== 'web') {
+          setTimeout(() => {
+            setHasInitialHeight(false);
+          }, ANIMATION_CONFIG.timing.duration);
+        }
+      }
     }
-  }, [isOpen, heightProgress, opacityProgress]);
+  }, [isOpen, heightProgress, opacityProgress, hasInitialHeight]);
 
   const animatedStyle = useAnimatedStyle(() => {
     // Usar altura mínima de 100px se contentHeight não estiver disponível
@@ -325,14 +339,38 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
 
 
 
+  // No nativo, se está aberto mas ainda não tem altura, renderiza invisível primeiro
+  if (Platform.OS !== 'web' && isOpen && !hasInitialHeight) {
+    return (
+      <View style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
+        <View 
+          onLayout={(event) => {
+            const { height } = event.nativeEvent.layout;
+            if (height > 0) {
+              setContentHeight(height);
+              setHasInitialHeight(true);
+            }
+          }}
+          style={[{ 
+            paddingHorizontal: 4, 
+            paddingBottom: contentPadding,
+            paddingTop: 4,
+          }, style]}
+        >
+          {children}
+        </View>
+      </View>
+    );
+  }
+
   return (
     <Animated.View style={[{ overflow: 'hidden' }, animatedStyle]}>
       <Animated.View 
         style={[animatedContentStyle]}
         onLayout={(event) => {
           const { height } = event.nativeEvent.layout;
-          // Sempre atualiza a altura para ser proporcional ao conteúdo
-          if (height > 0) {
+          // Na web, sempre atualiza a altura para ser proporcional ao conteúdo
+          if (Platform.OS === 'web' && height > 0) {
             setContentHeight(height);
           }
         }}
