@@ -89,7 +89,7 @@ const colors = {
 };
 
 import { Button } from '@/components/buttons/Button';
-import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette, Layout, ArrowUpDown, MoreHorizontal } from 'lucide-react-native';
+import { Mail, Plus, ChevronRight, Type, ChevronDown, ChevronsUpDown, Square, Settings, AlertCircle, Info, CheckCircle, AlertTriangle, X, Bell, MessageSquare, Sun, SunMoon, MousePointer, Move, Palette, Layout, ArrowUpDown, MoreHorizontal, Zap, Shapes, MoonIcon, Lightbulb, Rocket } from 'lucide-react-native';
 import { Toast, ToastPositionLabels } from '@/components/toasts/Toast';
 import { ThemeSelector } from '@/components/theme/ThemeSelector';
 import { HoverableView } from '@/components/effects/HoverableView';
@@ -833,10 +833,13 @@ export default function DevPage() {
             </View>
             
             <View className={`p-sm rounded-md mb-sm ${isDark ? 'bg-primary-dark/10' : 'bg-primary-light/10'} border border-primary-light/dark`}>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                <Text className="font-jakarta-bold">💡 Inteligência:</Text> As sombras são sempre escuras em ambos os temas, 
-                mas com intensidades diferentes para criar a aparência correta em cada modo.
-              </Text>
+                              <View className="flex-row items-start mb-xs">
+                  <Lightbulb size={14} color={isDark ? '#10B981' : '#059669'} style={{ marginRight: 4, marginTop: 1 }} />
+                  <Text className={`text-body-sm ${textSecondary}`}>
+                    <Text className="font-jakarta-bold">Inteligência:</Text> As sombras são sempre escuras em ambos os temas, 
+                    mas com intensidades diferentes para criar a aparência correta em cada modo.
+                  </Text>
+                </View>
             </View>
           </View>
           
@@ -880,10 +883,13 @@ export default function DevPage() {
             </View>
             
             <View className={`p-sm rounded-md mb-sm ${isDark ? 'bg-info-bg-dark' : 'bg-info-bg-light'} border border-info-border-light/dark`}>
-              <Text className={`text-body-sm ${textSecondary}`}>
-                <Text className="font-jakarta-bold">💡 Benefício:</Text> Consistência visual perfeita entre todos os tipos de label, 
-                facilitando manutenção e garantindo uniformidade no design.
-              </Text>
+                              <View className="flex-row items-start mb-xs">
+                  <Lightbulb size={14} color={isDark ? '#10B981' : '#059669'} style={{ marginRight: 4, marginTop: 1 }} />
+                  <Text className={`text-body-sm ${textSecondary}`}>
+                    <Text className="font-jakarta-bold">Benefício:</Text> Consistência visual perfeita entre todos os tipos de label, 
+                    facilitando manutenção e garantindo uniformidade no design.
+                  </Text>
+                </View>
             </View>
           </View>
           
@@ -1539,9 +1545,12 @@ export default function DevPage() {
           className={`${bgSecondary} rounded-xl ${cardSpacing} mb-md border-l-4 border-primary-light dark:border-primary-dark`}
           style={{ marginTop: gapSize }}
         >
-          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary} mb-xs`}>
-            💡 Como funciona?
-          </Text>
+          <View className="flex-row items-center mb-xs">
+            <Lightbulb size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs" />
+            <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium ${textPrimary}`}>
+              Como funciona?
+            </Text>
+          </View>
           <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-sm', default: 'text-xs' })} ${textSecondary}`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
             Clique nos <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">títulos acima</Text> para expandir/recolher o conteúdo. Cada exemplo demonstra um comportamento diferente: <Text className="text-success-icon-light dark:text-success-icon-dark font-jakarta-medium">FAQ</Text> (apenas um aberto), <Text className="text-info-icon-light dark:text-info-icon-dark font-jakarta-medium">Settings</Text> (vários abertos), <Text className="text-warning-icon-light dark:text-warning-icon-dark font-jakarta-medium">Info</Text> (sempre um aberto).
           </Text>
@@ -1560,7 +1569,7 @@ export default function DevPage() {
           }}>
             <View className={`${bgSecondary} rounded-lg ${cardSpacing} flex-1 border border-success-icon-light/20 dark:border-success-icon-dark/20`}>
               <View className="flex-row items-center mb-xs">
-                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-lg', default: 'text-sm' })} mr-xs`}>⚡</Text>
+                <Zap size={responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs" />
                 <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>React Native Reanimated 3</Text>
               </View>
               <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Animações 60fps no thread nativo</Text>
@@ -1568,7 +1577,7 @@ export default function DevPage() {
             
             <View className={`${bgSecondary} rounded-lg ${cardSpacing} flex-1 border border-info-icon-light/20 dark:border-info-icon-dark/20`}>
               <View className="flex-row items-center mb-xs">
-                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-lg', default: 'text-sm' })} mr-xs`}>🔷</Text>
+                <Shapes size={responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 })} color={isDark ? '#3B82F6' : '#1D4ED8'} className="mr-xs" />
                 <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>TypeScript</Text>
               </View>
               <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Tipagem completa e IntelliSense</Text>
@@ -1576,7 +1585,7 @@ export default function DevPage() {
             
             <View className={`${bgSecondary} rounded-lg ${cardSpacing} flex-1 border border-warning-icon-light/20 dark:border-warning-icon-dark/20`}>
               <View className="flex-row items-center mb-xs">
-                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-base', desktop: 'text-lg', default: 'text-sm' })} mr-xs`}>🌓</Text>
+                <MoonIcon size={responsive({ mobile: 14, tablet: 16, desktop: 18, default: 14 })} color={isDark ? '#F59E0B' : '#D97706'} className="mr-xs" />
                 <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-sm', desktop: 'text-sm', default: 'text-xs' })} font-jakarta-medium ${textPrimary}`}>Tema Automático</Text>
               </View>
               <Text className={`${responsive({ mobile: 'text-xs', tablet: 'text-xs', desktop: 'text-xs', default: 'text-xs' })} ${textSecondary}`}>Cores adaptativas light/dark</Text>
@@ -1624,7 +1633,7 @@ export default function DevPage() {
           {/* Pro Tip - Espaçamento consistente */}
           <View className={`${bgTertiary} rounded-lg ${cardSpacing} border-l-2 border-success-icon-light dark:border-success-icon-dark`}>
             <View className="flex-row items-center mb-xs">
-              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} mr-xs`}>🚀</Text>
+              <Rocket size={responsive({ mobile: 14, tablet: 14, desktop: 16, default: 14 })} color={isDark ? '#10B981' : '#059669'} className="mr-xs" />
               <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-base', default: 'text-sm' })} font-jakarta-medium text-success-icon-light dark:text-success-icon-dark`}>
                 Dica Pro
               </Text>
@@ -2546,10 +2555,13 @@ export default function DevPage() {
             </Text>
             
             <View className={`p-sm rounded-md mb-md ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}>
-              <Text className={`text-body-sm ${textSecondary} mb-xs`}>
-                <Text className="font-jakarta-bold">💡 Conceito:</Text> As sombras são sempre escuras (#000000) mas 
-                com intensidades diferentes para cada tema:
-              </Text>
+                              <View className="flex-row items-start mb-xs">
+                  <Lightbulb size={14} color={isDark ? '#10B981' : '#059669'} style={{ marginRight: 4, marginTop: 1 }} />
+                  <Text className={`text-body-sm ${textSecondary} mb-xs`}>
+                    <Text className="font-jakarta-bold">Conceito:</Text> As sombras são sempre escuras (#000000) mas 
+                    com intensidades diferentes para cada tema:
+                  </Text>
+                </View>
               <Text className={`text-body-sm ${textSecondary}`}>
                 • <Text className="font-jakarta-bold">Tema claro:</Text> Sombras mais sutis (menor opacidade)
               </Text>
@@ -2624,9 +2636,12 @@ export default function DevPage() {
             </View>
             
             <View className={`mt-md p-sm rounded-md ${isDark ? 'bg-primary-dark/10' : 'bg-primary-light/10'} border border-primary-light/dark`}>
-              <Text className={`text-body-sm ${textSecondary} mb-xs`}>
-                <Text className="font-jakarta-bold">🚀 Como usar:</Text>
-              </Text>
+                              <View className="flex-row items-start mb-xs">
+                  <Rocket size={14} color={isDark ? '#10B981' : '#059669'} style={{ marginRight: 4, marginTop: 1 }} />
+                  <Text className={`text-body-sm ${textSecondary} mb-xs`}>
+                    <Text className="font-jakarta-bold">Como usar:</Text>
+                  </Text>
+                </View>
               <Text className={`text-body-xs font-mono ${textSecondary}`}>
                 {`import { getShadow, getShadowColor } from '@/design-system/tokens/effects';`}
               </Text>
