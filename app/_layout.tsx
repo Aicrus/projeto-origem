@@ -32,7 +32,7 @@ import { ToastProvider } from '@/hooks/useToast';
 import { AuthProvider } from '@/contexts/auth';
 import { useAuth } from '@/contexts/auth';
 import { supabase } from '@/lib/supabase';
-import { StagewiseToolbar } from '@/components/StagewiseToolbar';
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -141,7 +141,6 @@ export default function RootLayout() {
             <ToastProvider>
               <AuthProvider initialSession={initialSession}>
                 <RootLayoutNav />
-                <StagewiseToolbar />
               </AuthProvider>
             </ToastProvider>
           </PortalProvider>
