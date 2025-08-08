@@ -503,9 +503,7 @@ const styles = StyleSheet.create({
     }),
   },
   themeText: {
-    fontSize: responsive(themeTextTypography.fontSize),
-    fontFamily: themeTextTypography.fontFamily,
-    lineHeight: responsive(themeTextTypography.lineHeight),
+    // fontSize aplicado dinamicamente no componente
   },
   menuItem: {
     flexDirection: 'row',
@@ -514,8 +512,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   menuItemText: {
-    fontSize: responsive(menuItemTypography.fontSize),
-    fontFamily: menuItemTypography.fontFamily,
-    lineHeight: responsive(menuItemTypography.lineHeight),
+    // fontSize aplicado dinamicamente no componente
   },
 }); 

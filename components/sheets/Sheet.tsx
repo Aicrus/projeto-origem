@@ -1,7 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, Animated, Dimensions, Platform, SafeAreaView, KeyboardAvoidingView } from 'react-native';
 import { useTheme } from '../../hooks/DesignSystemContext';
+import { useResponsive } from '../../hooks/useResponsive';
 import { colors } from '../../design-system/tokens/colors';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 export type SheetPosition = 'top' | 'right' | 'bottom' | 'left';
 
@@ -71,6 +73,12 @@ const Sheet: React.FC<SheetProps> = ({
   // Usando o hook useTheme do contexto de tema da aplicação
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
+  
+  // Responsividade
+  const { responsive } = useResponsive();
+  
+  // Tipografia responsiva
+  const buttonTypography = getResponsiveValues('body-md');
   
   // Usando cores diretamente do design system
   
@@ -317,7 +325,15 @@ const Sheet: React.FC<SheetProps> = ({
             onPress={onClose}
             testID={`${testID}-close-button`}
           >
-            <Text style={[styles.closeButtonText, { color: themeColors.closeButtonText }]}>✕</Text>
+            <Text style={[
+              styles.closeButtonText, 
+              { 
+                color: themeColors.closeButtonText,
+                fontSize: responsive(buttonTypography.fontSize),
+                fontFamily: buttonTypography.fontFamily,
+                lineHeight: responsive(buttonTypography.lineHeight),
+              }
+            ]}>✕</Text>
           </TouchableOpacity>
         )}
         {children}
@@ -347,7 +363,15 @@ const Sheet: React.FC<SheetProps> = ({
                       onPress={onClose}
                       testID={`${testID}-close-button`}
                     >
-                      <Text style={[styles.closeButtonText, { color: themeColors.closeButtonText }]}>✕</Text>
+                      <Text style={[
+                        styles.closeButtonText, 
+                        { 
+                          color: themeColors.closeButtonText,
+                          fontSize: responsive(buttonTypography.fontSize),
+                          fontFamily: buttonTypography.fontFamily,
+                          lineHeight: responsive(buttonTypography.lineHeight),
+                        }
+                      ]}>✕</Text>
                     </TouchableOpacity>
                   )}
                   {children}
@@ -451,7 +475,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   closeButtonText: {
-    fontSize: 16,
     fontWeight: 'bold',
   },
 });

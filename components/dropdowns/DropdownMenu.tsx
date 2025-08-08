@@ -5,6 +5,7 @@ import { useTheme } from '../../hooks/DesignSystemContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { createPortal } from 'react-dom';
 import { colors } from '../../design-system/tokens/colors';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 import { DropdownMenuOption, SubmenuOption, BaseDropdownMenuProps } from './types';
 
 /**
@@ -90,6 +91,8 @@ const SubmenuComponent = ({
 }) => {
   const submenuRef = useRef<any>(null);
   const themeColors = getThemeColors(isDark);
+  const { responsive } = useResponsive();
+  const itemTypography = getResponsiveValues('body-md');
 
   // Detectar clique fora para fechar
   useEffect(() => {
@@ -143,7 +146,9 @@ const SubmenuComponent = ({
       backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
     },
     itemText: {
-      fontSize: 14,
+      fontSize: responsive(itemTypography.fontSize),
+      fontFamily: itemTypography.fontFamily,
+      lineHeight: responsive(itemTypography.lineHeight),
       color: themeColors['text-primary'],
       fontWeight: '400',
       marginLeft: 8,
@@ -253,6 +258,9 @@ const MenuOptionItem = ({
   const [isHovered, setIsHovered] = useState(false);
   const itemRef = useRef<any>(null);
   const themeColors = getThemeColors(isDark);
+  const { responsive } = useResponsive();
+  const itemTypography = getResponsiveValues('body-md');
+  const shortcutTypography = getResponsiveValues('body-sm');
   
   const handleHoverIn = () => {
     if (Platform.OS === 'web') {
@@ -322,14 +330,18 @@ const MenuOptionItem = ({
         : 'transparent'
     },
     itemText: {
-      fontSize: 14,
+      fontSize: responsive(itemTypography.fontSize),
+      fontFamily: itemTypography.fontFamily,
+      lineHeight: responsive(itemTypography.lineHeight),
       color: themeColors['text-primary'],
       fontWeight: '400',
       flex: 1,
       marginLeft: 12, // Espaçamento direto do ícone
     },
     shortcutText: {
-      fontSize: 12,
+      fontSize: responsive(shortcutTypography.fontSize),
+      fontFamily: shortcutTypography.fontFamily,
+      lineHeight: responsive(shortcutTypography.lineHeight),
       color: themeColors['text-secondary'],
       marginRight: 8,
     }
