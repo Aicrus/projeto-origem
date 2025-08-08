@@ -6,6 +6,7 @@ import { useTheme } from '../../hooks/DesignSystemContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { useResponsive } from '../../hooks/useResponsive';
 import { HapticTab } from '@/components/HapticTab';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 // Definindo cores baseadas no tema dinamicamente
 const getThemeColors = (isDark: boolean) => ({
@@ -27,7 +28,8 @@ export default function TabsLayout() {
   const { 
     isMobile, 
     width, 
-    currentBreakpoint 
+    currentBreakpoint,
+    responsive,
   } = useResponsive();
   
   const isDark = currentTheme === 'dark';
@@ -88,14 +90,18 @@ export default function TabsLayout() {
               marginTop: -6,
             },
           }),
-          tabBarLabelStyle: Platform.select({
-            web: styles.webTabLabel,
-            native: {
-              fontSize: 12,
-              lineHeight: 16,
-              marginTop: -2
-            }
-          }),
+          tabBarLabelStyle: (() => {
+            const labelTypography = getResponsiveValues('label-sm');
+            const base = {
+              fontSize: responsive(labelTypography.fontSize),
+              lineHeight: responsive(labelTypography.lineHeight),
+              fontFamily: labelTypography.fontFamily,
+              // React Navigation espera RN fontWeight string
+              fontWeight: labelTypography.fontWeight as any,
+              marginTop: -2,
+            } as const;
+            return Platform.select({ web: base, native: base });
+          })(),
         }}
       >
         <Tabs.Screen
@@ -174,10 +180,5 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  webTabLabel: {
-    fontSize: 12,
-    lineHeight: 16,
-    marginTop: -2,
   },
 });

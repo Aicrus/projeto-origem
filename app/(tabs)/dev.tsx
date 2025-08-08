@@ -435,11 +435,11 @@ export default function DevPage() {
             <View className="mb-md">
           <View className="flex-row items-center mb-xs">
             <View className="w-1 h-8 bg-primary-light dark:bg-primary-dark rounded-full mr-sm" />
-            <Text className={`${responsive({ mobile: 'text-xl', tablet: 'text-xl', desktop: 'text-2xl', default: 'text-xl' })} font-jakarta-semibold ${textPrimary}`}>
+            <Text className={`text-title-md font-jakarta-semibold ${textPrimary}`}>
               Input
               </Text>
             </View>
-          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
+          <Text className={`text-body-sm ${textSecondary} mb-md`}>
             Componente para entrada de texto com <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">validação automática</Text>, máscaras, tipos especiais e design system nativo.
               </Text>
           
@@ -453,15 +453,15 @@ export default function DevPage() {
           >
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>9+ tipos especiais</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>9+ tipos especiais</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>3 variantes de label</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>3 variantes de label</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>Auto-validação</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>Auto-validação</Text>
             </View>
           </View>
             </View>
@@ -481,7 +481,7 @@ export default function DevPage() {
             <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Formulário de Cadastro
               </Text>
             </View>
@@ -527,7 +527,7 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Tipos Especiais
                   </Text>
                 </View>
@@ -582,7 +582,7 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Variantes e Estados
                   </Text>
                 </View>
@@ -676,7 +676,7 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-error-icon-light dark:bg-error-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Implementação Rápida
         </Text>
                 </View>
@@ -725,11 +725,11 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Texto Redimensionável
               </Text>
                 </View>
-                <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 16, tablet: 16, desktop: 18, default: 16 }) }}>
+                <Text className={`text-body-sm ${textSecondary} mb-md`}>
                   Redimensiona verticalmente • <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">Compatível com todas as plataformas</Text>
                </Text>
              </View>
@@ -768,7 +768,7 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Recursos Avançados
                </Text>
              </View>
@@ -909,11 +909,11 @@ export default function DevPage() {
             <View className="mb-md">
           <View className="flex-row items-center mb-xs">
             <View className="w-1 h-8 bg-primary-light dark:bg-primary-dark rounded-full mr-sm" />
-            <Text className={`${responsive({ mobile: 'text-xl', tablet: 'text-xl', desktop: 'text-2xl', default: 'text-xl' })} font-jakarta-semibold ${textPrimary}`}>
+            <Text className={`text-title-md font-jakarta-semibold ${textPrimary}`}>
               Select
               </Text>
             </View>
-          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
+          <Text className={`text-body-sm ${textSecondary} mb-md`}>
             Componente dropdown inteligente com <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">posicionamento automático</Text>, busca avançada e integração direta com Supabase.
               </Text>
           
@@ -927,15 +927,15 @@ export default function DevPage() {
           >
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>Seleção única/múltipla</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>Seleção única/múltipla</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>Busca inteligente</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>Busca inteligente</Text>
             </View>
             <View className="flex-row items-center">
               <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-xs" />
-              <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-xs', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary}`}>Integração Supabase</Text>
+              <Text className={`text-body-sm ${textSecondary}`}>Integração Supabase</Text>
             </View>
           </View>
             </View>
@@ -955,7 +955,7 @@ export default function DevPage() {
             <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Seleção Básica
               </Text>
             </View>
@@ -993,7 +993,7 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Seleção Múltipla
                   </Text>
                 </View>
@@ -1031,7 +1031,7 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Integração Direta
                   </Text>
                 </View>
@@ -1071,7 +1071,7 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-error-icon-light dark:bg-error-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Implementação Rápida
         </Text>
                 </View>
@@ -1219,11 +1219,11 @@ export default function DevPage() {
             <View className="mb-md">
           <View className="flex-row items-center mb-xs">
             <View className="w-1 h-8 bg-primary-light dark:bg-primary-dark rounded-full mr-sm" />
-            <Text className={`${responsive({ mobile: 'text-xl', tablet: 'text-xl', desktop: 'text-2xl', default: 'text-xl' })} font-jakarta-semibold ${textPrimary}`}>
+            <Text className={`text-title-md font-jakarta-semibold ${textPrimary}`}>
               Accordion
               </Text>
             </View>
-          <Text className={`${responsive({ mobile: 'text-sm', tablet: 'text-sm', desktop: 'text-sm', default: 'text-sm' })} ${textSecondary} mb-md`} style={{ lineHeight: responsive({ mobile: 18, tablet: 18, desktop: 20, default: 18 }) }}>
+          <Text className={`text-body-sm ${textSecondary} mb-md`}>
             Componente expansível moderno com <Text className="text-primary-light dark:text-primary-dark font-jakarta-medium">animações 60fps</Text>, cores do design system e pré-configurações elegantes.
               </Text>
           
@@ -1265,7 +1265,7 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-success-icon-light dark:bg-success-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     FAQ
                   </Text>
                 </View>
@@ -1304,7 +1304,7 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-info-icon-light dark:bg-info-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Settings
                   </Text>
                 </View>
@@ -1349,7 +1349,7 @@ export default function DevPage() {
               <View className="mb-md">
                 <View className="flex-row items-center mb-xs">
                   <View className="w-2 h-2 bg-warning-icon-light dark:bg-warning-icon-dark rounded-full mr-sm" />
-                  <Text className={`${responsive({ mobile: 'text-base', tablet: 'text-base', desktop: 'text-base', default: 'text-base' })} font-jakarta-medium ${textPrimary}`}>
+                  <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>
                     Info
                   </Text>
                 </View>
@@ -5980,9 +5980,21 @@ const [isOpen, setIsOpen] = useState(false);
    * de acordo com o tema do sistema (claro/escuro)
    */}
   <View style={{ padding: 16 }}>
-    <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>
-      Título do Sheet
-    </Text>
+    {(() => {
+      const t = getResponsiveValues('title-sm');
+      const s = {
+        fontSize: responsive(t.fontSize),
+        lineHeight: responsive(t.lineHeight),
+        fontFamily: t.fontFamily,
+        fontWeight: t.fontWeight as any,
+        marginBottom: 12,
+      } as const;
+      return (
+        <Text style={s}>
+          Título do Sheet
+        </Text>
+      );
+    })()}
     <Text style={{ marginBottom: 16 }}>
       Este é um exemplo de conteúdo que você pode incluir no Sheet.
       O componente já gerencia automaticamente os temas claro/escuro.

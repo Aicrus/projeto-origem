@@ -9,12 +9,13 @@ import { useResponsive } from '../../hooks/useResponsive';
 import { Building2, Users, ClipboardList, AlertTriangle } from 'lucide-react-native';
 import { breakpoints as BREAKPOINTS } from '../../design-system';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/accordions/Accordion';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 export default function Home() {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isMobile, isTablet, isDesktop } = useResponsive();
+  const { isMobile, isTablet, isDesktop, responsive } = useResponsive();
   const { width } = useWindowDimensions();
   
   const showHeader = true;
@@ -38,45 +39,82 @@ export default function Home() {
     style?: any;
   }
 
-  const StatCard = ({ title, value, change, trend, subtitle, icon: Icon, height, className = '', style }: StatCardProps) => (
-    <View className={`${cardBg} rounded-lg p-4 ${className}`} style={[style, height ? { height } : null]}>
-      <View style={styles.statHeader}>
-        <View style={styles.statTitleContainer}>
-          <Text style={[styles.statTitle, { color: isDark ? '#94A3B8' : '#64748B' }]}>
-            {title}
-          </Text>
-        </View>
-        <View style={[
-          styles.changeTag,
-          trend === 'up' ? styles.positiveChange : styles.negativeChange
-        ]}>
-          <Text style={[
-            styles.changeText,
-            trend === 'up' ? styles.positiveText : styles.negativeText
-          ]}>
-            {change}
-          </Text>
-        </View>
-      </View>
+  const StatCard = ({ title, value, change, trend, subtitle, icon: Icon, height, className = '', style }: StatCardProps) => {
+    // Tipografia padronizada via tokens responsivos
+    const statTitleTypography = getResponsiveValues('body-lg');
+    const statValueTypography = getResponsiveValues('headline-md');
+    const statSubtitleTypography = getResponsiveValues('body-sm');
+    const changeTextTypography = getResponsiveValues('body-md');
 
-      <View style={styles.statContent}>
-        <View>
-          <Text style={[styles.statValue, { color: isDark ? '#F1F5F9' : '#1E293B' }]}>
-            {value}
-          </Text>
-          <Text style={[styles.statSubtitle, { color: isDark ? '#94A3B8' : '#64748B' }]}>
-            {subtitle}
-          </Text>
+    const statTitleStyle = {
+      fontSize: responsive(statTitleTypography.fontSize),
+      lineHeight: responsive(statTitleTypography.lineHeight),
+      fontFamily: statTitleTypography.fontFamily,
+      fontWeight: statTitleTypography.fontWeight as any,
+    } as const;
+
+    const statValueStyle = {
+      fontSize: responsive(statValueTypography.fontSize),
+      lineHeight: responsive(statValueTypography.lineHeight),
+      fontFamily: statValueTypography.fontFamily,
+      fontWeight: statValueTypography.fontWeight as any,
+      marginBottom: 4,
+    } as const;
+
+    const statSubtitleStyle = {
+      fontSize: responsive(statSubtitleTypography.fontSize),
+      lineHeight: responsive(statSubtitleTypography.lineHeight),
+      fontFamily: statSubtitleTypography.fontFamily,
+      fontWeight: statSubtitleTypography.fontWeight as any,
+    } as const;
+
+    const changeTextStyle = {
+      fontSize: responsive(changeTextTypography.fontSize),
+      lineHeight: responsive(changeTextTypography.lineHeight),
+      fontFamily: changeTextTypography.fontFamily,
+      fontWeight: changeTextTypography.fontWeight as any,
+    } as const;
+
+    return (
+      <View className={`${cardBg} rounded-lg p-4 ${className}`} style={[style, height ? { height } : null]}>
+        <View style={styles.statHeader}>
+          <View style={styles.statTitleContainer}>
+            <Text style={[statTitleStyle, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+              {title}
+            </Text>
+          </View>
+          <View style={[
+            styles.changeTag,
+            trend === 'up' ? styles.positiveChange : styles.negativeChange
+          ]}>
+            <Text style={[
+              changeTextStyle,
+              trend === 'up' ? styles.positiveText : styles.negativeText
+            ]}>
+              {change}
+            </Text>
+          </View>
         </View>
-        <Icon 
-          size={24} 
-          color={isDark ? '#64748B' : '#94A3B8'} 
-          strokeWidth={1.5} 
-          style={styles.statIcon} 
-        />
+
+        <View style={styles.statContent}>
+          <View>
+            <Text style={[statValueStyle, { color: isDark ? '#F1F5F9' : '#1E293B' }]}>
+              {value}
+            </Text>
+            <Text style={[statSubtitleStyle, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+              {subtitle}
+            </Text>
+          </View>
+          <Icon 
+            size={24} 
+            color={isDark ? '#64748B' : '#94A3B8'} 
+            strokeWidth={1.5} 
+            style={styles.statIcon} 
+          />
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   const stats = [
     {
@@ -168,13 +206,35 @@ export default function Home() {
             className={`${cardBg} rounded-lg p-4`} 
             style={{ flex: 1 }} 
           >
-            <Text style={[styles.chartTitle, { color: isDark ? '#F1F5F9' : '#1E293B', marginBottom: 16 }]}>
-              Área de Conteúdo
-            </Text>
+            {(() => {
+              const chartTitleTypography = getResponsiveValues('title-md');
+              const chartTitleStyle = {
+                fontSize: responsive(chartTitleTypography.fontSize),
+                lineHeight: responsive(chartTitleTypography.lineHeight),
+                fontFamily: chartTitleTypography.fontFamily,
+                fontWeight: chartTitleTypography.fontWeight as any,
+              } as const;
+              return (
+                <Text style={[chartTitleStyle, { color: isDark ? '#F1F5F9' : '#1E293B', marginBottom: 16 }]}> 
+                  Área de Conteúdo
+                </Text>
+              );
+            })()}
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={[styles.statSubtitle, { color: isDark ? '#94A3B8' : '#64748B', textAlign: 'center' }]}>
-                Espaço disponível para conteúdo personalizado
-              </Text>
+              {(() => {
+                const chartSubtitleTypography = getResponsiveValues('body-sm');
+                const chartSubtitleStyle = {
+                  fontSize: responsive(chartSubtitleTypography.fontSize),
+                  lineHeight: responsive(chartSubtitleTypography.lineHeight),
+                  fontFamily: chartSubtitleTypography.fontFamily,
+                  fontWeight: chartSubtitleTypography.fontWeight as any,
+                } as const;
+                return (
+                  <Text style={[chartSubtitleStyle, { color: isDark ? '#94A3B8' : '#64748B', textAlign: 'center' }]}> 
+                    Espaço disponível para conteúdo personalizado
+                  </Text>
+                );
+              })()}
             </View>
           </View>
           
@@ -183,13 +243,35 @@ export default function Home() {
             className={`${cardBg} rounded-lg p-4`} 
             style={{ flex: 1 }} 
           >
-            <Text style={[styles.chartTitle, { color: isDark ? '#F1F5F9' : '#1E293B', marginBottom: 16 }]}>
-              Área de Conteúdo
-            </Text>
+            {(() => {
+              const chartTitleTypography = getResponsiveValues('title-md');
+              const chartTitleStyle = {
+                fontSize: responsive(chartTitleTypography.fontSize),
+                lineHeight: responsive(chartTitleTypography.lineHeight),
+                fontFamily: chartTitleTypography.fontFamily,
+                fontWeight: chartTitleTypography.fontWeight as any,
+              } as const;
+              return (
+                <Text style={[chartTitleStyle, { color: isDark ? '#F1F5F9' : '#1E293B', marginBottom: 16 }]}> 
+                  Área de Conteúdo
+                </Text>
+              );
+            })()}
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={[styles.statSubtitle, { color: isDark ? '#94A3B8' : '#64748B', textAlign: 'center' }]}>
-                Espaço disponível para conteúdo personalizado
-              </Text>
+              {(() => {
+                const chartSubtitleTypography = getResponsiveValues('body-sm');
+                const chartSubtitleStyle = {
+                  fontSize: responsive(chartSubtitleTypography.fontSize),
+                  lineHeight: responsive(chartSubtitleTypography.lineHeight),
+                  fontFamily: chartSubtitleTypography.fontFamily,
+                  fontWeight: chartSubtitleTypography.fontWeight as any,
+                } as const;
+                return (
+                  <Text style={[chartSubtitleStyle, { color: isDark ? '#94A3B8' : '#64748B', textAlign: 'center' }]}> 
+                    Espaço disponível para conteúdo personalizado
+                  </Text>
+                );
+              })()}
             </View>
           </View>
         </View>
@@ -309,8 +391,6 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   statTitle: {
-    fontSize: Platform.select({ web: 16, default: 14 }),
-    lineHeight: Platform.select({ web: 20, default: 18 }),
   },
   changeTag: {
     flexDirection: 'row',
@@ -327,8 +407,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fee2e2',
   },
   changeText: {
-    fontSize: 14,
-    fontWeight: '500',
+    // tipografia aplicada via tokens em runtime
   },
   positiveText: {
     color: '#16a34a',
@@ -342,24 +421,18 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   statValue: {
-    fontSize: Platform.select({ web: 32, default: 24 }),
-    fontWeight: 'bold',
     marginBottom: 4,
-    lineHeight: Platform.select({ web: 36, default: 28 }),
   },
   statSubtitle: {
-    fontSize: Platform.select({ web: 14, default: 12 }),
-    lineHeight: Platform.select({ web: 18, default: 16 }),
+    // tipografia aplicada via tokens em runtime
   },
   statIcon: {
     opacity: 0.8,
   },
   chartTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
     marginBottom: 4,
   },
   chartSubtitle: {
-    fontSize: 14,
+    // tipografia aplicada via tokens em runtime
   },
 }); 

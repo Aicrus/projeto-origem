@@ -18,13 +18,21 @@
     "target": "esnext"
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
+    "app",
+    "components",
+    "contexts",
+    "design-system",
+    "hooks",
+    "lib",
+    "scripts",
+    "types",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/node_modules/**",
+    "**/expo-font/**"
   ]
 }
