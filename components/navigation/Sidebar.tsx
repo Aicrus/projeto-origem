@@ -28,6 +28,7 @@ import { HoverableView } from '../effects/HoverableView';
 import { GradientView } from '../effects/GradientView';
 import { useAuth } from '../../contexts/auth';
 import { colors } from '../../design-system/tokens/colors';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 // Constante para z-index
 const Z_INDEX = {
@@ -66,12 +67,18 @@ export interface SidebarProps {
 }
 
 export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarProps) {
-  const { isMobile, isTablet, isDesktop } = useResponsive();
+  const { isMobile, isTablet, isDesktop, responsive } = useResponsive();
   const pathname = usePathname();
   const router = useRouter();
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
   const { signOut } = useAuth();
+  
+  // Tipografia responsiva
+  const logoTypography = getResponsiveValues('title-sm');
+  const subLogoTypography = getResponsiveValues('body-md');
+  const navTypography = getResponsiveValues('body-lg');
+  const logoutTypography = getResponsiveValues('body-md');
   
   // Para facilitar o acesso às cores mais usadas
   const colorWhite = colors['text-primary-dark']; // Branco está definido como text-primary-dark
@@ -242,8 +249,24 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                 <Building size={20} color={isDark ? colors['icon-dark'] : colors['icon-light']} strokeWidth={1.5} />
               </View>
               <View>
-                <Text style={[styles.logoText, isDark && styles.logoTextDark]}>Projeto</Text>
-                <Text style={[styles.subLogoText, isDark && styles.subLogoTextDark]}>Origem</Text>
+                <Text style={[
+                  styles.logoText, 
+                  isDark && styles.logoTextDark,
+                  {
+                    fontSize: responsive(logoTypography.fontSize),
+                    fontFamily: logoTypography.fontFamily,
+                    lineHeight: responsive(logoTypography.lineHeight),
+                  }
+                ]}>Projeto</Text>
+                <Text style={[
+                  styles.subLogoText, 
+                  isDark && styles.subLogoTextDark,
+                  {
+                    fontSize: responsive(subLogoTypography.fontSize),
+                    fontFamily: subLogoTypography.fontFamily,
+                    lineHeight: responsive(subLogoTypography.lineHeight),
+                  }
+                ]}>Origem</Text>
               </View>
             </View>
             
@@ -287,10 +310,14 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                           styles.navText,
                           styles.activeNavText,
                           isDark && styles.navTextDark,
+                          {
+                            fontSize: responsive(navTypography.fontSize),
+                            fontFamily: navTypography.fontFamily,
+                            lineHeight: responsive(navTypography.lineHeight),
+                          },
                           isDashboardActive && {
                             fontWeight: '600',
                             color: 'white',
-                            fontSize: 15
                           }
                         ]}>
                           {item.label}
@@ -326,10 +353,14 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                         styles.navText,
                         isDark && styles.navTextDark,
                         isActive && styles.activeNavText,
+                        {
+                          fontSize: responsive(navTypography.fontSize),
+                          fontFamily: navTypography.fontFamily,
+                          lineHeight: responsive(navTypography.lineHeight),
+                        },
                         isDashboardActive && {
                           fontWeight: '600',
                           color: 'white',
-                          fontSize: 15
                         }
                       ]}>
                         {item.label}
@@ -359,7 +390,15 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                     color={isDark ? colorGray['300'] : colorGray['600']}
                     strokeWidth={1.5}
                   />
-                  <Text style={[styles.logoutText, isDark && styles.logoutTextDark]}>Sair</Text>
+                  <Text style={[
+                    styles.logoutText, 
+                    isDark && styles.logoutTextDark,
+                    {
+                      fontSize: responsive(logoutTypography.fontSize),
+                      fontFamily: logoutTypography.fontFamily,
+                      lineHeight: responsive(logoutTypography.lineHeight),
+                    }
+                  ]}>Sair</Text>
                 </View>
               </Pressable>
             </View>
@@ -386,8 +425,24 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
         </View>
         {!isTablet && (
           <View>
-            <Text style={[styles.logoText, isDark && styles.logoTextDark]}>Projeto</Text>
-            <Text style={[styles.subLogoText, isDark && styles.subLogoTextDark]}>Origem</Text>
+            <Text style={[
+              styles.logoText, 
+              isDark && styles.logoTextDark,
+              {
+                fontSize: responsive(logoTypography.fontSize),
+                fontFamily: logoTypography.fontFamily,
+                lineHeight: responsive(logoTypography.lineHeight),
+              }
+            ]}>Projeto</Text>
+            <Text style={[
+              styles.subLogoText, 
+              isDark && styles.subLogoTextDark,
+              {
+                fontSize: responsive(subLogoTypography.fontSize),
+                fontFamily: subLogoTypography.fontFamily,
+                lineHeight: responsive(subLogoTypography.lineHeight),
+              }
+            ]}>Origem</Text>
           </View>
         )}
       </View>
@@ -433,10 +488,14 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                       styles.navText,
                       styles.activeNavText,
                       isDark && styles.navTextDark,
+                      {
+                        fontSize: responsive(navTypography.fontSize),
+                        fontFamily: navTypography.fontFamily,
+                        lineHeight: responsive(navTypography.lineHeight),
+                      },
                       isDashboardActive && {
                         fontWeight: '600',
                         color: 'white',
-                        fontSize: 15
                       }
                     ]}>
                       {item.label}
@@ -477,10 +536,14 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
                     styles.navText,
                     isDark && styles.navTextDark,
                     isActive && styles.activeNavText,
+                    {
+                      fontSize: responsive(navTypography.fontSize),
+                      fontFamily: navTypography.fontFamily,
+                      lineHeight: responsive(navTypography.lineHeight),
+                    },
                     isDashboardActive && {
                       fontWeight: '600',
                       color: 'white',
-                      fontSize: 15
                     }
                   ]}>
                     {item.label}
@@ -513,7 +576,15 @@ export function Sidebar({ isOpen = false, onClose, withHeader = true }: SidebarP
               color={isDark ? colorGray['300'] : colorGray['600']}
               strokeWidth={1.5}
             />
-            {!isTablet && <Text style={[styles.logoutText, isDark && styles.logoutTextDark]}>Sair</Text>}
+            {!isTablet && <Text style={[
+              styles.logoutText, 
+              isDark && styles.logoutTextDark,
+              {
+                fontSize: responsive(logoutTypography.fontSize),
+                fontFamily: logoutTypography.fontFamily,
+                lineHeight: responsive(logoutTypography.lineHeight),
+              }
+            ]}>Sair</Text>}
           </View>
         </HoverableView>
       </View>
@@ -568,7 +639,6 @@ const styles = StyleSheet.create({
     borderRadius: 22,
   },
   logoText: {
-    fontSize: 18,
     fontWeight: 'bold',
     color: colors['text-primary-light'],
   },
@@ -576,7 +646,6 @@ const styles = StyleSheet.create({
     color: colors['text-primary-dark'],
   },
   subLogoText: {
-    fontSize: 14,
     color: colors['text-secondary-light'],
   },
   subLogoTextDark: {
@@ -642,7 +711,6 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1 }]
   },
   navText: {
-    fontSize: 15,
     flex: 1,
     color: colors['text-secondary-light'],
   },
@@ -681,7 +749,6 @@ const styles = StyleSheet.create({
     gap: 0,
   },
   logoutText: {
-    fontSize: 14,
     color: colors['text-secondary-light'],
   },
   logoutTextDark: {

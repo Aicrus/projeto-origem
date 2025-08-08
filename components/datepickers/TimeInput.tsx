@@ -3,7 +3,9 @@ import { Platform, Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Di
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input, InputProps } from '../inputs/Input';
 import { useTheme } from '../../hooks/DesignSystemContext';
+import { useResponsive } from '../../hooks/useResponsive';
 import { colors } from '../../design-system/tokens/colors';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 /**
  * @component TimeInput
@@ -46,7 +48,12 @@ export const TimeInput: React.FC<TimeInputProps> = ({
 }) => {
   // Tema atual
   const { currentTheme, getColorByMode } = useTheme();
+  const { responsive } = useResponsive();
   const isDark = currentTheme === 'dark';
+  
+  // Tipografia responsiva
+  const buttonTypography = getResponsiveValues('body-md');
+  const titleTypography = getResponsiveValues('title-sm');
   
   // Estado para controlar visibilidade do seletor de hora
   const [showTimePicker, setShowTimePicker] = useState(false);

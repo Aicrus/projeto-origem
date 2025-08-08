@@ -8,13 +8,13 @@ import Animated, {
   interpolate,
   Easing
 } from 'react-native-reanimated';
-import { Eye, EyeOff, Search, X, Plus, Minus, ChevronUp, ChevronDown, AlertCircle } from 'lucide-react-native';
+import { Eye, EyeOff, Search, X, Plus, Minus, ChevronUp, ChevronDown, AlertCircle, Calendar } from 'lucide-react-native';
 import { useTheme } from '../../hooks/DesignSystemContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { colors, ColorType } from '../../design-system/tokens/colors';
 import { spacing } from '../../design-system/tokens/spacing';
 import { borderRadius, getBorderRadius } from '../../design-system/tokens/borders';
-import { fontSize, fontFamily } from '../../design-system/tokens/typography';
+import { fontSize, fontFamily, getResponsiveValues } from '../../design-system/tokens/typography';
 import { opacity, getOpacity, shadows, getShadow, getShadowColor } from '../../design-system/tokens/effects';
 
 /**
@@ -145,9 +145,9 @@ export interface InputProps {
   /** Se o input está desabilitado */
   disabled?: boolean;
   /** Tipo de input - determina o comportamento e ícones */
-  type?: 'text' | 'password' | 'search' | 'number' | 'email';
+  type?: 'text' | 'password' | 'search' | 'number' | 'email' | 'date';
   /** Máscara aplicada ao texto digitado */
-  mask?: 'cpf' | 'cnpj' | 'phone' | 'cep' | 'currency' | 'none';
+  mask?: 'cpf' | 'cnpj' | 'phone' | 'cep' | 'currency' | 'date' | 'none';
   /** Número máximo de caracteres permitidos */
   maxLength?: number;
   /** Como capitalizar o texto automaticamente */
@@ -200,6 +200,9 @@ export interface InputProps {
   step?: number;
   /** Se deve mostrar botões de incremento/decremento (para type="number") */
   showNumberControls?: boolean;
+
+  /** Função chamada quando o ícone de calendário é pressionado (para type="date") */
+  onCalendarPress?: () => void;
 
   /** Se o input deve ser redimensionável (funciona em todas as plataformas quando multiline=true) */
   resizable?: boolean;
@@ -254,6 +257,7 @@ export const Input = ({
   minHeight = 38,
   maxHeight = 200,
   setScrollEnabled,
+  onCalendarPress,
 }: InputProps) => {
   // Estado para controlar visibilidade da senha
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -510,20 +514,11 @@ export const Input = ({
   ).current;
   
   // Configurações compartilhadas para garantir consistência absoluta
+  const placeholderTypography = getResponsiveValues('body-md'); // Usando body-md para placeholder
   const sharedPlaceholderConfig = {
-    fontSize: responsive({
-      mobile: 13,      // body-sm + 1 (balanceado)
-      tablet: 13,      // consistente
-      desktop: 13,     // body-sm + 1 (web mantém menor)
-      default: 14      // nativo + 1 como solicitado
-    }),
-    fontFamily: fontFamily['jakarta-regular'],
-    lineHeight: responsive({
-      mobile: 19,      // proporção 1.46 (boa legibilidade)
-      tablet: 19,      // consistente
-      desktop: 19,     // body-sm + 1 line-height
-      default: 20      // nativo proporcionalmente ajustado
-    }),
+    fontSize: responsive(placeholderTypography.fontSize),
+    fontFamily: placeholderTypography.fontFamily,
+    lineHeight: responsive(placeholderTypography.lineHeight),
     color: isDark ? colors['text-tertiary-dark'] : colors['text-tertiary-light']
   };
 
@@ -718,6 +713,15 @@ export const Input = ({
         // Formata para moeda brasileira
         return `R$ ${number.toFixed(2).replace('.', ',')}`;
         
+      case 'date':
+        // Remove caracteres não numéricos
+        text = text.replace(/\D/g, '');
+        // Limita a 8 dígitos (ddmmaaaa)
+        text = text.substring(0, 8);
+        // Aplica máscara de data: dd/mm/aaaa
+        text = text.replace(/(\d{2})(\d)/, '$1/$2');
+        text = text.replace(/(\d{2})\/(\d{2})(\d)/, '$1/$2/$3');
+        return text;
         
       default:
         return text;
@@ -849,12 +853,13 @@ export const Input = ({
     if (keyboardType !== 'default') return keyboardType;
     
     // Definir tipo de teclado com base no mask ou type
-    if (mask === 'cpf' || mask === 'cnpj' || mask === 'phone' || mask === 'cep' || mask === 'currency') {
+    if (mask === 'cpf' || mask === 'cnpj' || mask === 'phone' || mask === 'cep' || mask === 'currency' || mask === 'date') {
       return 'numeric';
     }
     
     if (type === 'number') return 'numeric';
     if (type === 'email') return 'email-address';
+    if (type === 'date') return 'numeric';
     
     return 'default';
   };
@@ -1487,7 +1492,20 @@ export const Input = ({
           </TouchableOpacity>
         )}
         
-
+        {/* Ícone de calendário para tipo date */}
+        {type === 'date' && onCalendarPress && (
+          <TouchableOpacity 
+            onPress={onCalendarPress}
+            style={containerStyle.iconContainer}
+            {...(isWeb ? { 'data-input-icon': 'true' } : {})}
+            disabled={disabled}
+          >
+            <Calendar 
+              size={16} 
+              color={getThemeColor('text-secondary')} 
+            />
+          </TouchableOpacity>
+        )}
         
         {/* Botão de mostrar/esconder senha */}
         {type === 'password' && (

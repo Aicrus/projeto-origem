@@ -9,7 +9,7 @@ import { supabase } from '../../lib/supabase';
 import { colors } from '../../design-system/tokens/colors';
 import { spacing } from '../../design-system/tokens/spacing';
 import { borderRadius, getBorderRadius } from '../../design-system/tokens/borders';
-import { fontSize, fontFamily } from '../../design-system/tokens/typography';
+import { fontSize, fontFamily, getResponsiveValues } from '../../design-system/tokens/typography';
 import { getShadowColor } from '../../design-system/tokens/effects';
 
 /**
@@ -101,6 +101,12 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
   const [isHovered, setIsHovered] = useState(false);
   const themeColors = getThemeColors(isDark);
   
+  // Hook para responsividade
+  const { responsive } = useResponsive();
+  
+  // Tipografia responsiva para itens do dropdown
+  const itemTypography = getResponsiveValues('body-md');
+  
   const handleHoverIn = () => {
     if (Platform.OS === 'web') {
       setIsHovered(true);
@@ -130,8 +136,9 @@ const OptionItem = ({ item, selected, onSelect, isDark }: any) => {
             : 'transparent')
     },
     itemText: {
-      fontSize: 14, // 14px em ambas as plataformas
-      fontFamily: fontFamily['jakarta-regular'],
+      fontSize: responsive(itemTypography.fontSize),
+      fontFamily: itemTypography.fontFamily,
+      lineHeight: responsive(itemTypography.lineHeight),
       color: selected 
         ? themeColors['primary']
         : themeColors['text-primary'],
@@ -172,6 +179,9 @@ const WebDropdownOptions = ({
   autoFocus = false,
   superBaseTable,
 }: any) => {
+  // Hook para responsividade
+  const { responsive } = useResponsive();
+  
   // Ref para a lista de opções
   const optionsRef = useRef<any>(null);
   
@@ -907,21 +917,12 @@ export const Select = ({
   // Obter cores do theme.ts
   const themeColors = getThemeColors(isDark);
   
-  // Configurações compartilhadas de tipografia - Otimizada para todos os breakpoints
+  // Configurações compartilhadas de tipografia - Usando design system centralizado
+  const selectTypography = getResponsiveValues('body-md'); // Usando body-md para texto do select
   const sharedTextConfig = {
-    fontSize: responsive({
-      mobile: 13,      // body-sm + 1 (balanceado)
-      tablet: 13,      // consistente
-      desktop: 13,     // body-sm + 1 (web mantém menor)
-      default: 14      // nativo + 1 como solicitado
-    }),
-    fontFamily: fontFamily['jakarta-regular'],
-    lineHeight: responsive({
-      mobile: 19,      // proporção 1.46 (boa legibilidade)
-      tablet: 19,      // consistente
-      desktop: 19,     // body-sm + 1 line-height
-      default: 20      // nativo proporcionalmente ajustado
-    }),
+    fontSize: responsive(selectTypography.fontSize),
+    fontFamily: selectTypography.fontFamily,
+    lineHeight: responsive(selectTypography.lineHeight),
   };
   
   // Estado para controlar abertura do dropdown

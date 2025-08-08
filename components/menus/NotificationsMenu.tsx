@@ -6,6 +6,7 @@ import { useTheme } from '../../hooks/DesignSystemContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { router } from 'expo-router';
 import { colors } from '../../design-system/tokens/colors';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 /**
  * @component NotificationsMenu
@@ -122,7 +123,15 @@ export function NotificationsMenu({
 }: NotificationsMenuProps) {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  const { isMobile } = useResponsive();
+  const { isMobile, responsive } = useResponsive();
+  
+  // Tipografia responsiva
+  const titleTypography = getResponsiveValues('body-md');
+  const subtitleTypography = getResponsiveValues('body-sm');
+  const notificationTitleTypography = getResponsiveValues('body-md');
+  const notificationTimeTypography = getResponsiveValues('body-xs');
+  const notificationDescTypography = getResponsiveValues('body-sm');
+  const viewAllTypography = getResponsiveValues('body-md');
   
   // Valores de animação
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -464,15 +473,11 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   title: {
-    fontSize: 14,
     fontWeight: '600',
     marginBottom: 2,
-    fontFamily: 'PlusJakartaSans_600SemiBold',
   },
   subtitle: {
-    fontSize: 12,
     opacity: 0.7,
-    fontFamily: 'PlusJakartaSans_400Regular',
   },
   divider: {
     height: 1,
@@ -523,22 +528,15 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   notificationTitle: {
-    fontSize: 13,
     fontWeight: '600',
     flex: 1,
     marginRight: 12,
-    fontFamily: 'PlusJakartaSans_600SemiBold',
   },
   notificationTime: {
-    fontSize: 11,
     opacity: 0.5,
-    fontFamily: 'PlusJakartaSans_400Regular',
   },
   notificationDescription: {
-    fontSize: 12,
     opacity: 0.8,
-    lineHeight: 16,
-    fontFamily: 'PlusJakartaSans_400Regular',
     ...Platform.select({
       web: {
         whiteSpace: 'nowrap',
@@ -564,7 +562,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   viewAll: {
-    fontSize: 13,
     textAlign: 'center',
     padding: 8,
     fontFamily: 'PlusJakartaSans_500Medium',

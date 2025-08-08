@@ -9,10 +9,11 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Calendar, Clock, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../../hooks/DesignSystemContext';
+import { useResponsive } from '../../hooks/useResponsive';
 import { colors, ColorType } from '../../design-system/tokens/colors';
 import { spacing } from '../../design-system/tokens/spacing';
 import { borderRadius, getBorderRadius } from '../../design-system/tokens/borders';
-import { fontSize, fontFamily } from '../../design-system/tokens/typography';
+import { fontSize, fontFamily, getResponsiveValues } from '../../design-system/tokens/typography';
 import { getShadowColor } from '../../design-system/tokens/effects';
 
 /**
@@ -89,7 +90,12 @@ export const DateTimeInput = ({
   
   // Tema atual
   const { currentTheme } = useTheme();
+  const { responsive } = useResponsive();
   const isDark = currentTheme === 'dark';
+  
+  // Tipografia responsiva
+  const inputTypography = getResponsiveValues('body-md');
+  const displayTypography = getResponsiveValues('display-md');
   
   // Obter cores do design system
   const getThemeColor = (baseColor: string): string => {

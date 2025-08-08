@@ -44,6 +44,7 @@ export interface ProfileMenuProps {
 
 // Importar cores diretamente do design system (mais confiável)
 import { colors } from '../../design-system/tokens/colors';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 export function ProfileMenu({ 
   isVisible, 
@@ -53,8 +54,15 @@ export function ProfileMenu({
 }: ProfileMenuProps) {
   const { currentTheme, themeMode, setThemeMode } = useTheme();
   const { session, signOut } = useAuth();
-  const { isMobile } = useResponsive();
+  const { isMobile, responsive } = useResponsive();
   const isDark = currentTheme === 'dark';
+  
+  // Tipografia responsiva
+  const nameTypography = getResponsiveValues('body-md');
+  const emailTypography = getResponsiveValues('body-sm');
+  const sectionTitleTypography = getResponsiveValues('body-sm');
+  const themeTextTypography = getResponsiveValues('body-xs');
+  const menuItemTypography = getResponsiveValues('body-md');
   
   // Valores de animação
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -346,10 +354,24 @@ export function ProfileMenu({
         >
           {/* Cabeçalho do Perfil */}
           <View style={styles.profileHeader}>
-            <Text style={[styles.name, { color: themeColors['text-primary'] }]}>
+            <Text style={[
+              styles.name, 
+              { 
+                color: themeColors['text-primary'],
+                fontSize: responsive(nameTypography.fontSize),
+                fontFamily: nameTypography.fontFamily,
+              }
+            ]}>
               {session?.user?.user_metadata?.display_name || session?.user?.user_metadata?.name || 'Usuário'}
             </Text>
-            <Text style={[styles.email, { color: themeColors['text-secondary'] }]}>
+            <Text style={[
+              styles.email, 
+              { 
+                color: themeColors['text-secondary'],
+                fontSize: responsive(emailTypography.fontSize),
+                fontFamily: emailTypography.fontFamily,
+              }
+            ]}>
               {session?.user?.email || 'email@exemplo.com'}
             </Text>
           </View>
@@ -444,15 +466,11 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   name: {
-    fontSize: 14,
     fontWeight: '600',
     marginBottom: 2,
-    fontFamily: 'PlusJakartaSans_600SemiBold',
   },
   email: {
-    fontSize: 12,
     opacity: 0.7,
-    fontFamily: 'PlusJakartaSans_400Regular',
   },
   divider: {
     height: 1,
@@ -462,9 +480,8 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   sectionTitle: {
-    fontSize: 12,
+    fontWeight: '600',
     marginBottom: 8,
-    fontFamily: 'PlusJakartaSans_600SemiBold',
   },
   themeOptions: {
     flexDirection: 'row',
@@ -486,8 +503,9 @@ const styles = StyleSheet.create({
     }),
   },
   themeText: {
-    fontSize: 10,
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: responsive(themeTextTypography.fontSize),
+    fontFamily: themeTextTypography.fontFamily,
+    lineHeight: responsive(themeTextTypography.lineHeight),
   },
   menuItem: {
     flexDirection: 'row',
@@ -496,7 +514,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   menuItemText: {
-    fontSize: 13,
-    fontFamily: 'PlusJakartaSans_500Medium',
+    fontSize: responsive(menuItemTypography.fontSize),
+    fontFamily: menuItemTypography.fontFamily,
+    lineHeight: responsive(menuItemTypography.lineHeight),
   },
 }); 

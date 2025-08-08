@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '../../hooks/DesignSystemContext';
 import { useResponsive } from '../../hooks/useResponsive';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 // Interfaces para tipagem
 interface AccordionProps {
@@ -161,27 +162,10 @@ export const AccordionTrigger: React.FC<AccordionTriggerProps> = ({
     };
   });
 
-  // Tipografia usando tokens do design system - Body-lg como base
-  const triggerFontSize = responsive({
-    mobile: 16,      // body-md + 2 (era 14)
-    tablet: 15,      // entre body-md e body-lg
-    desktop: 16,     // body-lg
-    default: 16      // nativo + 2 (era 14)
-  });
-
-  const triggerLineHeight = responsive({
-    mobile: 22,      // body-md line-height + 2 (era 20)
-    tablet: 22,      // intermediário
-    desktop: 24,     // body-lg line-height
-    default: 22      // nativo + 2 (era 20)
-  });
-
-  const triggerFontWeight = responsive({
-    mobile: '400',   // body weight padrão
-    tablet: '400',   
-    desktop: '400',  // body-lg weight
-    default: '400'
-  });
+  // Tipografia usando tokens do design system - Body-lg responsivo
+  const triggerTypography = getResponsiveValues('body-lg');
+  const triggerFontSize = responsive(triggerTypography.fontSize);
+  const triggerLineHeight = responsive(triggerTypography.lineHeight);
 
   const triggerPadding = responsive({
     mobile: 12,
@@ -199,7 +183,8 @@ export const AccordionTrigger: React.FC<AccordionTriggerProps> = ({
 
   const baseTextStyle: TextStyle = {
     fontSize: triggerFontSize, 
-    fontWeight: triggerFontWeight as any, 
+    fontWeight: triggerTypography.fontWeight as any,
+    fontFamily: triggerTypography.fontFamily,
     flex: 1,
     color: isDark ? '#FFFFFF' : '#14181B',
     lineHeight: triggerLineHeight
@@ -263,20 +248,10 @@ export const AccordionContent: React.FC<AccordionContentProps> = ({
     default: 14
   });
 
-  // Tipografia para conteúdo - Body-md como base
-  const contentFontSize = responsive({
-    mobile: 14,      // body-sm + 2 (era 12)
-    tablet: 13,      // entre body-sm e body-md
-    desktop: 14,     // body-md
-    default: 14      // nativo + 2 (era 12)
-  });
-
-  const contentLineHeight = responsive({
-    mobile: 20,      // body-sm line-height + 2 (era 18)
-    tablet: 19,      // intermediário
-    desktop: 20,     // body-md line-height
-    default: 20      // nativo + 2 (era 18)
-  });
+  // Tipografia para conteúdo usando tokens do design system - Body-md
+  const contentTypography = getResponsiveValues('body-md');
+  const contentFontSize = responsive(contentTypography.fontSize);
+  const contentLineHeight = responsive(contentTypography.lineHeight);
 
   React.useEffect(() => {
     // No nativo, só anima depois de ter a altura inicial
@@ -414,37 +389,23 @@ export const useAccordionTypography = () => {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
 
+  // Usa body-lg para trigger (títulos)
+  const triggerTypography = getResponsiveValues('body-lg');
   const triggerStyle = {
-    fontSize: responsive({
-      mobile: 16,      // body-md + 2 (era 14)
-      tablet: 15,      // entre body-md e body-lg
-      desktop: 16,     // body-lg
-      default: 16      // nativo + 2 (era 14)
-    }),
-    lineHeight: responsive({
-      mobile: 22,      // body-md line-height + 2 (era 20)
-      tablet: 22,      // intermediário
-      desktop: 24,     // body-lg line-height
-      default: 22      // nativo + 2 (era 20)
-    }),
-    fontWeight: '400' as const,
+    fontSize: responsive(triggerTypography.fontSize),
+    lineHeight: responsive(triggerTypography.lineHeight),
+    fontWeight: triggerTypography.fontWeight,
+    fontFamily: triggerTypography.fontFamily,
     color: isDark ? '#FFFFFF' : '#14181B'
   };
 
+  // Usa body-md para content (descrições)
+  const contentTypography = getResponsiveValues('body-md');
   const contentStyle = {
-    fontSize: responsive({
-      mobile: 14,      // body-sm + 2 (era 12)
-      tablet: 13,      // entre body-sm e body-md
-      desktop: 14,     // body-md
-      default: 14      // nativo + 2 (era 12)
-    }),
-    lineHeight: responsive({
-      mobile: 20,      // body-sm line-height + 2 (era 18)
-      tablet: 19,      // intermediário
-      desktop: 20,     // body-md line-height
-      default: 20      // nativo + 2 (era 18)
-    }),
-    fontWeight: '400' as const,
+    fontSize: responsive(contentTypography.fontSize),
+    lineHeight: responsive(contentTypography.lineHeight),
+    fontWeight: contentTypography.fontWeight,
+    fontFamily: contentTypography.fontFamily,
     color: isDark ? '#95A1AC' : '#57636C'
   };
 

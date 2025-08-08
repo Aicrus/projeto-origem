@@ -6,6 +6,7 @@ import { useResponsive } from '../../hooks/useResponsive';
 import { NotificationsMenu } from '../menus/NotificationsMenu';
 import { ProfileMenu } from '../menus/ProfileMenu';
 import { colors } from '../../design-system/tokens/colors';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 // Definição de cores temporária até termos acesso ao arquivo de tema
 const customColors = {
@@ -100,7 +101,10 @@ export function Header({
 }: HeaderProps) {
   const { currentTheme } = useTheme();
   const isDark = currentTheme === 'dark';
-  const { isMobile, isDesktop } = useResponsive();
+  const { isMobile, isDesktop, responsive } = useResponsive();
+  
+  // Tipografia responsiva para logo
+  const logoTypography = getResponsiveValues('body-lg');
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isNotificationsMenuOpen, setIsNotificationsMenuOpen] = useState(false);
@@ -596,11 +600,9 @@ const styles = StyleSheet.create({
   },
   logoTextBold: {
     fontWeight: 'bold',
-    fontSize: 16,
     color: customColors.gray[900],
   },
   logoText: {
-    fontSize: 16,
     color: customColors.gray[600],
   },
   textDark: {

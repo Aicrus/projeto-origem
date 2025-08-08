@@ -3,7 +3,9 @@ import { Platform, Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Di
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input, InputProps } from '../inputs/Input';
 import { useTheme } from '../../hooks/DesignSystemContext';
+import { useResponsive } from '../../hooks/useResponsive';
 import { colors } from '../../design-system/tokens/colors';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 /**
  * @component DateInput
@@ -47,7 +49,12 @@ export const DateInput: React.FC<DateInputProps> = ({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDate, setTempDate] = useState<Date | null>(null);
   const { currentTheme, getColorByMode } = useTheme();
+  const { responsive } = useResponsive();
   const isDark = currentTheme === 'dark';
+  
+  // Tipografia responsiva
+  const buttonTypography = getResponsiveValues('body-md');
+  const titleTypography = getResponsiveValues('title-sm');
   
   // Animations
   const slideAnim = useRef(new Animated.Value(500)).current;
@@ -304,19 +311,25 @@ export const DateInput: React.FC<DateInputProps> = ({
     buttonTextCancel: {
       color: getColorByMode('text-primary'),
       fontWeight: '500',
-      fontSize: 14,
+      fontSize: responsive(buttonTypography.fontSize),
+      fontFamily: buttonTypography.fontFamily,
+      lineHeight: responsive(buttonTypography.lineHeight),
     },
     buttonTextConfirm: {
       color: '#FFFFFF',
       fontWeight: '600',
-      fontSize: 14,
+      fontSize: responsive(buttonTypography.fontSize),
+      fontFamily: buttonTypography.fontFamily,
+      lineHeight: responsive(buttonTypography.lineHeight),
     },
     pickerContainer: {
       alignItems: 'center',
       backgroundColor: getColorByMode('bg-secondary'),
     },
     pickerTitle: {
-      fontSize: 18,
+      fontSize: responsive(titleTypography.fontSize),
+      fontFamily: titleTypography.fontFamily,
+      lineHeight: responsive(titleTypography.lineHeight),
       fontWeight: '600',
       color: getColorByMode('text-primary'),
       marginBottom: 16,

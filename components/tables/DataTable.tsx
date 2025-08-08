@@ -33,6 +33,7 @@ import { ArrowUpDown, ChevronDown, MoreHorizontal, AlertCircle } from 'lucide-re
 import { useTheme } from '../../hooks/DesignSystemContext';
 import { useResponsive } from '../../hooks/useResponsive';
 import { colors, ColorType } from '../../design-system/tokens/colors';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 import { HoverableView } from '../effects/HoverableView';
 import { createPortal } from 'react-dom';
 import { SupabaseClient } from '@supabase/supabase-js';
@@ -383,7 +384,13 @@ export function DataTable<TData>({
   const isDark = currentTheme === 'dark';
   
   // Responsividade
-  const { isMobile } = useResponsive();
+  const { isMobile, responsive } = useResponsive();
+  
+  // Tipografias responsivas
+  const headerTypography = getResponsiveValues('body-md');
+  const cellTypography = getResponsiveValues('body-md'); 
+  const labelTypography = getResponsiveValues('body-sm');
+  const titleTypography = getResponsiveValues('title-sm');
   
   // Estado para determinar se estamos usando dados padrão
   const [usingDefaultData, setUsingDefaultData] = useState(false);
@@ -1007,7 +1014,9 @@ export function DataTable<TData>({
           overflowY: 'auto',
         },
         header: {
-          fontSize: 13,
+          fontSize: responsive(labelTypography.fontSize),
+          fontFamily: labelTypography.fontFamily,
+          lineHeight: responsive(labelTypography.lineHeight),
           fontWeight: '500',
           color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
           padding: 8,
@@ -1027,7 +1036,9 @@ export function DataTable<TData>({
           backgroundColor: isDark ? colors['hover-dark'] : colors['hover-light'],
         },
         itemText: {
-          fontSize: 14,
+          fontSize: responsive(cellTypography.fontSize),
+          fontFamily: cellTypography.fontFamily,
+          lineHeight: responsive(cellTypography.lineHeight),
           marginLeft: 8,
           textTransform: 'capitalize',
           color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
@@ -1164,7 +1175,9 @@ export function DataTable<TData>({
           >
             <Text 
               style={{
-                fontSize: 13,
+                fontSize: responsive(labelTypography.fontSize),
+                fontFamily: labelTypography.fontFamily,
+                lineHeight: responsive(labelTypography.lineHeight),
                 fontWeight: '500',
                 color: isDark ? colors['text-secondary-dark'] : colors['text-secondary-light'],
                 padding: 8,
@@ -1218,7 +1231,9 @@ export function DataTable<TData>({
                       <Text 
                         style={{
                           marginLeft: 8,
-                          fontSize: 14,
+                          fontSize: responsive(cellTypography.fontSize),
+                          fontFamily: cellTypography.fontFamily,
+                          lineHeight: responsive(cellTypography.lineHeight),
                           color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
                           textTransform: 'capitalize',
                           flex: 1,
@@ -1385,7 +1400,9 @@ export function DataTable<TData>({
       borderRadius: 4,
     },
     dropdownLabel: {
-      fontSize: 12,
+      fontSize: responsive(labelTypography.fontSize),
+      fontFamily: labelTypography.fontFamily,
+      lineHeight: responsive(labelTypography.lineHeight),
       fontWeight: '500',
       color: themeColors.text.secondary,
       paddingHorizontal: 8,
@@ -1494,7 +1511,9 @@ export function DataTable<TData>({
     },
     selectionText: {
       flex: 1,
-      fontSize: 14,
+      fontSize: responsive(cellTypography.fontSize),
+      fontFamily: cellTypography.fontFamily,
+      lineHeight: responsive(cellTypography.lineHeight),
       color: themeColors.text.secondary,
     },
     paginationGroup: {
@@ -1510,18 +1529,24 @@ export function DataTable<TData>({
       paddingHorizontal: 4,
     },
     headerText: {
-      fontSize: 14,
+      fontSize: responsive(headerTypography.fontSize),
+      fontFamily: headerTypography.fontFamily,
+      lineHeight: responsive(headerTypography.lineHeight),
       fontWeight: '500',
       color: themeColors.text.primary,
     },
     cellText: {
-      fontSize: 14,
+      fontSize: responsive(cellTypography.fontSize),
+      fontFamily: cellTypography.fontFamily,
+      lineHeight: responsive(cellTypography.lineHeight),
       color: themeColors.text.primary,
     },
     noResults: {
       padding: 24,
       textAlign: 'center',
-      fontSize: 14,
+      fontSize: responsive(cellTypography.fontSize),
+      fontFamily: cellTypography.fontFamily,
+      lineHeight: responsive(cellTypography.lineHeight),
       color: themeColors.text.secondary,
       width: '100%',
     },
@@ -1749,7 +1774,9 @@ export function DataTable<TData>({
           <AlertCircle size={24} color={isDark ? colors['error-icon-dark'] : colors['error-icon-light']} />
         </View>
         <Text style={{
-          fontSize: 18, 
+          fontSize: responsive(titleTypography.fontSize), 
+          fontFamily: titleTypography.fontFamily,
+          lineHeight: responsive(titleTypography.lineHeight),
           fontWeight: '700', 
           textAlign: 'center', 
           marginBottom: 8, 
@@ -1799,7 +1826,9 @@ export function DataTable<TData>({
         }} />
         <Text style={{
           textAlign: 'center',
-          fontSize: 14,
+          fontSize: responsive(cellTypography.fontSize),
+          fontFamily: cellTypography.fontFamily,
+          lineHeight: responsive(cellTypography.lineHeight),
           color: isDark ? colors['text-primary-dark'] : colors['text-primary-light'],
         }}>
           Carregando dados do Supabase...
@@ -1818,7 +1847,9 @@ export function DataTable<TData>({
         borderRadius: 8
       }}>
         <Text style={{
-          fontSize: 18, 
+          fontSize: responsive(titleTypography.fontSize), 
+          fontFamily: titleTypography.fontFamily,
+          lineHeight: responsive(titleTypography.lineHeight),
           fontWeight: '600', 
           textAlign: 'center', 
           marginBottom: 8, 

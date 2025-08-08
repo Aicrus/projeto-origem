@@ -15,7 +15,7 @@ import { useResponsive } from '../../hooks/useResponsive';
 import { colors, ColorType, getColorByMode } from '../../design-system/tokens/colors';
 import { spacing } from '../../design-system/tokens/spacing';
 import { borderRadius, BorderRadiusType, getBorderRadius } from '../../design-system/tokens/borders';
-import { fontSize, fontFamily, FontSizeType, getFontStyle } from '../../design-system/tokens/typography';
+import { fontSize, fontFamily, FontSizeType, getFontStyle, getResponsiveValues } from '../../design-system/tokens/typography';
 
 /**
  * @component Button
@@ -154,7 +154,7 @@ export const Button = ({
   const isDark = currentTheme === 'dark';
   
   // Responsividade
-  const { isMobile } = useResponsive();
+  const { isMobile, responsive } = useResponsive();
   
   // Determina se o botão tem texto ou apenas ícone
   const hasText = !isIconOnly && children;
@@ -228,13 +228,20 @@ export const Button = ({
     },
   };
   
+  // Configurações de tipografia responsiva para cada tamanho
+  const typographyConfigs = {
+    xs: getResponsiveValues('body-sm'),
+    sm: getResponsiveValues('body-md'),
+    md: getResponsiveValues('body-lg'),
+    lg: getResponsiveValues('subtitle-md'),
+  };
+
   // Dimensões para os diferentes tamanhos
   const sizes = {
     xs: {
       height: isIconOnly ? Number(spacing['6'].replace('px', '')) : Number(spacing['7'].replace('px', '')),
       paddingHorizontal: isIconOnly ? 0 : Number(spacing['3'].replace('px', '')),
-      fontStyle: getFontStyle('body-sm'),
-      fontFamily: fontFamily['jakarta-regular'],
+      typography: typographyConfigs.xs,
       iconSize: Number(spacing['3'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'xs').replace('px', '')),
       iconButtonDimension: Number(spacing['6'].replace('px', '')),
@@ -243,8 +250,7 @@ export const Button = ({
     sm: {
       height: isIconOnly ? Number(spacing['8'].replace('px', '')) : Number(spacing['9'].replace('px', '')),
       paddingHorizontal: isIconOnly ? 0 : Number(spacing['3.5'].replace('px', '')),
-      fontStyle: getFontStyle('body-md'),
-      fontFamily: fontFamily['jakarta-regular'],
+      typography: typographyConfigs.sm,
       iconSize: Number(spacing['3.5'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'sm').replace('px', '')),
       iconButtonDimension: Number(spacing['8'].replace('px', '')),
@@ -253,8 +259,7 @@ export const Button = ({
     md: {
       height: isIconOnly ? Number(spacing['10'].replace('px', '')) : 42,
       paddingHorizontal: isIconOnly ? 0 : Number(spacing['4'].replace('px', '')),
-      fontStyle: getFontStyle('body-lg'),
-      fontFamily: fontFamily['jakarta-regular'],
+      typography: typographyConfigs.md,
       iconSize: Number(spacing['4'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'md').replace('px', '')),
       iconButtonDimension: Number(spacing['10'].replace('px', '')),
@@ -263,8 +268,7 @@ export const Button = ({
     lg: {
       height: isIconOnly ? Number(spacing['12'].replace('px', '')) : Number(spacing['14'].replace('px', '')),
       paddingHorizontal: isIconOnly ? 0 : Number(spacing['5'].replace('px', '')),
-      fontStyle: getFontStyle('subtitle-md'),
-      fontFamily: fontFamily['jakarta-regular'],
+      typography: typographyConfigs.lg,
       iconSize: Number(spacing['5'].replace('px', '')),
       borderRadius: Number(getBorderRadius(borderRadius || 'lg').replace('px', '')),
       iconButtonDimension: Number(spacing['12'].replace('px', '')),
@@ -313,13 +317,14 @@ export const Button = ({
   const getTextStyles = (): TextStyle => {
     const sizeConfig = sizes[size];
     const variantColors = colorScheme[variant];
-    const fontStyle = sizeConfig.fontStyle;
+    const typography = sizeConfig.typography;
 
     return {
       color: disabled ? variantColors.disabledText : variantColors.text,
-      fontSize: Number(fontStyle.size.replace('px', '')),
-      fontFamily: sizeConfig.fontFamily,
-      fontWeight: fontStyle.fontWeight as TextStyle['fontWeight'],
+      fontSize: responsive(typography.fontSize),
+      fontFamily: typography.fontFamily,
+      fontWeight: typography.fontWeight as TextStyle['fontWeight'],
+      lineHeight: responsive(typography.lineHeight),
       marginLeft: leftIcon && hasText ? sizeConfig.spacing : 0,
       marginRight: rightIcon && hasText ? sizeConfig.spacing : 0,
       ...textStyle,
@@ -395,7 +400,7 @@ export const Button = ({
   // Renderiza o conteúdo do botão
   const renderContent = () => {
     const sizeConfig = sizes[size];
-    const fontStyle = sizeConfig.fontStyle;
+    const typography = sizeConfig.typography;
 
     if (loading) {
       return (
@@ -404,10 +409,11 @@ export const Button = ({
           {loadingText && (
             <Text
               style={{
-                fontFamily: sizeConfig.fontFamily,
+                fontFamily: typography.fontFamily,
                 color: colorScheme[variant].text,
-                fontSize: Number(fontStyle.size.replace('px', '')),
-                fontWeight: fontStyle.fontWeight as TextStyle['fontWeight'],
+                fontSize: responsive(typography.fontSize),
+                fontWeight: typography.fontWeight as TextStyle['fontWeight'],
+                lineHeight: responsive(typography.lineHeight),
                 marginLeft: sizeConfig.spacing,
               }}
             >
@@ -430,10 +436,11 @@ export const Button = ({
         ) : (
           <Text
             style={{
-              fontFamily: sizeConfig.fontFamily,
+              fontFamily: typography.fontFamily,
               color: colorScheme[variant].text,
-              fontSize: Number(fontStyle.size.replace('px', '')),
-              fontWeight: fontStyle.fontWeight as TextStyle['fontWeight'],
+              fontSize: responsive(typography.fontSize),
+              fontWeight: typography.fontWeight as TextStyle['fontWeight'],
+              lineHeight: responsive(typography.lineHeight),
             }}
           >
             {variant === 'link' && Platform.OS === 'web' ? (

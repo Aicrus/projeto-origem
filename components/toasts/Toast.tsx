@@ -15,8 +15,10 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Portal } from '@gorhom/portal';
 import { useTheme } from '../../hooks/DesignSystemContext';
+import { useResponsive } from '../../hooks/useResponsive';
 import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from 'lucide-react-native';
 import { colors } from '../../design-system/tokens/colors';
+import { getResponsiveValues } from '../../design-system/tokens/typography';
 
 /**
  * @component Toast
@@ -124,8 +126,13 @@ export function Toast({
   testID,
 }: ToastProps) {
   const { currentTheme } = useTheme();
+  const { responsive } = useResponsive();
   const isDark = currentTheme === 'dark';
   const opacity = React.useRef(new Animated.Value(0)).current;
+  
+  // Tipografia responsiva
+  const messageTypography = getResponsiveValues('body-md');
+  const descriptionTypography = getResponsiveValues('body-sm');
   const offset = React.useRef(new Animated.Value(position.includes('top') ? -20 : 20)).current;
   const progressAnim = React.useRef(new Animated.Value(1)).current;
   const { width: windowWidth } = useWindowDimensions();
@@ -492,7 +499,14 @@ export function Toast({
               <View style={styles.textContainer}>
                 <Text 
                   className={`${toastConfig[type].textColor} font-jakarta-semibold`}
-                  style={styles.message}
+                  style={[
+                    styles.message,
+                    {
+                      fontSize: responsive(messageTypography.fontSize),
+                      lineHeight: responsive(messageTypography.lineHeight),
+                      fontFamily: messageTypography.fontFamily,
+                    }
+                  ]}
                   numberOfLines={2}
                 >
                   {message}
@@ -501,7 +515,14 @@ export function Toast({
                 {description ? (
                   <Text 
                     className={`${toastConfig[type].textColor} opacity-90 font-jakarta-regular`}
-                    style={styles.description}
+                    style={[
+                      styles.description,
+                      {
+                        fontSize: responsive(descriptionTypography.fontSize),
+                        lineHeight: responsive(descriptionTypography.lineHeight),
+                        fontFamily: descriptionTypography.fontFamily,
+                      }
+                    ]}
                     numberOfLines={3}
                   >
                     {description}
@@ -587,7 +608,14 @@ export function Toast({
           <View style={styles.textContainer}>
             <Text 
               className={`${toastConfig[type].textColor} font-jakarta-semibold`}
-              style={styles.message}
+              style={[
+                styles.message,
+                {
+                  fontSize: responsive(messageTypography.fontSize),
+                  lineHeight: responsive(messageTypography.lineHeight),
+                  fontFamily: messageTypography.fontFamily,
+                }
+              ]}
               numberOfLines={2}
             >
               {message}
@@ -596,7 +624,14 @@ export function Toast({
             {description ? (
               <Text 
                 className={`${toastConfig[type].textColor} opacity-90 font-jakarta-regular`}
-                style={styles.description}
+                style={[
+                  styles.description,
+                  {
+                    fontSize: responsive(descriptionTypography.fontSize),
+                    lineHeight: responsive(descriptionTypography.lineHeight),
+                    fontFamily: descriptionTypography.fontFamily,
+                  }
+                ]}
                 numberOfLines={3}
               >
                 {description}
@@ -652,13 +687,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   message: {
-    fontSize: 14,
-    lineHeight: 20,
     fontWeight: '600',
+    marginTop: 0,
   },
   description: {
-    fontSize: 13,
-    lineHeight: 18,
     marginTop: 4,
     opacity: 0.85,
   },
