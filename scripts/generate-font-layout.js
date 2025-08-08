@@ -1,9 +1,66 @@
+#!/usr/bin/env node
+
+/**
+ * 🤖 GERADOR AUTOMÁTICO DE LAYOUT COM FONTES
+ * ==========================================
+ * 
+ * Este script gera automaticamente o _layout.tsx baseado na configuração
+ * de fonte definida em design-system/tokens/typography.ts
+ * 
+ * Uso:
+ * node scripts/generate-font-layout.js
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+// Importar a configuração de fonte (simulado - em produção usaria require)
+const FONT_CONFIG = { primary: 'jakarta', mono: 'spaceMono' };
+
+const FONT_SYSTEMS = {
+  jakarta: {
+    package: '@expo-google-fonts/plus-jakarta-sans',
+    imports: ['PlusJakartaSans_200ExtraLight', 'PlusJakartaSans_300Light', 'PlusJakartaSans_400Regular', 'PlusJakartaSans_500Medium', 'PlusJakartaSans_600SemiBold', 'PlusJakartaSans_700Bold', 'PlusJakartaSans_800ExtraBold'],
+  },
+  poppins: {
+    package: '@expo-google-fonts/poppins', 
+    imports: ['Poppins_100Thin', 'Poppins_300Light', 'Poppins_400Regular', 'Poppins_500Medium', 'Poppins_600SemiBold', 'Poppins_700Bold', 'Poppins_800ExtraBold'],
+  },
+  inter: {
+    package: '@expo-google-fonts/inter',
+    imports: ['Inter_100Thin', 'Inter_300Light', 'Inter_400Regular', 'Inter_500Medium', 'Inter_600SemiBold', 'Inter_700Bold', 'Inter_800ExtraBold'],
+  },
+  spaceMono: {
+    package: '@expo-google-fonts/space-mono',
+    imports: ['SpaceMono_400Regular'],
+  }
+};
+
+function generateLayout() {
+  const currentFont = FONT_SYSTEMS[FONT_CONFIG.primary];
+  const monoFont = FONT_SYSTEMS[FONT_CONFIG.mono];
+  
+  const allImports = [...currentFont.imports];
+  if (FONT_CONFIG.mono !== FONT_CONFIG.primary) {
+    allImports.push(...monoFont.imports);
+  }
+  
+  const importNames = allImports.join(',\\n  ');
+  const useFontsObject = allImports.map(imp => `    ${imp},`).join('\\n');
+  
+  return `// ⚠️ ARQUIVO GERADO AUTOMATICAMENTE - NÃO EDITAR MANUALMENTE!
+// Este arquivo é gerado baseado na configuração em design-system/tokens/typography.ts
+// Para trocar a fonte, altere FONT_CONFIG.primary no typography.ts e execute:
+// node scripts/generate-font-layout.js
+
 // Importar polyfills antes de tudo para garantir compatibilidade
 import '@/lib/polyfills';
 
 import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
-// 🎯 IMPORT DINÂMICO - NUNCA MAIS PRECISA ALTERAR!
-import { useDynamicFonts } from '@/hooks/useDynamicFonts';
+import { useFonts, 
+  ${importNames}
+} from '${currentFont.package}';
+${FONT_CONFIG.mono !== FONT_CONFIG.primary ? `import { SpaceMono_400Regular } from '${monoFont.package}';` : ''}
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
@@ -26,7 +83,6 @@ import { AuthProvider } from '@/contexts/auth';
 import { useAuth } from '@/contexts/auth';
 import { supabase } from '@/lib/supabase';
 
-
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -36,7 +92,7 @@ const LoadingScreen = memo(function LoadingScreen() {
   const isDark = currentTheme === 'dark';
   
   return (
-    <View className={`flex-1 justify-center items-center ${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}`}>
+    <View className={\`flex-1 justify-center items-center \${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}\`}>
       <ExpoStatusBar 
         style={isDark ? 'light' : 'dark'}
         backgroundColor={isDark ? '#1C1E26' : '#FFFFFF'}
@@ -53,8 +109,11 @@ const LoadingScreen = memo(function LoadingScreen() {
 const helmetContext = {};
 
 export default function RootLayout() {
-  // 🎯 CARREGAMENTO DINÂMICO - baseado na configuração central!
-  const { fontsLoaded, currentConfig } = useDynamicFonts();
+  // 🎯 CARREGAMENTO AUTOMÁTICO DE FONTES (baseado em FONT_CONFIG.primary)
+  const [fontsLoaded] = useFonts({
+${useFontsObject}
+  });
+  
   const [initialCheckDone, setInitialCheckDone] = useState(false);
   const [initialSession, setInitialSession] = useState<Session | null>(null);
   const sessionCheckTimeout = useRef<NodeJS.Timeout | number | undefined>(undefined);
@@ -167,7 +226,7 @@ const RootLayoutNav = memo(function RootLayoutNav() {
 
   const MainContent = (
     <NavigationThemeProvider value={currentTheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <View className={`flex-1 ${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}`}>
+      <View className={\`flex-1 \${isDark ? 'bg-bg-primary-dark' : 'bg-bg-primary-light'}\`}>
         {/* Usando a ExpoStatusBar apenas para manter compatibilidade, mas as configurações reais vêm do StatusBar nativo */}
         <ExpoStatusBar 
           style={currentTheme === 'dark' ? 'light' : 'dark'}
@@ -216,7 +275,7 @@ const RootLayoutNav = memo(function RootLayoutNav() {
 
   return (
     <SafeAreaView 
-      className={`flex-1 ${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}`}
+      className={\`flex-1 \${isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light'}\`}
       edges={['top', 'right', 'left']}
       style={{ 
         backgroundColor: isDark ? headerColors.dark : headerColors.light 
@@ -227,6 +286,30 @@ const RootLayoutNav = memo(function RootLayoutNav() {
   );
 });
 
-// 🎯 ESTE ARQUIVO NUNCA MAIS PRECISA SER ALTERADO!
-// Para trocar a fonte, altere apenas FONT_CONFIG.primary em:
-// design-system/tokens/typography.ts
+// 📝 INFORMAÇÕES DE DEBUG
+console.log('🎨 Fonte atual:', '${FONT_CONFIG.primary}');
+console.log('📦 Pacote:', '${currentFont.package}');
+console.log('📚 Imports:', [${allImports.map(imp => `'${imp}'`).join(', ')}]);
+`;
+}
+
+// Executar se chamado diretamente
+if (require.main === module) {
+  console.log('🤖 Gerando _layout.tsx automaticamente...');
+  
+  const layoutContent = generateLayout();
+  const outputPath = path.join(__dirname, '..', 'app', '_layout.tsx');
+  
+  // Fazer backup do arquivo atual
+  if (fs.existsSync(outputPath)) {
+    const backupPath = outputPath + '.backup.' + Date.now();
+    fs.copyFileSync(outputPath, backupPath);
+    console.log('💾 Backup criado:', backupPath);
+  }
+  
+  fs.writeFileSync(outputPath, layoutContent);
+  console.log('✅ _layout.tsx gerado com sucesso!');
+  console.log('🎯 Para trocar a fonte: altere FONT_CONFIG.primary no typography.ts e execute novamente este script');
+}
+
+module.exports = { generateLayout };

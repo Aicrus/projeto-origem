@@ -1,26 +1,255 @@
 /**
- * SISTEMA DE TIPOGRAFIA RESPONSIVA
- * ------------------------------
- * Define todas as configurações tipográficas do sistema de design.
+ * SISTEMA DE TIPOGRAFIA RESPONSIVA E CENTRALIZADA
+ * ===============================================
+ * 
+ * 🎯 COMO TROCAR DE FONTE:
+ * 1. Para fontes do Expo: npm install @expo-google-fonts/nova-fonte
+ * 2. Mude apenas FONT_CONFIG.primary abaixo
+ * 3. Pronto! Todo o app usa a nova fonte automaticamente
+ * 
+ * 📝 FONTES SUPORTADAS:
+ * - 50+ fontes do Expo (Poppins, Inter, Roboto, etc.)
+ * - Fontes customizadas (arquivos .ttf/.otf)
+ * 
+ * 🔧 Define todas as configurações tipográficas do sistema de design.
  * Inclui famílias de fonte, tamanhos responsivos, pesos e alturas de linha.
  * A responsividade é centralizada aqui para evitar duplicação nos componentes.
  */
 
 import { isMobileWidth, isTabletWidth, isDesktopWidth } from './breakpoints';
 
-// Famílias de fonte disponíveis
-export const fontFamily = {
-  // Família Jakarta Sans
-  'jakarta-thin': 'PlusJakartaSans_200ExtraLight',
-  'jakarta-light': 'PlusJakartaSans_300Light',
-  'jakarta-regular': 'PlusJakartaSans_400Regular',
-  'jakarta-medium': 'PlusJakartaSans_500Medium',
-  'jakarta-semibold': 'PlusJakartaSans_600SemiBold',
-  'jakarta-bold': 'PlusJakartaSans_700Bold',
-  'jakarta-extrabold': 'PlusJakartaSans_800ExtraBold',
-  // Família Monospace
-  'mono-regular': 'SpaceMono-Regular, monospace',
+// ============================================================================
+// 🎯 CONFIGURAÇÃO CENTRAL - MUDE SÓ AQUI PARA TROCAR A FONTE DO APP INTEIRO!
+// ============================================================================
+
+/**
+ * 🎨 CONFIGURAÇÃO PRINCIPAL DA FONTE
+ * 
+ * SIMPLICIDADE: Só duas fontes no projeto
+ * - PRIMARY: Poppins (para todo o app)
+ * - SECONDARY: Space Mono (para código/monospace)
+ * 
+ * 🔄 PARA TROCAR A FONTE PRINCIPAL:
+ * Mude apenas 'primary' abaixo para: 'inter', 'roboto', 'openSans', ou 'custom'
+ */
+const FONT_CONFIG = {
+  primary: 'poppins' as const,   // ← FONTE PRINCIPAL (Poppins)
+  secondary: 'spaceMono' as const, // ← FONTE SECUNDÁRIA (monospace)
 } as const;
+
+// ============================================================================
+// 📚 SISTEMAS DE FONTES DISPONÍVEIS
+// ============================================================================
+
+/**
+ * 🗂️ FONTES DISPONÍVEIS (SIMPLIFICADO)
+ * 
+ * ✨ FOCO: Só as opções essenciais
+ * 
+ * 🎯 PRINCIPAL: Poppins (padrão)
+ * 🔄 ALTERNATIVAS: Inter, Roboto, Open Sans
+ * 📁 CUSTOMIZADA: Sua própria fonte
+ */
+const FONT_SYSTEMS = {
+  // 🎯 POPPINS (FONTE PRINCIPAL - PADRÃO)
+  poppins: {
+    package: '@expo-google-fonts/poppins',
+    imports: ['Poppins_100Thin', 'Poppins_300Light', 'Poppins_400Regular', 'Poppins_500Medium', 'Poppins_600SemiBold', 'Poppins_700Bold', 'Poppins_800ExtraBold'],
+    thin: 'Poppins_100Thin',
+    light: 'Poppins_300Light', 
+    regular: 'Poppins_400Regular',
+    medium: 'Poppins_500Medium',
+    semibold: 'Poppins_600SemiBold',
+    bold: 'Poppins_700Bold',
+    extrabold: 'Poppins_800ExtraBold',
+  },
+  
+  // 🔄 ALTERNATIVAS (caso queira trocar)
+  inter: {
+    package: '@expo-google-fonts/inter',
+    imports: ['Inter_100Thin', 'Inter_300Light', 'Inter_400Regular', 'Inter_500Medium', 'Inter_600SemiBold', 'Inter_700Bold', 'Inter_800ExtraBold'],
+    thin: 'Inter_100Thin',
+    light: 'Inter_300Light',
+    regular: 'Inter_400Regular', 
+    medium: 'Inter_500Medium',
+    semibold: 'Inter_600SemiBold',
+    bold: 'Inter_700Bold',
+    extrabold: 'Inter_800ExtraBold',
+  },
+  
+  roboto: {
+    package: '@expo-google-fonts/roboto',
+    imports: ['Roboto_100Thin', 'Roboto_300Light', 'Roboto_400Regular', 'Roboto_500Medium', 'Roboto_700Bold', 'Roboto_900Black'],
+    thin: 'Roboto_100Thin',
+    light: 'Roboto_300Light',
+    regular: 'Roboto_400Regular',
+    medium: 'Roboto_500Medium',
+    semibold: 'Roboto_700Bold', // Roboto não tem 600
+    bold: 'Roboto_700Bold',
+    extrabold: 'Roboto_900Black',
+  },
+  
+  openSans: {
+    package: '@expo-google-fonts/open-sans',
+    imports: ['OpenSans_300Light', 'OpenSans_400Regular', 'OpenSans_500Medium', 'OpenSans_600SemiBold', 'OpenSans_700Bold', 'OpenSans_800ExtraBold'],
+    thin: 'OpenSans_300Light',
+    light: 'OpenSans_300Light',
+    regular: 'OpenSans_400Regular',
+    medium: 'OpenSans_500Medium',
+    semibold: 'OpenSans_600SemiBold',
+    bold: 'OpenSans_700Bold',
+    extrabold: 'OpenSans_800ExtraBold',
+  },
+  
+  // 📁 SUA FONTE CUSTOMIZADA
+  custom: {
+    package: 'local',
+    imports: [], // Configurado via app.json
+    thin: 'MinhaFonte-Thin',
+    light: 'MinhaFonte-Light',
+    regular: 'MinhaFonte-Regular',
+    medium: 'MinhaFonte-Medium', 
+    semibold: 'MinhaFonte-SemiBold',
+    bold: 'MinhaFonte-Bold',
+    extrabold: 'MinhaFonte-ExtraBold',
+  },
+  
+  // 🔤 SPACE MONO (SECUNDÁRIA - MONOSPACE)
+  spaceMono: {
+    package: '@expo-google-fonts/space-mono',
+    imports: ['SpaceMono_400Regular'],
+    regular: 'SpaceMono_400Regular',
+  },
+} as const;
+
+// ============================================================================
+// 🏭 GERAÇÃO AUTOMÁTICA DAS FAMÍLIAS DE FONTE
+// ============================================================================
+
+/**
+ * 🔄 GERA AUTOMATICAMENTE baseado na configuração central
+ * 
+ * ⚠️ NÃO ALTERE AQUI! Use FONT_CONFIG acima.
+ * 
+ * Esta seção gera automaticamente as famílias de fonte baseado na configuração.
+ * Os nomes mantêm compatibilidade com o código existente.
+ */
+const currentPrimaryFont = FONT_SYSTEMS[FONT_CONFIG.primary];
+const currentSecondaryFont = FONT_SYSTEMS[FONT_CONFIG.secondary];
+
+// Famílias de fonte disponíveis (geradas automaticamente)
+export const fontFamily = {
+  // 🎨 Família Principal (gerada automaticamente baseada em FONT_CONFIG.primary)
+  // Mantém nomes "jakarta-*" para compatibilidade, mas usa a fonte configurada
+  'jakarta-thin': currentPrimaryFont.thin,
+  'jakarta-light': currentPrimaryFont.light,
+  'jakarta-regular': currentPrimaryFont.regular,
+  'jakarta-medium': currentPrimaryFont.medium,
+  'jakarta-semibold': currentPrimaryFont.semibold,
+  'jakarta-bold': currentPrimaryFont.bold,
+  'jakarta-extrabold': currentPrimaryFont.extrabold,
+  
+  // 🔤 Família Secundária (monospace)
+  'mono-regular': `${currentSecondaryFont.regular}, monospace`,
+} as const;
+
+// ============================================================================
+// 📖 DOCUMENTAÇÃO E HELPERS
+// ============================================================================
+
+/**
+ * 📋 INFORMAÇÕES DA FONTE ATUAL
+ * Útil para debug e documentação
+ */
+export const CURRENT_FONT_INFO = {
+  primary: {
+    name: FONT_CONFIG.primary,
+    package: currentPrimaryFont.package,
+    isCustom: (currentPrimaryFont.package as string) === 'local',
+  },
+  secondary: {
+    name: FONT_CONFIG.secondary,
+    package: currentSecondaryFont.package,
+  },
+} as const;
+
+/**
+ * 🔧 HELPER: Lista as fontes principais disponíveis
+ */
+export function getAvailableFonts() {
+  return ['poppins', 'inter', 'roboto', 'openSans', 'custom'];
+}
+
+/**
+ * 🎯 INSTRUÇÕES SIMPLES PARA TROCAR DE FONTE
+ */
+export function getChangeInstructions() {
+  return `
+🎨 COMO TROCAR A FONTE DO APP:
+
+1️⃣ TROCAR PARA INTER:
+   • npm install @expo-google-fonts/inter
+   • Mude: FONT_CONFIG.primary = 'inter'
+   • Pronto! Todo o app usa Inter
+
+2️⃣ TROCAR PARA ROBOTO:
+   • npm install @expo-google-fonts/roboto
+   • Mude: FONT_CONFIG.primary = 'roboto'
+   • Pronto! Todo o app usa Roboto
+
+3️⃣ USAR FONTE CUSTOMIZADA:
+   • Coloque arquivos .ttf/.otf em: assets/fonts/
+   • Configure no app.json seção "fonts"
+   • Mude: FONT_CONFIG.primary = 'custom'
+   • Atualize nomes em FONT_SYSTEMS.custom
+
+✨ RESULTADO: TODO O APP muda automaticamente!
+`;
+}
+
+// ============================================================================
+// 🎯 SISTEMA SIMPLIFICADO DE TROCA DE FONTES
+// ============================================================================
+
+/**
+ * 🔧 INSTRUÇÕES PARA INSTALAR NOVA FONTE
+ */
+export function getInstallCommand(fontName: 'inter' | 'roboto' | 'openSans' | 'custom') {
+  if (fontName === 'custom') {
+    return `
+📁 FONTE CUSTOMIZADA:
+1. Coloque arquivos .ttf/.otf em: assets/fonts/
+2. Configure no app.json seção "fonts"
+3. Atualize nomes em FONT_SYSTEMS.custom
+4. Mude: FONT_CONFIG.primary = 'custom'
+`;
+  }
+  
+  const packages = {
+    inter: '@expo-google-fonts/inter',
+    roboto: '@expo-google-fonts/roboto', 
+    openSans: '@expo-google-fonts/open-sans'
+  };
+  
+  return `npm install ${packages[fontName]}`;
+}
+
+/**
+ * 🎯 MOSTRA CONFIGURAÇÃO ATUAL
+ */
+export function getCurrentConfig() {
+  return {
+    primary: FONT_CONFIG.primary,
+    secondary: FONT_CONFIG.secondary,
+    primaryPackage: currentPrimaryFont.package,
+    secondaryPackage: currentSecondaryFont.package,
+    isUsingCustom: (currentPrimaryFont.package as string) === 'local',
+  };
+}
+
+// ============================================================================
+// 🎯 EXPORTAÇÕES PARA COMPATIBILIDADE (NÃO ALTERAR)
+// ============================================================================
 
 // Interface para valores responsivos
 interface ResponsiveValue {
