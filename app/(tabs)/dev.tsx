@@ -15,6 +15,9 @@ import {
   transitionDuration as designTransitionDuration,
   fontFamily as designFontFamily,
   fontSize as designFontSize,
+  responsiveFontSize,
+  getResponsiveTypography,
+  getResponsiveValues,
   breakpoints as designBreakpoints,
   responsiveSpacing as designResponsiveSpacing
 } from '../../design-system';
@@ -177,6 +180,9 @@ export default function DevPage() {
   
   // HoverableView estados de exemplo
   const [activeItem, setActiveItem] = useState<number | null>(null);
+  
+  // Estados para tipografia responsiva
+  const [typographyActiveTab, setTypographyActiveTab] = useState<'current' | 'mobile' | 'tablet' | 'desktop'>('current');
   
   // Estados separados para cada exemplo de Input
   const [inputBasico, setInputBasico] = useState('');
@@ -2133,43 +2139,172 @@ export default function DevPage() {
           {/* Seção de Tipografia */}
           <SectionTitle title="Tipografia" textColor={textPrimary} />
           
-          <View className={`${bgSecondary} rounded-lg p-lg mb-xl`}>
-            {Object.entries(designFontSize).map(([key, config]) => (
-              <View key={key} className="mb-sm">
-                <Text 
-                  className={textPrimary}
-                  style={{
-                    fontSize: parseInt(config.size),
-                    lineHeight: parseInt(config.lineHeight),
-                    fontWeight: config.fontWeight as any,
-                    marginBottom: 4
-                  }}
-                >
-                  {key.charAt(0).toUpperCase() + key.slice(1)} - {config.size}/{config.lineHeight} ({config.fontWeight})
+          {/* Tipografia responsiva */}
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Sistema Responsivo</Text>
+          <Text className={`text-body-md ${textSecondary} mb-md`}>
+            A tipografia se adapta automaticamente ao breakpoint. Visualize como cada tamanho aparece em diferentes dispositivos.
+          </Text>
+          
+          {/* Breakpoint atual */}
+          <View className={`${bgSecondary} rounded-lg p-md mb-lg`}>
+            <View className="flex-row items-center justify-between">
+              <View>
+                <Text className={`text-label-md font-jakarta-bold ${textPrimary}`}>
+                  Breakpoint Atual: {currentBreakpoint}
                 </Text>
-                <Text className={`text-body-xs ${textSecondary} opacity-60`}>
-                  Size: {config.size} | Line Height: {config.lineHeight} | Weight: {config.fontWeight}
+                <Text className={`text-body-sm ${textSecondary}`}>
+                  Largura: {width}px
                 </Text>
               </View>
-            ))}
-            
-            <View className={`border-t ${isDark ? 'border-divider-dark' : 'border-divider-light'} my-md`}></View>
-            
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>Pesos disponíveis da fonte</Text>
-            
-            <Text className={`text-body-lg font-jakarta-thin ${textPrimary} mb-sm`}>Plus Jakarta Sans ExtraLight (200)</Text>
-            <Text className={`text-body-lg font-jakarta-light ${textPrimary} mb-sm`}>Plus Jakarta Sans Light (300)</Text>
-            <Text className={`text-body-lg font-jakarta-regular ${textPrimary} mb-sm`}>Plus Jakarta Sans Regular (400)</Text>
-            <Text className={`text-body-lg font-jakarta-medium ${textPrimary} mb-sm`}>Plus Jakarta Sans Medium (500)</Text>
-            <Text className={`text-body-lg font-jakarta-semibold ${textPrimary} mb-sm`}>Plus Jakarta Sans SemiBold (600)</Text>
-            <Text className={`text-body-lg font-jakarta-bold ${textPrimary} mb-sm`}>Plus Jakarta Sans Bold (700)</Text>
-            <Text className={`text-body-lg font-jakarta-extrabold ${textPrimary} mb-sm`}>Plus Jakarta Sans ExtraBold (800)</Text>
-            
-            <View className={`border-t ${isDark ? 'border-divider-dark' : 'border-divider-light'} my-md`}></View>
-            
-            <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-sm`}>Exemplo de fonte mono</Text>
-            <Text className={`text-body-lg font-mono-regular ${textPrimary} mb-sm`}>Space Mono (para código)</Text>
+              <View className={`px-sm py-xs rounded ${isDark ? 'bg-primary-dark/20' : 'bg-primary-light/20'}`}>
+                <Text className={`text-body-xs font-jakarta-medium`} style={{ 
+                  color: isDark ? designColors['primary-dark'] : designColors['primary-light'] 
+                }}>
+                  Responsivo
+                </Text>
+              </View>
+            </View>
           </View>
+
+          {/* Tabs para alternar breakpoints (só aparece no desktop) */}
+          {isDesktop && (
+            <View className="mb-lg">
+              <Text className={`text-subtitle-sm font-jakarta-bold ${textPrimary} mb-sm`}>
+                Visualizar em diferentes breakpoints:
+              </Text>
+              <View className="flex-row flex-wrap gap-xs">
+                {[
+                  { key: 'current', label: 'Desktop (Atual)', width: width },
+                  { key: 'tablet', label: 'Tablet', width: 800 },
+                  { key: 'mobile', label: 'Mobile', width: 360 }
+                ].map((tab) => (
+                  <TouchableOpacity
+                    key={tab.key}
+                    onPress={() => setTypographyActiveTab(tab.key as any)}
+                    className={`px-md py-sm rounded-md border ${
+                      typographyActiveTab === tab.key
+                        ? (isDark ? 'bg-primary-dark/20 border-primary-dark' : 'bg-primary-light/20 border-primary-light')
+                        : `border-divider-${isDark ? 'dark' : 'light'}`
+                    }`}
+                  >
+                    <Text className={`text-body-sm font-jakarta-medium ${
+                      typographyActiveTab === tab.key 
+                        ? (isDark ? 'text-primary-dark' : 'text-primary-light')
+                        : textSecondary
+                    }`}>
+                      {tab.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Preview da tipografia responsiva */}
+          <View className={`${bgSecondary} rounded-lg p-lg mb-lg`}>
+            <View className="flex-row items-center justify-between mb-md">
+              <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary}`}>
+                Preview Responsivo
+              </Text>
+              <Text className={`text-body-xs ${textSecondary}`}>
+                {(() => {
+                  if (!isDesktop) return `${width}px`;
+                  switch (typographyActiveTab) {
+                    case 'mobile': return '360px (Mobile)';
+                    case 'tablet': return '800px (Tablet)';
+                    case 'desktop': 
+                    case 'current': 
+                    default: return `${width}px (Desktop)`;
+                  }
+                })()}
+              </Text>
+            </View>
+            
+            {/* Lista de todos os tamanhos responsivos */}
+            {Object.entries(responsiveFontSize).map(([key, config]) => {
+              // Determina a largura para simulação
+              const simulatedWidth = (() => {
+                if (!isDesktop) return width;
+                switch (typographyActiveTab) {
+                  case 'mobile': return 360;
+                  case 'tablet': return 800;
+                  case 'desktop':
+                  case 'current':
+                  default: return width;
+                }
+              })();
+              
+              const typography = getResponsiveTypography(key as any, simulatedWidth);
+              
+              return (
+                <View key={key} className="mb-md">
+                  <Text 
+                    className={textPrimary}
+                    style={{
+                      fontSize: typography.fontSize,
+                      lineHeight: typography.lineHeight,
+                      fontWeight: typography.fontWeight as any,
+                      fontFamily: typography.fontFamily,
+                      marginBottom: 4
+                    }}
+                  >
+                    {key.charAt(0).toUpperCase() + key.slice(1).replace('-', ' ')}
+                  </Text>
+                  
+                  {/* Informações técnicas */}
+                  <Text className={`text-body-xs ${textSecondary} opacity-70 mb-xs`}>
+                    Atual: {typography.fontSize}px/{typography.lineHeight}px • Weight: {typography.fontWeight}
+                  </Text>
+                  
+                  {/* Valores para todos os breakpoints */}
+                  <View className="flex-row flex-wrap gap-xs">
+                    <Text className={`text-body-xs ${textSecondary} px-xs py-1 rounded ${
+                      (!isDesktop && isMobile) || (isDesktop && typographyActiveTab === 'mobile') 
+                        ? (isDark ? 'bg-primary-dark/20' : 'bg-primary-light/20') 
+                        : (isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light')
+                    }`}>
+                      M: {config.size.mobile}px
+                    </Text>
+                    <Text className={`text-body-xs ${textSecondary} px-xs py-1 rounded ${
+                      (!isDesktop && isTablet) || (isDesktop && typographyActiveTab === 'tablet') 
+                        ? (isDark ? 'bg-primary-dark/20' : 'bg-primary-light/20') 
+                        : (isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light')
+                    }`}>
+                      T: {config.size.tablet}px
+                    </Text>
+                    <Text className={`text-body-xs ${textSecondary} px-xs py-1 rounded ${
+                      isDesktop && (typographyActiveTab === 'desktop' || typographyActiveTab === 'current') 
+                        ? (isDark ? 'bg-primary-dark/20' : 'bg-primary-light/20') 
+                        : (isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light')
+                    }`}>
+                      D: {config.size.desktop}px
+                    </Text>
+                    <Text className={`text-body-xs ${textSecondary} px-xs py-1 rounded`} style={{
+                      backgroundColor: isDark ? designColors['bg-tertiary-dark'] : designColors['bg-tertiary-light']
+                    }}>
+                      RN: {config.size.default}px
+                    </Text>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+
+          {/* Pesos disponíveis da fonte */}
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Pesos disponíveis da fonte</Text>
+          <View className="flex-row flex-wrap gap-md mb-lg">
+            <Text className={`text-body-lg font-jakarta-thin ${textPrimary}`}>Thin (200)</Text>
+            <Text className={`text-body-lg font-jakarta-light ${textPrimary}`}>Light (300)</Text>
+            <Text className={`text-body-lg font-jakarta-regular ${textPrimary}`}>Regular (400)</Text>
+            <Text className={`text-body-lg font-jakarta-medium ${textPrimary}`}>Medium (500)</Text>
+            <Text className={`text-body-lg font-jakarta-semibold ${textPrimary}`}>SemiBold (600)</Text>
+            <Text className={`text-body-lg font-jakarta-bold ${textPrimary}`}>Bold (700)</Text>
+            <Text className={`text-body-lg font-jakarta-extrabold ${textPrimary}`}>ExtraBold (800)</Text>
+          </View>
+          
+          {/* Fonte monoespaçada */}
+          <Text className={`text-subtitle-md font-jakarta-bold ${textPrimary} mb-md`}>Fonte monoespaçada</Text>
+          <Text className={`text-body-lg font-mono-regular ${textPrimary} mb-xl`}>Space Mono Regular (para código)</Text>
           
           {/* Seção de Breakpoints */}
           <SectionTitle title="Breakpoints" textColor={textPrimary} />

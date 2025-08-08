@@ -7,7 +7,14 @@
 
 // Importa todos os tokens
 import { colors } from './tokens/colors';
-import { fontFamily, fontSize } from './tokens/typography';
+import { 
+  fontFamily, 
+  fontSize, 
+  responsiveFontSize,
+  getResponsiveTypography,
+  createResponsiveTypography,
+  getResponsiveValues
+} from './tokens/typography';
 import { spacing } from './tokens/spacing';
 import { borderRadius } from './tokens/borders';
 import { boxShadow, shadows, opacity, zIndex, transitionDuration } from './tokens/effects';
@@ -26,6 +33,7 @@ export const designSystem = {
   colors,
   fontFamily,
   fontSize,
+  responsiveFontSize,
   spacing,
   borderRadius,
   boxShadow,
@@ -35,6 +43,10 @@ export const designSystem = {
   transitionDuration,
   breakpoints,
   responsiveSpacing,
+  // Funções utilitárias responsivas
+  getResponsiveTypography,
+  createResponsiveTypography,
+  getResponsiveValues,
 } as const;
 
 // Tipo para o esquema de cores
@@ -74,6 +86,7 @@ export const theme = {
   colors,
   fontFamily,
   fontSize,
+  responsiveFontSize,
   spacing,
   borderRadius,
   boxShadow,
@@ -81,6 +94,10 @@ export const theme = {
   opacity,
   zIndex,
   transitionDuration,
+  // Funções utilitárias responsivas
+  getResponsiveTypography,
+  createResponsiveTypography,
+  getResponsiveValues,
 } as const;
 
 // Tipo para o tema completo
