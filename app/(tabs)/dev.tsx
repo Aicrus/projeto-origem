@@ -2259,11 +2259,11 @@ export default function DevPage() {
                   {/* Valores para todos os breakpoints */}
                   <View className="flex-row flex-wrap gap-xs">
                     <Text className={`text-body-xs ${textSecondary} px-xs py-1 rounded ${
-                      (!isDesktop && isMobile) || (isDesktop && typographyActiveTab === 'mobile') 
+                      isDesktop && (typographyActiveTab === 'desktop' || typographyActiveTab === 'current') 
                         ? (isDark ? 'bg-primary-dark/20' : 'bg-primary-light/20') 
                         : (isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light')
                     }`}>
-                      M: {config.size.mobile}px
+                      D: {config.size.desktop}px
                     </Text>
                     <Text className={`text-body-xs ${textSecondary} px-xs py-1 rounded ${
                       (!isDesktop && isTablet) || (isDesktop && typographyActiveTab === 'tablet') 
@@ -2273,16 +2273,11 @@ export default function DevPage() {
                       T: {config.size.tablet}px
                     </Text>
                     <Text className={`text-body-xs ${textSecondary} px-xs py-1 rounded ${
-                      isDesktop && (typographyActiveTab === 'desktop' || typographyActiveTab === 'current') 
+                      (!isDesktop && isMobile) || (isDesktop && typographyActiveTab === 'mobile') 
                         ? (isDark ? 'bg-primary-dark/20' : 'bg-primary-light/20') 
                         : (isDark ? 'bg-bg-tertiary-dark' : 'bg-bg-tertiary-light')
                     }`}>
-                      D: {config.size.desktop}px
-                    </Text>
-                    <Text className={`text-body-xs ${textSecondary} px-xs py-1 rounded`} style={{
-                      backgroundColor: isDark ? designColors['bg-tertiary-dark'] : designColors['bg-tertiary-light']
-                    }}>
-                      RN: {config.size.default}px
+                      M: {config.size.mobile}px
                     </Text>
                   </View>
                 </View>

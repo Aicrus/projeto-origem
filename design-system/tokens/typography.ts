@@ -24,9 +24,9 @@ export const fontFamily = {
 
 // Interface para valores responsivos
 interface ResponsiveValue {
-  mobile: number;    // Mobile: Web + Nativo (iOS, Android)
-  tablet: number;    // Tablet: Web + Nativo (iOS, Android)
   desktop: number;   // Desktop: Web + Nativo (macOS, Windows)
+  tablet: number;    // Tablet: Web + Nativo (iOS, Android)
+  mobile: number;    // Mobile: Web + Nativo (iOS, Android)
   default: number;   // React Native (valor fallback)
 }
 
